@@ -33,7 +33,10 @@ export const ListChildUsers = async (parentId,roleCode) => {
   if (queryErr) {
     return [queryErr,0]
   }
-  return [0,queryRet.Items]
+  const users = _.map(queryRet.Items,(item)=>{
+    return Omit(item,['passhash'])
+  })
+  return [0,users]
 }
 
 export const ListAvalibleManagers = async() =>{

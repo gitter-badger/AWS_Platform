@@ -77,7 +77,7 @@ const managerList = async(e, c, cb) => {
   const res = {
     m:'managerList'
   }
-  const [tokenErr,token] = await Model.currentToken(e,c)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
@@ -106,7 +106,7 @@ const merchantList = async(e, c, cb) => {
   const res = {
     m: 'merchantList'
   }
-  const [tokenErr,token] = await Model.currentToken(e,c)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
@@ -219,7 +219,7 @@ const depositPoints = async(e,c,cb)=>{
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr },jsonParseErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e,c)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
@@ -242,7 +242,7 @@ const withdrawPoints = async(e,c,cb)=>{
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr },jsonParseErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e,c)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }

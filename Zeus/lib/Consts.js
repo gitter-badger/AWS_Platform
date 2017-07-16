@@ -109,6 +109,7 @@ export const RoleModels = {
     adminName:Model.StringValue,
     adminEmail:Model.StringValue,
     adminContact:Model.StringValue,
+    contractPeriod:Model.StringValue,
     frontURL:Model.StringValue,
     parent: Model.DefaultParent,
     loginWhiteList:[]

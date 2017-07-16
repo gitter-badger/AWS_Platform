@@ -67,17 +67,25 @@ export const RegisterUser = async(userInfo = {}) => {
   // check if the user is exists
   const suffix = User.suffix
   const [queryUserErr, queryUserRet] = await checkUserBySuffix(roleCode,suffix,User.username)
-
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
   if (queryUserRet.Items.length) {
     return [BizErr.UserExistErr() , 0 ]
   }
+  const [queryParentErr,queryParentRet] = await queryUserById(User.parent)
+  if (queryParentErr) {
+    return [queryParentErr,0]
+  }
+  if (queryParentRet.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr('parent not found'),0]
+  }
+  const parentName = queryParentRet.Items[0].username
   const [saveUserErr, saveUserRet] = await saveUser(
     {
       ...User,
-      username: `${User.suffix}_${User.username}`
+      username: `${User.suffix}_${User.username}`,
+      parentName:parentName
     })
   if (saveUserErr) {
     return [saveUserErr, 0]
@@ -190,4 +198,38 @@ const queryUserBySuffix = async(role,suffix,username) => {
     }
   }
   return await Store$('query', query)
+}
+
+const queryUserById = async (userId) => {
+  if (Model.NoParent === userId ) {
+    return [0,{
+      Items:[{
+        username: 'SuperAdmin'
+      }]
+    }]
+  }
+  if (Model.DefaultParent === userId) {
+    return [0,{
+      Items:[{
+        username: 'PlatformAdmin'
+      }]
+    }]
+  }
+
+
+  const query = {
+    TableName: Tables.ZeusPlatformUser,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    FilterExpression:'#role = :role',
+    ExpressionAttributeNames:{
+      '#role':'role'
+    },
+    ExpressionAttributeValues:{
+      ':userId':userId,
+      ':role': RoleCodeEnum['Manager']
+
+    }
+  }
+  return await Store$('query',query)
 }
