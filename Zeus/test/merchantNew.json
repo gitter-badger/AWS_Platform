@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTYwYWRhYS02ZDQwLTRkMmQtYjZkMy00YmU0MjdmMGQxMGMiLCJ1c2VybmFtZSI6IlNLVF9oaWRlIG9uIGJ1c2giLCJwYXJlbnQiOiIwMSIsInJvbGUiOiIxMCIsImlhdCI6MTUwMDAyMzgyMX0.C2Hx6LnMaKQ2i6WPOKU_y-AMt-Vfrf7ry-AUnmEiuYY"
+  },
+  "body":
+
+
+  {
+    "role": "100",
+    "displayName": "222222",
+    "rate": "222222",
+    "managerEmail": "222222",
+    "hostName": "222222",
+    "hostContact": "222222",
+    "parent": "2960adaa-6d40-4d2d-b6d3-4be427f0d10c",
+    "remark": "222222",
+    "contractPeriod": ["2017-07-24T16:00:00.000Z", "2017-08-27T16:00:00.000Z"],
+    "isforever": false,
+    "points": "222222",
+    "msn": "222222",
+    "gameList": ["选项3", "选项4"],
+    "loginWhiteList": "222222",
+    "frontURL": "222222",
+    "username": "222222",
+    "password": "222222",
+    "adminName": "222222",
+    "adminEmail": "222222",
+    "adminContact": "222222",
+    "suffix": "222222"
+  }
+
+}

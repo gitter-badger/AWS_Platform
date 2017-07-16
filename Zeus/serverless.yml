@@ -1,0 +1,144 @@
+
+service: Zeus # NOTE: update this with your service name
+
+# Use the serverless-webpack plugin to transpile ES6
+plugins:
+  - serverless-webpack
+
+# Enable auto-packing of external modules
+custom:
+  webpackIncludeModules: true
+
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  iamRoleStatements:
+      -
+        Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:Scan
+        Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/Zeus*"
+
+functions:
+  tokenAuth:
+    handler: api.jwtverify
+    integration: lambda
+  userNew:
+    handler: api.userNew
+    events:
+      -
+        http:
+          path: users
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  userAuth:
+    handler: api.userAuth
+    events:
+      -
+        http:
+          path: users/auth
+          method: post
+          cors: true
+  managerList:
+    handler: api.managerList
+    events:
+      -
+        http:
+          path: managers
+          method: get
+          cors: true
+  managerUpdate:
+    handler: api.managerUpdate
+    events:
+      -
+        http:
+          path: managers/{id}
+          method: post
+          cors: true
+  merchantList:
+    handler: api.merchantList
+    events:
+      -
+        http:
+          path: merchants
+          method: get
+          cors: true
+          authorizer: tokenAuth
+            # arn: arn:aws:lambda:ap-southeast-1:031091139460:function:Javis-dev-jwtverify
+            # identitySource: method.request.header.Authorization
+  merchantUpdate:
+    handler: api.merchantUpdate
+    events:
+      -
+        http:
+          path: merchants/{id}
+          method: post
+          cors: true
+
+  avalibleManagers:
+    handler: api.avalibleManagers
+    events:
+      -
+        http:
+          path: avalible_managers
+          method: get
+          cors: true
+          authorizer: tokenAuth
+            # arn: arn:aws:lambda:ap-southeast-1:031091139460:function:Javis-dev-jwtverify
+            # identitySource: method.request.header.Authorization
+
+  gameNew:
+    handler: api.gameNew
+    events:
+      -
+        http:
+          path: games
+          method: post
+          cors: true
+  gameList:
+    handler: api.gameList
+    events:
+      -
+        http:
+          path: games/{gameType}
+          method: get
+          cors: true
+  depositPoints:
+    handler: api.depositPoints
+    events:
+      -
+        http:
+          path: deposit_points
+          method: post
+          cors: true
+  withdrawPoints:
+    handler: api.withdrawPoints
+    events:
+      -
+        http:
+          path: withdraw_points
+          method: post
+          cors: true
+  billList:
+    handler: api.billList
+    events:
+      -
+        http:
+          path: bills
+          method: get
+          cors: true

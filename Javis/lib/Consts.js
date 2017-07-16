@@ -1,0 +1,120 @@
+import { Model } from './Dynamo'
+
+export const GenderEnum = {
+  Male: 1,
+  Female: 0,
+  Trans: 2
+}
+export const StatusEnum = {
+  Enable: 1,
+  Disable: 0
+}
+
+export const BillActionEnum = {
+  Deposit: -1.0, // 存
+  Withdraw: 1.0 // 提
+}
+
+export const BillModel = {
+  sn: Model.uuid(),
+  fromRole: Model.StringValue,
+  toRole:Model.StringValue,
+  fromUser: Model.StringValue,
+  toUser:Model.StringValue,
+  action:Model.NumberValue,
+  amount: Model.NumberValue,
+  operator: Model.StringValue
+}
+export const RoleCodeEnum = {
+  'SuperAdmin': '0',
+  'PlatformAdmin': '1',
+  'Manager': '10',
+  'Merchant': '100',
+  'Agent': '1000',
+  'Player': '10000'
+}
+export const GameTypeEnum = {
+  '0':'TableGame',
+  '1':'VideoGame',
+  '2':'LiveGame'
+}
+const UserRole = {
+  userId:Model.uuid(),
+  username:Model.StringValue,
+  password:Model.StringValue,
+  passhash:Model.StringValue,
+  parent:Model.StringValue,
+  role:Model.StringValue
+}
+const PlatformBaseBizRole = {
+  ...UserRole,
+  displayId:Model.displayId(),
+  displayName:Model.StringValue,
+  suffix:Model.StringValue,
+  limit: Model.NumberValue,
+  children:Model.NumberValue,
+  points:Model.NumberValue,
+  rate:Model.NumberValue,
+  gameList:[],
+  parent:Model.StringValue,
+  status:StatusEnum.Enable,
+  remark:Model.StringValue,
+  gender:GenderEnum.Male,
+  lastIP:Model.StringValue,
+  enabledAt:Model.timeStamp(),
+  loginAt:Model.timeStamp()
+}
+
+export const RoleModels = {
+  '0':{
+    ...UserRole,
+    parent:Model.NoParent,
+    displayName:'超级管理员',
+    loginAt:Model.timeStamp(),
+    enabledAt:Model.timeStamp(),
+    status:StatusEnum.Enable,
+    suffix:'NAPlay'
+  },
+  '1':{
+    ...UserRole,
+    parent:Model.NoParent,
+    loginAt:Model.timeStamp(),
+    enabledAt:Model.timeStamp(),
+    status:StatusEnum.Enable,
+    suffix:'Platform',
+    adminName:Model.StringValue
+  },
+  '10':{ // 建站代理商
+    ...PlatformBaseBizRole,
+    managerName:Model.StringValue,
+    managerEmail:Model.StringValue,
+    hostName:Model.StringValue,
+    hostContact:Model.StringValue,
+    adminName:Model.StringValue,
+    adminEmail:Model.StringValue,
+    adminContact:Model.StringValue,
+    contractPeriod:Model.StringValue,
+    gmUsername:Model.StringValue,
+    gmPassword:Model.StringValue,
+    parent: Model.DefaultParent
+  },
+  '100':{ // 商户
+    ...PlatformBaseBizRole,
+    msn:Model.StringValue,
+    apiKey:Model.uuid(),
+    merchantName:Model.StringValue,
+    merchantEmail:Model.StringValue,
+    hostName:Model.StringValue,
+    hostContact:Model.StringValue,
+    adminName:Model.StringValue,
+    adminEmail:Model.StringValue,
+    adminContact:Model.StringValue,
+    frontURL:Model.StringValue,
+    parent: Model.DefaultParent,
+    loginWhiteList:[]
+  },
+  '1000':{},
+  '10000':{
+
+  }
+}

@@ -1,0 +1,190 @@
+
+service: Javis # NOTE: update this with your service name
+
+# Use the serverless-webpack plugin to transpile ES6
+plugins:
+  - serverless-webpack
+
+# Enable auto-packing of external modules
+custom:
+  webpackIncludeModules: true
+
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+functions:
+  initData:
+    handler: api.initData
+    events:
+      -
+        http:
+          path: /initData
+          method: get
+          cors: true
+  jwtverify:
+    handler: api.jwtverify
+    integration: lambda
+  generateToken:
+    handler: api.generateToken
+    events:
+      -
+        http:
+          path: /generate_token
+          method: post
+          cors: true
+resources:
+  Resources:
+    ZeusPlatformUser:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformUser
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+          -
+            AttributeName: role
+            AttributeType: S
+          -
+            AttributeName: username
+            AttributeType: S
+          -
+            AttributeName: suffix
+            AttributeType: S
+          -
+            AttributeName: parent
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: role
+            KeyType: HASH
+          -
+            AttributeName: userId
+            KeyType: RANGE
+
+        GlobalSecondaryIndexes:
+          -
+            IndexName: RoleSuffixIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: suffix
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: RoleUsernameIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: username
+                KeyType: RANGE
+
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: RoleParentIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: parent
+                KeyType: RANGE
+
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    ZeusPlatformGame:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformGame
+        AttributeDefinitions:
+          -
+            AttributeName: gameType
+            AttributeType: S
+          -
+            AttributeName: gameId
+            AttributeType: S
+          -
+            AttributeName: gameName
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: gameType
+            KeyType: HASH
+          -
+            AttributeName: gameId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: GameNameIndex
+            KeySchema:
+              -
+                AttributeName: gameType
+                KeyType: HASH
+              -
+                AttributeName: gameName
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: GameTypeIndex
+            KeySchema:
+              -
+                AttributeName: gameType
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    ZeusPlatformBill:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformBill
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: S
+
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+          -
+            AttributeName: userId
+            KeyType: RANGE
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
