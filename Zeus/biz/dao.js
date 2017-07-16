@@ -168,6 +168,19 @@ const getUserByName = async(role, username) => {
 
 
 
+export const CheckRoleFromToken  = (token,userInfo) => {
+  if (RoleCodeEnum['PlatformAdmin'] === token.role || RoleCodeEnum['Manager'] === token.role) {
+    if (parseInt(userInfo.role) < parseInt(token.role) ) {
+      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
+    }
+  }else {
+    if (parseInt(userInfo.role) <= parseInt(token.role) ) {
+      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
+    }
+  }
+  return [0,userInfo]
+}
+
 const getUserById = async (userId,role) => {
   // get points balance of the given userid
   const get = {
@@ -199,7 +212,7 @@ export const WithdrawFrom = async(token,billInfo) => {
   return await BillTransfer(userId,role,billInfo,BillActionEnum.Withdraw)
 }
 
-export const BillTransfer = async(userId,role,billInfo,action) => {
+const BillTransfer = async(userId,role,billInfo,action) => {
   if (Empty(billInfo)) {
     return [BizErr.ParamMissErr(),0]
   }

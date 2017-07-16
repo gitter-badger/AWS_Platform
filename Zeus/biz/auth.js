@@ -149,7 +149,7 @@ const saveUser = async(userInfo) => {
   if (saveUserErr) {
     return [saveUserErr,0]
   }
-  const ret = Pick(put.Item,['userId','username','parent','role'])
+  const ret = Pick(put.Item,['userId','username','parent','role','displayId'])
   return [0,ret]
 }
 const checkUserBySuffix = async (role,suffix,username) => {

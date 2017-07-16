@@ -11,10 +11,11 @@ import {
   GenderEnum,
   RoleCodeEnum,
   Trim,
-  JwtVerify
+  JwtVerify,
+  GeneratePolicyDocument
 } from './lib/all'
 import {RegisterUser, LoginUser} from './biz/auth'
-import { ListChildUsers,ListAvalibleManagers,AddGame,ListGames,DepositTo, WithdrawFrom } from './biz/dao'
+import {CheckRoleFromToken, ListChildUsers,ListAvalibleManagers,AddGame,ListGames,DepositTo, WithdrawFrom } from './biz/dao'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res,code=Codes.Error) => callback(null, Fail(res,code))
@@ -27,27 +28,20 @@ const userNew = async(e, c, cb) => {
   const res = {
     m: 'userNew'
   }
+  // 从POST 的body中获取提交数据
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
-  // input check err handle
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr },jsonParseErr.code)
   }
   const [tokenErr,token] = await Model.currentToken(e)
-
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
 
-  if (RoleCodeEnum['PlatformAdmin'] === token.role || RoleCodeEnum['Manager'] === token.role) {
-    if (parseInt(userInfo.role) < parseInt(token.role) ) {
-      return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
-    }
-  }else {
-    if (parseInt(userInfo.role) <= parseInt(token.role) ) {
-      return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
-    }
+  const [roleErr,_] = CheckRoleFromToken(token,userInfo)
+  if (roleErr) {
+    return ResFail(cb,{...errRes,err:roleErr},roleErr.code)
   }
-
   const [registerUserErr,resgisterUserRet] = await RegisterUser(Model.addSourceIP(e,userInfo))
   if (registerUserErr) {
     return ResFail(cb,{...errRes, err:registerUserErr},registerUserErr.code)
@@ -259,28 +253,7 @@ const withdrawPoints = async(e,c,cb)=>{
   return ResOK(cb,{...res,payload:withdrawBillRet})
 }
 
-function generatePolicyDocument(principalId, effect, resource,userInfo) {
-	var authResponse = {};
-	authResponse.principalId = principalId;
-  authResponse.context = {}
-  authResponse.context.username = userInfo.username
-  authResponse.context.role = userInfo.role
-  authResponse.context.userId = userInfo.userId
-  authResponse.context.parent = userInfo.parent
-	if (effect && resource) {
-		var policyDocument = {};
-		policyDocument.Version = '2012-10-17'; // default version
-		policyDocument.Statement = [];
-		var statementOne = {};
-		statementOne.Action = 'execute-api:Invoke'; // default action
-		statementOne.Effect = effect;
-		statementOne.Resource = resource;
-		policyDocument.Statement[0] = statementOne;
-		authResponse.policyDocument = policyDocument;
-	}
-	return authResponse;
-}
-export const jwtverify = async(e,c,cb) =>{
+const jwtverify = async(e,c,cb) =>{
   // get the token from event.authorizationToken
   const token = e.authorizationToken.split(' ')
   if (token[0] !== 'Bearer') {
@@ -293,7 +266,7 @@ export const jwtverify = async(e,c,cb) =>{
     return c.fail('Unauthorized')
   }
 
-  return c.succeed(generatePolicyDocument(userInfo.userId,'Allow',e.methodArn,userInfo))
+  return c.succeed(GeneratePolicyDocument(userInfo.userId,'Allow',e.methodArn,userInfo))
 
 }
 
@@ -302,16 +275,17 @@ export const jwtverify = async(e,c,cb) =>{
   api export
 **/
 export {
-  userAuth,
-  userNew,
-  managerList,
-  managerUpdate,
-  merchantList,
-  merchantUpdate,
-  avalibleManagers,
-  gameNew,
-  gameList,
-  depositPoints,
-  withdrawPoints,
-  billList
+  jwtverify, // 用于进行token验证的方法
+  userAuth, // 用户登录
+  userNew, // 创建新用户
+  managerList,// 建站商列表
+  managerUpdate, // 编辑某个建站商
+  merchantList, // 商户列表
+  merchantUpdate, // 编辑某个商户
+  avalibleManagers, //当前可用的建站商
+  gameNew, // 新建游戏
+  gameList, // 游戏列表
+  depositPoints, // 存点
+  withdrawPoints, // 取点
+  billList // 流水列表
 }
