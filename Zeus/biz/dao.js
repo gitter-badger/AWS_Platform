@@ -4,6 +4,7 @@ import {
   Codes,
   BizErr,
   RoleCodeEnum,
+  MSNStatusEnum,
   RoleModels,
   GameTypeEnum,
   Trim,
@@ -303,4 +304,44 @@ const BillTransfer = async(userId,role,billInfo,action) => {
     return [err,0]
   }
   return [0,Bill]
+}
+
+export const FormatMSN = function(param) {
+  try {
+    if (isNaN(parseFloat(param.msn)) || 1000.0 - parseFloat(param.msn) >= 1000.0 || 1000.0 - parseFloat(param.msn) <= 0 ) {
+      return [BizErr.ParamErr('msn is [1,999]')]
+    }
+    const formatedMsn = ((parseFloat(param.msn) * 0.001).toFixed(3) + '').substring(2)
+    return [0,formatedMsn]
+  } catch (e) {
+    return [BizErr.ParamErr(e.toString()),0]
+  }
+}
+export const CheckMSN = async(param) =>{
+  // get a number from event
+  const [formatErr,
+    msn] = FormatMSN(param)
+  if (formatErr) {
+    return [formatErr,0]
+  }
+  const query = {
+    TableName: Tables.ZeusPlatformMSN,
+    KeyConditionExpression: '#msn = :msn',
+    FilterExpression: '#status = :usedStatus or #status = :lockStatus',
+    ExpressionAttributeNames:{
+      '#status':'status',
+      '#msn':'msn'
+    },
+    ExpressionAttributeValues:{
+      ':msn':msn,
+      ':usedStatus':MSNStatusEnum['Used'],
+      ':lockStatus':MSNStatusEnum['Locked']
+    }
+  }
+  const [queryErr,queryRet] = await Store$('query',query)
+
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  return [0,(queryRet.Items.length == 0)]
 }

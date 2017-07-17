@@ -142,3 +142,11 @@ functions:
           path: bills
           method: get
           cors: true
+  checkMsn:
+    handler: api.checkMsn
+    events:
+      -
+        http:
+          path: check_msn/{msn}
+          method: get
+          cors: true

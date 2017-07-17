@@ -1,7 +1,14 @@
 {
   "headers": {
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTYwYWRhYS02ZDQwLTRkMmQtYjZkMy00YmU0MjdmMGQxMGMiLCJ1c2VybmFtZSI6IlNLVF9oaWRlIG9uIGJ1c2giLCJwYXJlbnQiOiIwMSIsInJvbGUiOiIxMCIsImlhdCI6MTUwMDAyMzgyMX0.C2Hx6LnMaKQ2i6WPOKU_y-AMt-Vfrf7ry-AUnmEiuYY"
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTYwYWRhBearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYTkxNDk5ZS0yN2RiLTRjMzItYTNkYy00MmQyYzNiNjM2YjciLCJ1c2VybmFtZSI6Ik5CX21hbmFnZXIwMDEiLCJwYXJlbnQiOiIzZWZhYjA0Yi05MDY1LTQ4ZTgtOTcwMC03MzA1MjBiMzQzOWMiLCJyb2xlIjoiMTAiLCJkaXNwbGF5SWQiOjE0MDA0MCwiaWF0IjoxNTAwMjA2MTYzfQ.Foo7YiGbXnLgqkJzinfAjiVIvGxZDTWfwao7a05XxK4"
   },
+  "requestContext": {
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    },
+    "authorizer": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTYwYWRhBearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYTkxNDk5ZS0yN2RiLTRjMzItYTNkYy00MmQyYzNiNjM2YjciLCJ1c2VybmFtZSI6Ik5CX21hbmFnZXIwMDEiLCJwYXJlbnQiOiIzZWZhYjA0Yi05MDY1LTQ4ZTgtOTcwMC03MzA1MjBiMzQzOWMiLCJyb2xlIjoiMTAiLCJkaXNwbGF5SWQiOjE0MDA0MCwiaWF0IjoxNTAwMjA2MTYzfQ.Foo7YiGbXnLgqkJzinfAjiVIvGxZDTWfwao7a05XxK4"
+  },
+
   "body":
 
 
@@ -17,7 +24,7 @@
     "contractPeriod": ["2017-07-24T16:00:00.000Z", "2017-08-27T16:00:00.000Z"],
     "isforever": false,
     "points": "222222",
-    "msn": "222222",
+    "msn": "999",
     "gameList": ["选项3", "选项4"],
     "loginWhiteList": "222222",
     "frontURL": "222222",
@@ -26,7 +33,7 @@
     "adminName": "222222",
     "adminEmail": "222222",
     "adminContact": "222222",
-    "suffix": "222222"
+    "suffix": "c6"
   }
 
 }

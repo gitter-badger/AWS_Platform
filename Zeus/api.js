@@ -15,10 +15,20 @@ import {
   GeneratePolicyDocument
 } from './lib/all'
 import {RegisterUser, LoginUser} from './biz/auth'
-import {CheckRoleFromToken, ListChildUsers,ListAvalibleManagers,AddGame,ListGames,DepositTo, WithdrawFrom } from './biz/dao'
+import {
+  CheckRoleFromToken,
+  ListChildUsers,
+  ListAvalibleManagers,
+  AddGame,
+  ListGames,
+  DepositTo,
+  WithdrawFrom,
+  CheckMSN,
+  FormatMSN
+} from './biz/dao'
 
 const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res,code=Codes.Error) => callback(null, Fail(res,code))
+const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 // 用户注册
 const userNew = async(e, c, cb) => {
   const errRes = {
@@ -29,25 +39,44 @@ const userNew = async(e, c, cb) => {
     m: 'userNew'
   }
   // 从POST 的body中获取提交数据
-  const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr },jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
 
-  const [roleErr,_] = CheckRoleFromToken(token,userInfo)
+  const [roleErr,
+    _] = CheckRoleFromToken(token, userInfo)
   if (roleErr) {
-    return ResFail(cb,{...errRes,err:roleErr},roleErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: roleErr
+    }, roleErr.code)
   }
-  const [registerUserErr,resgisterUserRet] = await RegisterUser(Model.addSourceIP(e,userInfo))
+  const [registerUserErr,
+    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo))
   if (registerUserErr) {
-    return ResFail(cb,{...errRes, err:registerUserErr},registerUserErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: registerUserErr
+    }, registerUserErr.code)
   }
 
-  return ResOK(cb, {...res,payload:resgisterUserRet})
+  return ResOK(cb, {
+    ...res,
+    payload: resgisterUserRet
+  })
 }
 // 用户登录
 const userAuth = async(e, c, cb) => {
@@ -58,34 +87,56 @@ const userAuth = async(e, c, cb) => {
   const res = {
     m: 'userAuth'
   }
-  const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    userLoginInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {...errRes, err: jsonParseErr},jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
-  const [loginUserErr,loginUserRet] = await LoginUser(Model.addSourceIP(e,userLoginInfo))
+  const [loginUserErr,
+    loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
   if (loginUserErr) {
-      return ResFail(cb,{...errRes,err:loginUserErr},loginUserErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: loginUserErr
+    }, loginUserErr.code)
   }
-  return ResOK(cb,{...res,payload:loginUserRet})
+  return ResOK(cb, {
+    ...res,
+    payload: loginUserRet
+  })
 }
 // 建站商列表
 const managerList = async(e, c, cb) => {
   const errRes = {
-    m:'managerList error',
-    input:e
+    m: 'managerList error',
+    input: e
   }
   const res = {
-    m:'managerList'
+    m: 'managerList'
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  const [err,ret] = await ListChildUsers(token.userId,RoleCodeEnum.Manager)
+  const [err,
+    ret] = await ListChildUsers(token.userId, RoleCodeEnum.Manager)
   if (err) {
-    return ResFail(cb,{...errRes,err:err},err.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: err
+    }, err.code)
   }
-  return ResOK(cb,{...res,payload:ret})
+  return ResOK(cb, {
+    ...res,
+    payload: ret
+  })
 
 }
 
@@ -100,75 +151,110 @@ const managerUpdate = async(e, c, cb) => {
 const merchantList = async(e, c, cb) => {
 
   const errRes = {
-    m:'merchantList err',
+    m: 'merchantList err',
     input: e
   }
   const res = {
     m: 'merchantList'
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  const [err,ret] = await ListChildUsers(token.userId,RoleCodeEnum.Merchant)
+  const [err,
+    ret] = await ListChildUsers(token.userId, RoleCodeEnum.Merchant)
   if (err) {
-    return ResFail(cb,{...errRes, err:err},err.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: err
+    }, err.code)
   }
-  return ResOK(cb,{...res,payload:ret})
+  return ResOK(cb, {
+    ...res,
+    payload: ret
+  })
 
 }
 
 const merchantUpdate = async(e, c, cb) => {}
 
-
-const avalibleManagers = async(e,c,cb)=>{
+const avalibleManagers = async(e, c, cb) => {
   const errRes = {
-    m:'avalibleManagers err',
-    input:e
+    m: 'avalibleManagers err',
+    input: e
   }
   const res = {
     m: 'avalibleManagers'
   }
-  const [err,ret] = await ListAvalibleManagers()
+  const [err,
+    ret] = await ListAvalibleManagers()
   if (err) {
-    return ResFail(cb,{...errRes,err:err},err.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: err
+    }, err.code)
   }
-  return ResOK(cb,{...res,payload:ret})
+  return ResOK(cb, {
+    ...res,
+    payload: ret
+  })
 }
 
-const gameNew = async (e,c,cb)=>{
+const gameNew = async(e, c, cb) => {
   const errRes = {
-    m:'gameNew err',
+    m: 'gameNew err',
     input: e
   }
   const res = {
     m: 'gameNew'
   }
-  const [jsonParseErr,gameInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    gameInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr },jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
-  const [addGameInfoErr,addGameRet] = await AddGame(gameInfo)
+  const [addGameInfoErr,
+    addGameRet] = await AddGame(gameInfo)
   if (addGameInfoErr) {
-    return ResFail(cb,{...errRes,err:addGameInfoErr},addGameInfoErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: addGameInfoErr
+    }, addGameInfoErr.code)
   }
-  return ResOK(cb,{...res,payload:addGameRet})
+  return ResOK(cb, {
+    ...res,
+    payload: addGameRet
+  })
 }
 
-const gameList = async(e,c,cb)=>{
+const gameList = async(e, c, cb) => {
   const errRes = {
-    m:'gamelist err',
-    input:e
+    m: 'gamelist err',
+    input: e
   }
   const res = {
     m: 'gamelist'
   }
   const gameParams = Model.pathParams(e)
-  const [err,ret] = await ListGames(gameParams)
+  const [err,
+    ret] = await ListGames(gameParams)
   if (err) {
-    return ResFail(cb,{...errRes,err:err},err.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: err
+    }, err.code)
   }
-  return ResOK(cb,{...res,payload:ret})
+  return ResOK(cb, {
+    ...res,
+    payload: ret
+  })
 }
 
 const billList = async(e, c, cb) => {
@@ -207,70 +293,127 @@ const billList = async(e, c, cb) => {
   }
   return cb(null, Success(res))
 }
-const depositPoints = async(e,c,cb)=>{
+const depositPoints = async(e, c, cb) => {
   const errRes = {
-    m:'depositPoints err',
+    m: 'depositPoints err',
     input: e
   }
   const res = {
     m: 'depositPoints'
   }
-  const [jsonParseErr,depositInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    depositInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr },jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  const [depositBillErr,depositBillRet] = await DepositTo(token,depositInfo)
+  const [depositBillErr,
+    depositBillRet] = await DepositTo(token, depositInfo)
   if (depositBillErr) {
-    return ResFail(cb,{...errRes,err:depositBillErr},depositBillErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: depositBillErr
+    }, depositBillErr.code)
   }
-  return ResOK(cb,{...res,payload:depositBillRet})
+  return ResOK(cb, {
+    ...res,
+    payload: depositBillRet
+  })
 }
 
-const withdrawPoints = async(e,c,cb)=>{
+const withdrawPoints = async(e, c, cb) => {
   const errRes = {
-    m:'withdrawPoints err',
+    m: 'withdrawPoints err',
     input: e
   }
   const res = {
     m: 'withdrawPoints'
   }
-  const [jsonParseErr,withdrawInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    withdrawInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr },jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  const [withdrawBillErr,withdrawBillRet] = await WithdrawFrom(token,withdrawInfo)
+  const [withdrawBillErr,
+    withdrawBillRet] = await WithdrawFrom(token, withdrawInfo)
   if (withdrawBillErr) {
-    return ResFail(cb,{...errRes,err:withdrawBillErr},withdrawBillErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: withdrawBillErr
+    }, withdrawBillErr.code)
   }
-  return ResOK(cb,{...res,payload:withdrawBillRet})
+  return ResOK(cb, {
+    ...res,
+    payload: withdrawBillRet
+  })
 }
 
-const jwtverify = async(e,c,cb) =>{
+const jwtverify = async(e, c, cb) => {
   // get the token from event.authorizationToken
   const token = e.authorizationToken.split(' ')
   if (token[0] !== 'Bearer') {
     return c.fail('Unauthorized: wrong token type')
   }
   // verify it and return the policy statements
-  const [err, userInfo] = await JwtVerify(token[1])
+  const [err,
+    userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
-    console.log(JSON.stringify(err),JSON.stringify(userInfo));
+    console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
 
-  return c.succeed(GeneratePolicyDocument(userInfo.userId,'Allow',e.methodArn,userInfo))
+  return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 
 }
 
+const msnList = async(e, c, cb) => {}
+const checkMsn = async(e, c, cb) => {
+  const errRes = {
+    m: 'checkMsn err',
+    input: e
+  }
+  const res = {
+    m: 'checkMsn'
+  }
 
+  const [checkErr,
+    checkRet] = await CheckMSN(Model.pathParams(e))
+  if (checkErr) {
+    return ResFail(cb, {
+      ...errRes,
+      err: checkErr
+    }, checkErr.code)
+  }
+  return ResOK(cb,{
+    ...res,
+    payload: {
+      avalible: Boolean(checkRet)
+    }
+  })
+
+}
+const msnOne = async(e, c, cb) => {}
 /**
   api export
 **/
@@ -278,7 +421,7 @@ export {
   jwtverify, // 用于进行token验证的方法
   userAuth, // 用户登录
   userNew, // 创建新用户
-  managerList,// 建站商列表
+  managerList, // 建站商列表
   managerUpdate, // 编辑某个建站商
   merchantList, // 商户列表
   merchantUpdate, // 编辑某个商户
@@ -287,5 +430,8 @@ export {
   gameList, // 游戏列表
   depositPoints, // 存点
   withdrawPoints, // 取点
+  msnList, // 线路号列表
+  checkMsn, // 检查msn是否被占用
+  msnOne, //获取一个未被占用的线路号
   billList // 流水列表
 }
