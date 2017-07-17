@@ -82,7 +82,14 @@ export const Model = {
     return e && e.requestContext.identity.sourceIp
   },
   pathParams:(e)=>{
-    return e && e.pathParameters || {}
+    try {
+      const params = e.pathParameters
+      if (Object.keys(params).length) {
+        return [0,params]
+      }
+    } catch (err) {
+        return [BizErr.ParamErr(err.toString()),0]
+    }
   },
   addSourceIP: (e,info)=>{
     const sourceIP = e && e.requestContext && e.requestContext.identity.sourceIp || '-100'
