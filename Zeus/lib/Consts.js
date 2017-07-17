@@ -90,7 +90,8 @@ export const RoleDisplay = {
     'userId',
     'role',
     'displayName',
-    'updatedAt'
+    'updatedAt',
+    'displayId'
   ],
   '100':[
     'username',
