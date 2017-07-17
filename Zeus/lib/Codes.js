@@ -9,6 +9,7 @@ export const Codes = {
   BizError: '50005',
   JSONParseError: '50006',
   NoSuffixError:'50007',
+  MsnExistError: '50008',
   Busy: '44004',
   ParamError: '47003',
   IPBlock: '44900',
@@ -59,7 +60,10 @@ export const BizErr = {
   ItemExistErr: (errMsg = 'data item is exist')=>{
     return {code:Codes.ItemDuplicate,err:errMsg}
   },
-  TokenErr: (errMsg= '403 no token') =>{
+  TokenErr: (errMsg= 'Token error') =>{
     return {code:Codes.TokenError,err:errMsg}
+  },
+  MsnExistErr: (errMsg = 'MSN number is exist') =>{
+    return {code:Codes.MsnExistError,err:errMsg}
   }
 }

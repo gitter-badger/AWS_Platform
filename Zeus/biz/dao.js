@@ -4,6 +4,7 @@ import {
   Codes,
   BizErr,
   RoleCodeEnum,
+  MSNStatusEnum,
   RoleModels,
   GameTypeEnum,
   Trim,
@@ -33,7 +34,10 @@ export const ListChildUsers = async (parentId,roleCode) => {
   if (queryErr) {
     return [queryErr,0]
   }
-  return [0,queryRet.Items]
+  const users = _.map(queryRet.Items,(item)=>{
+    return Omit(item,['passhash'])
+  })
+  return [0,users]
 }
 
 export const ListAvalibleManagers = async() =>{
@@ -168,6 +172,19 @@ const getUserByName = async(role, username) => {
 
 
 
+export const CheckRoleFromToken  = (token,userInfo) => {
+  if (RoleCodeEnum['PlatformAdmin'] === token.role || RoleCodeEnum['Manager'] === token.role) {
+    if (parseInt(userInfo.role) < parseInt(token.role) ) {
+      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
+    }
+  }else {
+    if (parseInt(userInfo.role) <= parseInt(token.role) ) {
+      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
+    }
+  }
+  return [0,userInfo]
+}
+
 const getUserById = async (userId,role) => {
   // get points balance of the given userid
   const get = {
@@ -199,7 +216,7 @@ export const WithdrawFrom = async(token,billInfo) => {
   return await BillTransfer(userId,role,billInfo,BillActionEnum.Withdraw)
 }
 
-export const BillTransfer = async(userId,role,billInfo,action) => {
+const BillTransfer = async(userId,role,billInfo,action) => {
   if (Empty(billInfo)) {
     return [BizErr.ParamMissErr(),0]
   }
@@ -287,4 +304,44 @@ export const BillTransfer = async(userId,role,billInfo,action) => {
     return [err,0]
   }
   return [0,Bill]
+}
+
+export const FormatMSN = function(param) {
+  try {
+    if (isNaN(parseFloat(param.msn)) || 1000.0 - parseFloat(param.msn) >= 1000.0 || 1000.0 - parseFloat(param.msn) <= 0 ) {
+      return [BizErr.ParamErr('msn is [1,999]')]
+    }
+    const formatedMsn = ((parseFloat(param.msn) * 0.001).toFixed(3) + '').substring(2)
+    return [0,formatedMsn]
+  } catch (e) {
+    return [BizErr.ParamErr(e.toString()),0]
+  }
+}
+export const CheckMSN = async(param) =>{
+  // get a number from event
+  const [formatErr,
+    msn] = FormatMSN(param)
+  if (formatErr) {
+    return [formatErr,0]
+  }
+  const query = {
+    TableName: Tables.ZeusPlatformMSN,
+    KeyConditionExpression: '#msn = :msn',
+    FilterExpression: '#status = :usedStatus or #status = :lockStatus',
+    ExpressionAttributeNames:{
+      '#status':'status',
+      '#msn':'msn'
+    },
+    ExpressionAttributeValues:{
+      ':msn':msn,
+      ':usedStatus':MSNStatusEnum['Used'],
+      ':lockStatus':MSNStatusEnum['Locked']
+    }
+  }
+  const [queryErr,queryRet] = await Store$('query',query)
+
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  return [0,(queryRet.Items.length == 0)]
 }

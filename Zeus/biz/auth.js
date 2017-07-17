@@ -12,9 +12,11 @@ import {
   GenderEnum,
   StatusEnum,
   RoleCodeEnum,
-  RoleModels
+  RoleModels,
+  RoleDisplay,
+  MSNStatusEnum
 } from '../lib/all'
-
+import { CheckMSN } from './dao'
 export const RegisterUser = async(userInfo = {}) => {
   // check the role code
   const roleCode = userInfo.role
@@ -67,17 +69,39 @@ export const RegisterUser = async(userInfo = {}) => {
   // check if the user is exists
   const suffix = User.suffix
   const [queryUserErr, queryUserRet] = await checkUserBySuffix(roleCode,suffix,User.username)
-
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
   if (queryUserRet.Items.length) {
     return [BizErr.UserExistErr() , 0 ]
   }
+  const [queryParentErr,queryParentRet] = await queryUserById(User.parent)
+  if (queryParentErr) {
+    return [queryParentErr,0]
+  }
+  if (queryParentRet.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr('parent not found'),0]
+  }
+  // 检查msn是否可用
+  if (roleCode === RoleCodeEnum['Merchant']) {
+    const [checkMSNErr,checkMSNRet] = await CheckMSN({
+      msn: User.msn
+    })
+    if (checkMSNErr) {
+      return [checkMSNErr,0]
+    }
+    if (!Boolean(checkMSNRet)) {
+      return [BizErr.MsnExistErr(),0]
+    }
+  }
+
+
+  const parentName = queryParentRet.Items[0].username
   const [saveUserErr, saveUserRet] = await saveUser(
     {
       ...User,
-      username: `${User.suffix}_${User.username}`
+      username: `${User.suffix}_${User.username}`,
+      parentName:parentName
     })
   if (saveUserErr) {
     return [saveUserErr, 0]
@@ -133,23 +157,52 @@ const getRole = async(code) => {
   }
   return [ 0, RoleModels[code] ]
 }
-
 const saveUser = async(userInfo) => {
   const baseModel = Model.baseModel()
-  const put = {
+  const roleDisplay = RoleDisplay[userInfo.role]
+  const UserItem =  {
+    ...baseModel,
+    ...userInfo,
+    updatedAt: Model.timeStamp(),
+    loginAt: Model.timeStamp()
+  }
+  var saveConfig = {
     TableName: Tables.ZeusPlatformUser,
-    Item: {
-      ...baseModel,
-      ...userInfo,
-      updatedAt: Model.timeStamp(),
-      loginAt: Model.timeStamp()
+    Item: UserItem
+  }
+  if (RoleCodeEnum['Merchant'] === userInfo.role) {
+    saveConfig = {
+      RequestItems:{
+        'ZeusPlatformUser':[
+          {
+            PutRequest:{
+              Item: UserItem
+            }
+          }
+        ],
+        'ZeusPlatformMSN':[
+          {
+            PutRequest:{
+              Item:{
+                  ...baseModel,
+                  updatedAt: Model.timeStamp(),
+                  msn: userInfo.msn,
+                  userId:userInfo.userId,
+                  status: MSNStatusEnum['Used']
+              }
+            }
+          }
+        ]
+      }
     }
   }
-  const [saveUserErr,saveUserRet] = await Store$('put', put)
+
+
+  const [saveUserErr,saveUserRet] = await Store$('batchWrite', saveConfig)
   if (saveUserErr) {
     return [saveUserErr,0]
   }
-  const ret = Pick(put.Item,['userId','username','parent','role'])
+  const ret = Pick(UserItem,roleDisplay)
   return [0,ret]
 }
 const checkUserBySuffix = async (role,suffix,username) => {
@@ -190,4 +243,38 @@ const queryUserBySuffix = async(role,suffix,username) => {
     }
   }
   return await Store$('query', query)
+}
+
+const queryUserById = async (userId) => {
+  if (Model.NoParent === userId ) {
+    return [0,{
+      Items:[{
+        username: 'SuperAdmin'
+      }]
+    }]
+  }
+  if (Model.DefaultParent === userId) {
+    return [0,{
+      Items:[{
+        username: 'PlatformAdmin'
+      }]
+    }]
+  }
+
+
+  const query = {
+    TableName: Tables.ZeusPlatformUser,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    FilterExpression:'#role = :role',
+    ExpressionAttributeNames:{
+      '#role':'role'
+    },
+    ExpressionAttributeValues:{
+      ':userId':userId,
+      ':role': RoleCodeEnum['Manager']
+
+    }
+  }
+  return await Store$('query',query)
 }

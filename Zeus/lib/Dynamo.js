@@ -12,7 +12,7 @@ const db$ = (action,params)=>{
   return dbClient[action](params).promise()
 }
 export const Store$ = async(action,params) =>{
-  console.log(params);
+  console.log(action,params);
   try{
     const result = await db$(action,params)
     return [0,result]
@@ -27,13 +27,15 @@ const ZeusPlatformRole = 'ZeusPlatformRole'
 const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformGame = 'ZeusPlatformGame'
+const ZeusPlatformMSN = 'ZeusPlatformMSN'
 
 export const Tables = {
   ZeusPlatformUser,
   ZeusPlatformRole,
   ZeusPlatformPlayer,
   ZeusPlatformBill,
-  ZeusPlatformGame
+  ZeusPlatformGame,
+  ZeusPlatformMSN
 }
 
 
@@ -44,7 +46,9 @@ export const Model = {
   StringValue: '0',
   NumberValue: 0.0,
   DefaultParent: '01', // 平台
+  DefaultParent: 'PlatformAdmin',
   NoParent: '00', // 没有
+  NoParentName:'SuperAdmin',
   usn: () => (new Date()).getTime() % 1000000 + 100000,
   uuid: () => uid(),
   displayId: () => (new Date()).getTime() % 1000000 + 100000,

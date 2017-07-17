@@ -14,7 +14,11 @@ export const BillActionEnum = {
   Deposit: -1.0, // 存
   Withdraw: 1.0 // 提
 }
-
+export const MSNStatusEnum ={
+  Used: 1,
+  Locked:2,
+  Free: 0
+}
 export const BillModel = {
   sn: Model.uuid(),
   fromRole: Model.StringValue,
@@ -65,6 +69,42 @@ const PlatformBaseBizRole = {
   loginAt:Model.timeStamp()
 }
 
+export const RoleDisplay = {
+  '0':[],
+  '1':[
+    'username',
+    'password',
+    'suffix',
+    'parent',
+    'parentName',
+    'userId',
+    'role',
+    'displayName'
+  ],
+  '10':[
+    'username',
+    'password',
+    'suffix',
+    'parent',
+    'parentName',
+    'userId',
+    'role',
+    'displayName'
+  ],
+  '100':[
+    'username',
+    'password',
+    'msn',
+    'suffix',
+    'parent',
+    'parentName',
+    'userId',
+    'role',
+    'displayName',
+    'apiKey'
+  ]
+}
+
 export const RoleModels = {
   '0':{
     ...UserRole,
@@ -78,6 +118,8 @@ export const RoleModels = {
   '1':{
     ...UserRole,
     parent:Model.NoParent,
+    parentName: Model.NoParentName,
+    displayName:'平台管理员',
     loginAt:Model.timeStamp(),
     enabledAt:Model.timeStamp(),
     status:StatusEnum.Enable,
@@ -96,7 +138,8 @@ export const RoleModels = {
     contractPeriod:Model.StringValue,
     gmUsername:Model.StringValue,
     gmPassword:Model.StringValue,
-    parent: Model.DefaultParent
+    parent: Model.DefaultParent,
+    parentName: Model.DefaultParentName
   },
   '100':{ // 商户
     ...PlatformBaseBizRole,
@@ -109,8 +152,10 @@ export const RoleModels = {
     adminName:Model.StringValue,
     adminEmail:Model.StringValue,
     adminContact:Model.StringValue,
+    contractPeriod:Model.StringValue,
     frontURL:Model.StringValue,
     parent: Model.DefaultParent,
+    parentName: Model.DefaultParentName,
     loginWhiteList:[]
   },
   '1000':{},
