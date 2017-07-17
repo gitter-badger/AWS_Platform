@@ -67,6 +67,7 @@
 #### 创建线路商 / 商户用户
 
 - URL
+
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
 ```
@@ -97,37 +98,48 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
 #### 平台管理员 / 线路商 / 商户 登录
 
 - URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/auth
+```
 - Token Header
+
+```
+不需要
+```
 - Body
   - 管理员
 
-    ```
-    {
-        "username": "Faker001",
-        "password": "111111",
-        "role": "1"
-    }
-    ```
+  ```
+  {
+      "username": "Faker001",
+      "password": "111111",
+      "role": "1"
+  }
+  ```
+
   - 线路商
 
-    ```
-    {
-      "username": "manager001",
-      "password": "111111",
-      "role": "10",
-      "suffix": "NB"
-    }
-    ```
+  ```
+  {
+    "username": "manager001",
+    "password": "111111",
+    "role": "10",
+    "suffix": "NB"
+  }
+  ```
+
   - 商户
 
-    ```
-    {
-      "username": "merchant001",
-      "password": "111111",
-      "role": "100",
-      "suffix": "NB"
-    }
-    ```
+  ```
+  {
+    "username": "merchant001",
+    "password": "111111",
+    "role": "100",
+    "suffix": "NB"
+  }
+  ```
+
 - Response
 
 ```
