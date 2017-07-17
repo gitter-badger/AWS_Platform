@@ -37,6 +37,14 @@ functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
+  eva:
+    handler: api.eva
+    events:
+      -
+        http:
+          path: beings
+          method: post
+          cors: true
   userNew:
     handler: api.userNew
     events:

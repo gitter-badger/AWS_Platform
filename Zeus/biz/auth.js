@@ -170,6 +170,7 @@ const saveUser = async(userInfo) => {
     TableName: Tables.ZeusPlatformUser,
     Item: UserItem
   }
+  var method = 'put'
   if (RoleCodeEnum['Merchant'] === userInfo.role) {
     saveConfig = {
       RequestItems:{
@@ -195,10 +196,11 @@ const saveUser = async(userInfo) => {
         ]
       }
     }
+    method = 'batchWrite'
   }
 
 
-  const [saveUserErr,saveUserRet] = await Store$('batchWrite', saveConfig)
+  const [saveUserErr,saveUserRet] = await Store$(method, saveConfig)
   if (saveUserErr) {
     return [saveUserErr,0]
   }

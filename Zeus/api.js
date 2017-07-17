@@ -29,6 +29,35 @@ import {
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+const eva = async(e,c,cb) =>{
+  const errRes = {
+    m:'eva error'
+  }
+  const res = {
+    m: 'userNew'
+  }
+  const [jsonParseErr,userInfo] = JSONParser(e&&e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
+  }
+  // admin dont need check token
+  const [registerUserErr,
+    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo))
+  if (registerUserErr) {
+    return ResFail(cb, {
+      ...errRes,
+      err: registerUserErr
+    }, registerUserErr.code)
+  }
+
+  return ResOK(cb, {
+    ...res,
+    payload: resgisterUserRet
+  })
+}
 // 用户注册
 const userNew = async(e, c, cb) => {
   const errRes = {
@@ -126,7 +155,7 @@ const managerList = async(e, c, cb) => {
     }, tokenErr.code)
   }
   const [err,
-    ret] = await ListChildUsers(token.userId, RoleCodeEnum.Manager)
+    ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
   if (err) {
     return ResFail(cb, {
       ...errRes,
@@ -166,7 +195,7 @@ const merchantList = async(e, c, cb) => {
     }, tokenErr.code)
   }
   const [err,
-    ret] = await ListChildUsers(token.userId, RoleCodeEnum.Merchant)
+    ret] = await ListChildUsers(token, RoleCodeEnum.Merchant)
   if (err) {
     return ResFail(cb, {
       ...errRes,
@@ -419,6 +448,7 @@ const msnOne = async(e, c, cb) => {}
 **/
 export {
   jwtverify, // 用于进行token验证的方法
+  eva,
   userAuth, // 用户登录
   userNew, // 创建新用户
   managerList, // 建站商列表

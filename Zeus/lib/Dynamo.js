@@ -46,7 +46,7 @@ export const Model = {
   StringValue: '0',
   NumberValue: 0.0,
   DefaultParent: '01', // 平台
-  DefaultParent: 'PlatformAdmin',
+  DefaultParentName: 'PlatformAdmin',
   NoParent: '00', // 没有
   NoParentName:'SuperAdmin',
   usn: () => (new Date()).getTime() % 1000000 + 100000,
