@@ -29,6 +29,7 @@ import {
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+// 用于生成第一个管理员
 const eva = async(e,c,cb) =>{
   const errRes = {
     m:'eva error'
@@ -168,7 +169,19 @@ const managerList = async(e, c, cb) => {
   })
 
 }
-
+const managerOne = async (e,c,cb) =>{
+  const errRes = {
+    m: 'managerOne err',
+    input: e
+  }
+  const res = {
+    m: 'managerOne'
+  }
+  const [paramsErr,params] = Model.pathParams(e)
+  if (paramsErr || !params.id) {
+    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
+}
 const managerUpdate = async(e, c, cb) => {
   const res = {
     m: 'managerUpdate',
@@ -271,7 +284,10 @@ const gameList = async(e, c, cb) => {
   const res = {
     m: 'gamelist'
   }
-  const gameParams = Model.pathParams(e)
+  const [paramsErr,gameParams] = Model.pathParams(e)
+  if (paramsErr) {
+      return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
   const [err,
     ret] = await ListGames(gameParams)
   if (err) {
@@ -425,9 +441,12 @@ const checkMsn = async(e, c, cb) => {
   const res = {
     m: 'checkMsn'
   }
-
+  const [paramErr,params] = Model.pathParams(e)
+  if (paramErr) {
+    return ResFail(cb,{...errRes,err:paramErr},paramErr.code)
+  }
   const [checkErr,
-    checkRet] = await CheckMSN(Model.pathParams(e))
+    checkRet] = await CheckMSN(params)
   if (checkErr) {
     return ResFail(cb, {
       ...errRes,

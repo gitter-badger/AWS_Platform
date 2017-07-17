@@ -70,6 +70,14 @@ functions:
           path: managers
           method: get
           cors: true
+  managerOne:
+    handler: api.managerOne
+    events:
+      -
+        http:
+          path: managers/{id}
+          method: get
+          cors: true
   managerUpdate:
     handler: api.managerUpdate
     events:
