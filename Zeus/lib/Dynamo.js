@@ -53,7 +53,7 @@ export const Model = {
   uuid: () => uid(),
   displayId: () => (new Date()).getTime() % 1000000 + 100000,
   timeStamp: () => (new Date()).getTime(),
-  currentToken: async (e,c) =>{
+  currentToken: async (e) =>{
     if (!e || !e.requestContext.authorizer) {
       return [BizErr.TokenErr(),0]
     }
