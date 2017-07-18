@@ -62,6 +62,14 @@ functions:
           path: users/auth
           method: post
           cors: true
+  userGrabToken:
+    handler: api.userGrabToken
+    events:
+      -
+        http:
+          path: users/token
+          method: post
+          cors: true
   managerList:
     handler: api.managerList
     events:

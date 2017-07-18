@@ -151,6 +151,53 @@ export const LoginUser = async(userLoginInfo = {}) => {
   }]
 }
 
+
+export const UserGrabToken = async(userInfo = {})=>{
+  if (!userInfo.username || !userInfo.apiKey || !userInfo.suffix) {
+    return [BizErr.ParamErr('missing params'),0]
+  }
+  // 获取角色模型 能够访问这个接口的只有商户
+  const Role =  RoleModels[RoleCodeEnum['Merchant']]
+  const roleDisplay = RoleDisplay[RoleCodeEnum['Merchant']]
+  if (!Role.apiKey) { // 是否有apiKey
+    return [BizErr.ParamErr('wrong role'),0]
+  }
+  const username = userInfo.username
+  const apiKey = userInfo.apiKey
+  const role = RoleCodeEnum['Merchant']
+  const suffix = userInfo.suffix
+
+  const query = {
+    TableName: Tables.ZeusPlatformUser,
+    IndexName: 'RoleSuffixIndex',
+    KeyConditionExpression: '#suffix = :suffix and #role = :role',
+    FilterExpression:'#username = :username and #apiKey = :apiKey',
+    ExpressionAttributeNames:{
+      '#role':'role',
+      '#suffix':'suffix',
+      '#username':'username',
+      '#apiKey':'apiKey'
+    },
+    ExpressionAttributeValues: {
+      ':suffix': suffix,
+      ':role': role,
+      ':username': `${suffix}_${username}`,
+      ':apiKey':userInfo.apiKey
+    }
+  }
+  const [queryErr,User] =  await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  if (User.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr(),0]
+  }
+  const userDisplay =  Pick(User.Items[0],roleDisplay)
+  return [0,{
+    ...userDisplay,
+    token: Model.token(userDisplay)
+  }]
+}
 const getRole = async(code) => {
   if (!RoleModels[code]) {
       return [BizErr.ParamErr('Role is not found'),0]

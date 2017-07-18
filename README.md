@@ -24,7 +24,52 @@ API的域名在每个部署节点上是不同的.( [ hostName ] 和 [ stage ] ).
   https://[hostName]/[stage]/[resouces]
 ```
 
+#### 通过apiKey 获取token
 
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/token
+```
+- Token Header
+
+```
+不需要
+```
+
+- Body
+
+```
+{
+  "username": "merchant002",
+  "apiKey": "0c361fab-b5a6-407c-bfa4-1e95a3a944b5",
+  "suffix": "YB"
+}
+```
+
+- Response
+
+```
+{
+    "m": "managerList",
+    "payload": {
+        "username": "YB_merchant002",
+        "password": "111111",
+        "msn": "957",
+        "suffix": "YB",
+        "parent": "01",
+        "parentName": "PlatformAdmin",
+        "userId": "3a06387e-8014-4d76-bb3d-b85d4353e2a4",
+        "role": "100",
+        "displayName": "0",
+        "apiKey": "0c361fab-b5a6-407c-bfa4-1e95a3a944b5",
+        "displayId": 853833,
+        "updatedAt": 1500320212625,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IllCX21lcmNoYW50MDAyIiwicGFzc3dvcmQiOiIxMTExMTEiLCJtc24iOiI5NTciLCJzdWZmaXgiOiJZQiIsInBhcmVudCI6IjAxIiwicGFyZW50TmFtZSI6IlBsYXRmb3JtQWRtaW4iLCJ1c2VySWQiOiIzYTA2Mzg3ZS04MDE0LTRkNzYtYmIzZC1iODVkNDM1M2UyYTQiLCJyb2xlIjoiMTAwIiwiZGlzcGxheU5hbWUiOiIwIiwiYXBpS2V5IjoiMGMzNjFmYWItYjVhNi00MDdjLWJmYTQtMWU5NWEzYTk0NGI1IiwiZGlzcGxheUlkIjo4NTM4MzMsInVwZGF0ZWRBdCI6MTUwMDMyMDIxMjYyNSwiaWF0IjoxNTAwMzQxODA1fQ.86Qv1Lyf20TyM3TE1yJtvVpAF6XJlbwTPOyFQRBr0wo"
+    },
+    "code": "0"
+}
+```
 #### 创建系统管理员**
 
 - URL
