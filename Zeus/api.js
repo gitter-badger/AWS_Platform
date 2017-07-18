@@ -25,7 +25,8 @@ import {
   WithdrawFrom,
   CheckMSN,
   FormatMSN,
-  ManagerById
+  ManagerById,
+  MerchantById
 
 } from './biz/dao'
 
@@ -209,11 +210,11 @@ const managerOne = async (e,c,cb) =>{
   if (paramsErr || !params.id) {
     return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
   }
-  const [tokenErr,token] = Model.currentToken(e)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
-  const [managerErr,manager] = await ManagerById(token,params.id)
+  const [managerErr,manager] = await ManagerById(params.id)
   if (managerErr) {
     return ResFail(cb,{...errRes,err:managerErr},managerErr.code)
   }
@@ -227,6 +228,28 @@ const managerUpdate = async(e, c, cb) => {
   return cb(null, Success(res))
 }
 
+const merchantOne = async (e,c,cb)=>{
+  const errRes = {
+    m:'merchantOne err',
+    input:e
+  }
+  const res = {
+    m:'merchantOne'
+  }
+  const [paramsErr,params] = Model.pathParams(e)
+  if (paramsErr || !params.id) {
+    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
+  const [tokenErr,token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  const [merchantErr,merchant] = await MerchantById(params.id)
+  if (merchantErr) {
+    return ResFail(cb,{...errRes,err:merchantErr},merchantErr.code)
+  }
+  return ResOK(cb,{...res,payload:merchant})
+}
 const merchantList = async(e, c, cb) => {
 
   const errRes = {
@@ -509,8 +532,10 @@ export {
   userNew, // 创建新用户
   userGrabToken, // 使用apiKey登录获取用户信息
   managerList, // 建站商列表
+  managerOne,
   managerUpdate, // 编辑某个建站商
   merchantList, // 商户列表
+  merchantOne, //商户
   merchantUpdate, // 编辑某个商户
   avalibleManagers, //当前可用的建站商
   gameNew, // 新建游戏

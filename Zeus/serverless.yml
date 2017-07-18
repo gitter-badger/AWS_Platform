@@ -86,6 +86,16 @@ functions:
           path: managers/{id}
           method: get
           cors: true
+          authorizer: tokenAuth
+  merchantOne:
+    handler: api.merchantOne
+    events:
+      -
+        http:
+          path: merchants/{id}
+          method: get
+          cors: true
+          authorizer: tokenAuth
   managerUpdate:
     handler: api.managerUpdate
     events:
