@@ -37,6 +37,14 @@ functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
+  eva:
+    handler: api.eva
+    events:
+      -
+        http:
+          path: beings
+          method: post
+          cors: true
   userNew:
     handler: api.userNew
     events:
@@ -54,12 +62,28 @@ functions:
           path: users/auth
           method: post
           cors: true
+  userGrabToken:
+    handler: api.userGrabToken
+    events:
+      -
+        http:
+          path: users/token
+          method: post
+          cors: true
   managerList:
     handler: api.managerList
     events:
       -
         http:
           path: managers
+          method: get
+          cors: true
+  managerOne:
+    handler: api.managerOne
+    events:
+      -
+        http:
+          path: managers/{id}
           method: get
           cors: true
   managerUpdate:

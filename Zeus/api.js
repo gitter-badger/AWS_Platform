@@ -14,7 +14,7 @@ import {
   JwtVerify,
   GeneratePolicyDocument
 } from './lib/all'
-import {RegisterUser, LoginUser} from './biz/auth'
+import {RegisterUser, LoginUser,UserGrabToken} from './biz/auth'
 import {
   CheckRoleFromToken,
   ListChildUsers,
@@ -25,10 +25,41 @@ import {
   WithdrawFrom,
   CheckMSN,
   FormatMSN
+
 } from './biz/dao'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+// 用于生成第一个管理员
+const eva = async(e,c,cb) =>{
+  const errRes = {
+    m:'eva error'
+  }
+  const res = {
+    m: 'userNew'
+  }
+  const [jsonParseErr,userInfo] = JSONParser(e&&e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
+  }
+  // admin dont need check token
+  const [registerUserErr,
+    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo))
+  if (registerUserErr) {
+    return ResFail(cb, {
+      ...errRes,
+      err: registerUserErr
+    }, registerUserErr.code)
+  }
+
+  return ResOK(cb, {
+    ...res,
+    payload: resgisterUserRet
+  })
+}
 // 用户注册
 const userNew = async(e, c, cb) => {
   const errRes = {
@@ -108,6 +139,32 @@ const userAuth = async(e, c, cb) => {
     payload: loginUserRet
   })
 }
+const userGrabToken = async (e,c,cb)=>{
+  const errRes = {
+    m: 'managerList error',
+    input: e
+  }
+  const res = {
+    m: 'managerList'
+  }
+  // username suffix role and apiKey
+  const [jsonParseErr,userInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
+  }
+
+  const [tokenErr,userToken] = await UserGrabToken(userInfo)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  return ResOK(cb,{
+    ...res,
+    payload:userToken
+  })
+
+
+
+}
 // 建站商列表
 const managerList = async(e, c, cb) => {
   const errRes = {
@@ -126,7 +183,7 @@ const managerList = async(e, c, cb) => {
     }, tokenErr.code)
   }
   const [err,
-    ret] = await ListChildUsers(token.userId, RoleCodeEnum.Manager)
+    ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
   if (err) {
     return ResFail(cb, {
       ...errRes,
@@ -139,7 +196,19 @@ const managerList = async(e, c, cb) => {
   })
 
 }
-
+const managerOne = async (e,c,cb) =>{
+  const errRes = {
+    m: 'managerOne err',
+    input: e
+  }
+  const res = {
+    m: 'managerOne'
+  }
+  const [paramsErr,params] = Model.pathParams(e)
+  if (paramsErr || !params.id) {
+    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
+}
 const managerUpdate = async(e, c, cb) => {
   const res = {
     m: 'managerUpdate',
@@ -166,7 +235,7 @@ const merchantList = async(e, c, cb) => {
     }, tokenErr.code)
   }
   const [err,
-    ret] = await ListChildUsers(token.userId, RoleCodeEnum.Merchant)
+    ret] = await ListChildUsers(token, RoleCodeEnum.Merchant)
   if (err) {
     return ResFail(cb, {
       ...errRes,
@@ -242,7 +311,10 @@ const gameList = async(e, c, cb) => {
   const res = {
     m: 'gamelist'
   }
-  const gameParams = Model.pathParams(e)
+  const [paramsErr,gameParams] = Model.pathParams(e)
+  if (paramsErr) {
+      return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
   const [err,
     ret] = await ListGames(gameParams)
   if (err) {
@@ -396,9 +468,12 @@ const checkMsn = async(e, c, cb) => {
   const res = {
     m: 'checkMsn'
   }
-
+  const [paramErr,params] = Model.pathParams(e)
+  if (paramErr) {
+    return ResFail(cb,{...errRes,err:paramErr},paramErr.code)
+  }
   const [checkErr,
-    checkRet] = await CheckMSN(Model.pathParams(e))
+    checkRet] = await CheckMSN(params)
   if (checkErr) {
     return ResFail(cb, {
       ...errRes,
@@ -419,8 +494,10 @@ const msnOne = async(e, c, cb) => {}
 **/
 export {
   jwtverify, // 用于进行token验证的方法
+  eva, // 用于创建系统的第一个管理员账号
   userAuth, // 用户登录
   userNew, // 创建新用户
+  userGrabToken, // 使用apiKey登录获取用户信息
   managerList, // 建站商列表
   managerUpdate, // 编辑某个建站商
   merchantList, // 商户列表

@@ -17,7 +17,11 @@ import {
   Omit
 } from '../lib/all'
 import _ from 'lodash'
-export const ListChildUsers = async (parentId,roleCode) => {
+export const ListChildUsers = async (token,roleCode) => {
+  var parentId = token.userId
+  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+      parentId = Model.DefaultParent
+  }
   const query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'RoleParentIndex',
