@@ -149,8 +149,12 @@ export const ListGames = async(pathParams)=>{
   return [0,ret]
 }
 
-export const ManagerById = async(token,id)=>{
-  return [err,manager] = await getUserById(id,token.userId)
+export const ManagerById = async(id)=>{
+  return  await getUserById(id,RoleCodeEnum['Manager'])
+}
+
+export const MerchantById = async(id)=>{
+  return await getUserById(id,RoleCodeEnum['Merchant'])
 }
 const getUserByName = async(role, username) => {
   const query = {
@@ -192,7 +196,6 @@ export const CheckRoleFromToken  = (token,userInfo) => {
 }
 
 const getUserById = async (userId,role) => {
-  // get points balance of the given userid
   const get = {
     TableName: Tables.ZeusPlatformUser,
     Key: {
