@@ -382,3 +382,57 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/avalible_m
     "code": "0"
 }
 ```
+
+#### 获取下级商户列表
+
+- URL
+
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants
+```
+- Response
+
+```
+{
+    "m": "merchantList",
+    "payload": [
+        {
+            "lastIP": "218.88.126.54",
+            "limit": 0,
+            "hostName": "0",
+            "status": 1,
+            "merchantName": "0",
+            "contractPeriod": "0",
+            "adminName": "Faker002",
+            "enabledAt": 1500319753833,
+            "displayName": "0",
+            "password": "111111",
+            "loginAt": 1500320212625,
+            "suffix": "YB",
+            "userId": "3a06387e-8014-4d76-bb3d-b85d4353e2a4",
+            "displayId": 853833,
+            "parentName": "PlatformAdmin",
+            "loginWhiteList": [],
+            "hostContact": "0",
+            "apiKey": "0c361fab-b5a6-407c-bfa4-1e95a3a944b5",
+            "rate": 0,
+            "adminContact": "0",
+            "msn": "957",
+            "createdAt": 1500319876115,
+            "merchantEmail": "0",
+            "gender": 1,
+            "children": 0,
+            "remark": "0",
+            "role": "100",
+            "points": 0,
+            "updatedAt": 1500320212625,
+            "frontURL": "0",
+            "adminEmail": "0",
+            "username": "YB_merchant002",
+            "parent": "01",
+            "gameList": []
+        }
+    ],
+    "code": "0"
+}
+```
