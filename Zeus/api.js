@@ -227,7 +227,6 @@ const managerUpdate = async(e, c, cb) => {
   }
   return cb(null, Success(res))
 }
-
 const merchantOne = async (e,c,cb)=>{
   const errRes = {
     m:'merchantOne err',
@@ -281,9 +280,16 @@ const merchantList = async(e, c, cb) => {
   })
 
 }
-
 const merchantUpdate = async(e, c, cb) => {}
-
+const randomPassword = (e,c,cb)=>{
+  const res = {
+    m:'randomPassword'
+  }
+  const passwd = Model.genPassword()
+  return ResOK(cb,{...res,payload:{
+    generatedPassword: passwd
+  }})
+}
 const avalibleManagers = async(e, c, cb) => {
   const errRes = {
     m: 'avalibleManagers err',
@@ -537,6 +543,7 @@ export {
   merchantList, // 商户列表
   merchantOne, //商户
   merchantUpdate, // 编辑某个商户
+  randomPassword,
   avalibleManagers, //当前可用的建站商
   gameNew, // 新建游戏
   gameList, // 游戏列表
