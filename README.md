@@ -24,6 +24,43 @@ API的域名在每个部署节点上是不同的.( [ hostName ] 和 [ stage ] ).
   https://[hostName]/[stage]/[resouces]
 ```
 
+#### 错误码定义
+
+```
+/* 在请求的Response里面的code字段 一定包含如下编码之一 */
+{
+  OK: '0',
+  Error: '-1',
+  DBError: '50001',
+  InputError: '50002',
+  ItemNotFound: '50003',
+  ItemDuplicate: '50004',
+  BizError: '50005',
+  JSONParseError: '50006',
+  NoSuffixError:'50007',
+  MsnExistError: '50008',
+  Busy: '44004',
+  ParamError: '47003',
+  IPBlock: '44900',
+  SysMaintenance: '44444',
+  GameMaintenance: '44445',
+  UnAuth: '44002',
+  ParamMiss: '44001',
+  TokenError: '44000',
+  UsernameTooLong: '40015',
+  UsernameTooShort: '40016',
+  PasswordError: '40017',
+  AddUserError: '21000',
+  DuplicateUser: '21001',
+  UserNotFound: '22011',
+  InsufficientBalance: '10002',
+  TransferError: '10003',
+  RepeatTransferError: '11000'
+}
+```
+
+
+
 #### 通过apiKey 获取token
 
 - URL

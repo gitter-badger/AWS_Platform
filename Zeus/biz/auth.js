@@ -192,10 +192,19 @@ export const UserGrabToken = async(userInfo = {})=>{
   if (User.Items.length - 1 != 0) {
     return [BizErr.UserNotFoundErr(),0]
   }
-  const userDisplay =  Pick(User.Items[0],roleDisplay)
+  console.log(User.Items[0]);
+  // update the login ip & updatedAt & loginAt
+  const UserLastLogin = {
+    ...User.Items[0],
+    lastIP: userInfo.lastIP
+  }
+  const [saveUserErr,savedUser] = await saveUser(UserLastLogin)
+  if (saveUserErr) {
+    return [saveUserErr,0]
+  }
   return [0,{
-    ...userDisplay,
-    token: Model.token(userDisplay)
+    ...savedUser,
+    token: Model.token(savedUser)
   }]
 }
 const getRole = async(code) => {

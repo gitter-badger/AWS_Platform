@@ -24,7 +24,8 @@ import {
   DepositTo,
   WithdrawFrom,
   CheckMSN,
-  FormatMSN
+  FormatMSN,
+  ManagerById
 
 } from './biz/dao'
 
@@ -153,7 +154,7 @@ const userGrabToken = async (e,c,cb)=>{
     return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
   }
 
-  const [tokenErr,userToken] = await UserGrabToken(userInfo)
+  const [tokenErr,userToken] = await UserGrabToken(Model.addSourceIP(e,userInfo))
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
@@ -208,6 +209,15 @@ const managerOne = async (e,c,cb) =>{
   if (paramsErr || !params.id) {
     return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
   }
+  const [tokenErr,token] = Model.currentToken(e)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  const [managerErr,manager] = await ManagerById(token,params.id)
+  if (managerErr) {
+    return ResFail(cb,{...errRes,err:managerErr},managerErr.code)
+  }
+  return ResOK(cb,{...res,payload:manager})
 }
 const managerUpdate = async(e, c, cb) => {
   const res = {
