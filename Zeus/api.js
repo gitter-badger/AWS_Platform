@@ -14,7 +14,7 @@ import {
   JwtVerify,
   GeneratePolicyDocument
 } from './lib/all'
-import {RegisterUser, LoginUser} from './biz/auth'
+import {RegisterUser, LoginUser,UserGrabToken} from './biz/auth'
 import {
   CheckRoleFromToken,
   ListChildUsers,
@@ -25,6 +25,7 @@ import {
   WithdrawFrom,
   CheckMSN,
   FormatMSN
+
 } from './biz/dao'
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -137,6 +138,32 @@ const userAuth = async(e, c, cb) => {
     ...res,
     payload: loginUserRet
   })
+}
+const userGrabToken = async (e,c,cb)=>{
+  const errRes = {
+    m: 'managerList error',
+    input: e
+  }
+  const res = {
+    m: 'managerList'
+  }
+  // username suffix role and apiKey
+  const [jsonParseErr,userInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
+  }
+
+  const [tokenErr,userToken] = await UserGrabToken(userInfo)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  return ResOK(cb,{
+    ...res,
+    payload:userToken
+  })
+
+
+
 }
 // 建站商列表
 const managerList = async(e, c, cb) => {
@@ -467,9 +494,10 @@ const msnOne = async(e, c, cb) => {}
 **/
 export {
   jwtverify, // 用于进行token验证的方法
-  eva,
+  eva, // 用于创建系统的第一个管理员账号
   userAuth, // 用户登录
   userNew, // 创建新用户
+  userGrabToken, // 使用apiKey登录获取用户信息
   managerList, // 建站商列表
   managerUpdate, // 编辑某个建站商
   merchantList, // 商户列表
