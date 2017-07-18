@@ -436,3 +436,79 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants
     "code": "0"
 }
 ```
+
+
+#### 新增游戏 **
+
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
+```
+- Body
+
+```
+{
+  "gameName": "英雄脸萌2",
+  "gameRecommend": "我最猛",
+  "gameType": "2",
+  "gameImg": "http://placehold.it/250x250",
+  "gameStatus": "01"
+}
+```
+
+- Response
+
+```
+{
+    "m": "gameNew",
+    "payload": {},
+    "code": "0"
+}
+```
+** 管理客户端没有操作界面
+
+#### 获取游戏列表
+
+- URL
+
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games/{gameType}
+```
+
+- Query
+
+```
+{
+  '0':'TableGame',
+  '1':'VideoGame',
+  '2':'LiveGame'
+}
+
+
+gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多个游戏类型通过 ',' 分割
+```
+- Response
+
+```
+{
+    "m": "gamelist",
+    "payload": {
+        "Items": [
+            {
+                "gameName": "英雄脸萌9",
+                "gameStatus": "01",
+                "updatedAt": 1500342495172,
+                "gameImg": "http://placehold.it/250x250",
+                "createdAt": 1500342495172,
+                "gameType": "0",
+                "gameId": "28c89106-6947-4198-8aab-3ef1b8fccb9f",
+                "gameRecommend": "我最猛"
+            }
+        ],
+        "Count": 1,
+        "ScannedCount": 1
+    },
+    "code": "0"
+}
+```
