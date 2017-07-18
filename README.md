@@ -87,8 +87,13 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
 - Response
 
 ```
+
+/*
+  成功则返回用户信息以及token
+  客户端缓存此token 用作后续请求的认证字段
+*/
 {
-    "m": "managerList",
+    "m": "grab user token",
     "payload": {
         "username": "YB_merchant002",
         "password": "111111",
@@ -106,6 +111,18 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
     },
     "code": "0"
 }
+
+/* 错误: 用户未找到 */
+{
+  "m": "grab user token error"
+  "err": {
+      "code": "22011",
+      "err": "User not found"
+  },
+  "code": "22011"
+}
+
+
 ```
 #### 创建系统管理员**
 
