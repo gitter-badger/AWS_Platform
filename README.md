@@ -196,7 +196,25 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
     "code": "0"
 }
 ```
+#### 生成随机管理员密码
 
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/random_password
+```
+
+- Response
+
+```
+{
+    "m": "randomPassword",
+    "payload": {
+        "generatedPassword": "tinunazovi"
+    },
+    "code": "0"
+}
+```
 #### 平台管理员 / 线路商 / 商户 登录
 
 - URL
