@@ -316,7 +316,8 @@ const BillTransfer = async(userId,role,billInfo,action) => {
       ...BillModel,
       ...billInfo,
       fromUser:fromUser,
-      fromRole:fromRole
+      fromRole:fromRole,
+      action:action
     },Keys(BillModel))
   }
 
