@@ -257,12 +257,13 @@ const getUserById = async (userId,role) => {
   }
   return [0,User]
 }
-
+// 存入
 export const DepositTo = async(token,billInfo) => {
   const userId = token.userId
   const role = token.role
   return await BillTransfer(userId,role,billInfo,BillActionEnum.Deposit)
 }
+// 提出
 export const WithdrawFrom = async(token,billInfo) => {
   const userId = token.userId
   const role = token.role
@@ -347,11 +348,6 @@ const BillTransfer = async(userId,role,billInfo,action) => {
     }
   }
 
-
-  // const put = {
-  //   TableName: Tables.ZeusPlatformBill,
-  //   Item:Bill
-  // }
   const [err,ret] = await Store$('batchWrite',batch)
   if (err) {
     return [err,0]
