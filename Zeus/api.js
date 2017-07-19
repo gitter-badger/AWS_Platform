@@ -10,7 +10,9 @@ import {
   StatusEnum,
   GenderEnum,
   RoleCodeEnum,
+  RoleEditProps,
   Trim,
+  Pick,
   JwtVerify,
   GeneratePolicyDocument
 } from './lib/all'
@@ -25,8 +27,8 @@ import {
   WithdrawFrom,
   CheckMSN,
   FormatMSN,
-  ManagerById,
-  MerchantById
+  UserUpdate,
+  GetUser
 
 } from './biz/dao'
 
@@ -214,18 +216,65 @@ const managerOne = async (e,c,cb) =>{
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
-  const [managerErr,manager] = await ManagerById(params.id)
+  var parent = token.userId
+  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+    parent = Model.DefaultParent
+  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
+    parent = Model.NoParent
+  }else {
+    parent = token.userId
+  }
+  const [managerErr,manager] = await GetUser(params.id,RoleCodeEnum['Manager'],parent)
   if (managerErr) {
     return ResFail(cb,{...errRes,err:managerErr},managerErr.code)
   }
   return ResOK(cb,{...res,payload:manager})
 }
 const managerUpdate = async(e, c, cb) => {
+  const errRes = {
+    m:'managerUpdate err',
+    input:e
+  }
   const res = {
     m: 'managerUpdate',
     input: e
   }
-  return cb(null, Success(res))
+  const [paramsErr,params] = Model.pathParams(e)
+  if (paramsErr || !params.id) {
+    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
+  const [tokenErr,token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  var parent = token.userId
+  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+    parent = Model.DefaultParent
+  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
+    parent = Model.NoParent
+  }else {
+    parent = token.userId
+  }
+  const [managerErr,manager] = await GetUser(params.id,RoleCodeEnum['Manager'],parent)
+  if (managerErr) {
+    return ResFail(cb,{...errRes,err:managerErr},managerErr.code)
+  }
+  const [jsonParseErr,managerInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
+  }
+  const Manager = {
+    ...manager,
+    ...Pick(managerInfo,RoleEditProps[RoleCodeEnum['Manager']])
+  }
+  const [updateErr,updateRet] = await UserUpdate(Manager)
+  if (updateErr) {
+    return ResFail(cb,{...errRes,err:updateErr},updateErr.code)
+  }
+  return ResOK(cb,{
+    ...res,
+    payload:updateRet
+  })
 }
 const merchantOne = async (e,c,cb)=>{
   const errRes = {
@@ -243,7 +292,15 @@ const merchantOne = async (e,c,cb)=>{
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
-  const [merchantErr,merchant] = await MerchantById(params.id)
+  var parent = token.userId
+  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+    parent = Model.DefaultParent
+  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
+    parent = Model.NoParent
+  }else {
+    parent = token.userId
+  }
+  const [merchantErr,merchant] = await GetUser(params.id,RoleCodeEnum['Merchant'],parent)
   if (merchantErr) {
     return ResFail(cb,{...errRes,err:merchantErr},merchantErr.code)
   }
@@ -280,7 +337,51 @@ const merchantList = async(e, c, cb) => {
   })
 
 }
-const merchantUpdate = async(e, c, cb) => {}
+const merchantUpdate = async(e, c, cb) => {
+  const errRes = {
+    m:'merchantUpdate err',
+    input:e
+  }
+  const res = {
+    m:'merchantUpdate'
+  }
+  const [paramsErr,params] = Model.pathParams(e)
+  if (paramsErr || !params.id) {
+    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
+  const [tokenErr,token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  var parent = token.userId
+  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+    parent = Model.DefaultParent
+  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
+    parent = Model.NoParent
+  }else {
+    parent = token.userId
+  }
+  const [merchantErr,merchant] = await GetUser(params.id,RoleCodeEnum['Merchant'],parent)
+  if (merchantErr) {
+    return ResFail(cb,{...errRes,err:merchantErr},merchantErr.code)
+  }
+  const [jsonParseErr,merchantInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
+  }
+  const Merchant = {
+    ...merchant,
+    ...Pick(merchantInfo,RoleEditProps[RoleCodeEnum['Manager']])
+  }
+  const [updateErr,updateRet] = await UserUpdate(Merchant)
+  if (updateErr) {
+    return ResFail(cb,{...errRes,err:updateErr},updateErr.code)
+  }
+  return ResOK(cb,{
+    ...res,
+    payload:updateRet
+  })
+}
 const randomPassword = (e,c,cb)=>{
   const res = {
     m:'randomPassword'

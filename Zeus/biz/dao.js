@@ -156,6 +156,22 @@ export const ManagerById = async(id)=>{
 export const MerchantById = async(id)=>{
   return await getUserById(id,RoleCodeEnum['Merchant'])
 }
+
+export const UserUpdate = async(userData)=>{
+  const User = {
+    ...userData,
+    updatedAt:Model.timeStamp()
+  }
+  const put = {
+    TableName: Tables.ZeusPlatformUser,
+    Item:User
+  }
+  const [err,updateRet] = await Store$('put',put)
+  if (err) {
+    return [err,0]
+  }
+  return [0,updateRet]
+}
 const getUserByName = async(role, username) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,
@@ -194,7 +210,35 @@ export const CheckRoleFromToken  = (token,userInfo) => {
   }
   return [0,userInfo]
 }
+export const GetUser = async (userId,role,parent) => {
 
+
+  const query = {
+    TableName: Tables.ZeusPlatformUser,
+    KeyConditionExpression: '#userId = :userId and #role = :role',
+    FilterExpression:'#parent = :parent',
+    ExpressionAttributeValues:{
+      ':parent':parent,
+      ':role':role,
+      ':userId':userId
+    },
+    ExpressionAttributeNames:{
+      '#parent':'parent',
+      '#userId':'userId',
+      '#role':'role'
+    }
+  }
+
+  const [queryErr,queryRet] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  if (queryRet.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr(),0]
+  }
+  const User = queryRet.Items[0]
+  return [0,User]
+}
 const getUserById = async (userId,role) => {
   const get = {
     TableName: Tables.ZeusPlatformUser,
