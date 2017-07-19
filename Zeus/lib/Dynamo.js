@@ -4,6 +4,7 @@ import { BizErr } from './Codes'
 import { JwtVerify,JwtSign } from './Response'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
+const generatePassword = require('password-generator')
 AWS.config.update({region: 'ap-southeast-1'})
 AWS.config.setPromisesDependency(require('bluebird'))
 
@@ -53,7 +54,7 @@ export const Model = {
   uuid: () => uid(),
   displayId: () => (new Date()).getTime() % 1000000 + 100000,
   timeStamp: () => (new Date()).getTime(),
-  currentToken: async (e,c) =>{
+  currentToken: async (e) =>{
     if (!e || !e.requestContext.authorizer) {
       return [BizErr.TokenErr(),0]
     }
@@ -90,6 +91,9 @@ export const Model = {
     } catch (err) {
         return [BizErr.ParamErr(err.toString()),0]
     }
+  },
+  genPassword:() => {
+    return generatePassword()
   },
   addSourceIP: (e,info)=>{
     const sourceIP = e && e.requestContext && e.requestContext.identity.sourceIp || '-100'

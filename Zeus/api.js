@@ -24,7 +24,9 @@ import {
   DepositTo,
   WithdrawFrom,
   CheckMSN,
-  FormatMSN
+  FormatMSN,
+  ManagerById,
+  MerchantById
 
 } from './biz/dao'
 
@@ -153,7 +155,7 @@ const userGrabToken = async (e,c,cb)=>{
     return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
   }
 
-  const [tokenErr,userToken] = await UserGrabToken(userInfo)
+  const [tokenErr,userToken] = await UserGrabToken(Model.addSourceIP(e,userInfo))
   if (tokenErr) {
     return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
   }
@@ -208,6 +210,15 @@ const managerOne = async (e,c,cb) =>{
   if (paramsErr || !params.id) {
     return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
   }
+  const [tokenErr,token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  const [managerErr,manager] = await ManagerById(params.id)
+  if (managerErr) {
+    return ResFail(cb,{...errRes,err:managerErr},managerErr.code)
+  }
+  return ResOK(cb,{...res,payload:manager})
 }
 const managerUpdate = async(e, c, cb) => {
   const res = {
@@ -216,7 +227,28 @@ const managerUpdate = async(e, c, cb) => {
   }
   return cb(null, Success(res))
 }
-
+const merchantOne = async (e,c,cb)=>{
+  const errRes = {
+    m:'merchantOne err',
+    input:e
+  }
+  const res = {
+    m:'merchantOne'
+  }
+  const [paramsErr,params] = Model.pathParams(e)
+  if (paramsErr || !params.id) {
+    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+  }
+  const [tokenErr,token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+  }
+  const [merchantErr,merchant] = await MerchantById(params.id)
+  if (merchantErr) {
+    return ResFail(cb,{...errRes,err:merchantErr},merchantErr.code)
+  }
+  return ResOK(cb,{...res,payload:merchant})
+}
 const merchantList = async(e, c, cb) => {
 
   const errRes = {
@@ -248,9 +280,16 @@ const merchantList = async(e, c, cb) => {
   })
 
 }
-
 const merchantUpdate = async(e, c, cb) => {}
-
+const randomPassword = (e,c,cb)=>{
+  const res = {
+    m:'randomPassword'
+  }
+  const passwd = Model.genPassword()
+  return ResOK(cb,{...res,payload:{
+    generatedPassword: passwd
+  }})
+}
 const avalibleManagers = async(e, c, cb) => {
   const errRes = {
     m: 'avalibleManagers err',
@@ -499,9 +538,12 @@ export {
   userNew, // 创建新用户
   userGrabToken, // 使用apiKey登录获取用户信息
   managerList, // 建站商列表
+  managerOne,
   managerUpdate, // 编辑某个建站商
   merchantList, // 商户列表
+  merchantOne, //商户
   merchantUpdate, // 编辑某个商户
+  randomPassword,
   avalibleManagers, //当前可用的建站商
   gameNew, // 新建游戏
   gameList, // 游戏列表
