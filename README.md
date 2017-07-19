@@ -457,6 +457,27 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{
 }
 ```
 
+#### 编辑某个建站线路商
+
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{id}
+```
+
+- Path Params
+
+```
+{
+  "id": "52d1e927-6261-43f9-b4f3-4b59ace35795"
+}
+```
+
+- Response
+
+```
+
+```
 #### 获取某个商户
 
 - URL

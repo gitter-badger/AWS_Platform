@@ -113,8 +113,6 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-            # arn: arn:aws:lambda:ap-southeast-1:031091139460:function:Javis-dev-jwtverify
-            # identitySource: method.request.header.Authorization
   merchantUpdate:
     handler: api.merchantUpdate
     events:
@@ -123,6 +121,7 @@ functions:
           path: merchants/{id}
           method: post
           cors: true
+          authorizer: tokenAuth
   randomPassword:
     handler: api.randomPassword
     events:
@@ -140,8 +139,6 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-            # arn: arn:aws:lambda:ap-southeast-1:031091139460:function:Javis-dev-jwtverify
-            # identitySource: method.request.header.Authorization
 
   gameNew:
     handler: api.gameNew

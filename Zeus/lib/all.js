@@ -24,6 +24,7 @@ export {
   GameTypeEnum,
   MSNStatusEnum,
   BillModel,
-  RoleDisplay
+  RoleDisplay,
+  RoleEditProps
 }
 from './Consts'
