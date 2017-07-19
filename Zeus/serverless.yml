@@ -104,6 +104,7 @@ functions:
           path: managers/{id}
           method: post
           cors: true
+          authorizer: tokenAuth
   merchantList:
     handler: api.merchantList
     events:
@@ -164,6 +165,7 @@ functions:
           path: deposit_points
           method: post
           cors: true
+          authorizer: tokenAuth
   withdrawPoints:
     handler: api.withdrawPoints
     events:
@@ -172,6 +174,7 @@ functions:
           path: withdraw_points
           method: post
           cors: true
+          authorizer: tokenAuth
   billList:
     handler: api.billList
     events:
