@@ -457,6 +457,27 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{
 }
 ```
 
+#### 编辑某个建站线路商
+
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{id}
+```
+
+- Path Params
+
+```
+{
+  "id": "52d1e927-6261-43f9-b4f3-4b59ace35795"
+}
+```
+
+- Response
+
+```
+
+```
 #### 获取某个商户
 
 - URL
@@ -716,5 +737,117 @@ gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多�
         "ScannedCount": 1
     },
     "code": "0"
+}
+```
+
+
+#### 存点
+
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_points
+```
+
+- Token
+
+```
+需要
+```
+- Body
+
+```
+/**
+存点操作的发起用户从token中获取
+**/
+  {
+    "toRole": "100",
+    "toUser": "EDG_clear_love001",
+    "amount": 1000.00
+  }
+```
+
+- Response
+
+```
+{
+    "m": "depositPoints",
+    "payload": {
+        "createdAt": 1500473811090,
+        "updatedAt": 1500473811090,
+        "sn": "1e508aa6-7397-49be-bcd5-4fe0d24f7ba6",
+        "fromRole": "10",
+        "toRole": "100",
+        "fromUser": "TAT_TAT001",
+        "toUser": "EDG_clear_love001",
+        "action": 0,
+        "amount": 1000,
+        "operator": "管理员"
+    },
+    "code": "0"
+}
+
+
+/* 找不到用户错误 */
+{
+    "m": "depositPoints err",
+    "err": {
+        "code": "22011",
+        "err": "User not found"
+    },
+    "code": "22011"
+}
+```
+
+##### 取点
+
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_points
+```
+
+- Body
+
+```
+/**
+取点操作的发起用户从token中获取
+**/
+  {
+    "toRole": "100",
+    "toUser": "EDG_clear_love001",
+    "amount": 1000.00
+  }
+
+```
+
+- Response
+
+```
+{
+    "m": "withdrawPoints",
+    "payload": {
+        "createdAt": 1500474814342,
+        "updatedAt": 1500474814342,
+        "sn": "297315d0-3c2f-4f13-9c5e-b2455d7438fc",
+        "fromRole": "10",
+        "toRole": "100",
+        "fromUser": "TAT_TAT001",
+        "toUser": "EDG_clear_love001",
+        "action": 1,
+        "amount": 1000,
+        "operator": "管理员"
+    },
+    "code": "0"
+}
+
+/* 找不到用户错误 */
+{
+    "m": "withdrawPoints err",
+    "err": {
+        "code": "22011",
+        "err": "User not found"
+    },
+    "code": "22011"
 }
 ```

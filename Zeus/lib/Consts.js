@@ -68,7 +68,43 @@ const PlatformBaseBizRole = {
   enabledAt:Model.timeStamp(),
   loginAt:Model.timeStamp()
 }
+export const RoleEditProps = {
+  '0':[],
+  '1':[],
+  '10':[
+    'hostName',
+'hostContact',
+'rate',
+'limit',
+'gameList',
+'managerEmail',
+'remark',
+'adminName',
+'adminEmail',
+'adminContact',
+'contractPeriod'
 
+  ],
+  '100':[
+    'hostName',
+ 'hostContact',
+ 'rate',
+ 'limit',
+ 'gameList',
+ 'managerEmail',
+ 'loginWhiteList',
+ 'frontURL',
+ 'remark',
+ 'adminName',
+ 'adminEmail',
+ 'adminContact',
+ 'contractPeriod'
+
+  ],
+  '1000':[],
+  '10000':[]
+
+}
 export const RoleDisplay = {
   '0':[],
   '1':[
@@ -128,6 +164,7 @@ export const RoleModels = {
     enabledAt:Model.timeStamp(),
     status:StatusEnum.Enable,
     suffix:'Platform',
+    points:Model.NumberValue,
     adminName:Model.StringValue
   },
   '10':{ // 建站代理商

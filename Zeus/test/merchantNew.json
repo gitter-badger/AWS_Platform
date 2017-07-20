@@ -1,39 +1,26 @@
 {
   "headers": {
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTYwYWRhBearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYTkxNDk5ZS0yN2RiLTRjMzItYTNkYy00MmQyYzNiNjM2YjciLCJ1c2VybmFtZSI6Ik5CX21hbmFnZXIwMDEiLCJwYXJlbnQiOiIzZWZhYjA0Yi05MDY1LTQ4ZTgtOTcwMC03MzA1MjBiMzQzOWMiLCJyb2xlIjoiMTAiLCJkaXNwbGF5SWQiOjE0MDA0MCwiaWF0IjoxNTAwMjA2MTYzfQ.Foo7YiGbXnLgqkJzinfAjiVIvGxZDTWfwao7a05XxK4"
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX0Zha2VyMDAxIiwicGFzc3dvcmQiOiIxMTExMTEiLCJzdWZmaXgiOiJQbGF0Zm9ybSIsInBhcmVudCI6IjAwIiwicGFyZW50TmFtZSI6IlN1cGVyQWRtaW4iLCJ1c2VySWQiOiIxNjVjNjYyYi1hMmYyLTQ4ZDEtOTUyNS1hMzczMmI3NTAxNzUiLCJyb2xlIjoiMSIsImRpc3BsYXlOYW1lIjoi5bmz5Y-w566h55CG5ZGYIiwiaWF0IjoxNTAwNTE3MDkxfQ.d4lkKqX0Z3mESeHIsvKGR4tbfdO6VD-63zMoM7bel_M"
   },
   "requestContext": {
+    "authorizer": {
+      "username": "Platform_Faker001",
+      "userId": "55f3f486-4c78-44f6-8721-fa5d5efa1bb9",
+      "parent": "00",
+      "role": "1",
+      "suffix": "Platform"
+
+    },
     "identity": {
       "sourceIp": "127.0.0.1"
-    },
-    "authorizer": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyOTYwYWRhBearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYTkxNDk5ZS0yN2RiLTRjMzItYTNkYy00MmQyYzNiNjM2YjciLCJ1c2VybmFtZSI6Ik5CX21hbmFnZXIwMDEiLCJwYXJlbnQiOiIzZWZhYjA0Yi05MDY1LTQ4ZTgtOTcwMC03MzA1MjBiMzQzOWMiLCJyb2xlIjoiMTAiLCJkaXNwbGF5SWQiOjE0MDA0MCwiaWF0IjoxNTAwMjA2MTYzfQ.Foo7YiGbXnLgqkJzinfAjiVIvGxZDTWfwao7a05XxK4"
+    }
   },
-
-  "body":
-
-
-  {
-    "role": "100",
-    "displayName": "222222",
-    "rate": "222222",
-    "managerEmail": "222222",
-    "hostName": "222222",
-    "hostContact": "222222",
-    "parent": "2960adaa-6d40-4d2d-b6d3-4be427f0d10c",
-    "remark": "222222",
-    "contractPeriod": ["2017-07-24T16:00:00.000Z", "2017-08-27T16:00:00.000Z"],
-    "isforever": false,
-    "points": "222222",
-    "msn": "999",
-    "gameList": ["选项3", "选项4"],
-    "loginWhiteList": "222222",
-    "frontURL": "222222",
-    "username": "222222",
-    "password": "222222",
-    "adminName": "222222",
-    "adminEmail": "222222",
-    "adminContact": "222222",
-    "suffix": "c6"
+  "body": {
+    "username": "Duplicate002",
+    "password": "111111",
+    "role": "10",
+    "suffix": "F2",
+    "points": 1000.00,
+    "adminName": "Benji"
   }
-
 }

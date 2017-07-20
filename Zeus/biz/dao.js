@@ -156,6 +156,22 @@ export const ManagerById = async(id)=>{
 export const MerchantById = async(id)=>{
   return await getUserById(id,RoleCodeEnum['Merchant'])
 }
+
+export const UserUpdate = async(userData)=>{
+  const User = {
+    ...userData,
+    updatedAt:Model.timeStamp()
+  }
+  const put = {
+    TableName: Tables.ZeusPlatformUser,
+    Item:User
+  }
+  const [err,updateRet] = await Store$('put',put)
+  if (err) {
+    return [err,0]
+  }
+  return [0,updateRet]
+}
 const getUserByName = async(role, username) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,
@@ -183,18 +199,59 @@ const getUserByName = async(role, username) => {
 
 
 export const CheckRoleFromToken  = (token,userInfo) => {
-  if (RoleCodeEnum['PlatformAdmin'] === token.role || RoleCodeEnum['Manager'] === token.role) {
-    if (parseInt(userInfo.role) < parseInt(token.role) ) {
-      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
-    }
-  }else {
-    if (parseInt(userInfo.role) <= parseInt(token.role) ) {
-      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
+  if (RoleCodeEnum['Merchant'] === token.role){
+    // 登录角色为商户角色,不可以创建任何其他角色
+    return [BizErr.TokenErr('Operation not allowd. merchant role cant create user'),0]
+  }
+  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+    //登录角色为平台管理员, 可以创建管理员, 线路商,商户
+    if (!(
+      RoleCodeEnum['PlatformAdmin'] === userInfo.role ||
+      RoleCodeEnum['Manager'] === userInfo.role ||
+      RoleCodeEnum['Merchant'] === userInfo.role
+    )) {
+      return [BizErr.TokenErr('Operation not Allowed. PlatformAdmin can only create PlatformAdmin,mananger, merchant')]
     }
   }
+  if (RoleCodeEnum['Manager'] === token.role) {
+    if(
+      !(RoleCodeEnum['Manager'] === userInfo.role || RoleCodeEnum['Merchant'] === userInfo.role)
+    ){
+      return [BizErr.TokenErr('Operation not allowed. Manager can only create manager , merchant')]
+    }
+  }
+
   return [0,userInfo]
 }
+export const GetUser = async (userId,role,parent) => {
 
+
+  const query = {
+    TableName: Tables.ZeusPlatformUser,
+    KeyConditionExpression: '#userId = :userId and #role = :role',
+    FilterExpression:'#parent = :parent',
+    ExpressionAttributeValues:{
+      ':parent':parent,
+      ':role':role,
+      ':userId':userId
+    },
+    ExpressionAttributeNames:{
+      '#parent':'parent',
+      '#userId':'userId',
+      '#role':'role'
+    }
+  }
+
+  const [queryErr,queryRet] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  if (queryRet.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr(),0]
+  }
+  const User = queryRet.Items[0]
+  return [0,User]
+}
 const getUserById = async (userId,role) => {
   const get = {
     TableName: Tables.ZeusPlatformUser,
@@ -213,12 +270,13 @@ const getUserById = async (userId,role) => {
   }
   return [0,User]
 }
-
+// 存入
 export const DepositTo = async(token,billInfo) => {
   const userId = token.userId
   const role = token.role
   return await BillTransfer(userId,role,billInfo,BillActionEnum.Deposit)
 }
+// 提出
 export const WithdrawFrom = async(token,billInfo) => {
   const userId = token.userId
   const role = token.role
@@ -231,7 +289,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   }
     // move out user input sn
   billInfo = Omit(billInfo,['sn','fromRole','fromUser','action'])
-
+console.log('billInfo',billInfo);
   const [toUserErr,toUser] = await getUserByName(billInfo.toRole,billInfo.toUser)
   if (toUserErr) {
     return [toUserErr,0]
@@ -244,6 +302,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   }
 
   const Role = RoleModels[role]
+  console.log('role',Role);
   if (!Role || Role.points === undefined) {
     return [BizErr.ParamErr('role error'),0]
   }
@@ -271,7 +330,8 @@ const BillTransfer = async(userId,role,billInfo,action) => {
       ...BillModel,
       ...billInfo,
       fromUser:fromUser,
-      fromRole:fromRole
+      fromRole:fromRole,
+      action:action
     },Keys(BillModel))
   }
 
@@ -302,12 +362,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
       ]
     }
   }
-
-
-  // const put = {
-  //   TableName: Tables.ZeusPlatformBill,
-  //   Item:Bill
-  // }
+console.log(JSON.stringify(batch,null,4));
   const [err,ret] = await Store$('batchWrite',batch)
   if (err) {
     return [err,0]
@@ -315,6 +370,9 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   return [0,Bill]
 }
 
+export const CheckBalance = async (token,userId) =>{
+  return [0,1000000.00]
+}
 export const FormatMSN = function(param) {
   try {
     if (isNaN(parseFloat(param.msn)) || 1000.0 - parseFloat(param.msn) >= 1000.0 || 1000.0 - parseFloat(param.msn) <= 0 ) {
