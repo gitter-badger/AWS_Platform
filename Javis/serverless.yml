@@ -189,6 +189,9 @@ resources:
           -
             AttributeName: userId
             AttributeType: S
+          -
+            AttributeName: createdAt
+            AttributeType: N
 
         KeySchema:
           -
@@ -198,6 +201,35 @@ resources:
             AttributeName: userId
             KeyType: RANGE
 
+        GlobalSecondaryIndexes:
+          -
+            IndexName: UserIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: SnIndex
+            KeySchema:
+              -
+                AttributeName: sn
+                KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

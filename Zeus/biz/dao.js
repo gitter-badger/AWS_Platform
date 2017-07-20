@@ -199,15 +199,28 @@ const getUserByName = async(role, username) => {
 
 
 export const CheckRoleFromToken  = (token,userInfo) => {
-  if (RoleCodeEnum['PlatformAdmin'] === token.role || RoleCodeEnum['Manager'] === token.role) {
-    if (parseInt(userInfo.role) < parseInt(token.role) ) {
-      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
-    }
-  }else {
-    if (parseInt(userInfo.role) <= parseInt(token.role) ) {
-      return [BizErr.TokenErr('Operation not allowed,check the role'),0]
+  if (RoleCodeEnum['Merchant'] === token.role){
+    // 登录角色为商户角色,不可以创建任何其他角色
+    return [BizErr.TokenErr('Operation not allowd. merchant role cant create user'),0]
+  }
+  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+    //登录角色为平台管理员, 可以创建管理员, 线路商,商户
+    if (!(
+      RoleCodeEnum['PlatformAdmin'] === userInfo.role ||
+      RoleCodeEnum['Manager'] === userInfo.role ||
+      RoleCodeEnum['Merchant'] === userInfo.role
+    )) {
+      return [BizErr.TokenErr('Operation not Allowed. PlatformAdmin can only create PlatformAdmin,mananger, merchant')]
     }
   }
+  if (RoleCodeEnum['Manager'] === token.role) {
+    if(
+      !(RoleCodeEnum['Manager'] === userInfo.role || RoleCodeEnum['Merchant'] === userInfo.role)
+    ){
+      return [BizErr.TokenErr('Operation not allowed. Manager can only create manager , merchant')]
+    }
+  }
+
   return [0,userInfo]
 }
 export const GetUser = async (userId,role,parent) => {
@@ -356,6 +369,9 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   return [0,Bill]
 }
 
+export const CheckBalance = async (token,userId) =>{
+  return 0.0
+}
 export const FormatMSN = function(param) {
   try {
     if (isNaN(parseFloat(param.msn)) || 1000.0 - parseFloat(param.msn) >= 1000.0 || 1000.0 - parseFloat(param.msn) <= 0 ) {
