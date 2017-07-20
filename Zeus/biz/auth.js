@@ -123,9 +123,11 @@ export const RegisterUser = async(userInfo = {},token = {}) => {
 
 
   const parentName = queryParentRet.Items[0].username
+
   const [saveUserErr, saveUserRet] = await saveUser(
     {
       ...User,
+      userId: Model.uuid(),
       username: `${User.suffix}_${User.username}`,
       parentName:parentName
     })
@@ -254,6 +256,7 @@ const getRole = async(code) => {
 const saveUser = async(userInfo) => {
   const baseModel = Model.baseModel()
   const roleDisplay = RoleDisplay[userInfo.role]
+  console.log('saveUser',userInfo.userId);
   const UserItem =  {
     ...baseModel,
     ...userInfo,
