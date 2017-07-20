@@ -65,5 +65,8 @@ export const BizErr = {
   },
   MsnExistErr: (errMsg = 'MSN number is exist') =>{
     return {code:Codes.MsnExistError,err:errMsg}
+  },
+  InsufficientBalanceErr: (errMsg = 'InsufficientBalance') => {
+    return {code: Codes.InsufficientBalance,err:errMsg}
   }
 }

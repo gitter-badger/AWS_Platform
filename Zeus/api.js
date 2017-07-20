@@ -90,7 +90,7 @@ const userNew = async(e, c, cb) => {
       err: tokenErr
     }, tokenErr.code)
   }
-
+// 检查当前操作账户是否有权创建新用户
   const [roleErr,
     _] = CheckRoleFromToken(token, userInfo)
   if (roleErr) {
@@ -99,8 +99,14 @@ const userNew = async(e, c, cb) => {
       err: roleErr
     }, roleErr.code)
   }
+  // 由于有了对角色的判断 就可以在这里对新建用户的parent进行推理约束了
+  /**
+   如果当前是一个管理员  则新用户的parent要么就是当前用户 要么就是Manager
+   如果当前是一个Manager 那么新用户的parent只能是当前用户或者当前用户的子级Manager
+
+  */
   const [registerUserErr,
-    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo))
+    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo),token)
   if (registerUserErr) {
     return ResFail(cb, {
       ...errRes,

@@ -17,7 +17,10 @@ import {
   MSNStatusEnum
 } from '../lib/all'
 import { CheckMSN } from './dao'
-export const RegisterUser = async(userInfo = {}) => {
+export const RegisterUser = async(userInfo = {},token = {}) => {
+  if (userInfo.points < 0) {
+    return [BizErr.ParamErr('points cant less then 0 for new user'),0]
+  }
   // check the role code
   const roleCode = userInfo.role
 
@@ -75,12 +78,35 @@ export const RegisterUser = async(userInfo = {}) => {
   if (queryUserRet.Items.length) {
     return [BizErr.UserExistErr() , 0 ]
   }
+  // 检查新建用户的parent 如果parent为DefaultParent或者NoParent 就指定当前操作用户作为parent
   const [queryParentErr,queryParentRet] = await queryUserById(User.parent)
   if (queryParentErr) {
     return [queryParentErr,0]
   }
   if (queryParentRet.Items.length - 1 != 0) {
     return [BizErr.UserNotFoundErr('parent not found'),0]
+  }
+  const parentUser = queryParentRet.Items[0]
+  // 检查作为parent的账户是否有足够的点数 但是 如果创建的是平台管理员账号则不需要检查 直接赋予此账号10000000点
+  if (RoleCodeEnum['PlatformAdmin'] == roleCode) {
+    User.points = 1000000000.00
+  } else {
+    /**
+     根据points参数的正负
+     + 表示从当前操作账户向新建账户存点 (deposit)
+     - 表示从新建账户中往操作账户提点 (withdraw)
+     由于是新建账户 所以我们不允许第一次就是从新建账户提点 因为默认的新增账户的点数为0
+     其次,新建的管理员是没有办法指定新建时的点数的.
+     综合以上两点, 新增时的points一定大于等于0. 因此一定是deposit 需要检查的是当前操作账号的余额
+    **/
+    const [balanceErr,parentBalance] = await CheckBalance(token,parentUser.userId)
+    if (balanceErr) {
+      return [balanceErr,0]
+    }
+    if (UserInfo.points > parentBalance) {
+      return [BizErr.InsufficientBalanceErr(),0]
+    }
+
   }
   // 检查msn是否可用
   if (roleCode === RoleCodeEnum['Merchant']) {
@@ -105,6 +131,15 @@ export const RegisterUser = async(userInfo = {}) => {
     })
   if (saveUserErr) {
     return [saveUserErr, 0]
+  }
+  const [depositErr,depositRet] = await DepositTo(token,{
+    toUser: saveUserRet.userId,
+    toRole: saveUserRet.role,
+    amount: saveUserRet.points,
+    operator: token.username
+  })
+  if (depositErr) {
+    return [depositErr,0]
   }
   return [0, saveUserRet]
 
@@ -304,22 +339,12 @@ const queryUserBySuffix = async(role,suffix,username) => {
 }
 
 const queryUserById = async (userId) => {
-  if (Model.NoParent === userId ) {
-    return [0,{
-      Items:[{
-        username: 'SuperAdmin'
-      }]
-    }]
+  if ( Model.DefaultParent === userId ) {
+    return [0,{ Items:[{ username: 'PlatformAdmin' }] }]
   }
-  if (Model.DefaultParent === userId) {
-    return [0,{
-      Items:[{
-        username: 'PlatformAdmin'
-      }]
-    }]
+  if (Model.NoParent === userId) {
+    return [0,{ Items:[{ username: 'SuperAdmin' }] }]
   }
-
-
   const query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'UserIdIndex',

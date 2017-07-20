@@ -819,13 +819,35 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
     "amount": 1000.00
   }
 
-  /* 找不到用户错误 */
-  {
-      "m": "withdrawPoints err",
-      "err": {
-          "code": "22011",
-          "err": "User not found"
-      },
-      "code": "22011"
-  }
+```
+
+- Response
+
+```
+{
+    "m": "withdrawPoints",
+    "payload": {
+        "createdAt": 1500474814342,
+        "updatedAt": 1500474814342,
+        "sn": "297315d0-3c2f-4f13-9c5e-b2455d7438fc",
+        "fromRole": "10",
+        "toRole": "100",
+        "fromUser": "TAT_TAT001",
+        "toUser": "EDG_clear_love001",
+        "action": 1,
+        "amount": 1000,
+        "operator": "管理员"
+    },
+    "code": "0"
+}
+
+/* 找不到用户错误 */
+{
+    "m": "withdrawPoints err",
+    "err": {
+        "code": "22011",
+        "err": "User not found"
+    },
+    "code": "22011"
+}
 ```
