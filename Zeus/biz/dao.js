@@ -289,7 +289,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   }
     // move out user input sn
   billInfo = Omit(billInfo,['sn','fromRole','fromUser','action'])
-
+console.log('billInfo',billInfo);
   const [toUserErr,toUser] = await getUserByName(billInfo.toRole,billInfo.toUser)
   if (toUserErr) {
     return [toUserErr,0]
@@ -302,6 +302,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   }
 
   const Role = RoleModels[role]
+  console.log('role',Role);
   if (!Role || Role.points === undefined) {
     return [BizErr.ParamErr('role error'),0]
   }
@@ -361,7 +362,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
       ]
     }
   }
-
+console.log(JSON.stringify(batch,null,4));
   const [err,ret] = await Store$('batchWrite',batch)
   if (err) {
     return [err,0]
@@ -370,7 +371,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
 }
 
 export const CheckBalance = async (token,userId) =>{
-  return 0.0
+  return [0,1000000.00]
 }
 export const FormatMSN = function(param) {
   try {

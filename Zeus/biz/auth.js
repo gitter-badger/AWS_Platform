@@ -16,7 +16,7 @@ import {
   RoleDisplay,
   MSNStatusEnum
 } from '../lib/all'
-import { CheckMSN } from './dao'
+import { CheckMSN,CheckBalance, DepositTo } from './dao'
 export const RegisterUser = async(userInfo = {},token = {}) => {
   if (userInfo.points < 0) {
     return [BizErr.ParamErr('points cant less then 0 for new user'),0]
@@ -89,14 +89,14 @@ export const RegisterUser = async(userInfo = {},token = {}) => {
   const parentUser = queryParentRet.Items[0]
   // 检查作为parent的账户是否有足够的点数 但是 如果创建的是平台管理员账号则不需要检查 直接赋予此账号10000000点
   if (RoleCodeEnum['PlatformAdmin'] == roleCode) {
-    User.points = 1000000000.00
+    User.points = 100000000.00
   } else {
     /**
      根据points参数的正负
      + 表示从当前操作账户向新建账户存点 (deposit)
      - 表示从新建账户中往操作账户提点 (withdraw)
      由于是新建账户 所以我们不允许第一次就是从新建账户提点 因为默认的新增账户的点数为0
-     其次,新建的管理员是没有办法指定新建时的点数的.
+     其次,新建的管理员是没有办法指定新建自己时的点数的.
      综合以上两点, 新增时的points一定大于等于0. 因此一定是deposit 需要检查的是当前操作账号的余额
     **/
     const [balanceErr,parentBalance] = await CheckBalance(token,parentUser.userId)
@@ -132,15 +132,19 @@ export const RegisterUser = async(userInfo = {},token = {}) => {
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  const [depositErr,depositRet] = await DepositTo(token,{
-    toUser: saveUserRet.userId,
-    toRole: saveUserRet.role,
-    amount: saveUserRet.points,
-    operator: token.username
-  })
-  if (depositErr) {
-    return [depositErr,0]
+  // 管理员角色创建时默认分配点数, 这笔交易不需要记录
+  if (RoleCodeEnum['PlatformAdmin'] !== User.role) {
+    const [depositErr,depositRet] = await DepositTo(token,{
+      toUser: saveUserRet.username,
+      toRole: saveUserRet.role,
+      amount: User.points,
+      operator: token.username
+    })
+    if (depositErr) {
+      return [depositErr,0]
+    }
   }
+
   return [0, saveUserRet]
 
 }
@@ -227,7 +231,6 @@ export const UserGrabToken = async(userInfo = {})=>{
   if (User.Items.length - 1 != 0) {
     return [BizErr.UserNotFoundErr(),0]
   }
-  console.log(User.Items[0]);
   // update the login ip & updatedAt & loginAt
   const UserLastLogin = {
     ...User.Items[0],

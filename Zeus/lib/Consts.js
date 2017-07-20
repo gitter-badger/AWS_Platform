@@ -164,6 +164,7 @@ export const RoleModels = {
     enabledAt:Model.timeStamp(),
     status:StatusEnum.Enable,
     suffix:'Platform',
+    points:Model.NumberValue,
     adminName:Model.StringValue
   },
   '10':{ // 建站代理商
