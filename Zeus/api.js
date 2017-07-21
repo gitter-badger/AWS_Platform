@@ -103,7 +103,7 @@ const userNew = async(e, c, cb) => {
   }
 
   const [registerUserErr,
-    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo),token)
+    resgisterUserRet] = await RegisterUser(token,Model.addSourceIP(e, userInfo))
   if (registerUserErr) {
     return ResFail(cb, {
       ...errRes,

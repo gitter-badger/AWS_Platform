@@ -271,15 +271,15 @@ const getUserById = async (userId,role) => {
   return [0,User]
 }
 // 存入
-export const DepositTo = async(token,billInfo) => {
-  const userId = token.userId
-  const role = token.role
+export const DepositTo = async(fromUser,billInfo) => {
+  const userId = fromUser.userId
+  const role = fromUser.role
   return await BillTransfer(userId,role,billInfo,BillActionEnum.Deposit)
 }
 // 提出
-export const WithdrawFrom = async(token,billInfo) => {
-  const userId = token.userId
-  const role = token.role
+export const WithdrawFrom = async(fromUser,billInfo) => {
+  const userId = fromUser.userId
+  const role = fromUser.role
   return await BillTransfer(userId,role,billInfo,BillActionEnum.Withdraw)
 }
 
