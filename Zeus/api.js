@@ -16,9 +16,8 @@ import {
   JwtVerify,
   GeneratePolicyDocument
 } from './lib/all'
-import {RegisterUser, LoginUser,UserGrabToken} from './biz/auth'
+import {RegisterAdmin,RegisterUser, LoginUser,UserGrabToken} from './biz/auth'
 import {
-  CheckRoleFromToken,
   ListChildUsers,
   ListAvalibleManagers,
   AddGame,
@@ -31,9 +30,9 @@ import {
   GetUser
 
 } from './biz/dao'
-
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+const ResErr=(callback,err) => ResFail(callback,{err:err},err.code)
 // 用于生成第一个管理员
 const eva = async(e,c,cb) =>{
   const errRes = {
@@ -64,6 +63,24 @@ const eva = async(e,c,cb) =>{
     payload: resgisterUserRet
   })
 }
+const adminNew = async(e,c,cb) => {
+  const [jsonParseErr,userInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb,jsonParseErr)
+  }
+  const [tokenErr,token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb,tokenErr)
+  }
+
+  const [registAdminErr,adminUser] = await RegisterAdmin(token ,Model.addSourceIP(e,userInfo))
+  if (registAdminErr) {
+    return ResErr(cb,registAdminErr)
+  }
+  return ResOK(cb,{
+    payload:adminUser
+  })
+}
 // 用户注册
 const userNew = async(e, c, cb) => {
   const errRes = {
@@ -77,34 +94,14 @@ const userNew = async(e, c, cb) => {
   const [jsonParseErr,
     userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: jsonParseErr
-    }, jsonParseErr.code)
+    return ResErr(cb,jsonParseErr)
   }
   const [tokenErr,
     token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResErr(cb,tokenErr)
   }
-// 检查当前操作账户是否有权创建新用户
-  const [roleErr,
-    _] = CheckRoleFromToken(token, userInfo)
-  if (roleErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: roleErr
-    }, roleErr.code)
-  }
-  // 由于有了对角色的判断 就可以在这里对新建用户的parent进行推理约束了
-  /**
-   如果当前是一个管理员  则新用户的parent要么就是当前用户 要么就是Manager
-   如果当前是一个Manager 那么新用户的parent只能是当前用户或者当前用户的子级Manager
 
-  */
   const [registerUserErr,
     resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo),token)
   if (registerUserErr) {
@@ -642,6 +639,7 @@ export {
   jwtverify, // 用于进行token验证的方法
   eva, // 用于创建系统的第一个管理员账号
   userAuth, // 用户登录
+  adminNew,
   userNew, // 创建新用户
   userGrabToken, // 使用apiKey登录获取用户信息
   managerList, // 建站商列表

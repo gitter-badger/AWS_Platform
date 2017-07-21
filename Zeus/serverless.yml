@@ -45,6 +45,15 @@ functions:
           path: beings
           method: post
           cors: true
+  adminNew:
+    handler: api.adminNew
+    events:
+      -
+        http:
+          path: admins
+          method: post
+          cors: true
+          authorizer: tokenAuth
   userNew:
     handler: api.userNew
     events:

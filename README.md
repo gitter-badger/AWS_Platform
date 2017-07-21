@@ -159,7 +159,23 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
 
 ** 部署和测试阶段使用的接口,正式发布版本也不会作为可访问api
 
+#### 创建管理员账号
 
+- URL
+
+```
+ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/admins
+```
+- Body
+
+```
+{
+  "username": "Faker001",
+  "password": "111111",
+  "role": "1",
+  "adminName": "Faker"
+}
+```
 #### 创建线路商 / 商户用户
 
 - URL

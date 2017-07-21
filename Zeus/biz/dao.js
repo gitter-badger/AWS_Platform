@@ -217,7 +217,7 @@ export const CheckRoleFromToken  = (token,userInfo) => {
     if(
       !(RoleCodeEnum['Manager'] === userInfo.role || RoleCodeEnum['Merchant'] === userInfo.role)
     ){
-      return [BizErr.TokenErr('Operation not allowed. Manager can only create manager , merchant')]
+      return [BizErr.TokenErr('Operation not allowed. Manager can only create manager , merchant'),0]
     }
   }
 
@@ -301,8 +301,7 @@ console.log('billInfo',billInfo);
     return [userErr,0]
   }
 
-  const Role = RoleModels[role]
-  console.log('role',Role);
+  const Role = RoleModels[role]()
   if (!Role || Role.points === undefined) {
     return [BizErr.ParamErr('role error'),0]
   }
@@ -327,12 +326,12 @@ console.log('billInfo',billInfo);
   const Bill = {
     ...Model.baseModel(),
     ...Pick({
-      ...BillModel,
+      ...BillModel(),
       ...billInfo,
       fromUser:fromUser,
       fromRole:fromRole,
       action:action
-    },Keys(BillModel))
+    },Keys(BillModel()))
   }
 
 
@@ -362,7 +361,6 @@ console.log('billInfo',billInfo);
       ]
     }
   }
-console.log(JSON.stringify(batch,null,4));
   const [err,ret] = await Store$('batchWrite',batch)
   if (err) {
     return [err,0]

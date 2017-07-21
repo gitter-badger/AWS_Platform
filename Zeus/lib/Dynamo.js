@@ -46,6 +46,7 @@ export const Model = {
   PASSWORD_PATTERN: [3,16],
   StringValue: '0',
   NumberValue: 0.0,
+  PlatformAdminDefaultPoints: 100000000.00,
   DefaultParent: '01', // 平台
   DefaultParentName: 'PlatformAdmin',
   NoParent: '00', // 没有

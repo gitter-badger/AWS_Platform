@@ -17,6 +17,72 @@ import {
   MSNStatusEnum
 } from '../lib/all'
 import { CheckMSN,CheckBalance, DepositTo } from './dao'
+/**
+  现在注册分成两部分
+  1. 管理员注册
+  2. 商户/建站商注册
+**/
+
+/*
+  userInfo = {
+    username,
+    password,
+    adminName,
+  }
+*/
+const userParamCheck = (userInfo)=>{
+  if (userInfo.adminName === Model.StringValue) {
+    return [BizErr.ParamErr('adminName must set'),0]
+  }
+  if (Trim(userInfo.username).length < Model.USERNAME_LIMIT[0]) {
+    return [ BizErr.UsernameTooShortErr(), 0 ]
+  }
+  if (Trim(userInfo.username).length > Model.USERNAME_LIMIT[1]) {
+    return [BizErr.UsernameTooLongErr() , 0 ]
+  }
+  if (userInfo.password.length < Model.PASSWORD_PATTERN[0]) {
+    return [BizErr.ParamErr(),0]
+  }
+  return [0,0]
+}
+export const RegisterAdmin = async(token={},userInfo={}) =>{
+  //创建管理员账号的只能是管理员
+  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin token'),0]
+  }
+  const adminRole = RoleModels[RoleCodeEnum['PlatformAdmin']]()
+  const userInput = Pick({
+    ...adminRole,
+    ...Omit(userInfo,['userId','points','role','suffix','passhash']) // 这几个都是默认值
+  },Keys(adminRole))
+  // check user
+  const [userParamErr,_] = userParamCheck(userInput)
+  if (userParamErr) {
+    return [userParamErr,0]
+  }
+  const CheckUser = {
+    ...userInput,
+    passhash: Model.hashGen(userInput.password)
+  }
+  const [queryUserErr,queryUserRet] = await checkUserBySuffix(CheckUser.role,CheckUser.suffix,CheckUser.username)
+  if (queryUserErr) {
+    return [queryUserErr,0]
+  }
+  if (queryUserRet.Items.length) {
+    return [BizErr.UserExistErr() , 0 ]
+  }
+  // save user
+  const User = {
+    ...CheckUser,
+    username: `${CheckUser.suffix}_${CheckUser.username}`
+  }
+  const [saveUserErr,saveUserRet] = await saveUser(User)
+  if (saveUserErr) {
+    return [saveUserErr,0]
+  }
+  return [0,saveUserRet]
+}
+
 export const RegisterUser = async(userInfo = {},token = {}) => {
   if (userInfo.points < 0) {
     return [BizErr.ParamErr('points cant less then 0 for new user'),0]
@@ -78,7 +144,9 @@ export const RegisterUser = async(userInfo = {},token = {}) => {
   if (queryUserRet.Items.length) {
     return [BizErr.UserExistErr() , 0 ]
   }
-  // 检查新建用户的parent 如果parent为DefaultParent或者NoParent 就指定当前操作用户作为parent
+  // 目前系统中只能由管理员角色来创建新的用户 因此 token.role 一定为 platformAdmin
+  // 这样的话,
+
   const [queryParentErr,queryParentRet] = await queryUserById(User.parent)
   if (queryParentErr) {
     return [queryParentErr,0]
@@ -198,7 +266,7 @@ export const UserGrabToken = async(userInfo = {})=>{
     return [BizErr.ParamErr('missing params'),0]
   }
   // 获取角色模型 能够访问这个接口的只有商户
-  const Role =  RoleModels[RoleCodeEnum['Merchant']]
+  const Role =  RoleModels[RoleCodeEnum['Merchant']]()
   const roleDisplay = RoleDisplay[RoleCodeEnum['Merchant']]
   if (!Role.apiKey) { // 是否有apiKey
     return [BizErr.ParamErr('wrong role'),0]
@@ -251,7 +319,7 @@ const getRole = async(code) => {
   if (!RoleModels[code]) {
       return [BizErr.ParamErr('Role is not found'),0]
   }
-  return [ 0, RoleModels[code] ]
+  return [ 0, RoleModels[code]() ]
 }
 const saveUser = async(userInfo) => {
   const baseModel = Model.baseModel()
@@ -346,6 +414,7 @@ const queryUserBySuffix = async(role,suffix,username) => {
 
 const queryUserById = async (userId) => {
   if ( Model.DefaultParent === userId ) {
+
     return [0,{ Items:[{ username: 'PlatformAdmin' }] }]
   }
   if (Model.NoParent === userId) {

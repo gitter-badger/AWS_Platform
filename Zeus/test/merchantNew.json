@@ -17,6 +17,7 @@
   },
   "body": {
     "username": "Duplicate002",
+    "adminName": "abc",
     "password": "111111",
     "role": "10",
     "suffix": "F2",
