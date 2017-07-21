@@ -34,6 +34,10 @@ const userParamCheck = (userInfo)=>{
   if (userInfo.adminName === Model.StringValue) {
     return [BizErr.ParamErr('adminName must set'),0]
   }
+
+  if (userInfo.suffix === Model.StringValue) {
+    return [BizErr.NoSuffixErr(),0]
+  }
   if (Trim(userInfo.username).length < Model.USERNAME_LIMIT[0]) {
     return [ BizErr.UsernameTooShortErr(), 0 ]
   }
@@ -44,6 +48,23 @@ const userParamCheck = (userInfo)=>{
     return [BizErr.ParamErr(),0]
   }
   return [0,0]
+}
+const queryParent = async(token,userId) => {
+  var id = 0,role = -1
+  if (!userId || Model.DefaultParent == userId) {
+    id = token.userId
+    role = token.role
+  }else {
+    id = userId
+    // 能够有子节点的只能是管理员或者线路商
+    role = RoleCodeEnum['Manager']
+  }
+
+  const [err,user] = await queryUserById(id,role)
+  if (err) {
+    return [err,0]
+  }
+  return [0,user]
 }
 export const RegisterAdmin = async(token={},userInfo={}) =>{
   //创建管理员账号的只能是管理员
@@ -82,102 +103,53 @@ export const RegisterAdmin = async(token={},userInfo={}) =>{
   }
   return [0,saveUserRet]
 }
-
-export const RegisterUser = async(userInfo = {},token = {}) => {
+// 专门用于创建商户/建站商
+export const RegisterUser = async(token = {},userInfo = {}) => {
+  //创建管理员账号的只能是管理员
+  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin token'),0]
+  }
   if (userInfo.points < 0) {
     return [BizErr.ParamErr('points cant less then 0 for new user'),0]
   }
   // check the role code
   const roleCode = userInfo.role
-
-  if (roleCode === RoleCodeEnum['PlatformAdmin'] && userInfo.suffix) {
-    userInfo = Omit(userInfo,['suffix'])
-    return [BizErr.ParamErr('suffix cant change as platform admin user'),0]
-  }
-  if (roleCode === RoleCodeEnum['PlatformAdmin'] && userInfo.parent) {
-    userInfo = Omit(userInfo,['parent'])
-    return [BizErr.ParamErr('parent cant change as platform admin user'),0]
+  if (roleCode === RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.ParamErr('admin role cant create by this api'),0]
   }
   // find the role in the role table
-  const [roleNotFoundErr, Role] = await getRole(roleCode)
+  const [roleNotFoundErr, bizRole] = await getRole(roleCode)
   if (roleNotFoundErr) {
     return [roleNotFoundErr, 0]
   }
-  userInfo = Omit(userInfo,['userId'])
-  const UserInfo = Pick({
-    ...Role,
+  userInfo = Omit(userInfo,['userId','passhash'])
+  const userInput = Pick({
+    ...bizRole,
     ...userInfo
-  },Keys(Role))
+  },Keys(bizRole))
 
 
-  if (UserInfo.suffix === Model.StringValue) {
-    return [BizErr.NoSuffixErr(),0]
-  }
-
-  if (UserInfo.adminName === Model.StringValue) {
-    return [BizErr.ParamErr('adminName must set'),0]
-  }
-
-
-  if (Trim(UserInfo.username).length < Model.USERNAME_LIMIT[0]) {
-    return [ BizErr.UsernameTooShortErr(), 0 ]
-  }
-  if (Trim(UserInfo.username).length > Model.USERNAME_LIMIT[1]) {
-    return [BizErr.UsernameTooLongErr() , 0 ]
-  }
-  if (UserInfo.password.length < Model.PASSWORD_PATTERN[0]) {
-    return [BizErr.ParamErr(),0]
+  const [userParamErr,_] = userParamCheck(userInput)
+  if (userParamErr) {
+    return [userParamErr,0]
   }
 
   // when get the role. can use it the puck attr from userInfo and build the User Model
-  const User = {
-    ...UserInfo,
-    passhash: Model.hashGen(UserInfo.password)
+  const CheckUser = {
+    ...userInput,
+    passhash: Model.hashGen(userInput.password)
   }
 
   // check if the user is exists
-  const suffix = User.suffix
-  const [queryUserErr, queryUserRet] = await checkUserBySuffix(roleCode,suffix,User.username)
+  const [queryUserErr,queryUserRet] = await checkUserBySuffix(CheckUser.role,CheckUser.suffix,CheckUser.username)
   if (queryUserErr) {
-    return [queryUserErr, 0]
+    return [queryUserErr,0]
   }
   if (queryUserRet.Items.length) {
     return [BizErr.UserExistErr() , 0 ]
   }
-  // 目前系统中只能由管理员角色来创建新的用户 因此 token.role 一定为 platformAdmin
-  // 这样的话,
-
-  const [queryParentErr,queryParentRet] = await queryUserById(User.parent)
-  if (queryParentErr) {
-    return [queryParentErr,0]
-  }
-  if (queryParentRet.Items.length - 1 != 0) {
-    return [BizErr.UserNotFoundErr('parent not found'),0]
-  }
-  const parentUser = queryParentRet.Items[0]
-  // 检查作为parent的账户是否有足够的点数 但是 如果创建的是平台管理员账号则不需要检查 直接赋予此账号10000000点
-  if (RoleCodeEnum['PlatformAdmin'] == roleCode) {
-    User.points = 100000000.00
-  } else {
-    /**
-     根据points参数的正负
-     + 表示从当前操作账户向新建账户存点 (deposit)
-     - 表示从新建账户中往操作账户提点 (withdraw)
-     由于是新建账户 所以我们不允许第一次就是从新建账户提点 因为默认的新增账户的点数为0
-     其次,新建的管理员是没有办法指定新建自己时的点数的.
-     综合以上两点, 新增时的points一定大于等于0. 因此一定是deposit 需要检查的是当前操作账号的余额
-    **/
-    const [balanceErr,parentBalance] = await CheckBalance(token,parentUser.userId)
-    if (balanceErr) {
-      return [balanceErr,0]
-    }
-    if (UserInfo.points > parentBalance) {
-      return [BizErr.InsufficientBalanceErr(),0]
-    }
-
-  }
   // 检查msn是否可用
-  if (roleCode === RoleCodeEnum['Merchant']) {
+  if (CheckUser.role === RoleCodeEnum['Merchant']) {
     const [checkMSNErr,checkMSNRet] = await CheckMSN({
       msn: User.msn
     })
@@ -188,37 +160,43 @@ export const RegisterUser = async(userInfo = {},token = {}) => {
       return [BizErr.MsnExistErr(),0]
     }
   }
-
-
-  const parentName = queryParentRet.Items[0].username
-
-  const [saveUserErr, saveUserRet] = await saveUser(
-    {
-      ...User,
-      userId: Model.uuid(),
-      username: `${User.suffix}_${User.username}`,
-      parentName:parentName
-    })
+  // 如果parent未指定,则为管理员. 从当前管理员对点数中扣去点数进行充值. 点数不可以为负数.而且一定是管理员存点到新用户
+  const [queryParentErr,parentUser] = await queryParent(token,CheckUser.parent)
+  if (queryParentErr) {
+    return [queryParentErr,0]
+  }
+  // 无论填入多少点数. 产生用户时, 点数的起始为0.0
+  const depositPoints = CheckUser.points
+  const User = {
+    ...CheckUser,
+    username: `${CheckUser.suffix}_${CheckUser.username}`,
+    parentName: parentUser.username,
+    points:0.0
+  }
+  const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  // 管理员角色创建时默认分配点数, 这笔交易不需要记录
-  if (RoleCodeEnum['PlatformAdmin'] !== User.role) {
-    const [depositErr,depositRet] = await DepositTo(token,{
-      toUser: saveUserRet.username,
-      toRole: saveUserRet.role,
-      amount: User.points,
-      operator: token.username
-    })
-    if (depositErr) {
-      return [depositErr,0]
-    }
+  const [depositErr,depositRet] = await DepositTo(parentUser,{
+    toUser: saveUserRet.username,
+    toRole: saveUserRet.role,
+    amount: Math.min(depositPoints,parentUser.points), // 有多少扣多少
+    operator: token.username
+  })
+  var orderId = depositRet.sn
+  if (depositErr) {
+    orderId = '-1'
   }
-
-  return [0, saveUserRet]
-
+  return [0,{
+    ...saveUserRet,
+    orderId:orderId
+  }]
 }
 
+
+/**
+LoginUser
+*/
 export const LoginUser = async(userLoginInfo = {}) => {
   // check the role code
   const roleCode = userLoginInfo.role
@@ -324,7 +302,6 @@ const getRole = async(code) => {
 const saveUser = async(userInfo) => {
   const baseModel = Model.baseModel()
   const roleDisplay = RoleDisplay[userInfo.role]
-  console.log('saveUser',userInfo.userId);
   const UserItem =  {
     ...baseModel,
     ...userInfo,
@@ -412,14 +389,8 @@ const queryUserBySuffix = async(role,suffix,username) => {
   return await Store$('query', query)
 }
 
-const queryUserById = async (userId) => {
-  if ( Model.DefaultParent === userId ) {
-
-    return [0,{ Items:[{ username: 'PlatformAdmin' }] }]
-  }
-  if (Model.NoParent === userId) {
-    return [0,{ Items:[{ username: 'SuperAdmin' }] }]
-  }
+const queryUserById = async (userId,role) => {
+console.log(userId,role);
   const query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'UserIdIndex',
@@ -430,9 +401,15 @@ const queryUserById = async (userId) => {
     },
     ExpressionAttributeValues:{
       ':userId':userId,
-      ':role': RoleCodeEnum['Manager']
-
+      ':role': role
     }
   }
-  return await Store$('query',query)
+  const [queryErr,ret] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  if (ret.Items.length - 1 != 0) {
+    return [BizErr.ItemExistErr('user more than one'),0]
+  }
+  return  [0,ret.Items[0]]
 }
