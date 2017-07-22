@@ -197,35 +197,26 @@ const getUserByName = async(role, username) => {
   return [0,User]
 }
 
-
-export const CheckRoleFromToken  = (token,userInfo) => {
-  if (RoleCodeEnum['Merchant'] === token.role){
-    // 登录角色为商户角色,不可以创建任何其他角色
-    return [BizErr.TokenErr('Operation not allowd. merchant role cant create user'),0]
-  }
-  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
-    //登录角色为平台管理员, 可以创建管理员, 线路商,商户
-    if (!(
-      RoleCodeEnum['PlatformAdmin'] === userInfo.role ||
-      RoleCodeEnum['Manager'] === userInfo.role ||
-      RoleCodeEnum['Merchant'] === userInfo.role
-    )) {
-      return [BizErr.TokenErr('Operation not Allowed. PlatformAdmin can only create PlatformAdmin,mananger, merchant')]
+export const QueryUserById = async (userId) => {
+  const query = {
+    TableName: Tables.ZeusPlatformUser,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues:{
+      ':userId': userId
     }
   }
-  if (RoleCodeEnum['Manager'] === token.role) {
-    if(
-      !(RoleCodeEnum['Manager'] === userInfo.role || RoleCodeEnum['Merchant'] === userInfo.role)
-    ){
-      return [BizErr.TokenErr('Operation not allowed. Manager can only create manager , merchant'),0]
-    }
+  const [err,querySet] = await  Store$('query',query)
+  if (err) {
+    return [err,0]
+  }
+  if (querySet.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr(),0]
   }
 
-  return [0,userInfo]
+  return [0,querySet.Items[0]]
 }
 export const GetUser = async (userId,role,parent) => {
-
-
   const query = {
     TableName: Tables.ZeusPlatformUser,
     KeyConditionExpression: '#userId = :userId and #role = :role',
@@ -289,7 +280,6 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   }
     // move out user input sn
   billInfo = Omit(billInfo,['sn','fromRole','fromUser','action'])
-console.log('billInfo',billInfo);
   const [toUserErr,toUser] = await getUserByName(billInfo.toRole,billInfo.toUser)
   if (toUserErr) {
     return [toUserErr,0]
@@ -367,9 +357,34 @@ console.log('billInfo',billInfo);
   }
   return [0,Bill]
 }
+// 返回某个账户下的余额
+export const CheckBalance = async (token,user) =>{
+  // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
+  // 当前登录用户只能查询自己的balance
+  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId)) {
+    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
+  }
+  if (user.points == undefined || user.points == null) {
+    return [BizErr.ParamErr('User dont have base points'),0]
+  }
+  const baseBalance = parseFloat(user.points)
+  const query = {
+    TableName: Tables.ZeusPlatformBill,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': user.userId
+    }
+  }
+  const [queryErr,bills] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  const sums = _.reduce(bills.Items,(sum,bill)=>{
+    return sum + parseFloat(bill.amount)
+  },0.0)
 
-export const CheckBalance = async (token,userId) =>{
-  return [0,1000000.00]
+  return [0,baseBalance + sums]
 }
 export const FormatMSN = function(param) {
   try {

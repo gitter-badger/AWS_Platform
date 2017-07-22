@@ -184,6 +184,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  billOne:
+    handler: api.billOne
+    events:
+      -
+        http:
+          path: bills/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
   billList:
     handler: api.billList
     events:

@@ -867,3 +867,40 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
     "code": "22011"
 }
 ```
+#### 查询某个用户的点数余额
+
+- URL
+
+```
+ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/bills/{userId}
+```
+
+- Path Params
+
+```
+{
+  "userId": "e116fce7-cc24-4262-91fe-f7d7e93b5995"
+}
+```
+
+- Token
+
+```
+需要
+只能是管理员账号 或者是该用户本人
+```
+
+- Response
+
+```
+{
+    "payload": {
+        "balance": 200000,
+        "userId": "e116fce7-cc24-4262-91fe-f7d7e93b5995"
+    },
+    "code": "0"
+}
+
+
+
+```
