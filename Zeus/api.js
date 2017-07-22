@@ -27,7 +27,9 @@ import {
   CheckMSN,
   FormatMSN,
   UserUpdate,
-  GetUser
+  GetUser,
+  QueryUserById,
+  CheckBalance
 
 } from './biz/dao'
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -472,6 +474,30 @@ const gameList = async(e, c, cb) => {
   })
 }
 
+const billOne = async (e,c,cb) => {
+  const [paramsErr,params] = Model.pathParams(e)
+  if (paramsErr || !params.userId) {
+    return ResErr(cb,paramsErr)
+  }
+  const [tokenErr,token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb,tokenErr)
+  }
+  const [queryErr,user] = await QueryUserById(params.userId)
+  if (queryErr) {
+    return ResErr(cb,queryErr)
+  }
+  const [balanceErr, balance] = await CheckBalance(token,user)
+  if (balanceErr) {
+    return ResErr(cb,balanceErr)
+  }
+  return ResOK(cb,{
+    payload:{
+      balance: balance,
+      userId: params.userId
+    }
+  })
+}
 const billList = async(e, c, cb) => {
   const bills = [
     {
@@ -657,5 +683,6 @@ export {
   msnList, // 线路号列表
   checkMsn, // 检查msn是否被占用
   msnOne, //获取一个未被占用的线路号
-  billList // 流水列表
+  billList,// 流水列表
+  billOne
 }

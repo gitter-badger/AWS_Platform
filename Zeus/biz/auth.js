@@ -23,13 +23,6 @@ import { CheckMSN,CheckBalance, DepositTo } from './dao'
   2. 商户/建站商注册
 **/
 
-/*
-  userInfo = {
-    username,
-    password,
-    adminName,
-  }
-*/
 const userParamCheck = (userInfo)=>{
   if (userInfo.adminName === Model.StringValue) {
     return [BizErr.ParamErr('adminName must set'),0]
@@ -166,7 +159,7 @@ export const RegisterUser = async(token = {},userInfo = {}) => {
     return [queryParentErr,0]
   }
   // 无论填入多少点数. 产生用户时, 点数的起始为0.0
-  const depositPoints = CheckUser.points
+  const depositPoints = parseFloat(CheckUser.points)
   const User = {
     ...CheckUser,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
@@ -177,10 +170,14 @@ export const RegisterUser = async(token = {},userInfo = {}) => {
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
+  const [queryBalanceErr,balance] = await CheckBalance(token,parentUser)
+  if (queryBalanceErr) {
+    return [queryBalanceErr,0]
+  }
   const [depositErr,depositRet] = await DepositTo(parentUser,{
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
-    amount: Math.min(depositPoints,parentUser.points), // 有多少扣多少
+    amount: Math.min(depositPoints,balance), // 有多少扣多少
     operator: token.username
   })
   var orderId = depositRet.sn
