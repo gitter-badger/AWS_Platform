@@ -198,9 +198,10 @@ functions:
     events:
       -
         http:
-          path: bills
+          path: waterfall/{userId}
           method: get
           cors: true
+          authorizer: tokenAuth
   checkMsn:
     handler: api.checkMsn
     events:
