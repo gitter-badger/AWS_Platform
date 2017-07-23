@@ -263,41 +263,31 @@ const getUserById = async (userId,role) => {
 }
 // 存入
 export const DepositTo = async(fromUser,billInfo) => {
-  const userId = fromUser.userId
-  const role = fromUser.role
-  return await BillTransfer(userId,role,billInfo,BillActionEnum.Deposit)
+  return await BillTransfer(fromUser,billInfo,BillActionEnum.Deposit)
 }
 // 提出
 export const WithdrawFrom = async(fromUser,billInfo) => {
-  const userId = fromUser.userId
-  const role = fromUser.role
-  return await BillTransfer(userId,role,billInfo,BillActionEnum.Withdraw)
+  return await BillTransfer(fromUser,billInfo,BillActionEnum.Withdraw)
 }
 
-const BillTransfer = async(userId,role,billInfo,action) => {
+const BillTransfer = async(from,billInfo,action) => {
   if (Empty(billInfo)) {
     return [BizErr.ParamMissErr(),0]
   }
     // move out user input sn
   billInfo = Omit(billInfo,['sn','fromRole','fromUser','action'])
-  const [toUserErr,toUser] = await getUserByName(billInfo.toRole,billInfo.toUser)
+  const [toUserErr,to] = await getUserByName(billInfo.toRole,billInfo.toUser)
   if (toUserErr) {
     return [toUserErr,0]
   }
-  const toUserId = toUser.userId
 
-  const [userErr,User] = await getUserById(userId,role)
-  if (userErr) {
-    return [userErr,0]
-  }
-
-  const Role = RoleModels[role]()
+  const Role = RoleModels[from.role]()
   if (!Role || Role.points === undefined) {
     return [BizErr.ParamErr('role error'),0]
   }
   const UserProps = Pick({
     ...Role,
-    ...User
+    ...from
   },Keys(Role))
 
   const initPoints = UserProps.points
@@ -320,7 +310,8 @@ const BillTransfer = async(userId,role,billInfo,action) => {
       ...billInfo,
       fromUser:fromUser,
       fromRole:fromRole,
-      action:action
+      action:action,
+      operator: from.username
     },Keys(BillModel()))
   }
 
@@ -334,7 +325,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
               ...Bill,
               amount: Bill.amount * action,
               action: action,
-              userId:userId
+              userId:from.userId
             }
           }
         },
@@ -344,7 +335,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
               ...Bill,
               amount: (-1.0) * Bill.amount * action,
               action: (-1.0) * action,
-              userId: toUserId
+              userId: to.userId
             }
           }
         }
@@ -357,13 +348,7 @@ const BillTransfer = async(userId,role,billInfo,action) => {
   }
   return [0,Bill]
 }
-// 返回某个账户下的余额
-export const CheckBalance = async (token,user) =>{
-  // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
-  // 当前登录用户只能查询自己的balance
-  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId)) {
-    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
-  }
+export const CheckUserBalance = async (user) => {
   if (user.points == undefined || user.points == null) {
     return [BizErr.ParamErr('User dont have base points'),0]
   }
@@ -385,6 +370,52 @@ export const CheckBalance = async (token,user) =>{
   },0.0)
 
   return [0,baseBalance + sums]
+}
+// 返回某个账户下的余额
+export const CheckBalance = async (token,user) =>{
+  // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
+  // 当前登录用户只能查询自己的balance
+  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId)) {
+    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
+  }
+  return await CheckUserBalance(user)
+}
+/* 商户的账单流水 */
+export const ComputeWaterfall = async (token, userId) =>{
+  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || userId === token.userId)) {
+    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
+  }
+  const [queryUserErr,user] = await QueryUserById(userId)
+  if (queryUserErr) {
+    return [queryUserErr,0]
+  }
+  const initPoints = parseFloat(user.points)
+  const query = {
+    TableName: Tables.ZeusPlatformBill,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': userId
+    }
+  }
+  const [queryErr,bills] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  // 直接在内存里面做列表了. 如果需要进行缓存,以后实现
+  const waterfall =
+
+  _.map(bills.Items,(item,index)=>{
+    let balance = _.reduce(_.slice(bills.Items,0,index+1),(sum,item)=>{
+          return sum + parseFloat(item.amount) + initPoints
+        },0.0)
+    return {
+      ...bills.Items[index],
+      oldBalance: balance - parseFloat(bills.Items[index].amount),
+      balance:balance
+    }
+  })
+  return [0,waterfall]
 }
 export const FormatMSN = function(param) {
   try {
@@ -424,4 +455,23 @@ export const CheckMSN = async(param) =>{
     return [queryErr,0]
   }
   return [0,(queryRet.Items.length == 0)]
+}
+/*获取转账用户*/
+export const QueryBillUser = async(token,fromUserId) => {
+
+  if (!fromUserId) {
+    fromUserId = token.userId
+  }
+  const [err,user] = await QueryUserById(fromUserId)
+  if (err) {
+    return [err,0]
+  }
+  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+    return [0,user]
+  }
+  if (!(user.userId == token.userId || user.parent == token.userId)) {
+    return [BizErr.TokenErr('current token user  cant operate this user'),0]
+  }
+
+  return [0,user]
 }

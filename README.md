@@ -879,7 +879,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
 
 ```
 {
-  "userId": "e116fce7-cc24-4262-91fe-f7d7e93b5995"
+  "userId": "ed598eb7-d471-43ce-bcea-c89989227145"
 }
 ```
 
@@ -901,6 +901,161 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
     "code": "0"
 }
 
+```
+
+
+#### 获取某个用户的账单流水列表
+
+- URL
+
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/waterfall/{userId}
+```
+
+- Token
+
+```
+需要
+
+只有管理员或者查询用户本人可以调用此接口
+```
+
+- Path Params
+
+```
+{
+  "userId":"341a07f4-3d54-4d35-9016-10b623c9bcce"
+}
+```
+
+- Response
+
+```
+{
+    "payload": [
+        {
+            "action": -1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "updatedAt": 1500610227778,
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "amount": -100000,
+            "toRole": "10",
+            "createdAt": 1500610227778,
+            "toUser": "WO_Woh001",
+            "operator": "Platform_Fade001",
+            "sn": "7fa79b1a-c281-4b3e-8504-c6413143b13e",
+            "oldBalance": 100000000,
+            "balance": 99900000
+        },
+        {
+            "action": -1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "updatedAt": 1500629611991,
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "amount": -100,
+            "toRole": "100",
+            "createdAt": 1500629611991,
+            "toUser": "MM_儿童而问题儿童",
+            "operator": "Platform_Fade001",
+            "sn": "648ed89a-4348-4472-a3b5-be1837b85a46",
+            "oldBalance": 199900000,
+            "balance": 199899900
+        },
+        {
+            "action": -1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "updatedAt": 1500654576650,
+            "amount": -30000,
+            "toRole": "10",
+            "createdAt": 1500654576650,
+            "toUser": "MG_manager1001",
+            "operator": "Platform_Fade001",
+            "sn": "2d50eb11-96e6-4444-bd27-b2a1271a9c37",
+            "oldBalance": 299899900,
+            "balance": 299869900
+        },
+        {
+            "action": -1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "updatedAt": 1500654737866,
+            "amount": -30000,
+            "toRole": "10",
+            "createdAt": 1500654737866,
+            "toUser": "MQ_manager1002",
+            "operator": "Platform_Fade001",
+            "sn": "c14f36db-9c75-4402-a601-cee6b01d80a9",
+            "oldBalance": 399869900,
+            "balance": 399839900
+        },
+        {
+            "action": -1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "updatedAt": 1500737872119,
+            "amount": -1000,
+            "toRole": "10",
+            "createdAt": 1500737872119,
+            "toUser": "Y3_Ytest3",
+            "operator": "管理员",
+            "sn": "0cc29ee2-961a-43c4-8533-4504ed47b3e5",
+            "oldBalance": 499839900,
+            "balance": 499838900
+        },
+        {
+            "action": -1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "updatedAt": 1500781649288,
+            "amount": -1000,
+            "toRole": "10",
+            "createdAt": 1500781649288,
+            "toUser": "Y3_Ytest3",
+            "operator": "管理员",
+            "sn": "f5655b03-dbec-412a-85e5-d3dcb46975c1",
+            "oldBalance": 599838900,
+            "balance": 599837900
+        },
+        {
+            "action": 1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "updatedAt": 1500781707284,
+            "amount": 1000,
+            "toRole": "10",
+            "createdAt": 1500781707284,
+            "toUser": "Y3_Ytest3",
+            "operator": "管理员",
+            "sn": "27e1435e-f85c-47da-9877-cc24381721f9",
+            "oldBalance": 699837900,
+            "balance": 699838900
+        },
+        {
+            "action": 1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "updatedAt": 1500782178101,
+            "amount": 1000,
+            "toRole": "10",
+            "createdAt": 1500782178101,
+            "toUser": "Y3_Ytest3",
+            "operator": "Platform_Fade001",
+            "sn": "fd51c172-4ed2-45e7-97bc-3d6108ee769a",
+            "oldBalance": 799838900,
+            "balance": 799839900
+        }
+    ],
+    "code": "0"
+}
 
 
 ```
