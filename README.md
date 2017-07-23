@@ -759,6 +759,14 @@ gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多�
 
 #### 存点
 
+**注意**
+存点和取点的接口中的fromUserId 以及 toUser & toRole 对应的是操作描述的主语和宾语
+例如:
+“老王 向 老李 存点 1000”
+这里的 fromUserId 指向老王  toUser 指向老李
+”老王 从 老李 处提点 1000”
+这里的fromUserId 依然指向老王  toUser 指向老李
+
 - URL
 
 ```
@@ -779,7 +787,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_p
   {
     "toRole": "100",
     "toUser": "EDG_clear_love001",
-    "amount": 1000.00
+    "amount": 1000.00,
+    "fromUserId": "发起存点操作的用户id"
   }
 ```
 
@@ -832,7 +841,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
   {
     "toRole": "100",
     "toUser": "EDG_clear_love001",
-    "amount": 1000.00
+    "amount": 1000.00,
+    "fromUserId": "发起取点操作的用户id"
   }
 
 ```
