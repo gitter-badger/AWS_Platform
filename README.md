@@ -635,6 +635,28 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/
 }
 ```
 
+-
+#### 锁定/解锁线路号
+- URL
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/lockmsn/{msn}/{operate}
+```
+- Token Header
+```
+有
+```
+- Path Params
+```
+/* 参数在url中 */
+{
+  "msn":"1"
+  "operate":"lock"
+}
+```
+- Response
+```
+```
+
 #### 获取所有线路号列表
 - URL
 ```
