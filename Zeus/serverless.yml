@@ -246,6 +246,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  lockmsn: #锁定/解锁线路号，接口编号：
+    handler: api.lockmsn
+    events:
+      -
+        http:
+          path: lockmsn/{msn}/{operate}
+          method: get
+          cors: true
+          authorizer: tokenAuth
   # exquery:
   #   handler: api.exquery
   #   events:

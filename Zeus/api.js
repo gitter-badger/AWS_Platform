@@ -15,6 +15,7 @@ import {
   Pick,
   JwtVerify,
   GeneratePolicyDocument,
+  MSNStatusEnum,
   BizErr
 } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
@@ -564,7 +565,7 @@ const msnList = async (e, c, cb) => {
           flag = false
         }
       }
-      if(flag){
+      if (flag) {
         arr.push({ msn: i, status: 0 })
       }
     }
@@ -592,13 +593,74 @@ const checkMsn = async (e, c, cb) => {
       avalible: Boolean(checkRet)
     }
   })
-
 }
 /**
  * 查看线路号详情
  */
 const msnOne = async (e, c, cb) => {
 
+}
+
+/**
+ * 锁定/解锁线路号
+ */
+const lockmsn = async (e, c, cb) => {
+  const errRes = { m: 'lockmsn err', input: e }
+  const res = { m: 'lockmsn' }
+  const [paramErr, params] = Model.pathParams(e)
+  if (paramErr) {
+    return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
+  }
+  // 获取令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+
+  // 查询msn
+  const [queryErr, queryRet] = await new MsnModel().query({
+    KeyConditionExpression: '#msn = :msn',
+    ExpressionAttributeNames: {
+      '#msn': 'msn',
+    },
+    ExpressionAttributeValues: {
+      ':msn': params.msn
+    }
+  })
+  // 锁定
+  if (params.operate == 'lock') {
+    if (queryRet.Items.length == 0) {
+      const msn = { msn: params.msn, userId: '0', status: MSNStatusEnum.Locked }
+      const [err, ret] = await new MsnModel().putItem(msn)
+      if (err) {
+        return ResFail(cb, { ...errRes, err: err }, err.code)
+      } else {
+        return ResOK(cb, { ...res, payload: msn })
+      }
+    }
+    else {
+      return ResFail(cb, { ...errRes, err: BizErr.MsnUsedError }, BizErr.MsnUsedError().code)
+    }
+  }
+  // 解锁
+  else {
+    if (queryRet.Items.length == 1 && queryRet.Items[0].status == 2) {
+      const [err, ret] = await new MsnModel().deleteItem({
+        Key: {
+          msn: params.msn,
+          userId: '0'
+        }
+      })
+      if (err) {
+        return ResFail(cb, { ...errRes, err: err }, err.code)
+      } else {
+        return ResOK(cb, { ...res, payload: params.msn })
+      }
+    }
+    else {
+      return ResFail(cb, { ...errRes, err: BizErr.MsnNotExistError }, BizErr.MsnNotExistError().code)
+    }
+  }
 }
 
 /**
@@ -704,7 +766,8 @@ export {
   msnOne, //获取一个未被占用的线路号
   billList, // 流水列表
   billOne,
-  captcha // 获取验证码
+  captcha, // 获取验证码
+  lockmsn  // 锁定/解锁msn
 }
 
 // export {

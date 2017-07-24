@@ -10,6 +10,8 @@ export const Codes = {
   JSONParseError: '50006',
   NoSuffixError:'50007',
   MsnExistError: '50008',
+  MsnUsedError: '50009',
+  MsnNotExistError: '50010',
   Busy: '44004',
   ParamError: '47003',
   IPBlock: '44900',
@@ -67,6 +69,12 @@ export const BizErr = {
   },
   MsnExistErr: (errMsg = 'MSN number is exist') =>{
     return {code:Codes.MsnExistError,err:errMsg}
+  },
+  MsnUsedError: (errMsg = 'MSN is used') =>{
+    return {code:Codes.MsnUsedError,err:errMsg}
+  },
+  MsnNotExistError: (errMsg = 'MSN is used') =>{
+    return {code:Codes.MsnNotExistError,err:errMsg}
   },
   InsufficientBalanceErr: (errMsg = 'InsufficientBalance') => {
     return {code: Codes.InsufficientBalance,err:errMsg}
