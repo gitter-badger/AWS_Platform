@@ -18,8 +18,10 @@ import {
 } from './lib/all'
 import {RegisterAdmin, RegisterUser, LoginUser, UserGrabToken} from './biz/auth'
 import {
+  ListAllAdmins,
   ListChildUsers,
   ListAvalibleManagers,
+  TheAdmin,
   AddGame,
   ListGames,
   DepositTo,
@@ -187,6 +189,34 @@ const userGrabToken = async(e, c, cb) => {
   })
 
 }
+const adminList = async(e,c,cb)=>{
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb,tokenErr)
+  }
+  // check the token  must admin
+  const [err,admins] = await ListAllAdmins(token)
+  if (err) {
+    return ResErr(cb,err)
+  }
+  return ResOK(cb,{
+    payload: admins
+  })
+}
+
+const adminCenter = async(e,c,cb) => {
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb,tokenErr)
+  }
+  const [err,admin] = await TheAdmin(token)
+  if (err) {
+    return ResErr(cb,err)
+  }
+  return ResOK(cb,{
+    payload: admin
+  })
+}
 // 建站商列表
 const managerList = async(e, c, cb) => {
   const errRes = {
@@ -196,16 +226,11 @@ const managerList = async(e, c, cb) => {
   const res = {
     m: 'managerList'
   }
-  const [tokenErr,
-    token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResErr(cb,tokenErr)
   }
-  const [err,
-    ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
+  const [err, ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
   if (err) {
     return ResFail(cb, {
       ...errRes,
@@ -242,16 +267,9 @@ const managerOne = async(e, c, cb) => {
       err: tokenErr
     }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  } else if (token.role == RoleCodeEnum['SuperAdmin']) {
-    parent = Model.NoParent
-  } else {
-    parent = token.userId
-  }
+
   const [managerErr,
-    manager] = await GetUser(params.id, RoleCodeEnum['Manager'], parent)
+    manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
     return ResFail(cb, {
       ...errRes,
@@ -288,16 +306,8 @@ const managerUpdate = async(e, c, cb) => {
       err: tokenErr
     }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  } else if (token.role == RoleCodeEnum['SuperAdmin']) {
-    parent = Model.NoParent
-  } else {
-    parent = token.userId
-  }
   const [managerErr,
-    manager] = await GetUser(params.id, RoleCodeEnum['Manager'], parent)
+    manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
     return ResFail(cb, {
       ...errRes,
@@ -353,16 +363,9 @@ const merchantOne = async(e, c, cb) => {
       err: tokenErr
     }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  } else if (token.role == RoleCodeEnum['SuperAdmin']) {
-    parent = Model.NoParent
-  } else {
-    parent = token.userId
-  }
+
   const [merchantErr,
-    merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'], parent)
+    merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
     return ResFail(cb, {
       ...errRes,
@@ -429,16 +432,9 @@ const merchantUpdate = async(e, c, cb) => {
       err: tokenErr
     }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  } else if (token.role == RoleCodeEnum['SuperAdmin']) {
-    parent = Model.NoParent
-  } else {
-    parent = token.userId
-  }
+
   const [merchantErr,
-    merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'], parent)
+    merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
     return ResFail(cb, {
       ...errRes,
@@ -778,6 +774,8 @@ export {
   eva, // 用于创建系统的第一个管理员账号
   userAuth, // 用户登录
   adminNew,
+  adminList,
+  adminCenter,
   userNew, // 创建新用户
   userGrabToken, // 使用apiKey登录获取用户信息
   managerList, // 建站商列表

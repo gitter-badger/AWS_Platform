@@ -45,6 +45,24 @@ functions:
           path: beings
           method: post
           cors: true
+  adminList:
+    handler: api.adminList
+    events:
+      -
+        http:
+          path: admins
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  adminCenter:
+    handler: api.adminCenter
+    events:
+      -
+        http:
+          path: admin_center
+          method: get
+          cors: true
+          authorizer: tokenAuth
   adminNew:
     handler: api.adminNew
     events:

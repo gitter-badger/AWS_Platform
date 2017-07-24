@@ -167,6 +167,7 @@ export const RegisterUser = async(token = {}, userInfo = {}) => {
   }
   // 无论填入多少点数. 产生用户时, 点数的起始为0.0
   const depositPoints = parseFloat(CheckUser.points)
+  console.log('registerUser: points: ',depositPoints);
   const User = {
     ...CheckUser,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
