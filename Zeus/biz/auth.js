@@ -36,13 +36,13 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
     ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
   }, Keys(adminRole))
   // 检查用户数据
-  const [userParamErr,_] = userParamCheck(userInput)
+  const [userParamErr, _] = userParamCheck(userInput)
   if (userParamErr) {
     return [userParamErr, 0]
   }
-  const CheckUser = {...userInput,passhash: Model.hashGen(userInput.password)}
+  const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 查询用户是否已存在
-  const [queryUserErr,queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
+  const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
@@ -50,8 +50,8 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
     return [BizErr.UserExistErr(), 0]
   }
   // 保存用户
-  const User = {...CheckUser,username: `${CheckUser.suffix}_${CheckUser.username}`}
-  const [saveUserErr,saveUserRet] = await saveUser(User)
+  const User = { ...CheckUser, username: `${CheckUser.suffix}_${CheckUser.username}` }
+  const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -92,8 +92,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
 
   // 检查用户是否已经存在
-  const [queryUserErr,
-    queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
+  const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
@@ -124,33 +123,25 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     parentName: parentUser.username,
     points: 0.0
   }
-  const [saveUserErr,
-    saveUserRet] = await saveUser(User)
+  const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  const [queryBalanceErr,
-    balance] = await CheckBalance(token, parentUser)
+  const [queryBalanceErr, balance] = await CheckBalance(token, parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
-  const [depositErr,
-    depositRet] = await DepositTo(parentUser, {
-      toUser: saveUserRet.username,
-      toRole: saveUserRet.role,
-      amount: Math.min(depositPoints, balance), // 有多少扣多少
-      operator: token.username
-    })
+  const [depositErr, depositRet] = await DepositTo(parentUser, {
+    toUser: saveUserRet.username,
+    toRole: saveUserRet.role,
+    amount: Math.min(depositPoints, balance), // 有多少扣多少
+    operator: token.username
+  })
   var orderId = depositRet.sn
   if (depositErr) {
     orderId = '-1'
   }
-  return [
-    0, {
-      ...saveUserRet,
-      orderId: orderId
-    }
-  ]
+  return [0, { ...saveUserRet, orderId: orderId }]
 }
 
 /**
@@ -310,6 +301,7 @@ const getRole = async (code) => {
   return [0, RoleModels[code]()]
 }
 
+// 保存用户
 const saveUser = async (userInfo) => {
   const baseModel = Model.baseModel()
   const roleDisplay = RoleDisplay[userInfo.role]
@@ -342,7 +334,9 @@ const saveUser = async (userInfo) => {
                 updatedAt: Model.timeStamp(),
                 msn: userInfo.msn,
                 userId: userInfo.userId,
-                status: MSNStatusEnum['Used']
+                status: MSNStatusEnum['Used'],
+                displayName: userInfo.displayName,
+                displayId: userInfo.displayId
               }
             }
           }
@@ -353,7 +347,7 @@ const saveUser = async (userInfo) => {
   }
 
   const [saveUserErr,
-    saveUserRet] = await Store$(method, saveConfig)
+    Ret] = await Store$(method, saveConfig)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }

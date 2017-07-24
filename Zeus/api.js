@@ -124,7 +124,7 @@ const userAuth = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
   // 检查验证码
-  if(!userLoginInfo.captcha){
+  if (!userLoginInfo.captcha) {
     return ResFail(cb, { ...errRes, err: BizErr.CaptchaErr() }, BizErr.CaptchaErr().code)
   }
   let suffix = 'Platform'
@@ -161,8 +161,8 @@ const userAuth = async (e, c, cb) => {
  * 获取用户TOKEN
  */
 const userGrabToken = async (e, c, cb) => {
-  const errRes = {m: 'userGrabToken error',input: e}
-  const res = {m: 'userGrabToken'}
+  const errRes = { m: 'userGrabToken error', input: e }
+  const res = { m: 'userGrabToken' }
   // username suffix role and apiKey
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
@@ -305,104 +305,126 @@ const merchantOne = async (e, c, cb) => {
  * 获取下级商户列表
  */
 const merchantList = async (e, c, cb) => {
-  const errRes = {m: 'merchantList err',input: e}
-  const res = { m: 'merchantList'}
-  const [tokenErr,token] = await Model.currentToken(e)
+  const errRes = { m: 'merchantList err', input: e }
+  const res = { m: 'merchantList' }
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
+    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
-  const [err,ret] = await ListChildUsers(token, RoleCodeEnum.Merchant)
+  const [err, ret] = await ListChildUsers(token, RoleCodeEnum.Merchant)
   if (err) {
-    return ResFail(cb, {...errRes,err: err}, err.code)
+    return ResFail(cb, { ...errRes, err: err }, err.code)
   }
-  return ResOK(cb, {...res,payload: ret})
+  return ResOK(cb, { ...res, payload: ret })
 
 }
+
+/**
+ * 更新商户
+ */
 const merchantUpdate = async (e, c, cb) => {
-  const errRes = {m: 'merchantUpdate err',input: e}
-  const res = {m: 'merchantUpdate'}
-  const [paramsErr,params] = Model.pathParams(e)
+  const errRes = { m: 'merchantUpdate err', input: e }
+  const res = { m: 'merchantUpdate' }
+  const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
+    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
+    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
 
-  const [merchantErr,merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
+  const [merchantErr, merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
-    return ResFail(cb, {...errRes,err: merchantErr}, merchantErr.code)
+    return ResFail(cb, { ...errRes, err: merchantErr }, merchantErr.code)
   }
-  const [jsonParseErr,merchantInfo] = JSONParser(e && e.body)
+  const [jsonParseErr, merchantInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {...errRes,err: jsonParseErr}, jsonParseErr.code)
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  const Merchant = {...merchant,...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
+  const Merchant = {
+    ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
-  const [updateErr,updateRet] = await UserUpdate(Merchant)
+  const [updateErr, updateRet] = await UserUpdate(Merchant)
   if (updateErr) {
-    return ResFail(cb, {...errRes,err: updateErr}, updateErr.code)
+    return ResFail(cb, { ...errRes, err: updateErr }, updateErr.code)
   }
-  return ResOK(cb, {...res,payload: updateRet})
+  return ResOK(cb, { ...res, payload: updateRet })
 }
+
+/**
+ * 随机密码
+ */
 const randomPassword = (e, c, cb) => {
-  const res = {m: 'randomPassword'}
+  const res = { m: 'randomPassword' }
   const passwd = Model.genPassword()
-  return ResOK(cb, {...res,payload: {generatedPassword: passwd}})
+  return ResOK(cb, { ...res, payload: { generatedPassword: passwd } })
 }
+
+/**
+ * 可用线路商
+ */
 const avalibleManagers = async (e, c, cb) => {
-  const errRes = {m: 'avalibleManagers err',input: e}
-  const res = {m: 'avalibleManagers'}
-  const [err,ret] = await ListAvalibleManagers()
+  const errRes = { m: 'avalibleManagers err', input: e }
+  const res = { m: 'avalibleManagers' }
+  const [err, ret] = await ListAvalibleManagers()
   if (err) {
-    return ResFail(cb, {...errRes,err: err}, err.code)
+    return ResFail(cb, { ...errRes, err: err }, err.code)
   }
-  return ResOK(cb, {...res,payload: ret})
+  return ResOK(cb, { ...res, payload: ret })
 }
 
+/**
+ * 创建游戏
+ */
 const gameNew = async (e, c, cb) => {
-  const errRes = {m: 'gameNew err',input: e}
-  const res = {m: 'gameNew'}
-  const [jsonParseErr,gameInfo] = JSONParser(e && e.body)
+  const errRes = { m: 'gameNew err', input: e }
+  const res = { m: 'gameNew' }
+  const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {...errRes,err: jsonParseErr}, jsonParseErr.code)
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  const [addGameInfoErr,addGameRet] = await AddGame(gameInfo)
+  const [addGameInfoErr, addGameRet] = await AddGame(gameInfo)
   if (addGameInfoErr) {
-    return ResFail(cb, {...errRes,err: addGameInfoErr}, addGameInfoErr.code)
+    return ResFail(cb, { ...errRes, err: addGameInfoErr }, addGameInfoErr.code)
   }
-  return ResOK(cb, {...res,payload: addGameRet})
+  return ResOK(cb, { ...res, payload: addGameRet })
 }
 
+/**
+ * 游戏列表
+ */
 const gameList = async (e, c, cb) => {
-  const errRes = {m: 'gamelist err',input: e}
-  const res = {m: 'gamelist'}
-  const [paramsErr,gameParams] = Model.pathParams(e)
+  const errRes = { m: 'gamelist err', input: e }
+  const res = { m: 'gamelist' }
+  const [paramsErr, gameParams] = Model.pathParams(e)
   if (paramsErr) {
-    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
+    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
-  const [err,ret] = await ListGames(gameParams)
+  const [err, ret] = await ListGames(gameParams)
   if (err) {
-    return ResFail(cb, {...errRes,err: err}, err.code)
+    return ResFail(cb, { ...errRes, err: err }, err.code)
   }
-  return ResOK(cb, {...res,payload: ret})
+  return ResOK(cb, { ...res, payload: ret })
 }
 
+/**
+ * 单个账单详情
+ */
 const billOne = async (e, c, cb) => {
-  const [paramsErr,params] = Model.pathParams(e)
+  const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.userId) {
     return ResErr(cb, paramsErr)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  const [queryErr,user] = await QueryUserById(params.userId)
+  const [queryErr, user] = await QueryUserById(params.userId)
   if (queryErr) {
     return ResErr(cb, queryErr)
   }
-  const [balanceErr,balance] = await CheckBalance(token, user)
+  const [balanceErr, balance] = await CheckBalance(token, user)
   if (balanceErr) {
     return ResErr(cb, balanceErr)
   }
@@ -413,14 +435,18 @@ const billOne = async (e, c, cb) => {
     }
   })
 }
+
+/**
+ * 账单列表
+ */
 const billList = async (e, c, cb) => {
   // 查询出当前详情页面的所属用户的交易记录列表
   // 根据其长度 进行n次
-  const [paramsErr,params] = Model.pathParams(e)
+  const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.userId) {
     return ResErr(cb, paramsErr)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
@@ -442,49 +468,55 @@ const billList = async (e, c, cb) => {
   3. 管理员指定fromUser 和 toUser 此时也需要满足约束 1
   4. 当前的非管理员用户也可以代表自己的下级进行转点操作
 */
+
+/**
+ * 存点
+ */
 const depositPoints = async (e, c, cb) => {
-  const errRes = {m: 'depositPoints err',input: e}
-  const res = {m: 'depositPoints'}
-  const [jsonParseErr,depositInfo] = JSONParser(e && e.body)
+  const errRes = { m: 'depositPoints err', input: e }
+  const res = { m: 'depositPoints' }
+  const [jsonParseErr, depositInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
   // 依据token判断当前登录用户是否是管理员
   // 如果是 再看传人的body参数是否满足条件2和3
   // 最后,如果当前登录用户不是管理员
-  const [queryErr,fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
+  const [queryErr, fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
   if (queryErr) {
     return ResFail(cb, queryErr)
   }
   // 获取fromUser的当前余额
-  const [userBalanceErr,userBalance] = await CheckUserBalance(fromUser)
+  const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
   if (userBalanceErr) {
     return ResErr(cb, userBalanceErr)
   }
-  const [depositBillErr,depositBillRet] = await DepositTo(fromUser, {
-      ...depositInfo,
-      amount: Math.min(userBalance, depositInfo.amount)
-    })
+  const [depositBillErr, depositBillRet] = await DepositTo(fromUser, {
+    ...depositInfo,
+    amount: Math.min(userBalance, depositInfo.amount)
+  })
   if (depositBillErr) {
     return ResErr(cb, depositBillErr)
   }
-  return ResOK(cb, {...res,payload: depositBillRet})
+  return ResOK(cb, { ...res, payload: depositBillRet })
 }
-
+/**
+ * 提点
+ */
 const withdrawPoints = async (e, c, cb) => {
-  const errRes = {m: 'withdrawPoints err',input: e}
-  const res = {m: 'withdrawPoints'}
-  const [jsonParseErr,withdrawInfo] = JSONParser(e && e.body)
+  const errRes = { m: 'withdrawPoints err', input: e }
+  const res = { m: 'withdrawPoints' }
+  const [jsonParseErr, withdrawInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {...errRes,err: jsonParseErr}, jsonParseErr.code)
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
+    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
   const [queryErr, fromUser] = await QueryBillUser(token, withdrawInfo.fromUserId)
   if (queryErr) {
@@ -494,14 +526,14 @@ const withdrawPoints = async (e, c, cb) => {
   if (userBalanceErr) {
     return ResErr(cb, userBalanceErr)
   }
-  const [withdrawBillErr,withdrawBillRet] = await WithdrawFrom(fromUser, {
-      ...withdrawInfo,
-      amount: Math.min(userBalance, withdrawInfo.amount)
-    })
+  const [withdrawBillErr, withdrawBillRet] = await WithdrawFrom(fromUser, {
+    ...withdrawInfo,
+    amount: Math.min(userBalance, withdrawInfo.amount)
+  })
   if (withdrawBillErr) {
-    return ResFail(cb, {...errRes,err: withdrawBillErr}, withdrawBillErr.code)
+    return ResFail(cb, { ...errRes, err: withdrawBillErr }, withdrawBillErr.code)
   }
-  return ResOK(cb, {...res,payload: withdrawBillRet})
+  return ResOK(cb, { ...res, payload: withdrawBillRet })
 }
 
 /**
@@ -523,33 +555,36 @@ const msnList = async (e, c, cb) => {
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {
+    let arr = new Array()
+    let flag = true
+    for (let i = 1; i < 1000; i++) {
+      flag = true
+      for (let item of ret.Items) {
+        if (i == parseInt(item.msn)) {
+          flag = false
+        }
+      }
+      if(flag){
+        arr.push({ msn: i, status: 0 })
+      }
+    }
+    ret.Items.push(...arr)
     return ResOK(cb, { ...res, payload: ret })
   }
 }
-
+/**
+ * 检查线路号是否可用
+ */
 const checkMsn = async (e, c, cb) => {
-  const errRes = {
-    m: 'checkMsn err',
-    input: e
-  }
-  const res = {
-    m: 'checkMsn'
-  }
-  const [paramErr,
-    params] = Model.pathParams(e)
+  const errRes = { m: 'checkMsn err', input: e }
+  const res = { m: 'checkMsn' }
+  const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: paramErr
-    }, paramErr.code)
+    return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
   }
-  const [checkErr,
-    checkRet] = await CheckMSN(params)
+  const [checkErr, checkRet] = await CheckMSN(params)
   if (checkErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: checkErr
-    }, checkErr.code)
+    return ResFail(cb, { ...errRes, err: checkErr }, checkErr.code)
   }
   return ResOK(cb, {
     ...res,
@@ -559,7 +594,12 @@ const checkMsn = async (e, c, cb) => {
   })
 
 }
-const msnOne = async (e, c, cb) => { }
+/**
+ * 查看线路号详情
+ */
+const msnOne = async (e, c, cb) => {
+
+}
 
 /**
  * 获取登录验证码，接口编号：

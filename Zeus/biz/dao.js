@@ -456,25 +456,25 @@ export const FormatMSN = function(param) {
 }
 export const CheckMSN = async(param) =>{
   // get a number from event
-  const [formatErr,
-    msn] = FormatMSN(param)
-  if (formatErr) {
-    return [formatErr,0]
-  }
+  // const [formatErr,msn] = FormatMSN(param)
+  // if (formatErr) {
+  //   return [formatErr,0]
+  // }
   const query = {
     TableName: Tables.ZeusPlatformMSN,
     KeyConditionExpression: '#msn = :msn',
     FilterExpression: '#status = :usedStatus or #status = :lockStatus',
     ExpressionAttributeNames:{
-      '#status':'status',
-      '#msn':'msn'
+      '#msn':'msn',
+      '#status':'status'
     },
     ExpressionAttributeValues:{
-      ':msn':msn,
-      ':usedStatus':MSNStatusEnum['Used'],
-      ':lockStatus':MSNStatusEnum['Locked']
+      ':msn': param.msn,
+      ':usedStatus': MSNStatusEnum['Used'],
+      ':lockStatus': MSNStatusEnum['Locked']
     }
   }
+  console.info(query)
   const [queryErr,queryRet] = await Store$('query',query)
 
   if (queryErr) {
