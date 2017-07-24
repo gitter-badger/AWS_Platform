@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX0ZhZGUwMDEiLCJwYXNzd29yZCI6IjExMTExMSIsInN1ZmZpeCI6IlBsYXRmb3JtIiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInVzZXJJZCI6ImVkNTk4ZWI3LWQ0NzEtNDNjZS1iY2VhLWM4OTk4OTIyNzE0NSIsInJvbGUiOiIxIiwiZGlzcGxheU5hbWUiOiLlubPlj7DnrqHnkIblkZgiLCJpYXQiOjE1MDA3MDEzMjN9.Wo2ZKXtfY6q3MraIoQra5MrJHP_S0JSE4qQ6KUevTmQ"
+  },
+  "pathParameters": {
+    "userId": "ed598eb7-d471-43ce-bcea-c89989227145"
+  },
+  "requestContext": {
+    "authorizer": {
+      "username": "Platform_Fade001",
+      "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+      "parent": "00",
+      "role": "1",
+      "principalId": "ed598eb7-d471-43ce-bcea-c89989227145"
+
+    },
+
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    }
+  },
+  "body": {
+    "toRole": "10",
+    "toUser": "Y3_Ytest3",
+    "amount": 1000.00,
+    "operator": "管理员"
+  }
+}

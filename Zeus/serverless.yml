@@ -45,6 +45,33 @@ functions:
           path: beings
           method: post
           cors: true
+  adminList:
+    handler: api.adminList
+    events:
+      -
+        http:
+          path: admins
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  adminCenter:
+    handler: api.adminCenter
+    events:
+      -
+        http:
+          path: admin_center
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  adminNew:
+    handler: api.adminNew
+    events:
+      -
+        http:
+          path: admins
+          method: post
+          cors: true
+          authorizer: tokenAuth
   userNew:
     handler: api.userNew
     events:
@@ -175,14 +202,24 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  billOne:
+    handler: api.billOne
+    events:
+      -
+        http:
+          path: bills/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
   billList:
     handler: api.billList
     events:
       -
         http:
-          path: bills
+          path: waterfall/{userId}
           method: get
           cors: true
+          authorizer: tokenAuth
   checkMsn:
     handler: api.checkMsn
     events:

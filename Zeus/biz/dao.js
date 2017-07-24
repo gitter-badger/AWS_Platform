@@ -17,12 +17,33 @@ import {
   Omit
 } from '../lib/all'
 import _ from 'lodash'
-export const ListChildUsers = async (token,roleCode) => {
-  var parentId = token.userId
-  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
-      parentId = Model.DefaultParent
+
+export const TheAdmin = async (token) =>{
+  return await GetUser(token.userId,token.role)
+}
+export const ListAllAdmins = async (token) => {
+  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin role'),0]
   }
   const query = {
+    TableName: Tables.ZeusPlatformUser,
+    KeyConditionExpression: '#role = :role',
+    ExpressionAttributeNames:{
+      '#role':'role'
+    },
+    ExpressionAttributeValues: {
+      ':role':RoleCodeEnum['PlatformAdmin']
+    }
+  }
+  const [queryErr,adminRet] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  return [0,adminRet.Items]
+}
+export const ListChildUsers = async (token,roleCode) => {
+  var parentId = token.userId
+  var query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'RoleParentIndex',
     KeyConditionExpression: '#role = :role and parent = :parent',
@@ -34,6 +55,20 @@ export const ListChildUsers = async (token,roleCode) => {
       ':role':roleCode
     }
   }
+  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+    query = {
+      TableName: Tables.ZeusPlatformUser,
+      IndexName: 'RoleParentIndex',
+      KeyConditionExpression: '#role = :role',
+      ExpressionAttributeNames:{
+        '#role':'role'
+      },
+      ExpressionAttributeValues:{
+        ':role':roleCode
+      }
+    }
+  }
+
   const [queryErr,queryRet] = await Store$('query',query)
   if (queryErr) {
     return [queryErr,0]
@@ -149,13 +184,6 @@ export const ListGames = async(pathParams)=>{
   return [0,ret]
 }
 
-export const ManagerById = async(id)=>{
-  return  await getUserById(id,RoleCodeEnum['Manager'])
-}
-
-export const MerchantById = async(id)=>{
-  return await getUserById(id,RoleCodeEnum['Merchant'])
-}
 
 export const UserUpdate = async(userData)=>{
   const User = {
@@ -197,46 +225,34 @@ const getUserByName = async(role, username) => {
   return [0,User]
 }
 
-
-export const CheckRoleFromToken  = (token,userInfo) => {
-  if (RoleCodeEnum['Merchant'] === token.role){
-    // 登录角色为商户角色,不可以创建任何其他角色
-    return [BizErr.TokenErr('Operation not allowd. merchant role cant create user'),0]
-  }
-  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
-    //登录角色为平台管理员, 可以创建管理员, 线路商,商户
-    if (!(
-      RoleCodeEnum['PlatformAdmin'] === userInfo.role ||
-      RoleCodeEnum['Manager'] === userInfo.role ||
-      RoleCodeEnum['Merchant'] === userInfo.role
-    )) {
-      return [BizErr.TokenErr('Operation not Allowed. PlatformAdmin can only create PlatformAdmin,mananger, merchant')]
+export const QueryUserById = async (userId) => {
+  const query = {
+    TableName: Tables.ZeusPlatformUser,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues:{
+      ':userId': userId
     }
   }
-  if (RoleCodeEnum['Manager'] === token.role) {
-    if(
-      !(RoleCodeEnum['Manager'] === userInfo.role || RoleCodeEnum['Merchant'] === userInfo.role)
-    ){
-      return [BizErr.TokenErr('Operation not allowed. Manager can only create manager , merchant')]
-    }
+  const [err,querySet] = await  Store$('query',query)
+  if (err) {
+    return [err,0]
+  }
+  if (querySet.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr(),0]
   }
 
-  return [0,userInfo]
+  return [0,querySet.Items[0]]
 }
-export const GetUser = async (userId,role,parent) => {
-
-
+export const GetUser = async (userId,role) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,
     KeyConditionExpression: '#userId = :userId and #role = :role',
-    FilterExpression:'#parent = :parent',
     ExpressionAttributeValues:{
-      ':parent':parent,
       ':role':role,
       ':userId':userId
     },
     ExpressionAttributeNames:{
-      '#parent':'parent',
       '#userId':'userId',
       '#role':'role'
     }
@@ -271,44 +287,32 @@ const getUserById = async (userId,role) => {
   return [0,User]
 }
 // 存入
-export const DepositTo = async(token,billInfo) => {
-  const userId = token.userId
-  const role = token.role
-  return await BillTransfer(userId,role,billInfo,BillActionEnum.Deposit)
+export const DepositTo = async(fromUser,billInfo) => {
+  return await BillTransfer(fromUser,billInfo,BillActionEnum.Deposit)
 }
 // 提出
-export const WithdrawFrom = async(token,billInfo) => {
-  const userId = token.userId
-  const role = token.role
-  return await BillTransfer(userId,role,billInfo,BillActionEnum.Withdraw)
+export const WithdrawFrom = async(fromUser,billInfo) => {
+  return await BillTransfer(fromUser,billInfo,BillActionEnum.Withdraw)
 }
 
-const BillTransfer = async(userId,role,billInfo,action) => {
+const BillTransfer = async(from,billInfo,action) => {
   if (Empty(billInfo)) {
     return [BizErr.ParamMissErr(),0]
   }
     // move out user input sn
   billInfo = Omit(billInfo,['sn','fromRole','fromUser','action'])
-console.log('billInfo',billInfo);
-  const [toUserErr,toUser] = await getUserByName(billInfo.toRole,billInfo.toUser)
+  const [toUserErr,to] = await getUserByName(billInfo.toRole,billInfo.toUser)
   if (toUserErr) {
     return [toUserErr,0]
   }
-  const toUserId = toUser.userId
 
-  const [userErr,User] = await getUserById(userId,role)
-  if (userErr) {
-    return [userErr,0]
-  }
-
-  const Role = RoleModels[role]
-  console.log('role',Role);
+  const Role = RoleModels[from.role]()
   if (!Role || Role.points === undefined) {
     return [BizErr.ParamErr('role error'),0]
   }
   const UserProps = Pick({
     ...Role,
-    ...User
+    ...from
   },Keys(Role))
 
   const initPoints = UserProps.points
@@ -327,12 +331,13 @@ console.log('billInfo',billInfo);
   const Bill = {
     ...Model.baseModel(),
     ...Pick({
-      ...BillModel,
+      ...BillModel(),
       ...billInfo,
       fromUser:fromUser,
       fromRole:fromRole,
-      action:action
-    },Keys(BillModel))
+      action:action,
+      operator: from.username
+    },Keys(BillModel()))
   }
 
 
@@ -345,7 +350,7 @@ console.log('billInfo',billInfo);
               ...Bill,
               amount: Bill.amount * action,
               action: action,
-              userId:userId
+              userId:from.userId
             }
           }
         },
@@ -355,23 +360,88 @@ console.log('billInfo',billInfo);
               ...Bill,
               amount: (-1.0) * Bill.amount * action,
               action: (-1.0) * action,
-              userId: toUserId
+              userId: to.userId
             }
           }
         }
       ]
     }
   }
-console.log(JSON.stringify(batch,null,4));
   const [err,ret] = await Store$('batchWrite',batch)
   if (err) {
     return [err,0]
   }
   return [0,Bill]
 }
+export const CheckUserBalance = async (user) => {
+  if (user.points == undefined || user.points == null) {
+    return [BizErr.ParamErr('User dont have base points'),0]
+  }
+  const baseBalance = parseFloat(user.points)
+  const query = {
+    TableName: Tables.ZeusPlatformBill,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': user.userId
+    }
+  }
+  const [queryErr,bills] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  const sums = _.reduce(bills.Items,(sum,bill)=>{
+    return sum + parseFloat(bill.amount)
+  },0.0)
 
-export const CheckBalance = async (token,userId) =>{
-  return [0,1000000.00]
+  return [0,baseBalance + sums]
+}
+// 返回某个账户下的余额
+export const CheckBalance = async (token,user) =>{
+  // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
+  // 当前登录用户只能查询自己的balance
+  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
+    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
+  }
+  return await CheckUserBalance(user)
+}
+/* 商户的账单流水 */
+export const ComputeWaterfall = async (token, userId) =>{
+
+  const [queryUserErr,user] = await QueryUserById(userId)
+  if (queryUserErr) {
+    return [queryUserErr,0]
+  }
+  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId )) {
+    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
+  }
+  const initPoints = parseFloat(user.points)
+  const query = {
+    TableName: Tables.ZeusPlatformBill,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': userId
+    }
+  }
+  const [queryErr,bills] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  // 直接在内存里面做列表了. 如果需要进行缓存,以后实现
+  const waterfall =
+
+  _.map(bills.Items,(item,index)=>{
+    let balance = _.reduce(_.slice(bills.Items,0,index+1),(sum,item)=>{
+          return sum + parseFloat(item.amount)
+        },0.0)  + initPoints
+    return {
+      ...bills.Items[index],
+      oldBalance: balance - parseFloat(bills.Items[index].amount),
+      balance:balance
+    }
+  })
+  return [0,waterfall]
 }
 export const FormatMSN = function(param) {
   try {
@@ -411,4 +481,23 @@ export const CheckMSN = async(param) =>{
     return [queryErr,0]
   }
   return [0,(queryRet.Items.length == 0)]
+}
+/*获取转账用户*/
+export const QueryBillUser = async(token,fromUserId) => {
+
+  if (!fromUserId) {
+    fromUserId = token.userId
+  }
+  const [err,user] = await QueryUserById(fromUserId)
+  if (err) {
+    return [err,0]
+  }
+  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+    return [0,user]
+  }
+  if (!(user.userId == token.userId || user.parent == token.userId)) {
+    return [BizErr.TokenErr('current token user  cant operate this user'),0]
+  }
+
+  return [0,user]
 }

@@ -6,7 +6,7 @@ import {
   JSONParser,
   Model,
   Tables,
-  BillTypeEnum,
+  BillActionEnum,
   StatusEnum,
   GenderEnum,
   RoleCodeEnum,
@@ -16,11 +16,12 @@ import {
   JwtVerify,
   GeneratePolicyDocument
 } from './lib/all'
-import {RegisterUser, LoginUser,UserGrabToken} from './biz/auth'
+import {RegisterAdmin, RegisterUser, LoginUser, UserGrabToken} from './biz/auth'
 import {
-  CheckRoleFromToken,
+  ListAllAdmins,
   ListChildUsers,
   ListAvalibleManagers,
+  TheAdmin,
   AddGame,
   ListGames,
   DepositTo,
@@ -28,21 +29,29 @@ import {
   CheckMSN,
   FormatMSN,
   UserUpdate,
-  GetUser
+  GetUser,
+  QueryUserById,
+  QueryBillUser,
+  CheckBalance,
+  CheckUserBalance,
+  ComputeWaterfall
 
 } from './biz/dao'
-
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+const ResErr = (callback, err) => ResFail(callback, {
+  err: err
+}, err.code)
 // 用于生成第一个管理员
-const eva = async(e,c,cb) =>{
+const eva = async(e, c, cb) => {
   const errRes = {
-    m:'eva error'
+    m: 'eva error'
   }
   const res = {
     m: 'userNew'
   }
-  const [jsonParseErr,userInfo] = JSONParser(e&&e.body)
+  const [jsonParseErr,
+    userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResFail(cb, {
       ...errRes,
@@ -64,6 +73,25 @@ const eva = async(e,c,cb) =>{
     payload: resgisterUserRet
   })
 }
+const adminNew = async(e, c, cb) => {
+  const [jsonParseErr,
+    userInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  const [tokenErr,
+    token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+
+  const [registAdminErr,
+    adminUser] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
+  if (registAdminErr) {
+    return ResErr(cb, registAdminErr)
+  }
+  return ResOK(cb, {payload: adminUser})
+}
 // 用户注册
 const userNew = async(e, c, cb) => {
   const errRes = {
@@ -77,36 +105,16 @@ const userNew = async(e, c, cb) => {
   const [jsonParseErr,
     userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: jsonParseErr
-    }, jsonParseErr.code)
+    return ResErr(cb, jsonParseErr)
   }
   const [tokenErr,
     token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResErr(cb, tokenErr)
   }
-// 检查当前操作账户是否有权创建新用户
-  const [roleErr,
-    _] = CheckRoleFromToken(token, userInfo)
-  if (roleErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: roleErr
-    }, roleErr.code)
-  }
-  // 由于有了对角色的判断 就可以在这里对新建用户的parent进行推理约束了
-  /**
-   如果当前是一个管理员  则新用户的parent要么就是当前用户 要么就是Manager
-   如果当前是一个Manager 那么新用户的parent只能是当前用户或者当前用户的子级Manager
 
-  */
   const [registerUserErr,
-    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo),token)
+    resgisterUserRet] = await RegisterUser(token, Model.addSourceIP(e, userInfo))
   if (registerUserErr) {
     return ResFail(cb, {
       ...errRes,
@@ -149,7 +157,7 @@ const userAuth = async(e, c, cb) => {
     payload: loginUserRet
   })
 }
-const userGrabToken = async (e,c,cb)=>{
+const userGrabToken = async(e, c, cb) => {
   const errRes = {
     m: 'managerList error',
     input: e
@@ -158,22 +166,56 @@ const userGrabToken = async (e,c,cb)=>{
     m: 'managerList'
   }
   // username suffix role and apiKey
-  const [jsonParseErr,userInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
 
-  const [tokenErr,userToken] = await UserGrabToken(Model.addSourceIP(e,userInfo))
+  const [tokenErr,
+    userToken] = await UserGrabToken(Model.addSourceIP(e, userInfo))
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  return ResOK(cb,{
+  return ResOK(cb, {
     ...res,
-    payload:userToken
+    payload: userToken
   })
 
+}
+const adminList = async(e,c,cb)=>{
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb,tokenErr)
+  }
+  // check the token  must admin
+  const [err,admins] = await ListAllAdmins(token)
+  if (err) {
+    return ResErr(cb,err)
+  }
+  return ResOK(cb,{
+    payload: admins
+  })
+}
 
-
+const adminCenter = async(e,c,cb) => {
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb,tokenErr)
+  }
+  const [err,admin] = await TheAdmin(token)
+  if (err) {
+    return ResErr(cb,err)
+  }
+  return ResOK(cb,{
+    payload: admin
+  })
 }
 // 建站商列表
 const managerList = async(e, c, cb) => {
@@ -184,16 +226,11 @@ const managerList = async(e, c, cb) => {
   const res = {
     m: 'managerList'
   }
-  const [tokenErr,
-    token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResErr(cb,tokenErr)
   }
-  const [err,
-    ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
+  const [err, ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
   if (err) {
     return ResFail(cb, {
       ...errRes,
@@ -206,7 +243,7 @@ const managerList = async(e, c, cb) => {
   })
 
 }
-const managerOne = async (e,c,cb) =>{
+const managerOne = async(e, c, cb) => {
   const errRes = {
     m: 'managerOne err',
     input: e
@@ -214,103 +251,131 @@ const managerOne = async (e,c,cb) =>{
   const res = {
     m: 'managerOne'
   }
-  const [paramsErr,params] = Model.pathParams(e)
+  const [paramsErr,
+    params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: paramsErr
+    }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
-    parent = Model.NoParent
-  }else {
-    parent = token.userId
-  }
-  const [managerErr,manager] = await GetUser(params.id,RoleCodeEnum['Manager'],parent)
+
+  const [managerErr,
+    manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
-    return ResFail(cb,{...errRes,err:managerErr},managerErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: managerErr
+    }, managerErr.code)
   }
-  return ResOK(cb,{...res,payload:manager})
+  return ResOK(cb, {
+    ...res,
+    payload: manager
+  })
 }
 const managerUpdate = async(e, c, cb) => {
   const errRes = {
-    m:'managerUpdate err',
-    input:e
+    m: 'managerUpdate err',
+    input: e
   }
   const res = {
     m: 'managerUpdate',
     input: e
   }
-  const [paramsErr,params] = Model.pathParams(e)
+  const [paramsErr,
+    params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: paramsErr
+    }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
-    parent = Model.NoParent
-  }else {
-    parent = token.userId
-  }
-  const [managerErr,manager] = await GetUser(params.id,RoleCodeEnum['Manager'],parent)
+  const [managerErr,
+    manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
-    return ResFail(cb,{...errRes,err:managerErr},managerErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: managerErr
+    }, managerErr.code)
   }
-  const [jsonParseErr,managerInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    managerInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
   const Manager = {
     ...manager,
-    ...Pick(managerInfo,RoleEditProps[RoleCodeEnum['Manager']])
+    ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
-  const [updateErr,updateRet] = await UserUpdate(Manager)
+  const [updateErr,
+    updateRet] = await UserUpdate(Manager)
   if (updateErr) {
-    return ResFail(cb,{...errRes,err:updateErr},updateErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: updateErr
+    }, updateErr.code)
   }
-  return ResOK(cb,{
+  return ResOK(cb, {
     ...res,
-    payload:updateRet
+    payload: updateRet
   })
 }
-const merchantOne = async (e,c,cb)=>{
+const merchantOne = async(e, c, cb) => {
   const errRes = {
-    m:'merchantOne err',
-    input:e
+    m: 'merchantOne err',
+    input: e
   }
   const res = {
-    m:'merchantOne'
+    m: 'merchantOne'
   }
-  const [paramsErr,params] = Model.pathParams(e)
+  const [paramsErr,
+    params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: paramsErr
+    }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
-    parent = Model.NoParent
-  }else {
-    parent = token.userId
-  }
-  const [merchantErr,merchant] = await GetUser(params.id,RoleCodeEnum['Merchant'],parent)
+
+  const [merchantErr,
+    merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
-    return ResFail(cb,{...errRes,err:merchantErr},merchantErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: merchantErr
+    }, merchantErr.code)
   }
-  return ResOK(cb,{...res,payload:merchant})
+  return ResOK(cb, {
+    ...res,
+    payload: merchant
+  })
 }
 const merchantList = async(e, c, cb) => {
 
@@ -345,57 +410,73 @@ const merchantList = async(e, c, cb) => {
 }
 const merchantUpdate = async(e, c, cb) => {
   const errRes = {
-    m:'merchantUpdate err',
-    input:e
+    m: 'merchantUpdate err',
+    input: e
   }
   const res = {
-    m:'merchantUpdate'
+    m: 'merchantUpdate'
   }
-  const [paramsErr,params] = Model.pathParams(e)
+  const [paramsErr,
+    params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: paramsErr
+    }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr,
+    token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb,{...errRes,err:tokenErr},tokenErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: tokenErr
+    }, tokenErr.code)
   }
-  var parent = token.userId
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
-    parent = Model.DefaultParent
-  }else if (token.role == RoleCodeEnum['SuperAdmin'] ) {
-    parent = Model.NoParent
-  }else {
-    parent = token.userId
-  }
-  const [merchantErr,merchant] = await GetUser(params.id,RoleCodeEnum['Merchant'],parent)
+
+  const [merchantErr,
+    merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
-    return ResFail(cb,{...errRes,err:merchantErr},merchantErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: merchantErr
+    }, merchantErr.code)
   }
-  const [jsonParseErr,merchantInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,
+    merchantInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb,{...errRes,err:jsonParseErr},jsonParseErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: jsonParseErr
+    }, jsonParseErr.code)
   }
   const Merchant = {
     ...merchant,
-    ...Pick(merchantInfo,RoleEditProps[RoleCodeEnum['Manager']])
+    ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
-  const [updateErr,updateRet] = await UserUpdate(Merchant)
+  const [updateErr,
+    updateRet] = await UserUpdate(Merchant)
   if (updateErr) {
-    return ResFail(cb,{...errRes,err:updateErr},updateErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: updateErr
+    }, updateErr.code)
   }
-  return ResOK(cb,{
+  return ResOK(cb, {
     ...res,
-    payload:updateRet
+    payload: updateRet
   })
 }
-const randomPassword = (e,c,cb)=>{
+const randomPassword = (e, c, cb) => {
   const res = {
-    m:'randomPassword'
+    m: 'randomPassword'
   }
   const passwd = Model.genPassword()
-  return ResOK(cb,{...res,payload:{
-    generatedPassword: passwd
-  }})
+  return ResOK(cb, {
+    ...res,
+    payload: {
+      generatedPassword: passwd
+    }
+  })
 }
 const avalibleManagers = async(e, c, cb) => {
   const errRes = {
@@ -457,9 +538,13 @@ const gameList = async(e, c, cb) => {
   const res = {
     m: 'gamelist'
   }
-  const [paramsErr,gameParams] = Model.pathParams(e)
+  const [paramsErr,
+    gameParams] = Model.pathParams(e)
   if (paramsErr) {
-      return ResFail(cb,{...errRes,err:paramsErr},paramsErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: paramsErr
+    }, paramsErr.code)
   }
   const [err,
     ret] = await ListGames(gameParams)
@@ -475,42 +560,65 @@ const gameList = async(e, c, cb) => {
   })
 }
 
-const billList = async(e, c, cb) => {
-  const bills = [
-    {
-      balance: 6000.00, // 最新余额
-      oldBalance: 5000.00, // 旧余额
-      createdAt: 1499156312967, // 交易时间
-      billType: BillTypeEnum.Withdraw, //
-      from: 'from account', // 交易发起账户
-      to: 'to account', // 交易对象账户
-      fromRole: 'role code', // 发起账户的角色
-      toRole: 'role code', // 对象账户的角色
-      points: 1000.00 | -100.00, // 金额
-      billDetail: '5000 + 1000 = 6000', // 交易详情
-      operator: 'operator name' // 操作人
-    }, {
-      balance: 7000.00, // 最新余额
-      oldBalance: 5000.00, // 旧余额
-      createdAt: 1499156312967, // 交易时间
-      billType: BillTypeEnum.Deposit, //
-      from: 'from account', // 交易发起账户
-      to: 'to account', // 交易对象账户
-      fromRole: 'role code', // 发起账户的角色
-      toRole: 'role code', // 对象账户的角色
-      points: 1000.00 | -100.00, // 金额
-      billDetail: '5000 + 1000 = 6000', // 交易详情
-      operator: 'operator name' // 操作人
-    }
-
-  ]
-  const res = {
-    m: 'billList',
-    payload: bills,
-    input: e
+const billOne = async(e, c, cb) => {
+  const [paramsErr,
+    params] = Model.pathParams(e)
+  if (paramsErr || !params.userId) {
+    return ResErr(cb, paramsErr)
   }
-  return cb(null, Success(res))
+  const [tokenErr,
+    token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  const [queryErr,
+    user] = await QueryUserById(params.userId)
+  if (queryErr) {
+    return ResErr(cb, queryErr)
+  }
+  const [balanceErr,
+    balance] = await CheckBalance(token, user)
+  if (balanceErr) {
+    return ResErr(cb, balanceErr)
+  }
+  return ResOK(cb, {
+    payload: {
+      balance: balance,
+      userId: params.userId
+    }
+  })
 }
+const billList = async(e, c, cb) => {
+  // 查询出当前详情页面的所属用户的交易记录列表
+  // 根据其长度 进行n次
+  const [paramsErr,
+    params] = Model.pathParams(e)
+  if (paramsErr || !params.userId) {
+    return ResErr(cb, paramsErr)
+  }
+  const [tokenErr,
+    token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+
+  const [queryErr,bills] = await ComputeWaterfall(token,params.userId)
+  if (queryErr) {
+    return ResErr(cb,queryErr)
+  }
+  return ResOK(cb,{
+    payload: bills
+  })
+}
+
+/*
+  提点
+  转点 操作
+  1 fromUser是toUser的parent (非管理员)
+  2.fromUser是管理员 因为管理员是所有用户的parent
+  3. 管理员指定fromUser 和 toUser 此时也需要满足约束 1
+  4. 当前的非管理员用户也可以代表自己的下级进行转点操作
+*/
 const depositPoints = async(e, c, cb) => {
   const errRes = {
     m: 'depositPoints err',
@@ -522,26 +630,34 @@ const depositPoints = async(e, c, cb) => {
   const [jsonParseErr,
     depositInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: jsonParseErr
-    }, jsonParseErr.code)
+    return ResErr(cb, jsonParseErr)
   }
   const [tokenErr,
     token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResErr(cb, tokenErr)
+  }
+  // 依据token判断当前登录用户是否是管理员
+  // 如果是 再看传人的body参数是否满足条件2和3
+  // 最后,如果当前登录用户不是管理员
+  const [queryErr,
+    fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
+  if (queryErr) {
+    return ResFail(cb,queryErr)
+  }
+  // 获取fromUser的当前余额
+  const [userBalanceErr,
+    userBalance] = await CheckUserBalance(fromUser)
+  if (userBalanceErr) {
+    return ResErr(cb, userBalanceErr)
   }
   const [depositBillErr,
-    depositBillRet] = await DepositTo(token, depositInfo)
+    depositBillRet] = await DepositTo(fromUser, {
+    ...depositInfo,
+    amount: Math.min(userBalance, depositInfo.amount)
+  })
   if (depositBillErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: depositBillErr
-    }, depositBillErr.code)
+    return ResErr(cb, depositBillErr)
   }
   return ResOK(cb, {
     ...res,
@@ -573,8 +689,19 @@ const withdrawPoints = async(e, c, cb) => {
       err: tokenErr
     }, tokenErr.code)
   }
+  const [queryErr,fromUser] = await QueryBillUser(token,withdrawInfo.fromUserId)
+  if (queryErr) {
+    return ResErr(cb,queryErr)
+  }
+  const [userBalanceErr,userBalance] = await CheckUserBalance(fromUser)
+  if (userBalanceErr) {
+    return ResErr(cb,userBalanceErr)
+  }
   const [withdrawBillErr,
-    withdrawBillRet] = await WithdrawFrom(token, withdrawInfo)
+    withdrawBillRet] = await WithdrawFrom(fromUser, {
+      ...withdrawInfo,
+      amount: Math.min(userBalance,withdrawInfo.amount)
+    })
   if (withdrawBillErr) {
     return ResFail(cb, {
       ...errRes,
@@ -614,9 +741,13 @@ const checkMsn = async(e, c, cb) => {
   const res = {
     m: 'checkMsn'
   }
-  const [paramErr,params] = Model.pathParams(e)
+  const [paramErr,
+    params] = Model.pathParams(e)
   if (paramErr) {
-    return ResFail(cb,{...errRes,err:paramErr},paramErr.code)
+    return ResFail(cb, {
+      ...errRes,
+      err: paramErr
+    }, paramErr.code)
   }
   const [checkErr,
     checkRet] = await CheckMSN(params)
@@ -626,7 +757,7 @@ const checkMsn = async(e, c, cb) => {
       err: checkErr
     }, checkErr.code)
   }
-  return ResOK(cb,{
+  return ResOK(cb, {
     ...res,
     payload: {
       avalible: Boolean(checkRet)
@@ -642,6 +773,9 @@ export {
   jwtverify, // 用于进行token验证的方法
   eva, // 用于创建系统的第一个管理员账号
   userAuth, // 用户登录
+  adminNew,
+  adminList,
+  adminCenter,
   userNew, // 创建新用户
   userGrabToken, // 使用apiKey登录获取用户信息
   managerList, // 建站商列表
@@ -659,5 +793,6 @@ export {
   msnList, // 线路号列表
   checkMsn, // 检查msn是否被占用
   msnOne, //获取一个未被占用的线路号
-  billList // 流水列表
+  billList, // 流水列表
+  billOne
 }
