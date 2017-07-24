@@ -237,6 +237,15 @@ functions:
           path: captcha
           method: post
           cors: true
+  msnList: #获取线路号列表，接口编号：
+    handler: api.msnList
+    events:
+      -
+        http:
+          path: msnList
+          method: post
+          cors: true
+          authorizer: tokenAuth
   # exquery:
   #   handler: api.exquery
   #   events:

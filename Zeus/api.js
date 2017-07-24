@@ -39,6 +39,7 @@ import {
 
 } from './biz/dao'
 import { CaptchaModel } from './model/CaptchaModel'
+import { MsnModel } from './model/MsnModel'
 // import { Util } from "athena"
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -86,71 +87,52 @@ const adminNew = async (e, c, cb) => {
   }
   return ResOK(cb, { payload: adminUser })
 }
-// 用户注册
+/**
+ * 用户注册
+ */
 const userNew = async (e, c, cb) => {
-  const errRes = {
-    m: 'userNew error',
-    input: e
-  }
-  const res = {
-    m: 'userNew'
-  }
+  const errRes = { m: 'userNew error', input: e }
+  const res = { m: 'userNew' }
   // 从POST 的body中获取提交数据
-  const [jsonParseErr,
-    userInfo] = JSONParser(e && e.body)
+  const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  const [tokenErr,
-    token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
 
-  const [registerUserErr,
-    resgisterUserRet] = await RegisterUser(token, Model.addSourceIP(e, userInfo))
+  const [registerUserErr, resgisterUserRet] = await RegisterUser(token, Model.addSourceIP(e, userInfo))
   if (registerUserErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: registerUserErr
-    }, registerUserErr.code)
+    return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
 
-  return ResOK(cb, {
-    ...res,
-    payload: resgisterUserRet
-  })
+  return ResOK(cb, { ...res, payload: resgisterUserRet })
 }
-// 用户登录
+
+/**
+ * 用户登录
+ */
 const userAuth = async (e, c, cb) => {
-  const errRes = {
-    m: 'userNew error',
-    input: e
-  }
+  const errRes = { m: 'userNew error', input: e }
   const res = {
     m: 'userAuth'
   }
-  const [jsonParseErr,
-    userLoginInfo] = JSONParser(e && e.body)
+  const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: jsonParseErr
-    }, jsonParseErr.code)
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  const [loginUserErr,
-    loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
+  const [loginUserErr, loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
   if (loginUserErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: loginUserErr
-    }, loginUserErr.code)
+    return ResFail(cb, { ...errRes, err: loginUserErr }, loginUserErr.code)
   }
-  return ResOK(cb, {
-    ...res,
-    payload: loginUserRet
-  })
+  return ResOK(cb, { ...res, payload: loginUserRet })
 }
+
+/**
+ * 获取用户TOKEN
+ */
 const userGrabToken = async (e, c, cb) => {
   const errRes = {
     m: 'managerList error',
@@ -160,29 +142,22 @@ const userGrabToken = async (e, c, cb) => {
     m: 'managerList'
   }
   // username suffix role and apiKey
-  const [jsonParseErr,
-    userInfo] = JSONParser(e && e.body)
+  const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: jsonParseErr
-    }, jsonParseErr.code)
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
 
-  const [tokenErr,
-    userToken] = await UserGrabToken(Model.addSourceIP(e, userInfo))
+  const [tokenErr, userToken] = await UserGrabToken(Model.addSourceIP(e, userInfo))
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
-  return ResOK(cb, {
-    ...res,
-    payload: userToken
-  })
+  return ResOK(cb, { ...res, payload: userToken })
 
 }
+
+/**
+ * 管理员列表
+ */
 const adminList = async (e, c, cb) => {
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -193,11 +168,12 @@ const adminList = async (e, c, cb) => {
   if (err) {
     return ResErr(cb, err)
   }
-  return ResOK(cb, {
-    payload: admins
-  })
+  return ResOK(cb, { payload: admins })
 }
 
+/**
+ * 管理员个人中心
+ */
 const adminCenter = async (e, c, cb) => {
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -207,170 +183,105 @@ const adminCenter = async (e, c, cb) => {
   if (err) {
     return ResErr(cb, err)
   }
-  return ResOK(cb, {
-    payload: admin
-  })
+  return ResOK(cb, { payload: admin })
 }
-// 建站商列表
+
+/**
+ * 建站商列表
+ */
 const managerList = async (e, c, cb) => {
-  const errRes = {
-    m: 'managerList error',
-    input: e
-  }
-  const res = {
-    m: 'managerList'
-  }
+  const errRes = { m: 'managerList error', input: e }
+  const res = { m: 'managerList' }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
   const [err, ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
   if (err) {
-    return ResFail(cb, {
-      ...errRes,
-      err: err
-    }, err.code)
+    return ResFail(cb, { ...errRes, err: err }, err.code)
   }
-  return ResOK(cb, {
-    ...res,
-    payload: ret
-  })
-
+  return ResOK(cb, { ...res, payload: ret })
 }
+/**
+ * 获取管理员信息
+ */
 const managerOne = async (e, c, cb) => {
-  const errRes = {
-    m: 'managerOne err',
-    input: e
-  }
-  const res = {
-    m: 'managerOne'
-  }
-  const [paramsErr,
-    params] = Model.pathParams(e)
+  const errRes = {m: 'managerOne err',input: e}
+  const res = {m: 'managerOne'}
+  const [paramsErr,params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb, {
-      ...errRes,
-      err: paramsErr
-    }, paramsErr.code)
+    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
   }
-  const [tokenErr,
-    token] = await Model.currentToken(e)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
   }
 
-  const [managerErr,
-    manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
+  const [managerErr,manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: managerErr
-    }, managerErr.code)
+    return ResFail(cb, {...errRes,err: managerErr}, managerErr.code)
   }
-  return ResOK(cb, {
-    ...res,
-    payload: manager
-  })
+  return ResOK(cb, {...res,payload: manager})
 }
+/**
+ * 更新管理员信息
+ */
 const managerUpdate = async (e, c, cb) => {
-  const errRes = {
-    m: 'managerUpdate err',
-    input: e
-  }
-  const res = {
-    m: 'managerUpdate',
-    input: e
-  }
-  const [paramsErr,
-    params] = Model.pathParams(e)
+  const errRes = {m: 'managerUpdate err',input: e}
+  const res = {m: 'managerUpdate',input: e}
+  const [paramsErr,params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb, {
-      ...errRes,
-      err: paramsErr
-    }, paramsErr.code)
+    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
   }
-  const [tokenErr,
-    token] = await Model.currentToken(e)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
   }
-  const [managerErr,
-    manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
+  const [managerErr,manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: managerErr
-    }, managerErr.code)
+    return ResFail(cb, {...errRes,err: managerErr}, managerErr.code)
   }
-  const [jsonParseErr,
-    managerInfo] = JSONParser(e && e.body)
+  const [jsonParseErr,managerInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: jsonParseErr
-    }, jsonParseErr.code)
+    return ResFail(cb, {...errRes,err: jsonParseErr}, jsonParseErr.code)
   }
   const Manager = {
     ...manager,
     ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
-  const [updateErr,
-    updateRet] = await UserUpdate(Manager)
+  const [updateErr,updateRet] = await UserUpdate(Manager)
   if (updateErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: updateErr
-    }, updateErr.code)
+    return ResFail(cb, {...errRes,err: updateErr}, updateErr.code)
   }
-  return ResOK(cb, {
-    ...res,
-    payload: updateRet
-  })
+  return ResOK(cb, {...res,payload: updateRet})
 }
+
+/**
+ * 获取商户信息
+ */
 const merchantOne = async (e, c, cb) => {
-  const errRes = {
-    m: 'merchantOne err',
-    input: e
-  }
-  const res = {
-    m: 'merchantOne'
-  }
-  const [paramsErr,
-    params] = Model.pathParams(e)
+  const errRes = {m: 'merchantOne err',input: e}
+  const res = {m: 'merchantOne'}
+  const [paramsErr,params] = Model.pathParams(e)
+
   if (paramsErr || !params.id) {
-    return ResFail(cb, {
-      ...errRes,
-      err: paramsErr
-    }, paramsErr.code)
+    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
   }
-  const [tokenErr,
-    token] = await Model.currentToken(e)
+  const [tokenErr,token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: tokenErr
-    }, tokenErr.code)
+    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
   }
 
-  const [merchantErr,
-    merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
+  const [merchantErr,merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: merchantErr
-    }, merchantErr.code)
+    return ResFail(cb, {...errRes,err: merchantErr}, merchantErr.code)
   }
-  return ResOK(cb, {
-    ...res,
-    payload: merchant
-  })
+  return ResOK(cb, {...res,payload: merchant})
 }
+
+/**
+ * 获取下级商户列表
+ */
 const merchantList = async (e, c, cb) => {
 
   const errRes = {
@@ -708,25 +619,29 @@ const withdrawPoints = async (e, c, cb) => {
   })
 }
 
-const jwtverify = async (e, c, cb) => {
-  // get the token from event.authorizationToken
-  const token = e.authorizationToken.split(' ')
-  if (token[0] !== 'Bearer') {
-    return c.fail('Unauthorized: wrong token type')
+/**
+ * 获取线路号列表
+ */
+const msnList = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'msnList error' }
+  const res = { m: 'msnList' }
+  if(!e){e = {}}
+  if(!e.body){e.body = {}}
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  // verify it and return the policy statements
-  const [err,
-    userInfo] = await JwtVerify(token[1])
-  if (err || !userInfo) {
-    console.log(JSON.stringify(err), JSON.stringify(userInfo));
-    return c.fail('Unauthorized')
+  // 参数校验
+  // 业务操作
+  const [err, ret] = await new MsnModel().scan()
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
   }
-
-  return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
-
 }
 
-const msnList = async (e, c, cb) => { }
 const checkMsn = async (e, c, cb) => {
   const errRes = {
     m: 'checkMsn err',
@@ -777,7 +692,7 @@ const captcha = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
   }
   // 业务操作
-  inparam.code = randomNum(1000,9999)
+  inparam.code = randomNum(1000, 9999)
   const [err, ret] = await new CaptchaModel().putItem(inparam)
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
@@ -807,6 +722,25 @@ const exquery = async (e, c, cb) => {
     console.info(res)
   }
 }*/
+
+// TOKEN验证
+const jwtverify = async (e, c, cb) => {
+  // get the token from event.authorizationToken
+  const token = e.authorizationToken.split(' ')
+  if (token[0] !== 'Bearer') {
+    return c.fail('Unauthorized: wrong token type')
+  }
+  // verify it and return the policy statements
+  const [err,
+    userInfo] = await JwtVerify(token[1])
+  if (err || !userInfo) {
+    console.log(JSON.stringify(err), JSON.stringify(userInfo));
+    return c.fail('Unauthorized')
+  }
+
+  return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+
+}
 
 // 随机四位数
 function randomNum(min, max) {

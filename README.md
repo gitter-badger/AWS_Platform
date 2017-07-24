@@ -250,9 +250,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/random_pa
 ```
 
 #### 获取验证码
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/captcha
 ```
@@ -632,6 +630,41 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/
     "code": "0"
 }
 ```
+
+#### 获取所有线路号列表
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnList
+```
+- Token Header
+```
+有
+```
+- Body
+```
+{}
+```
+- Response
+```
+{
+    "m": "msnList",
+    "payload": {
+        "Items": [
+            {
+                "createdAt": 1500889189008,
+                "msn": "1",
+                "updatedAt": 1500889189008,
+                "userId": "e6a59b02-0932-4391-9950-e174e5045ae1",
+                "status": 1
+            }
+        ],
+        "Count": 1,
+        "ScannedCount": 1
+    },
+    "code": "0"
+}
+```
+
 #### 获取当前可用的线路商列表  ( 创建线路商或者商户时的可选所属线路商列表 )
 
 - URL

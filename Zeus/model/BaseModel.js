@@ -142,13 +142,31 @@ export class BaseModel {
     /**
      * 查询数据
      */
-    query(conditions) {
+    query(conditions = {}) {
         return new Promise((reslove, reject) => {
             const params = {
                 ...this.params,
                 ...conditions
             }
             this.db$('query', params)
+                .then((res) => {
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), false])
+                })
+        })
+    }
+
+    /**
+     * 全表查询数据
+     */
+    scan(conditions = {}) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                ...conditions
+            }
+            this.db$('scan', params)
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
