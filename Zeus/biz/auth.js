@@ -102,7 +102,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   }
   // 如果是创建商户，检查msn是否可用
   if (CheckUser.role === RoleCodeEnum['Merchant']) {
-    const [checkMSNErr, checkMSNRet] = await CheckMSN({ msn: User.msn })
+    const [checkMSNErr, checkMSNRet] = await CheckMSN({ msn: CheckUser.msn })
     if (checkMSNErr) {
       return [checkMSNErr, 0]
     }
