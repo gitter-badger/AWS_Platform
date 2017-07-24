@@ -17,12 +17,33 @@ import {
   Omit
 } from '../lib/all'
 import _ from 'lodash'
-export const ListChildUsers = async (token,roleCode) => {
-  var parentId = token.userId
-  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
-      parentId = Model.DefaultParent
+
+export const TheAdmin = async (token) =>{
+  return await GetUser(token.userId,token.role)
+}
+export const ListAllAdmins = async (token) => {
+  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin role'),0]
   }
   const query = {
+    TableName: Tables.ZeusPlatformUser,
+    KeyConditionExpression: '#role = :role',
+    ExpressionAttributeNames:{
+      '#role':'role'
+    },
+    ExpressionAttributeValues: {
+      ':role':RoleCodeEnum['PlatformAdmin']
+    }
+  }
+  const [queryErr,adminRet] = await Store$('query',query)
+  if (queryErr) {
+    return [queryErr,0]
+  }
+  return [0,adminRet.Items]
+}
+export const ListChildUsers = async (token,roleCode) => {
+  var parentId = token.userId
+  var query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'RoleParentIndex',
     KeyConditionExpression: '#role = :role and parent = :parent',
@@ -34,6 +55,20 @@ export const ListChildUsers = async (token,roleCode) => {
       ':role':roleCode
     }
   }
+  if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+    query = {
+      TableName: Tables.ZeusPlatformUser,
+      IndexName: 'RoleParentIndex',
+      KeyConditionExpression: '#role = :role',
+      ExpressionAttributeNames:{
+        '#role':'role'
+      },
+      ExpressionAttributeValues:{
+        ':role':roleCode
+      }
+    }
+  }
+
   const [queryErr,queryRet] = await Store$('query',query)
   if (queryErr) {
     return [queryErr,0]
@@ -149,13 +184,6 @@ export const ListGames = async(pathParams)=>{
   return [0,ret]
 }
 
-export const ManagerById = async(id)=>{
-  return  await getUserById(id,RoleCodeEnum['Manager'])
-}
-
-export const MerchantById = async(id)=>{
-  return await getUserById(id,RoleCodeEnum['Merchant'])
-}
 
 export const UserUpdate = async(userData)=>{
   const User = {
@@ -216,18 +244,15 @@ export const QueryUserById = async (userId) => {
 
   return [0,querySet.Items[0]]
 }
-export const GetUser = async (userId,role,parent) => {
+export const GetUser = async (userId,role) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,
     KeyConditionExpression: '#userId = :userId and #role = :role',
-    FilterExpression:'#parent = :parent',
     ExpressionAttributeValues:{
-      ':parent':parent,
       ':role':role,
       ':userId':userId
     },
     ExpressionAttributeNames:{
-      '#parent':'parent',
       '#userId':'userId',
       '#role':'role'
     }
@@ -375,19 +400,20 @@ export const CheckUserBalance = async (user) => {
 export const CheckBalance = async (token,user) =>{
   // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
   // 当前登录用户只能查询自己的balance
-  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId)) {
+  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
     return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
   }
   return await CheckUserBalance(user)
 }
 /* 商户的账单流水 */
 export const ComputeWaterfall = async (token, userId) =>{
-  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || userId === token.userId)) {
-    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
-  }
+
   const [queryUserErr,user] = await QueryUserById(userId)
   if (queryUserErr) {
     return [queryUserErr,0]
+  }
+  if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId )) {
+    return [BizErr.TokenErr('only admin or user himself can check users balance'),0]
   }
   const initPoints = parseFloat(user.points)
   const query = {
@@ -407,8 +433,8 @@ export const ComputeWaterfall = async (token, userId) =>{
 
   _.map(bills.Items,(item,index)=>{
     let balance = _.reduce(_.slice(bills.Items,0,index+1),(sum,item)=>{
-          return sum + parseFloat(item.amount) + initPoints
-        },0.0)
+          return sum + parseFloat(item.amount)
+        },0.0)  + initPoints
     return {
       ...bills.Items[index],
       oldBalance: balance - parseFloat(bills.Items[index].amount),
