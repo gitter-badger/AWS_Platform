@@ -1,0 +1,10 @@
+{
+  "body": {
+    "role": "100",
+    "limit": 1,
+    "startkey": {
+      "role": "100",
+      "userId": "0ba72cc9-ca2e-4d96-975c-a72c6736fe71"
+    }
+  }
+}

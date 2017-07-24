@@ -124,7 +124,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
 
 
 ```
-#### 创建系统管理员**
+#### 创建第一个系统管理员，接口编号0
 
 - URL
 

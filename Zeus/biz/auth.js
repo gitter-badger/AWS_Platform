@@ -16,93 +16,55 @@ import {
   RoleDisplay,
   MSNStatusEnum
 } from '../lib/all'
-import {CheckMSN, CheckBalance, DepositTo} from './dao'
+import { CheckMSN, CheckBalance, DepositTo } from './dao'
+
 /**
-  现在注册分成两部分
-  1. 管理员注册
-  2. 商户/建站商注册
-**/
-
-const userParamCheck = (userInfo) => {
-  if (userInfo.adminName === Model.StringValue) {
-    return [BizErr.ParamErr('adminName must set'), 0]
-  }
-
-  if (userInfo.suffix === Model.StringValue) {
-    return [BizErr.NoSuffixErr(), 0]
-  }
-  if (Trim(userInfo.username).length < Model.USERNAME_LIMIT[0]) {
-    return [BizErr.UsernameTooShortErr(), 0]
-  }
-  if (Trim(userInfo.username).length > Model.USERNAME_LIMIT[1]) {
-    return [BizErr.UsernameTooLongErr(), 0]
-  }
-  if (userInfo.password.length < Model.PASSWORD_PATTERN[0]) {
-    return [BizErr.ParamErr(), 0]
-  }
-  return [0, 0]
-}
-const queryParent = async(token, userId) => {
-  var id = 0,
-    role = -1
-  if (!userId || Model.DefaultParent == userId) {
-    id = token.userId
-    role = token.role
-  } else {
-    id = userId
-    // 能够有子节点的只能是管理员或者线路商
-    role = RoleCodeEnum['Manager']
-  }
-
-  const [err,
-    user] = await queryUserById(id, role)
-  if (err) {
-    return [err, 0]
-  }
-  return [0, user]
-}
-export const RegisterAdmin = async(token = {}, userInfo = {}) => {
-  //创建管理员账号的只能是管理员
+ * 接口编号：0
+ * 现在注册分成两部分 1. 管理员注册 2. 商户/建站商注册
+ * @param {*} token 身份令牌
+ * @param {*} userInfo 输入用户信息
+ */
+export const RegisterAdmin = async (token = {}, userInfo = {}) => {
+  // 创建管理员账号的只能是管理员
   if (token.role !== RoleCodeEnum['PlatformAdmin']) {
     return [BizErr.TokenErr('must admin token'), 0]
   }
+  // 默认值设置
   const adminRole = RoleModels[RoleCodeEnum['PlatformAdmin']]()
   const userInput = Pick({
     ...adminRole,
     ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
   }, Keys(adminRole))
-  // check user
-  const [userParamErr,
-    _] = userParamCheck(userInput)
+  // 检查用户数据
+  const [userParamErr,_] = userParamCheck(userInput)
   if (userParamErr) {
     return [userParamErr, 0]
   }
-  const CheckUser = {
-    ...userInput,
-    passhash: Model.hashGen(userInput.password)
-  }
-  const [queryUserErr,
-    queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
+  const CheckUser = {...userInput,passhash: Model.hashGen(userInput.password)}
+  // 查询用户是否已存在
+  const [queryUserErr,queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
   if (queryUserRet.Items.length) {
     return [BizErr.UserExistErr(), 0]
   }
-  // save user
-  const User = {
-    ...CheckUser,
-    username: `${CheckUser.suffix}_${CheckUser.username}`
-  }
-  const [saveUserErr,
-    saveUserRet] = await saveUser(User)
+  // 保存用户
+  const User = {...CheckUser,username: `${CheckUser.suffix}_${CheckUser.username}`}
+  const [saveUserErr,saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
   return [0, saveUserRet]
 }
-// 专门用于创建商户/建站商
-export const RegisterUser = async(token = {}, userInfo = {}) => {
+
+/**
+ * 接口编号：2
+ * 专门用于创建商户/建站商
+ * @param {*} token 身份令牌
+ * @param {*} userInfo 输入用户信息
+ */
+export const RegisterUser = async (token = {}, userInfo = {}) => {
   //创建管理员账号的只能是管理员
   if (token.role !== RoleCodeEnum['PlatformAdmin']) {
     return [BizErr.TokenErr('must admin token'), 0]
@@ -110,36 +72,26 @@ export const RegisterUser = async(token = {}, userInfo = {}) => {
   if (userInfo.points < 0) {
     return [BizErr.ParamErr('points cant less then 0 for new user'), 0]
   }
-  // check the role code
+  // 检查角色码
   const roleCode = userInfo.role
   if (roleCode === RoleCodeEnum['PlatformAdmin']) {
     return [BizErr.ParamErr('admin role cant create by this api'), 0]
   }
-  // find the role in the role table
-  const [roleNotFoundErr,
-    bizRole] = await getRole(roleCode)
+  // 根据角色码查询角色
+  const [roleNotFoundErr, bizRole] = await getRole(roleCode)
   if (roleNotFoundErr) {
     return [roleNotFoundErr, 0]
   }
+  // 生成注册用户信息
   userInfo = Omit(userInfo, ['userId', 'passhash'])
-  const userInput = Pick({
-    ...bizRole,
-    ...userInfo
-  }, Keys(bizRole))
-
-  const [userParamErr,
-    _] = userParamCheck(userInput)
+  const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
+  const [userParamErr, _] = userParamCheck(userInput)
   if (userParamErr) {
     return [userParamErr, 0]
   }
+  const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
 
-  // when get the role. can use it the puck attr from userInfo and build the User Model
-  const CheckUser = {
-    ...userInput,
-    passhash: Model.hashGen(userInput.password)
-  }
-
-  // check if the user is exists
+  // 检查用户是否已经存在
   const [queryUserErr,
     queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
@@ -148,10 +100,9 @@ export const RegisterUser = async(token = {}, userInfo = {}) => {
   if (queryUserRet.Items.length) {
     return [BizErr.UserExistErr(), 0]
   }
-  // 检查msn是否可用
+  // 如果是创建商户，检查msn是否可用
   if (CheckUser.role === RoleCodeEnum['Merchant']) {
-    const [checkMSNErr,
-      checkMSNRet] = await CheckMSN({msn: User.msn})
+    const [checkMSNErr, checkMSNRet] = await CheckMSN({ msn: User.msn })
     if (checkMSNErr) {
       return [checkMSNErr, 0]
     }
@@ -160,14 +111,13 @@ export const RegisterUser = async(token = {}, userInfo = {}) => {
     }
   }
   // 如果parent未指定,则为管理员. 从当前管理员对点数中扣去点数进行充值. 点数不可以为负数.而且一定是管理员存点到新用户
-  const [queryParentErr,
-    parentUser] = await queryParent(token, CheckUser.parent)
+  const [queryParentErr, parentUser] = await queryParent(token, CheckUser.parent)
   if (queryParentErr) {
     return [queryParentErr, 0]
   }
   // 无论填入多少点数. 产生用户时, 点数的起始为0.0
   const depositPoints = parseFloat(CheckUser.points)
-  console.log('registerUser: points: ',depositPoints);
+  console.log('registerUser: points: ', depositPoints);
   const User = {
     ...CheckUser,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
@@ -186,11 +136,11 @@ export const RegisterUser = async(token = {}, userInfo = {}) => {
   }
   const [depositErr,
     depositRet] = await DepositTo(parentUser, {
-    toUser: saveUserRet.username,
-    toRole: saveUserRet.role,
-    amount: Math.min(depositPoints, balance), // 有多少扣多少
-    operator: token.username
-  })
+      toUser: saveUserRet.username,
+      toRole: saveUserRet.role,
+      amount: Math.min(depositPoints, balance), // 有多少扣多少
+      operator: token.username
+    })
   var orderId = depositRet.sn
   if (depositErr) {
     orderId = '-1'
@@ -206,7 +156,7 @@ export const RegisterUser = async(token = {}, userInfo = {}) => {
 /**
 LoginUser
 */
-export const LoginUser = async(userLoginInfo = {}) => {
+export const LoginUser = async (userLoginInfo = {}) => {
   // check the role code
   const roleCode = userLoginInfo.role
   // find the role in the role table
@@ -252,7 +202,7 @@ export const LoginUser = async(userLoginInfo = {}) => {
   ]
 }
 
-export const UserGrabToken = async(userInfo = {}) => {
+export const UserGrabToken = async (userInfo = {}) => {
   if (!userInfo.username || !userInfo.apiKey || !userInfo.suffix) {
     return [BizErr.ParamErr('missing params'), 0]
   }
@@ -310,13 +260,57 @@ export const UserGrabToken = async(userInfo = {}) => {
     }
   ]
 }
-const getRole = async(code) => {
+
+// 检查用户数据
+const userParamCheck = (userInfo) => {
+  if (userInfo.adminName === Model.StringValue) {
+    return [BizErr.ParamErr('adminName must set'), 0]
+  }
+
+  if (userInfo.suffix === Model.StringValue) {
+    return [BizErr.NoSuffixErr(), 0]
+  }
+  if (Trim(userInfo.username).length < Model.USERNAME_LIMIT[0]) {
+    return [BizErr.UsernameTooShortErr(), 0]
+  }
+  if (Trim(userInfo.username).length > Model.USERNAME_LIMIT[1]) {
+    return [BizErr.UsernameTooLongErr(), 0]
+  }
+  if (userInfo.password.length < Model.PASSWORD_PATTERN[0]) {
+    return [BizErr.ParamErr(), 0]
+  }
+  return [0, 0]
+}
+
+// 查询用户上级
+const queryParent = async (token, userId) => {
+  var id = 0,
+    role = -1
+  if (!userId || Model.DefaultParent == userId) {
+    id = token.userId
+    role = token.role
+  } else {
+    id = userId
+    // 能够有子节点的只能是管理员或者线路商
+    role = RoleCodeEnum['Manager']
+  }
+
+  const [err, user] = await queryUserById(id, role)
+  if (err) {
+    return [err, 0]
+  }
+  return [0, user]
+}
+
+// 根据角色码获取角色
+const getRole = async (code) => {
   if (!RoleModels[code]) {
     return [BizErr.ParamErr('Role is not found'), 0]
   }
   return [0, RoleModels[code]()]
 }
-const saveUser = async(userInfo) => {
+
+const saveUser = async (userInfo) => {
   const baseModel = Model.baseModel()
   const roleDisplay = RoleDisplay[userInfo.role]
   const UserItem = {
@@ -366,7 +360,7 @@ const saveUser = async(userInfo) => {
   const ret = Pick(UserItem, roleDisplay)
   return [0, ret]
 }
-const checkUserBySuffix = async(role, suffix, username) => {
+const checkUserBySuffix = async (role, suffix, username) => {
   if (role === RoleCodeEnum['PlatformAdmin']) { // 对于平台管理员来说。 可以允许suffix相同
     return await queryUserBySuffix(role, suffix, username)
   }
@@ -386,7 +380,7 @@ const checkUserBySuffix = async(role, suffix, username) => {
   }
   return await Store$('query', query)
 }
-const queryUserBySuffix = async(role, suffix, username) => {
+const queryUserBySuffix = async (role, suffix, username) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'RoleSuffixIndex',
@@ -406,7 +400,7 @@ const queryUserBySuffix = async(role, suffix, username) => {
   return await Store$('query', query)
 }
 
-const queryUserById = async(userId, role) => {
+const queryUserById = async (userId, role) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'UserIdIndex',
@@ -420,8 +414,7 @@ const queryUserById = async(userId, role) => {
       ':role': role
     }
   }
-  const [queryErr,
-    ret] = await Store$('query', query)
+  const [queryErr, ret] = await Store$('query', query)
   if (queryErr) {
     return [queryErr, 0]
   }
