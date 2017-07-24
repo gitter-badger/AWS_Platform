@@ -16,7 +16,7 @@ import {
   JwtVerify,
   GeneratePolicyDocument
 } from './lib/all'
-import {RegisterAdmin, RegisterUser, LoginUser, UserGrabToken} from './biz/auth'
+import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
 import {
   ListAllAdmins,
   ListChildUsers,
@@ -37,63 +37,58 @@ import {
   ComputeWaterfall
 
 } from './biz/dao'
+// import { GameModel } from './model/GameModel'
+// import { Util } from "athena"
+
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, {
-  err: err
-}, err.code)
-// 用于生成第一个管理员
-const eva = async(e, c, cb) => {
-  const errRes = {
-    m: 'eva error'
-  }
-  const res = {
-    m: 'userNew'
-  }
-  const [jsonParseErr,
-    userInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: jsonParseErr
-    }, jsonParseErr.code)
-  }
-  // admin dont need check token
-  const [registerUserErr,
-    resgisterUserRet] = await RegisterUser(Model.addSourceIP(e, userInfo))
-  if (registerUserErr) {
-    return ResFail(cb, {
-      ...errRes,
-      err: registerUserErr
-    }, registerUserErr.code)
-  }
+const ResErr = (callback, err) => ResFail(callback, {err: err}, err.code)
 
-  return ResOK(cb, {
-    ...res,
-    payload: resgisterUserRet
-  })
+/**
+ * 接口编号：0
+ * 生成第一个管理员
+ */
+const eva = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = {m: 'eva error'}
+  const res = {m: 'eva'}
+  const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  console.info('test')
+  console.info(userInfo)
+  // 生成第一个管理员业务
+  const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
+  const [registerUserErr, resgisterUserRet] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
+  if (registerUserErr) {
+    return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
+  }
+  return ResOK(cb, { ...res, payload: resgisterUserRet })
 }
-const adminNew = async(e, c, cb) => {
-  const [jsonParseErr,
-    userInfo] = JSONParser(e && e.body)
+
+/**
+ * 接口编号：2
+ * 创建管理员帐号
+ */
+const adminNew = async (e, c, cb) => {
+  const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  const [tokenErr,
-    token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
 
-  const [registAdminErr,
-    adminUser] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
+  const [registAdminErr, adminUser] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
   if (registAdminErr) {
     return ResErr(cb, registAdminErr)
   }
-  return ResOK(cb, {payload: adminUser})
+  return ResOK(cb, { payload: adminUser })
 }
 // 用户注册
-const userNew = async(e, c, cb) => {
+const userNew = async (e, c, cb) => {
   const errRes = {
     m: 'userNew error',
     input: e
@@ -128,7 +123,7 @@ const userNew = async(e, c, cb) => {
   })
 }
 // 用户登录
-const userAuth = async(e, c, cb) => {
+const userAuth = async (e, c, cb) => {
   const errRes = {
     m: 'userNew error',
     input: e
@@ -157,7 +152,7 @@ const userAuth = async(e, c, cb) => {
     payload: loginUserRet
   })
 }
-const userGrabToken = async(e, c, cb) => {
+const userGrabToken = async (e, c, cb) => {
   const errRes = {
     m: 'managerList error',
     input: e
@@ -189,36 +184,36 @@ const userGrabToken = async(e, c, cb) => {
   })
 
 }
-const adminList = async(e,c,cb)=>{
+const adminList = async (e, c, cb) => {
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResErr(cb,tokenErr)
+    return ResErr(cb, tokenErr)
   }
   // check the token  must admin
-  const [err,admins] = await ListAllAdmins(token)
+  const [err, admins] = await ListAllAdmins(token)
   if (err) {
-    return ResErr(cb,err)
+    return ResErr(cb, err)
   }
-  return ResOK(cb,{
+  return ResOK(cb, {
     payload: admins
   })
 }
 
-const adminCenter = async(e,c,cb) => {
+const adminCenter = async (e, c, cb) => {
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResErr(cb,tokenErr)
+    return ResErr(cb, tokenErr)
   }
-  const [err,admin] = await TheAdmin(token)
+  const [err, admin] = await TheAdmin(token)
   if (err) {
-    return ResErr(cb,err)
+    return ResErr(cb, err)
   }
-  return ResOK(cb,{
+  return ResOK(cb, {
     payload: admin
   })
 }
 // 建站商列表
-const managerList = async(e, c, cb) => {
+const managerList = async (e, c, cb) => {
   const errRes = {
     m: 'managerList error',
     input: e
@@ -228,7 +223,7 @@ const managerList = async(e, c, cb) => {
   }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResErr(cb,tokenErr)
+    return ResErr(cb, tokenErr)
   }
   const [err, ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
   if (err) {
@@ -243,7 +238,7 @@ const managerList = async(e, c, cb) => {
   })
 
 }
-const managerOne = async(e, c, cb) => {
+const managerOne = async (e, c, cb) => {
   const errRes = {
     m: 'managerOne err',
     input: e
@@ -281,7 +276,7 @@ const managerOne = async(e, c, cb) => {
     payload: manager
   })
 }
-const managerUpdate = async(e, c, cb) => {
+const managerUpdate = async (e, c, cb) => {
   const errRes = {
     m: 'managerUpdate err',
     input: e
@@ -339,7 +334,7 @@ const managerUpdate = async(e, c, cb) => {
     payload: updateRet
   })
 }
-const merchantOne = async(e, c, cb) => {
+const merchantOne = async (e, c, cb) => {
   const errRes = {
     m: 'merchantOne err',
     input: e
@@ -377,7 +372,7 @@ const merchantOne = async(e, c, cb) => {
     payload: merchant
   })
 }
-const merchantList = async(e, c, cb) => {
+const merchantList = async (e, c, cb) => {
 
   const errRes = {
     m: 'merchantList err',
@@ -408,7 +403,7 @@ const merchantList = async(e, c, cb) => {
   })
 
 }
-const merchantUpdate = async(e, c, cb) => {
+const merchantUpdate = async (e, c, cb) => {
   const errRes = {
     m: 'merchantUpdate err',
     input: e
@@ -478,7 +473,7 @@ const randomPassword = (e, c, cb) => {
     }
   })
 }
-const avalibleManagers = async(e, c, cb) => {
+const avalibleManagers = async (e, c, cb) => {
   const errRes = {
     m: 'avalibleManagers err',
     input: e
@@ -500,7 +495,7 @@ const avalibleManagers = async(e, c, cb) => {
   })
 }
 
-const gameNew = async(e, c, cb) => {
+const gameNew = async (e, c, cb) => {
   const errRes = {
     m: 'gameNew err',
     input: e
@@ -530,7 +525,7 @@ const gameNew = async(e, c, cb) => {
   })
 }
 
-const gameList = async(e, c, cb) => {
+const gameList = async (e, c, cb) => {
   const errRes = {
     m: 'gamelist err',
     input: e
@@ -560,7 +555,7 @@ const gameList = async(e, c, cb) => {
   })
 }
 
-const billOne = async(e, c, cb) => {
+const billOne = async (e, c, cb) => {
   const [paramsErr,
     params] = Model.pathParams(e)
   if (paramsErr || !params.userId) {
@@ -588,7 +583,7 @@ const billOne = async(e, c, cb) => {
     }
   })
 }
-const billList = async(e, c, cb) => {
+const billList = async (e, c, cb) => {
   // 查询出当前详情页面的所属用户的交易记录列表
   // 根据其长度 进行n次
   const [paramsErr,
@@ -602,11 +597,11 @@ const billList = async(e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
 
-  const [queryErr,bills] = await ComputeWaterfall(token,params.userId)
+  const [queryErr, bills] = await ComputeWaterfall(token, params.userId)
   if (queryErr) {
-    return ResErr(cb,queryErr)
+    return ResErr(cb, queryErr)
   }
-  return ResOK(cb,{
+  return ResOK(cb, {
     payload: bills
   })
 }
@@ -619,7 +614,7 @@ const billList = async(e, c, cb) => {
   3. 管理员指定fromUser 和 toUser 此时也需要满足约束 1
   4. 当前的非管理员用户也可以代表自己的下级进行转点操作
 */
-const depositPoints = async(e, c, cb) => {
+const depositPoints = async (e, c, cb) => {
   const errRes = {
     m: 'depositPoints err',
     input: e
@@ -643,7 +638,7 @@ const depositPoints = async(e, c, cb) => {
   const [queryErr,
     fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
   if (queryErr) {
-    return ResFail(cb,queryErr)
+    return ResFail(cb, queryErr)
   }
   // 获取fromUser的当前余额
   const [userBalanceErr,
@@ -653,9 +648,9 @@ const depositPoints = async(e, c, cb) => {
   }
   const [depositBillErr,
     depositBillRet] = await DepositTo(fromUser, {
-    ...depositInfo,
-    amount: Math.min(userBalance, depositInfo.amount)
-  })
+      ...depositInfo,
+      amount: Math.min(userBalance, depositInfo.amount)
+    })
   if (depositBillErr) {
     return ResErr(cb, depositBillErr)
   }
@@ -665,7 +660,7 @@ const depositPoints = async(e, c, cb) => {
   })
 }
 
-const withdrawPoints = async(e, c, cb) => {
+const withdrawPoints = async (e, c, cb) => {
   const errRes = {
     m: 'withdrawPoints err',
     input: e
@@ -689,18 +684,18 @@ const withdrawPoints = async(e, c, cb) => {
       err: tokenErr
     }, tokenErr.code)
   }
-  const [queryErr,fromUser] = await QueryBillUser(token,withdrawInfo.fromUserId)
+  const [queryErr, fromUser] = await QueryBillUser(token, withdrawInfo.fromUserId)
   if (queryErr) {
-    return ResErr(cb,queryErr)
+    return ResErr(cb, queryErr)
   }
-  const [userBalanceErr,userBalance] = await CheckUserBalance(fromUser)
+  const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
   if (userBalanceErr) {
-    return ResErr(cb,userBalanceErr)
+    return ResErr(cb, userBalanceErr)
   }
   const [withdrawBillErr,
     withdrawBillRet] = await WithdrawFrom(fromUser, {
       ...withdrawInfo,
-      amount: Math.min(userBalance,withdrawInfo.amount)
+      amount: Math.min(userBalance, withdrawInfo.amount)
     })
   if (withdrawBillErr) {
     return ResFail(cb, {
@@ -714,7 +709,7 @@ const withdrawPoints = async(e, c, cb) => {
   })
 }
 
-const jwtverify = async(e, c, cb) => {
+const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken
   const token = e.authorizationToken.split(' ')
   if (token[0] !== 'Bearer') {
@@ -732,8 +727,8 @@ const jwtverify = async(e, c, cb) => {
 
 }
 
-const msnList = async(e, c, cb) => {}
-const checkMsn = async(e, c, cb) => {
+const msnList = async (e, c, cb) => { }
+const checkMsn = async (e, c, cb) => {
   const errRes = {
     m: 'checkMsn err',
     input: e
@@ -765,7 +760,29 @@ const checkMsn = async(e, c, cb) => {
   })
 
 }
-const msnOne = async(e, c, cb) => {}
+const msnOne = async (e, c, cb) => { }
+/*
+const exquery = async (e, c, cb) => {
+  // 模拟入参
+  const gameType = '3'
+  const gameId = 'test'
+  // 属性检查
+  const array = [
+    { name: "gameType", value: gameType, min: 2, max: 5, type: "S" },
+    { name: "gameId", value: gameId, type: "N" }
+  ]
+  const [checkErr, checkRet] = Util.chekcProperties(array)
+  if (checkErr) {
+    console.error(checkRet)
+  }
+  // 业务操作
+  else {
+    const gameModel = new GameModel(gameType, gameId, new Date(), new Date())
+    let [err, res] = await gameModel.save()
+    console.info(res)
+  }
+}*/
+
 /**
   api export
 **/
@@ -796,3 +813,7 @@ export {
   billList, // 流水列表
   billOne
 }
+
+// export {
+//   exquery
+// }

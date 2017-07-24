@@ -37,7 +37,7 @@ functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
-  eva:
+  eva: #创建第一个管理员，接口编号0
     handler: api.eva
     events:
       -
@@ -228,3 +228,11 @@ functions:
           path: check_msn/{msn}
           method: get
           cors: true
+  # exquery:
+  #   handler: api.exquery
+  #   events:
+  #     -
+  #       http:
+  #         path: exquery
+  #         method: get
+  #         cors: true
