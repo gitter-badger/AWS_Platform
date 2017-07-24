@@ -123,6 +123,30 @@ const userAuth = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
+  // 检查验证码
+  let suffix = 'Platform'
+  if (userLoginInfo.suffix) {
+    suffix = userLoginInfo.suffix
+  }
+  const relKey = suffix + '_' + userLoginInfo.username
+  const [err, ret] = await new CaptchaModel().query({
+    KeyConditionExpression: 'relKey = :relKey and #usage = :usage',
+    FilterExpression: 'code = :code',
+    ExpressionAttributeNames: {
+      '#usage': 'usage'
+    },
+    ExpressionAttributeValues: {
+      ':relKey': relKey,
+      ':usage': 'login',
+      ':code': parseInt(userLoginInfo.captcha)
+    }
+  })
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else if (ret.Items.length == 0) {
+    return ResFail(cb, { ...errRes, err: BizErr.CaptchaErr() }, BizErr.CaptchaErr().code)
+  }
+  // 用户登录
   const [loginUserErr, loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
   if (loginUserErr) {
     return ResFail(cb, { ...errRes, err: loginUserErr }, loginUserErr.code)
@@ -206,77 +230,77 @@ const managerList = async (e, c, cb) => {
  * 获取管理员信息
  */
 const managerOne = async (e, c, cb) => {
-  const errRes = {m: 'managerOne err',input: e}
-  const res = {m: 'managerOne'}
-  const [paramsErr,params] = Model.pathParams(e)
+  const errRes = { m: 'managerOne err', input: e }
+  const res = { m: 'managerOne' }
+  const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
+    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
+    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
 
-  const [managerErr,manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
+  const [managerErr, manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
-    return ResFail(cb, {...errRes,err: managerErr}, managerErr.code)
+    return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
   }
-  return ResOK(cb, {...res,payload: manager})
+  return ResOK(cb, { ...res, payload: manager })
 }
 /**
  * 更新管理员信息
  */
 const managerUpdate = async (e, c, cb) => {
-  const errRes = {m: 'managerUpdate err',input: e}
-  const res = {m: 'managerUpdate',input: e}
-  const [paramsErr,params] = Model.pathParams(e)
+  const errRes = { m: 'managerUpdate err', input: e }
+  const res = { m: 'managerUpdate', input: e }
+  const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
+    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
+    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
-  const [managerErr,manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
+  const [managerErr, manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
-    return ResFail(cb, {...errRes,err: managerErr}, managerErr.code)
+    return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
   }
-  const [jsonParseErr,managerInfo] = JSONParser(e && e.body)
+  const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, {...errRes,err: jsonParseErr}, jsonParseErr.code)
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
   const Manager = {
     ...manager,
     ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
-  const [updateErr,updateRet] = await UserUpdate(Manager)
+  const [updateErr, updateRet] = await UserUpdate(Manager)
   if (updateErr) {
-    return ResFail(cb, {...errRes,err: updateErr}, updateErr.code)
+    return ResFail(cb, { ...errRes, err: updateErr }, updateErr.code)
   }
-  return ResOK(cb, {...res,payload: updateRet})
+  return ResOK(cb, { ...res, payload: updateRet })
 }
 
 /**
  * 获取商户信息
  */
 const merchantOne = async (e, c, cb) => {
-  const errRes = {m: 'merchantOne err',input: e}
-  const res = {m: 'merchantOne'}
-  const [paramsErr,params] = Model.pathParams(e)
+  const errRes = { m: 'merchantOne err', input: e }
+  const res = { m: 'merchantOne' }
+  const [paramsErr, params] = Model.pathParams(e)
 
   if (paramsErr || !params.id) {
-    return ResFail(cb, {...errRes,err: paramsErr}, paramsErr.code)
+    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
-  const [tokenErr,token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, {...errRes,err: tokenErr}, tokenErr.code)
+    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
 
-  const [merchantErr,merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
+  const [merchantErr, merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
-    return ResFail(cb, {...errRes,err: merchantErr}, merchantErr.code)
+    return ResFail(cb, { ...errRes, err: merchantErr }, merchantErr.code)
   }
-  return ResOK(cb, {...res,payload: merchant})
+  return ResOK(cb, { ...res, payload: merchant })
 }
 
 /**
@@ -626,8 +650,8 @@ const msnList = async (e, c, cb) => {
   // 数据输入，转换，校验
   const errRes = { m: 'msnList error' }
   const res = { m: 'msnList' }
-  if(!e){e = {}}
-  if(!e.body){e.body = {}}
+  if (!e) { e = {} }
+  if (!e.body) { e.body = {} }
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)

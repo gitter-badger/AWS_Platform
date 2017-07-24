@@ -293,7 +293,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
   {
       "username": "Faker001",
       "password": "111111",
-      "role": "1"
+      "role": "1",
+      "captcha": "1234"
   }
   ```
 
@@ -304,7 +305,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
     "username": "manager001",
     "password": "111111",
     "role": "10",
-    "suffix": "NB"
+    "suffix": "NB",
+    "captcha": "1234"
   }
   ```
 
@@ -315,7 +317,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
     "username": "merchant001",
     "password": "111111",
     "role": "100",
-    "suffix": "NB"
+    "suffix": "NB",
+    "captcha": "1234"
   }
   ```
 

@@ -1,8 +1,8 @@
 {
   "body": {
-    "username": "manager001",
-    "password": "111111",
-    "role": "10",
-    "suffix": "NB"
+    "username": "cheney",
+    "password": "123456",
+    "role": "1",
+    "captcha": "7732"
   }
 }

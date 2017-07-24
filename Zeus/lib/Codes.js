@@ -27,7 +27,8 @@ export const Codes = {
   InsufficientBalance: '10002',
   TransferError: '10003',
   RepeatTransferError: '11000',
-  InparamError: '60001'
+  InparamError: '60001',
+  CaptchaErr: '60002'
 }
 
 export const BizErr = {
@@ -72,5 +73,8 @@ export const BizErr = {
   },
   InparamErr: (errMsg = 'InparamError') => {
     return  {code : Codes.InparamError, err: errMsg}
+  },
+  CaptchaErr: (errMsg = 'CaptchaErr') => {
+    return  {code : Codes.CaptchaErr, err: errMsg}
   }
 }
