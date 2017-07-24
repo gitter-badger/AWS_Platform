@@ -14,7 +14,8 @@ import {
   Trim,
   Pick,
   JwtVerify,
-  GeneratePolicyDocument
+  GeneratePolicyDocument,
+  BizErr
 } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
 import {
@@ -37,12 +38,12 @@ import {
   ComputeWaterfall
 
 } from './biz/dao'
-// import { GameModel } from './model/GameModel'
+import { CaptchaModel } from './model/CaptchaModel'
 // import { Util } from "athena"
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, {err: err}, err.code)
+const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 接口编号：0
@@ -50,14 +51,12 @@ const ResErr = (callback, err) => ResFail(callback, {err: err}, err.code)
  */
 const eva = async (e, c, cb) => {
   // 数据输入，转换，校验
-  const errRes = {m: 'eva error'}
-  const res = {m: 'eva'}
+  const errRes = { m: 'eva error' }
+  const res = { m: 'eva' }
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  console.info('test')
-  console.info(userInfo)
   // 生成第一个管理员业务
   const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
   const [registerUserErr, resgisterUserRet] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
@@ -761,6 +760,32 @@ const checkMsn = async (e, c, cb) => {
 
 }
 const msnOne = async (e, c, cb) => { }
+
+/**
+ * 获取登录验证码，接口编号：
+ */
+const captcha = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'captcha error' }
+  const res = { m: 'captcha' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  // 参数校验
+  if (!inparam.usage || !inparam.relKey) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
+  }
+  // 业务操作
+  inparam.code = randomNum(1000,9999)
+  const [err, ret] = await new CaptchaModel().putItem(inparam)
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: inparam })
+  }
+}
+
 /*
 const exquery = async (e, c, cb) => {
   // 模拟入参
@@ -782,6 +807,14 @@ const exquery = async (e, c, cb) => {
     console.info(res)
   }
 }*/
+
+// 随机四位数
+function randomNum(min, max) {
+  var range = max - min
+  var rand = Math.random()
+  var num = min + Math.round(rand * range)
+  return num
+}
 
 /**
   api export
@@ -811,7 +844,8 @@ export {
   checkMsn, // 检查msn是否被占用
   msnOne, //获取一个未被占用的线路号
   billList, // 流水列表
-  billOne
+  billOne,
+  captcha // 获取验证码
 }
 
 // export {
