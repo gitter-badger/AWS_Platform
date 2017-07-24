@@ -203,7 +203,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
     "adminName": "Faker002",
     "parent":"01",
     "msn":"957",
-    "suffix":"YB"
+    "suffix":"YB",
+    "displayName": "测试商户2"
 }
 ```
 - Response
