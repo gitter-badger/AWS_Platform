@@ -24,7 +24,7 @@ export class LogModel extends BaseModel {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.ZeusPlatformLog,
+            TableName: Tables.ZeusPlatformLog
         }
         // 设置对象属性
         this.item = {
