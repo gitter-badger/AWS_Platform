@@ -91,7 +91,6 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [userParamErr, 0]
   }
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
-
   // 检查用户是否已经存在
   const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
@@ -283,7 +282,6 @@ const queryParent = async (token, userId) => {
     // 能够有子节点的只能是管理员或者线路商
     role = RoleCodeEnum['Manager']
   }
-
   const [err, user] = await queryUserById(id, role)
   if (err) {
     return [err, 0]
@@ -329,7 +327,7 @@ const saveUser = async (userInfo) => {
               Item: {
                 ...baseModel,
                 updatedAt: Model.timeStamp(),
-                msn: userInfo.msn,
+                msn: userInfo.msn.toString(),
                 userId: userInfo.userId,
                 status: MSNStatusEnum['Used'],
                 displayName: userInfo.displayName,

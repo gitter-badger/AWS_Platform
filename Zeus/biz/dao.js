@@ -469,12 +469,12 @@ export const CheckMSN = async(param) =>{
       '#status':'status'
     },
     ExpressionAttributeValues:{
-      ':msn': param.msn,
+      ':msn': param.msn.toString(),
       ':usedStatus': MSNStatusEnum['Used'],
       ':lockStatus': MSNStatusEnum['Locked']
     }
   }
-  console.info(query)
+  
   const [queryErr,queryRet] = await Store$('query',query)
 
   if (queryErr) {

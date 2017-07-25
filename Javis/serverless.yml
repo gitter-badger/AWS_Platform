@@ -279,3 +279,68 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    ZeusPlatformLog:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformLog
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: S
+          -
+            AttributeName: role
+            AttributeType: S
+          -
+            AttributeName: suffix
+            AttributeType: S
+          -
+            AttributeName: username
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+          -
+            AttributeName: userId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: LogRoleIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: LogRoleSuffixIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: suffix
+                KeyType: RANGE
+          -
+            IndexName: LogRoleUsernameIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: username
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
