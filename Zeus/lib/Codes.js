@@ -31,7 +31,8 @@ export const Codes = {
   TransferError: '10003',
   RepeatTransferError: '11000',
   InparamError: '60001',
-  CaptchaErr: '60002'
+  CaptchaErr: '60002',
+  MerchantPeriodErr: '60003' 
 }
 
 export const BizErr = {
@@ -61,6 +62,9 @@ export const BizErr = {
   },
   NoSuffixErr: (errMsg = 'no suffix error')=>{
     return {code:Codes.NoSuffixError,err:errMsg}
+  },
+  MerchantPeriodErr: (errMsg = 'MerchantPeriodErr') => {
+    return {code: Codes.MerchantPeriodErr, err: errMsg}
   },
   ItemExistErr: (errMsg = 'data item is exist')=>{
     return {code:Codes.ItemDuplicate,err:errMsg}

@@ -117,40 +117,20 @@ const userNew = async (e, c, cb) => {
  * 用户登录
  */
 const userAuth = async (e, c, cb) => {
-  const errRes = { m: 'userNew error', input: e }
-  const res = {
-    m: 'userAuth'
-  }
+  const errRes = { m: 'userAuth error'/*, input: e*/ }
+  const res = { m: 'userAuth' }
+  // 输入参数转换与校验
   const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResErr(cb, jsonParseErr)
   }
   // 检查验证码
-  if (!userLoginInfo.captcha) {
-    return ResFail(cb, { ...errRes, err: BizErr.CaptchaErr() }, BizErr.CaptchaErr().code)
+  const [checkErr, checkRet] = await new CaptchaModel().checkCaptcha(userLoginInfo)
+  if (checkErr) {
+    return ResFail(cb, { ...errRes, err: checkErr }, checkErr.code)
   }
-  let suffix = 'Platform'
-  if (userLoginInfo.suffix) {
-    suffix = userLoginInfo.suffix
-  }
-  const relKey = suffix + '_' + userLoginInfo.username
-  const [err, ret] = await new CaptchaModel().query({
-    KeyConditionExpression: 'relKey = :relKey and #usage = :usage',
-    FilterExpression: 'code = :code',
-    ExpressionAttributeNames: {
-      '#usage': 'usage'
-    },
-    ExpressionAttributeValues: {
-      ':relKey': relKey,
-      ':usage': 'login',
-      ':code': parseInt(userLoginInfo.captcha)
-    }
-  })
-  if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
-  } else if (ret.Items.length == 0) {
-    return ResFail(cb, { ...errRes, err: BizErr.CaptchaErr() }, BizErr.CaptchaErr().code)
-  }
+  // 非管理员检查有效期
+  
   // 用户登录
   const [loginUserErr, loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
   if (loginUserErr) {
@@ -188,7 +168,7 @@ const userChangeStatus = async (e, c, cb) => {
   // 入参转换和校验
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResErr(cb, jsonParseErr)
   }
   if (!inparam.role || !inparam.userId) {
     return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)

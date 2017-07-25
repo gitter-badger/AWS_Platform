@@ -32,4 +32,5 @@ export class MsnModel extends BaseModel {
             userId: Model.StringValue
         }
     }
+    
 }
