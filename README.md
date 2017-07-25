@@ -650,7 +650,7 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/lockmsn/{m
 /* 参数在url中 */
 {
   "msn":"1"
-  "operate":"lock"
+  "operate":"lock"（或unlock）
 }
 ```
 - Response
