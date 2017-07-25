@@ -707,7 +707,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnList
 #### 随机线路号
 - URL
 ```
-POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnRandom
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnRandom
 ```
 - Token Header
 ```
