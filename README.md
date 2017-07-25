@@ -691,6 +691,24 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnList
 }
 ```
 
+#### 随机线路号
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnRandom
+```
+- Token Header
+```
+有
+```
+- Response
+```
+{
+    "m": "msnRandom",
+    "payload": 413,
+    "code": "0"
+}
+```
+
 #### 获取当前可用的线路商列表  ( 创建线路商或者商户时的可选所属线路商列表 )
 
 - URL

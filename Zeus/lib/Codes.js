@@ -12,6 +12,7 @@ export const Codes = {
   MsnExistError: '50008',
   MsnUsedError: '50009',
   MsnNotExistError: '50010',
+  MsnFullError: '50011',
   Busy: '44004',
   ParamError: '47003',
   IPBlock: '44900',
@@ -75,6 +76,9 @@ export const BizErr = {
   },
   MsnNotExistError: (errMsg = 'MSN is used') =>{
     return {code:Codes.MsnNotExistError,err:errMsg}
+  },
+  MsnFullError: (errMsg = 'MSN full') =>{
+    return {code:Codes.MsnFullError,err:errMsg}
   },
   InsufficientBalanceErr: (errMsg = 'InsufficientBalance') => {
     return {code: Codes.InsufficientBalance,err:errMsg}

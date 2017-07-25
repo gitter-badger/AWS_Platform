@@ -256,6 +256,15 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
+  msnRandom: #随机线路号，接口编号：
+    handler: api.msnRandom
+    events:
+      -
+        http:
+          path: msnRandom
+          method: get
+          cors: true
+          authorizer: tokenAuth
   # exquery:
   #   handler: api.exquery
   #   events:

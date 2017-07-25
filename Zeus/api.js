@@ -595,12 +595,36 @@ const checkMsn = async (e, c, cb) => {
   })
 }
 /**
- * 查看线路号详情
+ * 随机线路号
  */
-const msnOne = async (e, c, cb) => {
-
+const msnRandom = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'msnRandom error' }
+  const res = { m: 'msnRandom' }
+  // 参数校验
+  // 业务操作
+  const [err, ret] = await new MsnModel().scan()
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    // 所有线路号都被占用
+    if (ret.Items.length >= 999) {
+      return ResFail(cb, { ...errRes, err: BizErr.MsnFullError }, BizErr.MsnFullError().code)
+    }
+    // 所有占用线路号组成数组
+    let msnArr = new Array()
+    for (let item of ret.Items) {
+      msnArr.push(parseInt(item.msn))
+    }
+    // 随机生成线路号
+    let randomMsn = randomNum(1, 999)
+    // 判断随机线路号是否已被占用
+    while (msnArr.indexOf(randomMsn) != -1) {
+      randomMsn = randomNum(1, 999)
+    }
+    return ResOK(cb, { ...res, payload: randomMsn })
+  }
 }
-
 /**
  * 锁定/解锁线路号
  */
@@ -713,6 +737,8 @@ const exquery = async (e, c, cb) => {
   }
 }*/
 
+// ==================== 以下为内部方法 ====================
+
 // TOKEN验证
 const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken
@@ -732,7 +758,7 @@ const jwtverify = async (e, c, cb) => {
 
 }
 
-// 随机四位数
+// 随机数
 function randomNum(min, max) {
   var range = max - min
   var rand = Math.random()
@@ -744,33 +770,38 @@ function randomNum(min, max) {
   api export
 **/
 export {
-  jwtverify, // 用于进行token验证的方法
-  eva, // 用于创建系统的第一个管理员账号
-  userAuth, // 用户登录
-  adminNew,
-  adminList,
-  adminCenter,
-  userNew, // 创建新用户
-  userGrabToken, // 使用apiKey登录获取用户信息
-  managerList, // 建站商列表
+  jwtverify,                    // 用于进行token验证的方法
+  eva,                          // 用于创建系统的第一个管理员账号
+  userAuth,                     // 用户登录
+  adminNew,                     // 新管理员
+  adminList,                    // 管理员列表
+  adminCenter,                  // 管理员个人中心
+  userNew,                      // 创建新用户
+  userGrabToken,                // 使用apiKey登录获取用户信息
+  randomPassword,               // 随机密码
+
+  managerList,                  // 建站商列表
   managerOne,
-  managerUpdate, // 编辑某个建站商
-  merchantList, // 商户列表
-  merchantOne, //商户
-  merchantUpdate, // 编辑某个商户
-  randomPassword,
-  avalibleManagers, //当前可用的建站商
-  gameNew, // 新建游戏
-  gameList, // 游戏列表
-  depositPoints, // 存点
-  withdrawPoints, // 取点
-  msnList, // 线路号列表
-  checkMsn, // 检查msn是否被占用
-  msnOne, //获取一个未被占用的线路号
-  billList, // 流水列表
+  managerUpdate,                // 编辑某个建站商
+  avalibleManagers,             // 当前可用的建站商
+
+  merchantList,                 // 商户列表
+  merchantOne,                  // 商户
+  merchantUpdate,               // 编辑某个商户
+  
+  gameNew,                      // 新建游戏
+  gameList,                     // 游戏列表
+
+  billList,                     // 流水列表
   billOne,
-  captcha, // 获取验证码
-  lockmsn  // 锁定/解锁msn
+  depositPoints,                // 存点
+  withdrawPoints,               // 取点
+
+  msnList,                      // 线路号列表
+  checkMsn,                     // 检查msn是否被占用
+  lockmsn,                      // 锁定/解锁msn
+  msnRandom,                    // 随机线路号
+  captcha                       // 获取验证码
 }
 
 // export {
