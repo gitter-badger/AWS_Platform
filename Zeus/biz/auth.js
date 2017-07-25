@@ -177,7 +177,6 @@ export const LoginUser = async (userLoginInfo = {}) => {
   const User = queryUserRet.Items[0]
   // 检查非管理员的有效期
   const [periodErr, periodRet] = await new UserModel().checkContractPeriod(User)
-  console.info(periodErr)
   if (periodErr) {
     return [periodErr, 0]
   }
