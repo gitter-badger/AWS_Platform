@@ -98,6 +98,15 @@ functions:
           path: users/token
           method: post
           cors: true
+  userChangeStatus:
+    handler: api.userChangeStatus
+    events:
+      -
+        http:
+          path: userChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
   managerList:
     handler: api.managerList
     events:

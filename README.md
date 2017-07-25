@@ -590,6 +590,29 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants/
     "code": "0"
 }
 ```
+
+-
+#### 变更用户状态
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/userChangeStatus
+```
+- Token Header
+```
+- Body
+```
+{
+    "role": "100",
+    "userId": "25f76130-e04b-4b9f-9a20-1836a75fe419",
+    "status": 1
+}
+```
+有
+```
+- Response
+```
+```
+
 -
 #### 检查给定线路号是否可用
 

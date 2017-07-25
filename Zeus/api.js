@@ -41,6 +41,7 @@ import {
 } from './biz/dao'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
+import { UserModel } from './model/UserModel'
 // import { Util } from "athena"
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -176,6 +177,38 @@ const userGrabToken = async (e, c, cb) => {
   }
   return ResOK(cb, { ...res, payload: userToken })
 
+}
+
+/**
+ * 变更用户状态
+ */
+const userChangeStatus = async (e, c, cb) => {
+  const errRes = { m: 'userChangeStatus error'/*, input: e*/ }
+  const res = { m: 'userChangeStatus' }
+  // 入参转换和校验
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  if (!inparam.role || !inparam.userId) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 只有管理员有权限
+  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin token'), 0]
+  }
+  // 更新用户状态
+  const [err, ret] = await new UserModel().changeStatus(inparam.role, inparam.userId, inparam.status)
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
 }
 
 /**
@@ -609,7 +642,7 @@ const msnRandom = async (e, c, cb) => {
   } else {
     // 所有线路号都被占用
     if (ret.Items.length >= 999) {
-      return ResFail(cb, { ...errRes, err: BizErr.MsnFullError }, BizErr.MsnFullError().code)
+      return ResFail(cb, { ...errRes, err: BizErr.MsnFullError() }, BizErr.MsnFullError().code)
     }
     // 所有占用线路号组成数组
     let msnArr = new Array()
@@ -666,7 +699,7 @@ const lockmsn = async (e, c, cb) => {
       }
     }
     else {
-      return ResFail(cb, { ...errRes, err: BizErr.MsnUsedError }, BizErr.MsnUsedError().code)
+      return ResFail(cb, { ...errRes, err: BizErr.MsnUsedError() }, BizErr.MsnUsedError().code)
     }
   }
   // 解锁
@@ -685,7 +718,7 @@ const lockmsn = async (e, c, cb) => {
       }
     }
     else {
-      return ResFail(cb, { ...errRes, err: BizErr.MsnNotExistError }, BizErr.MsnNotExistError().code)
+      return ResFail(cb, { ...errRes, err: BizErr.MsnNotExistError() }, BizErr.MsnNotExistError().code)
     }
   }
 }
@@ -778,6 +811,7 @@ export {
   adminCenter,                  // 管理员个人中心
   userNew,                      // 创建新用户
   userGrabToken,                // 使用apiKey登录获取用户信息
+  userChangeStatus,             // 变更用户状态
   randomPassword,               // 随机密码
 
   managerList,                  // 建站商列表
@@ -788,7 +822,7 @@ export {
   merchantList,                 // 商户列表
   merchantOne,                  // 商户
   merchantUpdate,               // 编辑某个商户
-  
+
   gameNew,                      // 新建游戏
   gameList,                     // 游戏列表
 
