@@ -124,7 +124,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
 
 
 ```
-#### 创建系统管理员**
+#### 创建第一个系统管理员，接口编号0
 
 - URL
 
@@ -248,6 +248,34 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/random_pa
     "code": "0"
 }
 ```
+
+#### 获取验证码
+
+- URL
+
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/captcha
+```
+- Body
+```
+{
+    "usage": "login",
+    "relKey": "Platform_cheney"
+}
+```
+- Response
+```
+{
+    "m": "captcha",
+    "payload": {
+        "usage": "login",
+        "relKey": "Platform_cheney",
+        "code": 4023
+    },
+    "code": "0"
+}
+```
+
 #### 平台管理员 / 线路商 / 商户 登录
 
 - URL
