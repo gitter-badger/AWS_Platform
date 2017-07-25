@@ -619,17 +619,7 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/
 {
     "m": "checkMsn",
     "payload": {
-        "avalible": true
-    },
-    "code": "0"
-}
-
-/* https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/957 */
-/* 线路号 957 被占有 */
-{
-    "m": "checkMsn",
-    "payload": {
-        "avalible": false
+        "avalible": true（如果false表示被占用）
     },
     "code": "0"
 }
@@ -681,7 +671,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnList
                 "msn": "1",
                 "updatedAt": 1500889189008,
                 "userId": "e6a59b02-0932-4391-9950-e174e5045ae1",
-                "status": 1
+                "status": 1（状态，0：可使用，1：已使用，2：已锁定）
             }
         ],
         "Count": 1,
