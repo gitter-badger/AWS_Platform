@@ -101,7 +101,6 @@ export async function gamePlayerLogin(event, context, callback) {
   userName = `${merchantInfo.suffix}_${userName}`;
   let user = new UserModel(requestParams);
   let [userExistError, userInfo] = await user.get({userName});
-  // console.log(userInfo);
   if(userExistError) return callback(null, ReHandler.fail(userExistError));
   if(!userInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   //账号已冻结
@@ -128,9 +127,8 @@ export async function getGamePlayerBalance(event, context, callback) {
   console.log(event);  
   let userName = event.headers.pathParameters.userName;
   //验证token
-  let [err, userInfo] = await Util.jwtVerify(event.headers.X-Amz-Security-Token);
-  if(err || !Object.is(userInfo+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
-  
+  let [err, userInfo] = await Util.jwtVerify(event.headers["X-Amz-Security-Token"]);
+  if(err || !Object.is(userInfo.suffix+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
     //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters);
 
@@ -175,8 +173,8 @@ export async function gamePlayerBalance(event, context, callback) {
     console.log(event);
     let userName = event.headers.pathParameters.userName;
     //验证token
-    let [err, userInfo] = await Util.jwtVerify(event.headers.X-Amz-Security-Token);
-    if(err || !Object.is(userInfo+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
+    let [err, userInfo] = await Util.jwtVerify(event.headers["X-Amz-Security-Token"]);
+    if(err || !Object.is(userInfo.suffix+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
     //json转换
     
     let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
@@ -190,13 +188,11 @@ export async function gamePlayerBalance(event, context, callback) {
         {name : "action", type:"N"},
     ], requestParams);
 
-    
 
     if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return callback(null, ReHandler.fail(checkAttError));
     } 
-
     let action = +requestParams.action;
     let merchantAmount = -action * (+requestParams.amount);
 
@@ -216,21 +212,20 @@ export async function gamePlayerBalance(event, context, callback) {
       userId : merchantInfo.userId
     })
     let [mError, amount] = await merchantBillModel.handlerPoint();
-   
     if(mError) return callback(null, ReHandler.fail(mError));
-
     //保存玩家账单
     Object.assign(requestParams, {userName});
     let userBillModel = new UserBillModel(requestParams);
-    let [uBalance, userAmount] = await userBillModel.handlerPoint();
-    let [saveError] = userBillModel.save();
-    if(saveRrror) return callback(null, ReHandler.fail(saveError));
+    let [uBalanceError, userAmount] = await userBillModel.handlerPoint();
+    if(uBalanceError) return callback(null, ReHandler.fail(uBalanceError));
+    let [saveError] = await userBillModel.save();
+    if(saveError) return callback(null, ReHandler.fail(saveError));
 
     //查账
-    let [getError, mount] = await userBillModel.getMount();
+    let [getError, userSumAmount] = await userBillModel.getBalance();
     if(getError) return callback(null, ReHandler.fail(getError));
 
     callback(null, ReHandler.success({
-      data:{mount : mount}
+      data:{amount : userSumAmount}
     }));
 }
