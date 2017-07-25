@@ -205,7 +205,7 @@ resources:
             AttributeName: userId
             AttributeType: S
           -
-            AttributeName: createAt
+            AttributeName: createdAt
             AttributeType: N
 
         KeySchema:
@@ -224,8 +224,19 @@ resources:
                 AttributeName: userId
                 KeyType: HASH
               -
-                AttributeName: createAt
+                AttributeName: createdAt
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: UserIdIndexSec
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
@@ -238,7 +249,7 @@ resources:
                 AttributeName: sn
                 KeyType: HASH
               -
-                AttributeName: createAt
+                AttributeName: createdAt
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -266,29 +277,6 @@ resources:
             KeyType: HASH
           -
             AttributeName: userId
-            KeyType: RANGE
-
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    ZeusPlatformCaptcha:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ZeusPlatformCaptcha
-        AttributeDefinitions:
-          -
-            AttributeName: relKey
-            AttributeType: S
-          -
-            AttributeName: usage
-            AttributeType: S
-          
-        KeySchema:
-          -
-            AttributeName: relKey
-            KeyType: HASH
-          -
-            AttributeName: usage
             KeyType: RANGE
 
         ProvisionedThroughput:
