@@ -54,9 +54,6 @@ export const BizErr = {
   UserNotFoundErr:(errMsg = 'User not found') => {
     return {code:Codes.UserNotFound,err:errMsg}
   },
-  PasswordErr:(errMsg = 'password error') => {
-    return {code:Codes.PasswordError,err:errMsg}
-  },
   ParamMissErr: (errMsg = 'params missing') => {
     return {code: Codes.ParamMiss, err: errMsg}
   },

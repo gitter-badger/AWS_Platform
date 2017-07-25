@@ -178,59 +178,6 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-
-  gameNew:
-    handler: api.gameNew
-    events:
-      -
-        http:
-          path: games
-          method: post
-          cors: true
-  gameList:
-    handler: api.gameList
-    events:
-      -
-        http:
-          path: games/{gameType}
-          method: get
-          cors: true
-  depositPoints:
-    handler: api.depositPoints
-    events:
-      -
-        http:
-          path: deposit_points
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  withdrawPoints:
-    handler: api.withdrawPoints
-    events:
-      -
-        http:
-          path: withdraw_points
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  billOne:
-    handler: api.billOne
-    events:
-      -
-        http:
-          path: bills/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  billList:
-    handler: api.billList
-    events:
-      -
-        http:
-          path: waterfall/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
   checkMsn:
     handler: api.checkMsn
     events:
@@ -261,7 +208,7 @@ functions:
     events:
       -
         http:
-          path: lockmsn/{msn}/{operate}
+          path: lockmsn/{msn}/{status}
           method: get
           cors: true
           authorizer: tokenAuth
@@ -282,3 +229,55 @@ functions:
   #         path: exquery
   #         method: get
   #         cors: true
+  # gameNew:
+  #   handler: api.gameNew
+  #   events:
+  #     -
+  #       http:
+  #         path: games
+  #         method: post
+  #         cors: true
+  # gameList:
+  #   handler: api.gameList
+  #   events:
+  #     -
+  #       http:
+  #         path: games/{gameType}
+  #         method: get
+  #         cors: true
+  # depositPoints:
+  #   handler: api.depositPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: deposit_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # withdrawPoints:
+  #   handler: api.withdrawPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: withdraw_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # billOne:
+  #   handler: api.billOne
+  #   events:
+  #     -
+  #       http:
+  #         path: bills/{userId}
+  #         method: get
+  #         cors: true
+  #         authorizer: tokenAuth
+  # billList:
+  #   handler: api.billList
+  #   events:
+  #     -
+  #       http:
+  #         path: waterfall/{userId}
+  #         method: get
+  #         cors: true
+  #         authorizer: tokenAuth

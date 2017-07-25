@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX0ZhZGUwMDEiLCJwYXNzd29yZCI6IjExMTExMSIsInN1ZmZpeCI6IlBsYXRmb3JtIiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInVzZXJJZCI6ImVkNTk4ZWI3LWQ0NzEtNDNjZS1iY2VhLWM4OTk4OTIyNzE0NSIsInJvbGUiOiIxIiwiZGlzcGxheU5hbWUiOiLlubPlj7DnrqHnkIblkZgiLCJpYXQiOjE1MDA3MDEzMjN9.Wo2ZKXtfY6q3MraIoQra5MrJHP_S0JSE4qQ6KUevTmQ"
+  },
+  "requestContext": {
+    "authorizer": {
+      "username": "Platform_cheney",
+      "parent": "00",
+      "role": "1",
+      "userId": "6028eec6-96ec-492d-a36b-fd8d6981b76f",
+      "principalId": "6028eec6-96ec-492d-a36b-fd8d6981b76f"
+    },
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    }
+  },
+  "body": {
+    "role": "100",
+    "userId": "25f76130-e04b-4b9f-9a20-1836a75fe419",
+    "status": 1
+  }
+}

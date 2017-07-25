@@ -652,7 +652,7 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/
 #### 锁定/解锁线路号
 - URL
 ```
-GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/lockmsn/{msn}/{operate}
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/lockmsn/{msn}/{status}
 ```
 - Token Header
 ```
@@ -663,7 +663,7 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/lockmsn/{m
 /* 参数在url中 */
 {
   "msn":"1"
-  "operate":"lock"（或unlock）
+  "operate":"2:lock"（或0:unlock）
 }
 ```
 - Response

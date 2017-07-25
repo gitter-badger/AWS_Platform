@@ -299,6 +299,7 @@ resources:
           -
             AttributeName: username
             AttributeType: S
+
         KeySchema:
           -
             AttributeName: sn
@@ -306,6 +307,7 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
+        
         GlobalSecondaryIndexes:
           -
             IndexName: LogRoleIndex
@@ -327,6 +329,11 @@ resources:
               -
                 AttributeName: suffix
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
           -
             IndexName: LogRoleUsernameIndex
             KeySchema:
@@ -344,3 +351,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+

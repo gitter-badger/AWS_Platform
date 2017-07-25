@@ -17,7 +17,6 @@ import {
   MSNStatusEnum
 } from '../lib/all'
 import { CheckMSN, CheckBalance, DepositTo } from './dao'
-import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 
 /**
@@ -150,12 +149,6 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
  * @param {*} userLoginInfo 用户登录信息
  */
 export const LoginUser = async (userLoginInfo = {}) => {
-  console.info(userLoginInfo)
-  // 检查验证码
-  const [checkErr, checkRet] = await new CaptchaModel().checkCaptcha(userLoginInfo)
-  if (checkErr) {
-    return [checkErr, 0]
-  }
   // 获取用户身份
   const roleCode = userLoginInfo.role
   const [roleNotFoundErr, Role] = await getRole(roleCode)
@@ -184,17 +177,17 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // 检查非管理员的有效期
   const [periodErr, periodRet] = await new UserModel().checkContractPeriod(User)
   if (periodErr) {
-    return [periodErr, User]
+    return [periodErr, 0]
   }
   // 校验用户密码
   const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
   if (!valid) {
-    return [BizErr.PasswordErr(), 0]
+    return [BizErr.UserNotFoundErr(), 0]
   }
   // 更新用户信息
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
-    return [saveUserErr, User]
+    return [saveUserErr, 0]
   }
   // 返回用户身份令牌
   return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]

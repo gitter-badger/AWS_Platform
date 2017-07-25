@@ -42,7 +42,7 @@ import {
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
-// import { Util } from "athena"
+import { LogModel } from './model/LogModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -123,15 +123,11 @@ const userAuth = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  // 检查验证码
-  const [checkErr, checkRet] = await new CaptchaModel().checkCaptcha(userLoginInfo)
-  if (checkErr) {
-    return ResFail(cb, { ...errRes, err: checkErr }, checkErr.code)
-  }
-  // 非管理员检查有效期
-  
   // 用户登录
   const [loginUserErr, loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
+  // 日志记录
+  new LogModel().addLogin(Model.addSourceIP(e, userLoginInfo), loginUserErr, Model.addSourceIP(e, loginUserRet))
+
   if (loginUserErr) {
     return ResFail(cb, { ...errRes, err: loginUserErr }, loginUserErr.code)
   }
@@ -388,168 +384,6 @@ const avalibleManagers = async (e, c, cb) => {
 }
 
 /**
- * 创建游戏
- */
-const gameNew = async (e, c, cb) => {
-  const errRes = { m: 'gameNew err', input: e }
-  const res = { m: 'gameNew' }
-  const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
-  }
-  const [addGameInfoErr, addGameRet] = await AddGame(gameInfo)
-  if (addGameInfoErr) {
-    return ResFail(cb, { ...errRes, err: addGameInfoErr }, addGameInfoErr.code)
-  }
-  return ResOK(cb, { ...res, payload: addGameRet })
-}
-
-/**
- * 游戏列表
- */
-const gameList = async (e, c, cb) => {
-  const errRes = { m: 'gamelist err', input: e }
-  const res = { m: 'gamelist' }
-  const [paramsErr, gameParams] = Model.pathParams(e)
-  if (paramsErr) {
-    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
-  }
-  const [err, ret] = await ListGames(gameParams)
-  if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
-  }
-  return ResOK(cb, { ...res, payload: ret })
-}
-
-/**
- * 单个账单详情
- */
-const billOne = async (e, c, cb) => {
-  const [paramsErr, params] = Model.pathParams(e)
-  if (paramsErr || !params.userId) {
-    return ResErr(cb, paramsErr)
-  }
-  const [tokenErr, token] = await Model.currentToken(e)
-  if (tokenErr) {
-    return ResErr(cb, tokenErr)
-  }
-  const [queryErr, user] = await QueryUserById(params.userId)
-  if (queryErr) {
-    return ResErr(cb, queryErr)
-  }
-  const [balanceErr, balance] = await CheckBalance(token, user)
-  if (balanceErr) {
-    return ResErr(cb, balanceErr)
-  }
-  return ResOK(cb, {
-    payload: {
-      balance: balance,
-      userId: params.userId
-    }
-  })
-}
-
-/**
- * 账单列表
- */
-const billList = async (e, c, cb) => {
-  // 查询出当前详情页面的所属用户的交易记录列表
-  // 根据其长度 进行n次
-  const [paramsErr, params] = Model.pathParams(e)
-  if (paramsErr || !params.userId) {
-    return ResErr(cb, paramsErr)
-  }
-  const [tokenErr, token] = await Model.currentToken(e)
-  if (tokenErr) {
-    return ResErr(cb, tokenErr)
-  }
-
-  const [queryErr, bills] = await ComputeWaterfall(token, params.userId)
-  if (queryErr) {
-    return ResErr(cb, queryErr)
-  }
-  return ResOK(cb, {
-    payload: bills
-  })
-}
-
-/*
-  提点
-  转点 操作
-  1 fromUser是toUser的parent (非管理员)
-  2.fromUser是管理员 因为管理员是所有用户的parent
-  3. 管理员指定fromUser 和 toUser 此时也需要满足约束 1
-  4. 当前的非管理员用户也可以代表自己的下级进行转点操作
-*/
-
-/**
- * 存点
- */
-const depositPoints = async (e, c, cb) => {
-  const errRes = { m: 'depositPoints err', input: e }
-  const res = { m: 'depositPoints' }
-  const [jsonParseErr, depositInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResErr(cb, jsonParseErr)
-  }
-  const [tokenErr, token] = await Model.currentToken(e)
-  if (tokenErr) {
-    return ResErr(cb, tokenErr)
-  }
-  // 依据token判断当前登录用户是否是管理员
-  // 如果是 再看传人的body参数是否满足条件2和3
-  // 最后,如果当前登录用户不是管理员
-  const [queryErr, fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
-  if (queryErr) {
-    return ResFail(cb, queryErr)
-  }
-  // 获取fromUser的当前余额
-  const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
-  if (userBalanceErr) {
-    return ResErr(cb, userBalanceErr)
-  }
-  const [depositBillErr, depositBillRet] = await DepositTo(fromUser, {
-    ...depositInfo,
-    amount: Math.min(userBalance, depositInfo.amount)
-  })
-  if (depositBillErr) {
-    return ResErr(cb, depositBillErr)
-  }
-  return ResOK(cb, { ...res, payload: depositBillRet })
-}
-/**
- * 提点
- */
-const withdrawPoints = async (e, c, cb) => {
-  const errRes = { m: 'withdrawPoints err', input: e }
-  const res = { m: 'withdrawPoints' }
-  const [jsonParseErr, withdrawInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
-  }
-  const [tokenErr, token] = await Model.currentToken(e)
-  if (tokenErr) {
-    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
-  }
-  const [queryErr, fromUser] = await QueryBillUser(token, withdrawInfo.fromUserId)
-  if (queryErr) {
-    return ResErr(cb, queryErr)
-  }
-  const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
-  if (userBalanceErr) {
-    return ResErr(cb, userBalanceErr)
-  }
-  const [withdrawBillErr, withdrawBillRet] = await WithdrawFrom(fromUser, {
-    ...withdrawInfo,
-    amount: Math.min(userBalance, withdrawInfo.amount)
-  })
-  if (withdrawBillErr) {
-    return ResFail(cb, { ...errRes, err: withdrawBillErr }, withdrawBillErr.code)
-  }
-  return ResOK(cb, { ...res, payload: withdrawBillRet })
-}
-
-/**
  * 获取线路号列表
  */
 const msnList = async (e, c, cb) => {
@@ -667,7 +501,7 @@ const lockmsn = async (e, c, cb) => {
     }
   })
   // 锁定
-  if (params.operate == 'lock') {
+  if (params.status == MSNStatusEnum.Locked) {
     if (queryRet.Items.length == 0) {
       const msn = { msn: params.msn, userId: '0', status: MSNStatusEnum.Locked }
       const [err, ret] = await new MsnModel().putItem(msn)
@@ -749,6 +583,168 @@ const exquery = async (e, c, cb) => {
   }
 }*/
 
+// /**
+//  * 创建游戏
+//  */
+// const gameNew = async (e, c, cb) => {
+//   const errRes = { m: 'gameNew err', input: e }
+//   const res = { m: 'gameNew' }
+//   const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
+//   if (jsonParseErr) {
+//     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+//   }
+//   const [addGameInfoErr, addGameRet] = await AddGame(gameInfo)
+//   if (addGameInfoErr) {
+//     return ResFail(cb, { ...errRes, err: addGameInfoErr }, addGameInfoErr.code)
+//   }
+//   return ResOK(cb, { ...res, payload: addGameRet })
+// }
+
+// /**
+//  * 游戏列表
+//  */
+// const gameList = async (e, c, cb) => {
+//   const errRes = { m: 'gamelist err', input: e }
+//   const res = { m: 'gamelist' }
+//   const [paramsErr, gameParams] = Model.pathParams(e)
+//   if (paramsErr) {
+//     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
+//   }
+//   const [err, ret] = await ListGames(gameParams)
+//   if (err) {
+//     return ResFail(cb, { ...errRes, err: err }, err.code)
+//   }
+//   return ResOK(cb, { ...res, payload: ret })
+// }
+
+// /**
+//  * 单个账单详情
+//  */
+// const billOne = async (e, c, cb) => {
+//   const [paramsErr, params] = Model.pathParams(e)
+//   if (paramsErr || !params.userId) {
+//     return ResErr(cb, paramsErr)
+//   }
+//   const [tokenErr, token] = await Model.currentToken(e)
+//   if (tokenErr) {
+//     return ResErr(cb, tokenErr)
+//   }
+//   const [queryErr, user] = await QueryUserById(params.userId)
+//   if (queryErr) {
+//     return ResErr(cb, queryErr)
+//   }
+//   const [balanceErr, balance] = await CheckBalance(token, user)
+//   if (balanceErr) {
+//     return ResErr(cb, balanceErr)
+//   }
+//   return ResOK(cb, {
+//     payload: {
+//       balance: balance,
+//       userId: params.userId
+//     }
+//   })
+// }
+
+// /**
+//  * 账单列表
+//  */
+// const billList = async (e, c, cb) => {
+//   // 查询出当前详情页面的所属用户的交易记录列表
+//   // 根据其长度 进行n次
+//   const [paramsErr, params] = Model.pathParams(e)
+//   if (paramsErr || !params.userId) {
+//     return ResErr(cb, paramsErr)
+//   }
+//   const [tokenErr, token] = await Model.currentToken(e)
+//   if (tokenErr) {
+//     return ResErr(cb, tokenErr)
+//   }
+
+//   const [queryErr, bills] = await ComputeWaterfall(token, params.userId)
+//   if (queryErr) {
+//     return ResErr(cb, queryErr)
+//   }
+//   return ResOK(cb, {
+//     payload: bills
+//   })
+// }
+
+// /*
+//   提点
+//   转点 操作
+//   1 fromUser是toUser的parent (非管理员)
+//   2.fromUser是管理员 因为管理员是所有用户的parent
+//   3. 管理员指定fromUser 和 toUser 此时也需要满足约束 1
+//   4. 当前的非管理员用户也可以代表自己的下级进行转点操作
+// */
+
+// /**
+//  * 存点
+//  */
+// const depositPoints = async (e, c, cb) => {
+//   const errRes = { m: 'depositPoints err', input: e }
+//   const res = { m: 'depositPoints' }
+//   const [jsonParseErr, depositInfo] = JSONParser(e && e.body)
+//   if (jsonParseErr) {
+//     return ResErr(cb, jsonParseErr)
+//   }
+//   const [tokenErr, token] = await Model.currentToken(e)
+//   if (tokenErr) {
+//     return ResErr(cb, tokenErr)
+//   }
+//   // 依据token判断当前登录用户是否是管理员
+//   // 如果是 再看传人的body参数是否满足条件2和3
+//   // 最后,如果当前登录用户不是管理员
+//   const [queryErr, fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
+//   if (queryErr) {
+//     return ResFail(cb, queryErr)
+//   }
+//   // 获取fromUser的当前余额
+//   const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
+//   if (userBalanceErr) {
+//     return ResErr(cb, userBalanceErr)
+//   }
+//   const [depositBillErr, depositBillRet] = await DepositTo(fromUser, {
+//     ...depositInfo,
+//     amount: Math.min(userBalance, depositInfo.amount)
+//   })
+//   if (depositBillErr) {
+//     return ResErr(cb, depositBillErr)
+//   }
+//   return ResOK(cb, { ...res, payload: depositBillRet })
+// }
+// /**
+//  * 提点
+//  */
+// const withdrawPoints = async (e, c, cb) => {
+//   const errRes = { m: 'withdrawPoints err', input: e }
+//   const res = { m: 'withdrawPoints' }
+//   const [jsonParseErr, withdrawInfo] = JSONParser(e && e.body)
+//   if (jsonParseErr) {
+//     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+//   }
+//   const [tokenErr, token] = await Model.currentToken(e)
+//   if (tokenErr) {
+//     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
+//   }
+//   const [queryErr, fromUser] = await QueryBillUser(token, withdrawInfo.fromUserId)
+//   if (queryErr) {
+//     return ResErr(cb, queryErr)
+//   }
+//   const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
+//   if (userBalanceErr) {
+//     return ResErr(cb, userBalanceErr)
+//   }
+//   const [withdrawBillErr, withdrawBillRet] = await WithdrawFrom(fromUser, {
+//     ...withdrawInfo,
+//     amount: Math.min(userBalance, withdrawInfo.amount)
+//   })
+//   if (withdrawBillErr) {
+//     return ResFail(cb, { ...errRes, err: withdrawBillErr }, withdrawBillErr.code)
+//   }
+//   return ResOK(cb, { ...res, payload: withdrawBillRet })
+// }
+
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -794,7 +790,7 @@ export {
   randomPassword,               // 随机密码
 
   managerList,                  // 建站商列表
-  managerOne,
+  managerOne,                   // 建站商详情
   managerUpdate,                // 编辑某个建站商
   avalibleManagers,             // 当前可用的建站商
 
@@ -802,19 +798,18 @@ export {
   merchantOne,                  // 商户
   merchantUpdate,               // 编辑某个商户
 
-  gameNew,                      // 新建游戏
-  gameList,                     // 游戏列表
-
-  billList,                     // 流水列表
-  billOne,
-  depositPoints,                // 存点
-  withdrawPoints,               // 取点
-
   msnList,                      // 线路号列表
   checkMsn,                     // 检查msn是否被占用
   lockmsn,                      // 锁定/解锁msn
   msnRandom,                    // 随机线路号
   captcha                       // 获取验证码
+
+  // gameNew,                      // 新建游戏
+  // gameList,                     // 游戏列表
+  // billList,                     // 流水列表
+  // billOne,                       
+  // depositPoints,                // 存点
+  // withdrawPoints,               // 取点
 }
 
 // export {
