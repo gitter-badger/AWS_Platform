@@ -616,7 +616,10 @@ const lockmsn = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-
+  // 只有管理员有权限
+  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin token'), 0]
+  }
   // 查询msn
   const [queryErr, queryRet] = await new MsnModel().query({
     KeyConditionExpression: '#msn = :msn',
