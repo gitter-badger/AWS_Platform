@@ -39,7 +39,6 @@ export class UserModel extends BaseModel {
      * @param {*} user 登录信息
      */
     async checkContractPeriod(user) {
-        await this.db$('update', params)
         // 不是平台管理员，需要检查有效期
         if (!user.role != RoleCodeEnum['PlatformAdmin']) {
             // 如果存在有效期

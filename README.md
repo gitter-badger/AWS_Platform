@@ -799,7 +799,7 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants
 ```
 
 
-#### 新增游戏 **
+#### 新增游戏（Diana）
 
 - URL
 
@@ -829,7 +829,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
 ```
 ** 管理客户端没有操作界面
 
-#### 获取游戏列表
+#### 获取游戏列表（Diana）
 
 - URL
 
@@ -875,7 +875,7 @@ gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多�
 ```
 
 
-#### 存点
+#### 存点（Diana）
 
 **注意**
 存点和取点的接口中的fromUserId 以及 toUser & toRole 对应的是操作描述的主语和宾语
@@ -942,7 +942,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_p
 }
 ```
 
-##### 取点
+##### 取点（Diana）
 
 - URL
 
@@ -995,7 +995,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
     "code": "22011"
 }
 ```
-#### 查询某个用户的点数余额
+#### 查询某个用户的点数余额（Diana）
 
 - URL
 
@@ -1032,7 +1032,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
 ```
 
 
-#### 获取某个用户的账单流水列表
+#### 获取某个用户的账单流水列表（Diana）
 
 - URL
 
