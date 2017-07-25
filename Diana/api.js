@@ -239,13 +239,12 @@ const jwtverify = async (e, c, cb) => {
     return c.fail('Unauthorized: wrong token type')
   }
   // verify it and return the policy statements
-  const [err,
-    userInfo] = await JwtVerify(token[1])
+  const [err,userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
-
+  console.info(userInfo)
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 
 }

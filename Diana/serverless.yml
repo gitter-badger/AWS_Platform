@@ -1,5 +1,5 @@
 
-service: Zeus # NOTE: update this with your service name
+service: Diana # NOTE: update this with your service name
 
 # Use the serverless-webpack plugin to transpile ES6
 plugins:
