@@ -18,25 +18,15 @@ import {
   BizErr
 } from './lib/all'
 import {
-  ListAllAdmins,
-  ListChildUsers,
-  ListAvalibleManagers,
-  TheAdmin,
   AddGame,
-  ListGames,
-  CheckMSN,
-  FormatMSN,
-  GetUser,
-  QueryUserById
+  ListGames
 } from './biz/dao'
 import {
   BillTransfer,
-  DepositTo,
-  WithdrawFrom,
   QueryBillUser,
   CheckBalance,
   CheckUserBalance,
-  ComputeWaterfall
+  QueryUserById
 } from './biz/bill'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
