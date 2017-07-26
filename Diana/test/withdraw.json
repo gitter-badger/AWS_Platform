@@ -17,13 +17,7 @@
     "body": {
         "toRole": "100",
         "toUser": "CY1_cmerchant1",
-        "amount": 1000.00,
+        "amount": 1100.00,
         "fromUserId": "1df0dc09-38df-40d1-a8ec-228aca473011"
     }
 }
-// "body": {
-    //     "fromUserId": "1df0dc09-38df-40d1-a8ec-228aca473011",
-    //     "toRole": "100",
-    //     "toUser": "CY1_cmerchant1",
-    //     "amount": 1000.00
-    // }

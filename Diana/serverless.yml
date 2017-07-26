@@ -55,24 +55,33 @@ functions:
           path: games/{gameType}
           method: get
           cors: true
-  depositPoints:
-    handler: api.depositPoints
+  billTransfer:
+    handler: api.billTransfer
     events:
       -
         http:
-          path: deposit_points
+          path: billTransfer
           method: post
           cors: true
           authorizer: tokenAuth
-  withdrawPoints:
-    handler: api.withdrawPoints
-    events:
-      -
-        http:
-          path: withdraw_points
-          method: post
-          cors: true
-          authorizer: tokenAuth
+  # depositPoints:
+  #   handler: api.depositPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: deposit_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # withdrawPoints:
+  #   handler: api.withdrawPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: withdraw_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
   billOne:
     handler: api.billOne
     events:

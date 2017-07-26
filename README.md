@@ -873,31 +873,74 @@ gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多�
     "code": "0"
 }
 ```
-
-
-#### 存点（Diana）
+#### 转账（Diana）
 
 **注意**
-存点和取点的接口中的fromUserId 以及 toUser & toRole 对应的是操作描述的主语和宾语
-例如:
-“老王 向 老李 存点 1000”
-这里的 fromUserId 指向老王  toUser 指向老李
-”老王 从 老李 处提点 1000”
-这里的fromUserId 依然指向老王  toUser 指向老李
-
+存点和取点的接口中的fromUserId无论任何情况都是代表转账的账户发起源头（存-取+）
 - URL
-
 ```
-POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_points
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/billTransfer
 ```
-
 - Token
-
 ```
 需要
 ```
 - Body
+```
+/**
+存点操作的发起用户从token中获取
+**/
+  {
+    "fromUserId": "转账源账户"
+    "toRole": "100",（转账目的账户角色）
+    "toUser": "EDG_clear_love001",（转账目的账户）
+    "amount": 1000.00,（转账金额）
+  }
+```
+- Response
+```
+{
+    "m": "billTransfer",
+    "payload": {
+        "createdAt": 1500473811090,
+        "updatedAt": 1500473811090,
+        "sn": "1e508aa6-7397-49be-bcd5-4fe0d24f7ba6",
+        "fromRole": "10",
+        "toRole": "100",
+        "fromUser": "TAT_TAT001",
+        "toUser": "EDG_clear_love001",
+        "action": 0,
+        "amount": 1000,
+        "operator": "管理员"
+    },
+    "code": "0"
+}
 
+
+/* 找不到用户错误 */
+{
+    "m": "billTransfer err",
+    "err": {
+        "code": "22011",
+        "err": "User not found"
+    },
+    "code": "22011"
+}
+```
+
+#### 存点（Diana）
+
+**注意**
+存点和取点的接口中的fromUserId无论任何情况都是代表转账的账户发起源头（存-取+）
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_points
+```
+- Token
+```
+需要
+```
+- Body
 ```
 /**
 存点操作的发起用户从token中获取
@@ -909,9 +952,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_p
     "fromUserId": "发起存点操作的用户id"
   }
 ```
-
 - Response
-
 ```
 {
     "m": "depositPoints",
@@ -943,15 +984,11 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_p
 ```
 
 ##### 取点（Diana）
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_points
 ```
-
 - Body
-
 ```
 /**
 取点操作的发起用户从token中获取
@@ -964,9 +1001,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
   }
 
 ```
-
 - Response
-
 ```
 {
     "m": "withdrawPoints",

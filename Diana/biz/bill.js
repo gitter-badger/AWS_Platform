@@ -26,7 +26,7 @@ export const WithdrawFrom = async(fromUser,billInfo) => {
   return await BillTransfer(fromUser,billInfo,BillActionEnum.Withdraw)
 }
 // 转账
-const BillTransfer = async(from,billInfo,action) => {
+export const BillTransfer = async(from,billInfo) => {
   if (Empty(billInfo)) {
     return [BizErr.ParamMissErr(),0]
   }
@@ -64,7 +64,7 @@ const BillTransfer = async(from,billInfo,action) => {
       ...billInfo,
       fromUser:fromUser,
       fromRole:fromRole,
-      action:action,
+      action:0,
       operator: from.operatorToken.username
     },Keys(BillModel()))
   }
@@ -75,8 +75,8 @@ const BillTransfer = async(from,billInfo,action) => {
           PutRequest:{
             Item: {
               ...Bill,
-              amount: Bill.amount * action,
-              action: action,
+              amount: Bill.amount * (-1.0),
+              action: -1,
               userId:from.userId
             }
           }
@@ -85,8 +85,8 @@ const BillTransfer = async(from,billInfo,action) => {
           PutRequest:{
             Item: {
               ...Bill,
-              amount: (-1.0) * Bill.amount * action,
-              action: (-1.0) * action,
+              amount: Bill.amount,
+              action: 1,
               userId: to.userId
             }
           }
@@ -100,6 +100,10 @@ const BillTransfer = async(from,billInfo,action) => {
   }
   return [0,Bill]
 }
+/**
+ * 查询用户余额
+ * @param {*} user 
+ */
 export const CheckUserBalance = async (user) => {
   if (user.points == undefined || user.points == null) {
     return [BizErr.ParamErr('User dont have base points'),0]
