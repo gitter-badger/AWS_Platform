@@ -281,7 +281,10 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/larry
     ZeusPlatformCaptcha:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -320,11 +323,8 @@ resources:
             AttributeName: role
             AttributeType: S
           -
-            AttributeName: suffix
-            AttributeType: S
-          -
-            AttributeName: username
-            AttributeType: S
+            AttributeName: createdAt
+            AttributeType: N
 
         KeySchema:
           -
@@ -336,38 +336,13 @@ resources:
         
         GlobalSecondaryIndexes:
           -
-            IndexName: LogRoleIndex
-            KeySchema:
-              -
-                AttributeName: role
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-          -
-            IndexName: LogRoleSuffixIndex
+            IndexName: LogRoleCreatedAtIndex
             KeySchema:
               -
                 AttributeName: role
                 KeyType: HASH
               -
-                AttributeName: suffix
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-          -
-            IndexName: LogRoleUsernameIndex
-            KeySchema:
-              -
-                AttributeName: role
-                KeyType: HASH
-              -
-                AttributeName: username
+                AttributeName: createdAt
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -376,5 +351,9 @@ resources:
               WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
+<<<<<<< HEAD
           WriteCapacityUnits: 1
 
+=======
+          WriteCapacityUnits: 1
+>>>>>>> origin/larry

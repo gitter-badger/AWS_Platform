@@ -225,12 +225,11 @@ const logList = async (e, c, cb) => {
   }else{
     inparam.pageSize = parseInt(inparam.pageSize)
   }
-
-  // 只有管理员有权限
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e,RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
   }
-
   // 业务操作
   const [err, ret] = await new LogModel().query({
     IndexName: 'LogRoleIndex',

@@ -21,6 +21,8 @@ export const Codes = {
   UnAuth: '44002',
   ParamMiss: '44001',
   TokenError: '44000',
+  RoleTokenError: '44013',
+  AdminTokenError: '44014',
   UsernameTooLong: '40015',
   UsernameTooShort: '40016',
   PasswordError: '40017',
@@ -71,6 +73,12 @@ export const BizErr = {
   },
   TokenErr: (errMsg= 'Token error') =>{
     return {code:Codes.TokenError,err:errMsg}
+  },
+  RoleTokenErr: (errMsg= 'Role Token error, must right token') =>{
+    return {code:Codes.RoleTokenError,err:errMsg}
+  },
+  AdminTokenErr: (errMsg= 'Admin Token error, must admin token') =>{
+    return {code:Codes.AdminTokenError,err:errMsg}
   },
   MsnExistErr: (errMsg = 'MSN number is exist') =>{
     return {code:Codes.MsnExistError,err:errMsg}
