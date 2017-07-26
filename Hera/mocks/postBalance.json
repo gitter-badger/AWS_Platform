@@ -1,0 +1,10 @@
+{
+    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"merchantID_4\",  \"gamePlatform\":\"NA\", \"amount\":\"1\",  \"action\":\"1\"}",
+    "pathParameters" : {
+            "userName" : "lisichen11"
+        },
+    "headers":{
+        
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkhBX2xpc2ljaGVuMTEiLCJzdWZmaXgiOiJIQSIsImlhdCI6MTUwMTAzMzIwNX0.LmRRS0HLr9owVviMy7UYGDGLuqAGvj20Nmj6MpedlOQ"
+    }
+}

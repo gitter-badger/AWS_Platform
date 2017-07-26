@@ -54,7 +54,7 @@ functions:
           path: admins
           method: get
           cors: true
-          authorizer: tokenAuth
+          authorizer:
   adminCenter:
     handler: api.adminCenter
     events:
