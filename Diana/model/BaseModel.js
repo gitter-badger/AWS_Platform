@@ -27,7 +27,7 @@ export class BaseModel {
      * 构造方法，设置基础对象属性
      */
     constructor() {
-        this.baseitem = Model.baseModel
+        this.baseitem = Model.baseModel()
     }
 
     /**
