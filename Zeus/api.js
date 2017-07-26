@@ -22,8 +22,6 @@ import {
   ListChildUsers,
   ListAvalibleManagers,
   TheAdmin,
-  AddGame,
-  ListGames,
   CheckMSN,
   FormatMSN,
   UserUpdate,
@@ -611,15 +609,4 @@ export {
   captcha,                      // 获取验证码
 
   randomPassword                // 随机密码
-
 }
-
-// export {
-  // gameNew,                      // 新建游戏
-  // gameList,                     // 游戏列表
-  // billList,                     // 流水列表
-  // billOne,                       
-  // depositPoints,                // 存点
-  // withdrawPoints,               // 取点
-//   exquery
-// }
