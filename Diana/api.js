@@ -17,10 +17,7 @@ import {
   MSNStatusEnum,
   BizErr
 } from './lib/all'
-import {
-  AddGame,
-  ListGames
-} from './biz/dao'
+import {AddGame,ListGames} from './biz/dao'
 import {
   BillTransfer,
   QueryBillUser,
@@ -168,79 +165,6 @@ const billTransfer = async (e, c, cb) => {
 }
 
 /**
- * 存点
- */
-// const depositPoints = async (e, c, cb) => {
-//   const errRes = { m: 'depositPoints err'/*, input: e*/ }
-//   const res = { m: 'depositPoints' }
-//   // 入参数据转换
-//   const [jsonParseErr, depositInfo] = JSONParser(e && e.body)
-//   if (jsonParseErr) {
-//     return ResErr(cb, jsonParseErr)
-//   }
-//   // 身份令牌
-//   const [tokenErr, token] = await Model.currentToken(e)
-//   if (tokenErr) {
-//     return ResErr(cb, tokenErr)
-//   }
-//   // 获取转账账户
-//   const [queryErr, fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
-//   if (queryErr) {
-//     return ResFail(cb, queryErr)
-//   }
-//   fromUser.operatorToken = token
-//   // 获取fromUser的当前余额
-//   const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
-//   if (userBalanceErr) {
-//     return ResErr(cb, userBalanceErr)
-//   }
-//   const [depositBillErr, depositBillRet] = await DepositTo(fromUser, {
-//     ...depositInfo,
-//     amount: Math.min(userBalance, depositInfo.amount)
-//   })
-//   if (depositBillErr) {
-//     return ResErr(cb, depositBillErr)
-//   }
-//   return ResOK(cb, { ...res, payload: depositBillRet })
-// }
-/**
- * 提点
- */
-// const withdrawPoints = async (e, c, cb) => {
-//   const errRes = { m: 'withdrawPoints err'/*, input: e*/ }
-//   const res = { m: 'withdrawPoints' }
-//   // 入参数据
-//   const [jsonParseErr, withdrawInfo] = JSONParser(e && e.body)
-//   if (jsonParseErr) {
-//     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
-//   }
-//   // 身份令牌
-//   const [tokenErr, token] = await Model.currentToken(e)
-//   if (tokenErr) {
-//     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
-//   }
-//   // 获取转账用户
-//   const [queryErr, fromUser] = await QueryBillUser(token, withdrawInfo.fromUserId)
-//   if (queryErr) {
-//     return ResErr(cb, queryErr)
-//   }
-//   fromUser.operatorToken = token
-//   // 查询用户余额
-//   const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
-//   if (userBalanceErr) {
-//     return ResErr(cb, userBalanceErr)
-//   }
-//   const [withdrawBillErr, withdrawBillRet] = await WithdrawFrom(fromUser, {
-//     ...withdrawInfo,
-//     amount: Math.min(userBalance, withdrawInfo.amount)
-//   })
-//   if (withdrawBillErr) {
-//     return ResFail(cb, { ...errRes, err: withdrawBillErr }, withdrawBillErr.code)
-//   }
-//   return ResOK(cb, { ...res, payload: withdrawBillRet })
-// }
-
-/**
  * 日志列表，接口编号：
  */
 const logList = async (e, c, cb) => {
@@ -321,8 +245,82 @@ export {
 
   billList,                     // 流水列表
   billOne,
-  // depositPoints,                // 存点
-  // withdrawPoints,               // 取点
   billTransfer,
   logList                      // 日志列表
+
+  // depositPoints,                // 存点
+  // withdrawPoints,               // 取点
 }
+
+/**
+ * 存点
+ */
+// const depositPoints = async (e, c, cb) => {
+//   const errRes = { m: 'depositPoints err'/*, input: e*/ }
+//   const res = { m: 'depositPoints' }
+//   // 入参数据转换
+//   const [jsonParseErr, depositInfo] = JSONParser(e && e.body)
+//   if (jsonParseErr) {
+//     return ResErr(cb, jsonParseErr)
+//   }
+//   // 身份令牌
+//   const [tokenErr, token] = await Model.currentToken(e)
+//   if (tokenErr) {
+//     return ResErr(cb, tokenErr)
+//   }
+//   // 获取转账账户
+//   const [queryErr, fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
+//   if (queryErr) {
+//     return ResFail(cb, queryErr)
+//   }
+//   fromUser.operatorToken = token
+//   // 获取fromUser的当前余额
+//   const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
+//   if (userBalanceErr) {
+//     return ResErr(cb, userBalanceErr)
+//   }
+//   const [depositBillErr, depositBillRet] = await DepositTo(fromUser, {
+//     ...depositInfo,
+//     amount: Math.min(userBalance, depositInfo.amount)
+//   })
+//   if (depositBillErr) {
+//     return ResErr(cb, depositBillErr)
+//   }
+//   return ResOK(cb, { ...res, payload: depositBillRet })
+// }
+/**
+ * 提点
+ */
+// const withdrawPoints = async (e, c, cb) => {
+//   const errRes = { m: 'withdrawPoints err'/*, input: e*/ }
+//   const res = { m: 'withdrawPoints' }
+//   // 入参数据
+//   const [jsonParseErr, withdrawInfo] = JSONParser(e && e.body)
+//   if (jsonParseErr) {
+//     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+//   }
+//   // 身份令牌
+//   const [tokenErr, token] = await Model.currentToken(e)
+//   if (tokenErr) {
+//     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
+//   }
+//   // 获取转账用户
+//   const [queryErr, fromUser] = await QueryBillUser(token, withdrawInfo.fromUserId)
+//   if (queryErr) {
+//     return ResErr(cb, queryErr)
+//   }
+//   fromUser.operatorToken = token
+//   // 查询用户余额
+//   const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
+//   if (userBalanceErr) {
+//     return ResErr(cb, userBalanceErr)
+//   }
+//   const [withdrawBillErr, withdrawBillRet] = await WithdrawFrom(fromUser, {
+//     ...withdrawInfo,
+//     amount: Math.min(userBalance, withdrawInfo.amount)
+//   })
+//   if (withdrawBillErr) {
+//     return ResFail(cb, { ...errRes, err: withdrawBillErr }, withdrawBillErr.code)
+//   }
+//   return ResOK(cb, { ...res, payload: withdrawBillRet })
+// }

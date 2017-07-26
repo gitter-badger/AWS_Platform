@@ -33,7 +33,6 @@ export const AddGame = async(gameInfo) => {
   if (!_.isNumber(kindId)) {
     return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
   }
-
   const query = {
     TableName: Tables.ZeusPlatformGame,
     IndexName: 'GameNameIndex',

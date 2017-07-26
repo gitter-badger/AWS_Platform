@@ -15,14 +15,6 @@ import {
   Omit
 } from '../lib/all'
 import _ from 'lodash'
-// // 存入
-// export const DepositTo = async(fromUser,billInfo) => {
-//   return await BillTransfer(fromUser,billInfo,BillActionEnum.Deposit)
-// }
-// // 提出
-// export const WithdrawFrom = async(fromUser,billInfo) => {
-//   return await BillTransfer(fromUser,billInfo,BillActionEnum.Withdraw)
-// }
 
 /**
  * 转账
@@ -209,3 +201,12 @@ const getUserByName = async (role, username) => {
   }
   return [0, User]
 }
+
+// // 存入
+// export const DepositTo = async(fromUser,billInfo) => {
+//   return await BillTransfer(fromUser,billInfo,BillActionEnum.Deposit)
+// }
+// // 提出
+// export const WithdrawFrom = async(fromUser,billInfo) => {
+//   return await BillTransfer(fromUser,billInfo,BillActionEnum.Withdraw)
+// }
