@@ -13,8 +13,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs6.10
-#  region: ap-southeast-1
-  region: us-east-2
+  region: ap-southeast-1
 functions:
   initData:
     handler: api.initData
@@ -282,8 +281,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-<<<<<<< HEAD
-=======
     ZeusPlatformCaptcha:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -322,11 +319,8 @@ resources:
             AttributeName: role
             AttributeType: S
           -
-            AttributeName: suffix
-            AttributeType: S
-          -
-            AttributeName: username
-            AttributeType: S
+            AttributeName: createdAt
+            AttributeType: N
 
         KeySchema:
           -
@@ -343,33 +337,8 @@ resources:
               -
                 AttributeName: role
                 KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-          -
-            IndexName: LogRoleSuffixIndex
-            KeySchema:
               -
-                AttributeName: role
-                KeyType: HASH
-              -
-                AttributeName: suffix
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-          -
-            IndexName: LogRoleUsernameIndex
-            KeySchema:
-              -
-                AttributeName: role
-                KeyType: HASH
-              -
-                AttributeName: username
+                AttributeName: createdAt
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -379,5 +348,3 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
->>>>>>> origin/larry
