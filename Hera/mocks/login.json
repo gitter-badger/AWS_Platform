@@ -1,3 +1,4 @@
+
 {
-    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"merchantID_4\",  \"gamePlatform\":\"NA\"}"
+    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\"}"
 }

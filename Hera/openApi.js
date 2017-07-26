@@ -19,6 +19,12 @@ import {Util} from "./lib/Util"
 
 const gamePlatform = "NA"
 
+/**
+ * 玩家注册
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
 export async function gamePlayerRegister(event, context, callback) {
 
   //json转换
@@ -46,7 +52,11 @@ export async function gamePlayerRegister(event, context, callback) {
   if(!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   } 
-    
+  Object.assign(requestParams, {
+    msn : merchantInfo.msn,
+    merchantName : merchantInfo.displayName,
+    amount : 0
+  })
   //判断用户是否存在
   userName = `${merchantInfo.suffix}_${userName}`;
   requestParams.userName = userName;
@@ -133,11 +143,10 @@ export async function getGamePlayerBalance(event, context, callback) {
 
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   
-
     //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "userName", type:"S", min:6, max :12},
-      {name : "buId", type:"S", min:1},
+      {name : "buId", type:"N", min:1},
       {name : "gamePlatform", type:"S", equal:gamePlatform}
   ], requestParams);
 
@@ -145,7 +154,6 @@ export async function getGamePlayerBalance(event, context, callback) {
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, ReHandler.fail(checkAttError));
   } 
-
   //检查商户信息是否正确
   const merchant = new MerchantModel();
   const [queryMerchantError, merchantInfo] = await merchant.findById(+requestParams.buId);
@@ -174,8 +182,8 @@ export async function gamePlayerBalance(event, context, callback) {
     //验证token
     let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
     if(err || !Object.is(userInfo.suffix+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
+
     //json转换
-    
     let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
     if(parserErr) return callback(null, ReHandler.fail(parserErr));
 
@@ -198,11 +206,13 @@ export async function gamePlayerBalance(event, context, callback) {
     if(!Object.is(action, 1) && !Object.is(action, -1)){
       return callback(null, ReHandler.fail(new CHeraErr(CODES.DataError)));
     }
+    
+    
     //检查玩家点数是否足够 如果是玩家提现才检查，充值不需要
     let userBillModel = new UserBillModel(requestParams);
+    let [pError, palyerBalance] = await userBillModel.getBalance(); //获取玩家余额
+    if(pError) return callback(null, ReHandler.fail(action)); 
     if(action == -1){
-      let [pError, palyerBalance] = await userBillModel.getBalance();
-      if(pError) return callback(null, ReHandler.fail(action)); 
       if(palyerBalance < +requestParams.amount) return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
     }
     //获取商家
@@ -210,6 +220,12 @@ export async function gamePlayerBalance(event, context, callback) {
     if(merError) return callback(null, ReHandler.fail(merError));
     if(!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
     userName = `${merchantInfo.suffix}_${userName}`;
+    requestParams.userName = userName;
+    //获取用户信息
+    let u = new UserModel();
+    let [getUserError, user] = await u.get({userName});
+    if(!user) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+
     //商户点数变化
     let merchantBillModel = new MerchantBillModel(requestParams);
     merchantBillModel.action = -merchantBillModel.action;
@@ -220,14 +236,20 @@ export async function gamePlayerBalance(event, context, callback) {
     let [mError, amount] = await merchantBillModel.handlerPoint();
     if(mError) return callback(null, ReHandler.fail(mError));
     //保存玩家账单
-    Object.assign(requestParams, {userName});
-    
+    Object.assign(requestParams, {
+      originalAmount : palyerBalance,
+      userId : user.userId
+    });
+    userBillModel.userName = userName;
     let [saveError] = await userBillModel.save();
     if(saveError) return callback(null, ReHandler.fail(saveError));
 
     //查账
     let [getError, userSumAmount] = await userBillModel.getBalance();
     if(getError) return callback(null, ReHandler.fail(getError));
+    //更新余额
+    let [updateError] = await u.update({userName},{balance : userSumAmount});
+    if(updateError) return callback(null, ReHandler.fail(updateError));
 
     callback(null, ReHandler.success({
       data:{amount : userSumAmount}

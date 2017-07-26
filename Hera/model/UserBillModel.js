@@ -8,15 +8,22 @@ import {CODES, CHeraErr} from "../lib/Codes";
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({userName, action, amount, userId} = {}) {
+    constructor({userName, action, amount, userId, msn, merchantName, operator, type} = {}) {
         super(TABLE_NAMES.BILL_USER);
-        this.sn = Util.uuid();
+        this.billId = Util.uuid();
+        this.userId = userId
         this.action = +action;
         this.userName = userName;
+        this.msn = msn;
+        this.type = type;
+        this.merchantName = merchantName;
+        this.originalAmount = 0;
+        this.operator = operator;
         this.createAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
         if(this.action == Action.reflect) this.amount = -this.amount;
+        this.type = this.action == Action.recharge ? Type.recharge : Type.reflect
     }
 
     async getBalance(){
@@ -28,6 +35,23 @@ export class UserBillModel extends athena.BaseModel {
             sumMount += element.amount;
         });
         return [null, sumMount];
+    }
+    async list(userName){
+        let scanParams = {
+            TableName : this.tableName,
+            FilterExpression : "userName=:userName",
+            ExpressionAttributeValues : {
+                ":userName" : userName
+            }
+        }
+        console.log(scanParams);
+        return new Promise((reslove, reject) => {
+            this.db$("scan", scanParams).then((result)=>{
+                return reslove([null, result.Items]);
+            }).catch((error) => {
+                return reslove([error, 0]);
+            })
+        })
     }
 
     carryPoint(){
@@ -54,4 +78,9 @@ export class UserBillModel extends athena.BaseModel {
 export const Action = {
     recharge : 1,  //充值
     reflect : -1 //体现
+}
+//账单类型
+export const Type = {
+    recharge : 1, //中心钱包转入平台钱包
+    withdrawals : 2 //平台转入中心钱包
 }

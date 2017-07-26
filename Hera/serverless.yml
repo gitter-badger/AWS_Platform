@@ -47,7 +47,6 @@ functions:
           path: /player/{username}/balance
           method: post
           cors: true
-          #authorizer: tokenAuth
   getGamePlayerBalance:  #获取余额
     handler: openApi.getGamePlayerBalance
     events:
@@ -55,7 +54,22 @@ functions:
           path: /player/{userName}/balance
           method: get
           cors: true
-          #authorizer: tokenAuth
+  gamePlayerList:  #获取玩家列表
+    handler: managerApi.gamePlayerList
+    events:
+      - http:
+          path: /player/list
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  gamePlayerInfo:  #玩家详情页面
+    handler: managerApi.gamePlayerInfo
+    events:
+      - http:
+          path: /player/bill/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
 resources:
   Resources:
     HeraGamePlayer:
