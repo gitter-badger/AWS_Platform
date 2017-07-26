@@ -365,6 +365,43 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
 }
 ```
 
+#### 管理员列表
+- URL
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/admins
+```
+- TOKEN
+```
+有
+```
+- Response
+```
+{
+    "payload": [
+        {
+            "passhash": "$2a$10$IMQH/TpHu/0pPzgUcON.K.ww.zpOdAMNsCu7bkORDE5Q9fOB1z0ti",
+            "status": 1,
+            "createdAt": 1501062779344,
+            "adminName": "GP001",
+            "enabledAt": 1501062779084,
+            "displayName": "平台管理员",
+            "password": "111111",
+            "loginAt": 1501063568127,
+            "role": "1",
+            "suffix": "Platform",
+            "points": 100000000,
+            "updatedAt": 1501063568127,
+            "userId": "1aab42bd-d603-43e7-9dc2-1cc422af0af1",
+            "parent": "00",
+            "parentName": "SuperAdmin",
+            "username": "Platform_GPtest001"
+        }
+    ],
+    "code": "0"
+}
+```
+
+
 #### 下级建站商列表
 
 - URL

@@ -30,9 +30,6 @@ export const TheAdmin = async (token) => {
  * @param {*} token 
  */
 export const ListAllAdmins = async (token) => {
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin role'), 0]
-  }
   const query = {
     TableName: Tables.ZeusPlatformUser,
     KeyConditionExpression: '#role = :role',

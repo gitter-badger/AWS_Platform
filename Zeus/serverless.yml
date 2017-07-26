@@ -46,7 +46,7 @@ functions:
           path: beings
           method: post
           cors: true
-  adminList:
+  adminList: # 管理员列表
     handler: api.adminList
     events:
       -
@@ -54,8 +54,8 @@ functions:
           path: admins
           method: get
           cors: true
-          authorizer:
-  adminCenter:
+          authorizer: tokenAuth
+  adminCenter: # 管理员个人中心
     handler: api.adminCenter
     events:
       -

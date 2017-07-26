@@ -178,11 +178,10 @@ const userChangeStatus = async (e, c, cb) => {
  * 管理员列表
  */
 const adminList = async (e, c, cb) => {
-  const [tokenErr, token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  // check the token  must admin
   const [err, admins] = await ListAllAdmins(token)
   if (err) {
     return ResErr(cb, err)
