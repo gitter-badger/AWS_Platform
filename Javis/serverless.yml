@@ -281,6 +281,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
     ZeusPlatformCaptcha:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -332,7 +333,7 @@ resources:
         
         GlobalSecondaryIndexes:
           -
-            IndexName: LogRoleCreatedAtIndex
+            IndexName: LogRoleIndex
             KeySchema:
               -
                 AttributeName: role
@@ -348,3 +349,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+

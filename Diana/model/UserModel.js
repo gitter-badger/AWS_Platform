@@ -94,6 +94,26 @@ export class UserModel extends BaseModel {
                 })
         })
     }
+    /**
+     * 根据用户ID查询
+     * @param {*} userId 用户ID 
+     */
+    async queryUserById(userId) {
+        const [err, ret] = await this.query({
+            IndexName: 'UserIdIndex',
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeValues: {
+                ':userId': userId
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length - 1 != 0) {
+            return [BizErr.UserNotFoundErr(), 0]
+        }
+        return [0, ret.Items[0]]
+    }
 
     // const params = {
     //     ...this.params,

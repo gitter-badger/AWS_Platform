@@ -1,5 +1,4 @@
 import {
-  Stream$,
   Success,
   Fail,
   Codes,
@@ -18,7 +17,6 @@ import {
   MSNStatusEnum,
   BizErr
 } from './lib/all'
-import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
 import {
   ListAllAdmins,
   ListChildUsers,
@@ -26,21 +24,22 @@ import {
   TheAdmin,
   AddGame,
   ListGames,
-  DepositTo,
-  WithdrawFrom,
   CheckMSN,
   FormatMSN,
-  UserUpdate,
   GetUser,
-  QueryUserById,
+  QueryUserById
+} from './biz/dao'
+import {
+  DepositTo,
+  WithdrawFrom,
   QueryBillUser,
   CheckBalance,
   CheckUserBalance,
   ComputeWaterfall
-
-} from './biz/dao'
+} from './biz/bill'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
+import { BillModel } from './model/BillModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -118,18 +117,17 @@ const billList = async (e, c, cb) => {
   if (paramsErr || !params.userId) {
     return ResErr(cb, paramsErr)
   }
+  // 身份令牌校验
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-
-  const [queryErr, bills] = await ComputeWaterfall(token, params.userId)
+  // 业务查询
+  const [queryErr, bills] = await new BillModel().computeWaterfall(token, params.userId)
   if (queryErr) {
     return ResErr(cb, queryErr)
   }
-  return ResOK(cb, {
-    payload: bills
-  })
+  return ResOK(cb, {payload: bills})
 }
 
 /*
@@ -145,23 +143,24 @@ const billList = async (e, c, cb) => {
  * 存点
  */
 const depositPoints = async (e, c, cb) => {
-  const errRes = { m: 'depositPoints err', input: e }
+  const errRes = { m: 'depositPoints err'/*, input: e*/ }
   const res = { m: 'depositPoints' }
+  // 入参数据转换
   const [jsonParseErr, depositInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
+  // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  // 依据token判断当前登录用户是否是管理员
-  // 如果是 再看传人的body参数是否满足条件2和3
-  // 最后,如果当前登录用户不是管理员
+  // 获取转账账户
   const [queryErr, fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
   if (queryErr) {
     return ResFail(cb, queryErr)
   }
+  fromUser.operatorToken = token
   // 获取fromUser的当前余额
   const [userBalanceErr, userBalance] = await CheckUserBalance(fromUser)
   if (userBalanceErr) {
@@ -235,12 +234,13 @@ const logList = async (e, c, cb) => {
     IndexName: 'LogRoleIndex',
     Limit: inparam.pageSize,
     ExclusiveStartKey: inparam.startKey,
+    ScanIndexForward: false,
     KeyConditionExpression: "#role = :role",
     ExpressionAttributeNames: {
       '#role': 'role'
     },
     ExpressionAttributeValues: {
-      ':role': inparam.role
+      ':role': inparam.role + ''
     }
   })
   if (err) {
