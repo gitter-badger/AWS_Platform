@@ -9,8 +9,6 @@ import {
   Pick,
   Keys,
   Omit,
-  GenderEnum,
-  StatusEnum,
   RoleCodeEnum,
   RoleModels,
   RoleDisplay,
