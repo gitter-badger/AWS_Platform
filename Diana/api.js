@@ -40,6 +40,7 @@ import {
 
 } from './biz/dao'
 import { UserModel } from './model/UserModel'
+import { LogModel } from './model/LogModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -207,28 +208,48 @@ const withdrawPoints = async (e, c, cb) => {
   return ResOK(cb, { ...res, payload: withdrawBillRet })
 }
 
-/*
-const exquery = async (e, c, cb) => {
-  // 模拟入参
-  const gameType = '3'
-  const gameId = 'test'
-  // 属性检查
-  const array = [
-    { name: "gameType", value: gameType, min: 2, max: 5, type: "S" },
-    { name: "gameId", value: gameId, type: "N" }
-  ]
-  const [checkErr, checkRet] = Util.chekcProperties(array)
-  if (checkErr) {
-    console.error(checkRet)
+/**
+ * 日志列表，接口编号：
+ */
+const logList = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'logList error' }
+  const res = { m: 'logList' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  // 业务操作
-  else {
-    const gameModel = new GameModel(gameType, gameId, new Date(), new Date())
-    let [err, res] = await gameModel.save()
-    console.info(res)
+  // 参数校验
+  if (!inparam.pageSize || !inparam.role) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
+  }else{
+    inparam.pageSize = parseInt(inparam.pageSize)
   }
-}*/
 
+  // 只有管理员有权限
+  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin token'), 0]
+  }
+
+  // 业务操作
+  const [err, ret] = await new LogModel().query({
+    IndexName: 'LogRoleIndex',
+    Limit: inparam.pageSize,
+    ExclusiveStartKey: inparam.startKey,
+    KeyConditionExpression: "#role = :role",
+    ExpressionAttributeNames: {
+      '#role': 'role'
+    },
+    ExpressionAttributeValues: {
+      ':role': inparam.role
+    }
+  })
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -239,7 +260,7 @@ const jwtverify = async (e, c, cb) => {
     return c.fail('Unauthorized: wrong token type')
   }
   // verify it and return the policy statements
-  const [err,userInfo] = await JwtVerify(token[1])
+  const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
@@ -270,8 +291,6 @@ export {
   billOne,
   depositPoints,                // 存点
   withdrawPoints,               // 取点
-}
 
-// export {
-//   exquery
-// }
+  logList,                      // 日志列表
+}
