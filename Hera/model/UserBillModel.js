@@ -40,7 +40,7 @@ export class UserBillModel extends athena.BaseModel {
             let [amountError, amount] = await this.getBalance();
             if(amountError) return [amountError, 0];
             if(-this.amount > amount){  //如果所提的点数比商家余额还要少，提现失败 -this.amount 表示
-                return [new CHeraErr(CODES.merchantNotExist),0]
+                return [new CHeraErr(CODES.palyerIns),0]
             }else{
                 return this.carryPoint();
             }

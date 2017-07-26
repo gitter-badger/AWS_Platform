@@ -203,7 +203,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
     "adminName": "Faker002",
     "parent":"01",
     "msn":"957",
-    "suffix":"YB"
+    "suffix":"YB",
+    "displayName": "测试商户2"
 }
 ```
 - Response
@@ -250,9 +251,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/random_pa
 ```
 
 #### 获取验证码
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/captcha
 ```
@@ -295,7 +294,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
   {
       "username": "Faker001",
       "password": "111111",
-      "role": "1"
+      "role": "1",
+      "captcha": "1234"
   }
   ```
 
@@ -306,7 +306,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
     "username": "manager001",
     "password": "111111",
     "role": "10",
-    "suffix": "NB"
+    "suffix": "NB",
+    "captcha": "1234"
   }
   ```
 
@@ -317,7 +318,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
     "username": "merchant001",
     "password": "111111",
     "role": "100",
-    "suffix": "NB"
+    "suffix": "NB",
+    "captcha": "1234"
   }
   ```
 
@@ -588,6 +590,29 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants/
     "code": "0"
 }
 ```
+
+-
+#### 变更用户状态
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/userChangeStatus
+```
+- Token Header
+```
+- Body
+```
+{
+    "role": "100",
+    "userId": "25f76130-e04b-4b9f-9a20-1836a75fe419",
+    "status": 1
+}
+```
+有
+```
+- Response
+```
+```
+
 -
 #### 检查给定线路号是否可用
 
@@ -617,21 +642,86 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/
 {
     "m": "checkMsn",
     "payload": {
-        "avalible": true
-    },
-    "code": "0"
-}
-
-/* https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/957 */
-/* 线路号 957 被占有 */
-{
-    "m": "checkMsn",
-    "payload": {
-        "avalible": false
+        "avalible": true（如果false表示被占用）
     },
     "code": "0"
 }
 ```
+
+-
+#### 锁定/解锁线路号
+- URL
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/lockmsn/{msn}/{status}
+```
+- Token Header
+```
+有
+```
+- Path Params
+```
+/* 参数在url中 */
+{
+  "msn":"1"
+  "operate":"2:lock"（或0:unlock）
+}
+```
+- Response
+```
+```
+
+#### 获取所有线路号列表
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnList
+```
+- Token Header
+```
+有
+```
+- Body
+```
+{}
+```
+- Response
+```
+{
+    "m": "msnList",
+    "payload": {
+        "Items": [
+            {
+                "createdAt": 1500889189008,
+                "msn": "1",
+                "updatedAt": 1500889189008,
+                "userId": "e6a59b02-0932-4391-9950-e174e5045ae1",
+                "status": 1（状态，0：可使用，1：已使用，2：已锁定）
+            }
+        ],
+        "Count": 1,
+        "ScannedCount": 1
+    },
+    "code": "0"
+}
+```
+
+#### 随机线路号
+- URL
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnRandom
+```
+- Token Header
+```
+有
+```
+- Response
+```
+{
+    "m": "msnRandom",
+    "payload": 413,
+    "code": "0"
+}
+```
+
 #### 获取当前可用的线路商列表  ( 创建线路商或者商户时的可选所属线路商列表 )
 
 - URL
@@ -709,7 +799,7 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants
 ```
 
 
-#### 新增游戏 **
+#### 新增游戏（Diana）
 
 - URL
 
@@ -739,7 +829,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
 ```
 ** 管理客户端没有操作界面
 
-#### 获取游戏列表
+#### 获取游戏列表（Diana）
 
 - URL
 
@@ -785,7 +875,7 @@ gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多�
 ```
 
 
-#### 存点
+#### 存点（Diana）
 
 **注意**
 存点和取点的接口中的fromUserId 以及 toUser & toRole 对应的是操作描述的主语和宾语
@@ -852,7 +942,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_p
 }
 ```
 
-##### 取点
+##### 取点（Diana）
 
 - URL
 
@@ -905,7 +995,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
     "code": "22011"
 }
 ```
-#### 查询某个用户的点数余额
+#### 查询某个用户的点数余额（Diana）
 
 - URL
 
@@ -942,7 +1032,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
 ```
 
 
-#### 获取某个用户的账单流水列表
+#### 获取某个用户的账单流水列表（Diana）
 
 - URL
 

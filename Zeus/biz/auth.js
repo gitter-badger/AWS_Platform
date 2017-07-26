@@ -17,6 +17,8 @@ import {
   MSNStatusEnum
 } from '../lib/all'
 import { CheckMSN, CheckBalance, DepositTo } from './dao'
+import { CaptchaModel } from '../model/CaptchaModel'
+import { UserModel } from '../model/UserModel'
 
 /**
  * 接口编号：0
@@ -36,13 +38,13 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
     ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
   }, Keys(adminRole))
   // 检查用户数据
-  const [userParamErr,_] = userParamCheck(userInput)
+  const [userParamErr, _] = userParamCheck(userInput)
   if (userParamErr) {
     return [userParamErr, 0]
   }
-  const CheckUser = {...userInput,passhash: Model.hashGen(userInput.password)}
+  const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 查询用户是否已存在
-  const [queryUserErr,queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
+  const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
@@ -50,8 +52,8 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
     return [BizErr.UserExistErr(), 0]
   }
   // 保存用户
-  const User = {...CheckUser,username: `${CheckUser.suffix}_${CheckUser.username}`}
-  const [saveUserErr,saveUserRet] = await saveUser(User)
+  const User = { ...CheckUser, username: `${CheckUser.suffix}_${CheckUser.username}` }
+  const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -90,10 +92,8 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [userParamErr, 0]
   }
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
-
   // 检查用户是否已经存在
-  const [queryUserErr,
-    queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
+  const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
@@ -124,56 +124,53 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     parentName: parentUser.username,
     points: 0.0
   }
-  const [saveUserErr,
-    saveUserRet] = await saveUser(User)
+  const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  const [queryBalanceErr,
-    balance] = await CheckBalance(token, parentUser)
+  const [queryBalanceErr, balance] = await CheckBalance(token, parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
-  const [depositErr,
-    depositRet] = await DepositTo(parentUser, {
-      toUser: saveUserRet.username,
-      toRole: saveUserRet.role,
-      amount: Math.min(depositPoints, balance), // 有多少扣多少
-      operator: token.username
-    })
+  const [depositErr, depositRet] = await DepositTo(parentUser, {
+    toUser: saveUserRet.username,
+    toRole: saveUserRet.role,
+    amount: Math.min(depositPoints, balance), // 有多少扣多少
+    operator: token.username
+  })
   var orderId = depositRet.sn
   if (depositErr) {
     orderId = '-1'
   }
-  return [
-    0, {
-      ...saveUserRet,
-      orderId: orderId
-    }
-  ]
+  return [0, { ...saveUserRet, orderId: orderId }]
 }
 
 /**
-LoginUser
-*/
+ * 用户登录
+ * @param {*} userLoginInfo 用户登录信息
+ */
 export const LoginUser = async (userLoginInfo = {}) => {
-  // check the role code
+  console.info(userLoginInfo)
+  // 检查验证码
+  const [checkErr, checkRet] = await new CaptchaModel().checkCaptcha(userLoginInfo)
+  if (checkErr) {
+    return [checkErr, 0]
+  }
+  // 获取用户身份
   const roleCode = userLoginInfo.role
-  // find the role in the role table
-  const [roleNotFoundErr,
-    Role] = await getRole(roleCode)
+  const [roleNotFoundErr, Role] = await getRole(roleCode)
   if (roleNotFoundErr) {
     return [roleNotFoundErr, 0]
   }
-
+  // 组装用户登录信息
   const UserLoginInfo = Pick({
     ...Role,
     ...userLoginInfo
   }, Keys(Role))
   const username = UserLoginInfo.username
   const suffix = UserLoginInfo.suffix
-  const [queryUserErr,
-    queryUserRet] = await queryUserBySuffix(roleCode, suffix, username)
+  // 查询用户信息
+  const [queryUserErr, queryUserRet] = await queryUserBySuffix(roleCode, suffix, username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
@@ -184,24 +181,29 @@ export const LoginUser = async (userLoginInfo = {}) => {
     return [BizErr.DBErr(), 0]
   }
   const User = queryUserRet.Items[0]
+  // 检查非管理员的有效期
+  const [periodErr, periodRet] = await new UserModel().checkContractPeriod(User)
+  if (periodErr) {
+    return [periodErr, User]
+  }
+  // 校验用户密码
   const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
   if (!valid) {
-    return [BizErr.UserNotFoundErr(), 0]
+    return [BizErr.PasswordErr(), 0]
   }
-  const [saveUserErr,
-    saveUserRet] = await saveUser(User)
+  // 更新用户信息
+  const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
-    return [saveUserErr, 0]
+    return [saveUserErr, User]
   }
-
-  return [
-    0, {
-      ...saveUserRet,
-      token: Model.token(saveUserRet)
-    }
-  ]
+  // 返回用户身份令牌
+  return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
 }
 
+/**
+ * 获取用户TOKEN
+ * @param {*} userInfo 
+ */
 export const UserGrabToken = async (userInfo = {}) => {
   if (!userInfo.username || !userInfo.apiKey || !userInfo.suffix) {
     return [BizErr.ParamErr('missing params'), 0]
@@ -209,14 +211,15 @@ export const UserGrabToken = async (userInfo = {}) => {
   // 获取角色模型 能够访问这个接口的只有商户
   const Role = RoleModels[RoleCodeEnum['Merchant']]()
   const roleDisplay = RoleDisplay[RoleCodeEnum['Merchant']]
-  if (!Role.apiKey) { // 是否有apiKey
+  // 是否有apiKey
+  if (!Role.apiKey) {
     return [BizErr.ParamErr('wrong role'), 0]
   }
   const username = userInfo.username
   const apiKey = userInfo.apiKey
   const role = RoleCodeEnum['Merchant']
   const suffix = userInfo.suffix
-
+  // 根据角色，前缀，apikey查询
   const query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'RoleSuffixIndex',
@@ -235,38 +238,31 @@ export const UserGrabToken = async (userInfo = {}) => {
       ':apiKey': userInfo.apiKey
     }
   }
-  const [queryErr,
-    User] = await Store$('query', query)
+  const [queryErr, User] = await Store$('query', query)
   if (queryErr) {
     return [queryErr, 0]
   }
   if (User.Items.length - 1 != 0) {
     return [BizErr.UserNotFoundErr(), 0]
   }
-  // update the login ip & updatedAt & loginAt
-  const UserLastLogin = {
-    ...User.Items[0],
-    lastIP: userInfo.lastIP
-  }
-  const [saveUserErr,
-    savedUser] = await saveUser(UserLastLogin)
+  // 更新用户登录信息
+  const UserLastLogin = { ...User.Items[0], lastIP: userInfo.lastIP }
+  const [saveUserErr, savedUser] = await saveUser(UserLastLogin)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  return [
-    0, {
-      ...savedUser,
-      token: Model.token(savedUser)
-    }
+  // 返回身份令牌
+  return [0, { ...savedUser, token: Model.token(savedUser) }
   ]
 }
 
-// 检查用户数据
+// ==================== 以下为内部方法 ====================
+
+// 检查用户数据合法性
 const userParamCheck = (userInfo) => {
   if (userInfo.adminName === Model.StringValue) {
     return [BizErr.ParamErr('adminName must set'), 0]
   }
-
   if (userInfo.suffix === Model.StringValue) {
     return [BizErr.NoSuffixErr(), 0]
   }
@@ -284,8 +280,7 @@ const userParamCheck = (userInfo) => {
 
 // 查询用户上级
 const queryParent = async (token, userId) => {
-  var id = 0,
-    role = -1
+  var id = 0, role = -1
   if (!userId || Model.DefaultParent == userId) {
     id = token.userId
     role = token.role
@@ -294,7 +289,6 @@ const queryParent = async (token, userId) => {
     // 能够有子节点的只能是管理员或者线路商
     role = RoleCodeEnum['Manager']
   }
-
   const [err, user] = await queryUserById(id, role)
   if (err) {
     return [err, 0]
@@ -310,7 +304,9 @@ const getRole = async (code) => {
   return [0, RoleModels[code]()]
 }
 
+// 保存用户
 const saveUser = async (userInfo) => {
+  // 组装用户信息
   const baseModel = Model.baseModel()
   const roleDisplay = RoleDisplay[userInfo.role]
   const UserItem = {
@@ -319,11 +315,9 @@ const saveUser = async (userInfo) => {
     updatedAt: Model.timeStamp(),
     loginAt: Model.timeStamp()
   }
-  var saveConfig = {
-    TableName: Tables.ZeusPlatformUser,
-    Item: UserItem
-  }
+  var saveConfig = { TableName: Tables.ZeusPlatformUser, Item: UserItem }
   var method = 'put'
+  // 如果是商户，还需要保存线路号
   if (RoleCodeEnum['Merchant'] === userInfo.role) {
     saveConfig = {
       RequestItems: {
@@ -340,9 +334,11 @@ const saveUser = async (userInfo) => {
               Item: {
                 ...baseModel,
                 updatedAt: Model.timeStamp(),
-                msn: userInfo.msn,
+                msn: userInfo.msn.toString(),
                 userId: userInfo.userId,
-                status: MSNStatusEnum['Used']
+                status: MSNStatusEnum['Used'],
+                displayName: userInfo.displayName,
+                displayId: userInfo.displayId
               }
             }
           }
@@ -351,20 +347,22 @@ const saveUser = async (userInfo) => {
     }
     method = 'batchWrite'
   }
-
-  const [saveUserErr,
-    saveUserRet] = await Store$(method, saveConfig)
+  // 保存用户
+  const [saveUserErr, Ret] = await Store$(method, saveConfig)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
   const ret = Pick(UserItem, roleDisplay)
   return [0, ret]
 }
+
+// 检查用户是否重复
 const checkUserBySuffix = async (role, suffix, username) => {
-  if (role === RoleCodeEnum['PlatformAdmin']) { // 对于平台管理员来说。 可以允许suffix相同
+  // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
+  if (role === RoleCodeEnum['PlatformAdmin']) {
     return await queryUserBySuffix(role, suffix, username)
   }
-
+  // 对于其他用户，角色和前缀具有联合唯一性
   const query = {
     TableName: Tables.ZeusPlatformUser,
     IndexName: 'RoleSuffixIndex',
@@ -380,6 +378,8 @@ const checkUserBySuffix = async (role, suffix, username) => {
   }
   return await Store$('query', query)
 }
+
+// 根据角色，前缀，用户名查询唯一用户
 const queryUserBySuffix = async (role, suffix, username) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,
@@ -400,6 +400,7 @@ const queryUserBySuffix = async (role, suffix, username) => {
   return await Store$('query', query)
 }
 
+// 根据角色和用户ID查询唯一用户
 const queryUserById = async (userId, role) => {
   const query = {
     TableName: Tables.ZeusPlatformUser,

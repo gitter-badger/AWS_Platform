@@ -7,12 +7,12 @@ var reqdata = JSON.stringify(post_data);
 var options = {
     hostname: '1emqyhik84.execute-api.us-east-2.amazonaws.com',
     port: '443',
-    path: '/dev/player/chenwen/balance',
+    path: '/dev/player/lisichen11/balance',
     method: 'POST',
     headers: {
         'Content-Type': 'Application/json',
         "Content-Length":reqdata.length,
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkhBX2xpc2ljaGVuIiwiaWF0IjoxNTAwOTg5MzI0fQ.PqouByRz1UIXbS9nO6RD68q3Qgj8vvv85L08IPBmjBs"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkhBX2xpc2ljaGVuMTEiLCJzdWZmaXgiOiJIQSIsImlhdCI6MTUwMTAzMzIwNX0.LmRRS0HLr9owVviMy7UYGDGLuqAGvj20Nmj6MpedlOQ"
     }
 };
 

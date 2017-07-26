@@ -125,9 +125,9 @@ export async function gamePlayerLogin(event, context, callback) {
  */
 export async function getGamePlayerBalance(event, context, callback) {
   console.log(event);  
-  let userName = event.headers.pathParameters.userName;
+  let userName = event.pathParameters.userName;
   //验证token
-  let [err, userInfo] = await Util.jwtVerify(event.headers["X-Amz-Security-Token"]);
+  let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
   if(err || !Object.is(userInfo.suffix+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
     //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters);
@@ -171,9 +171,9 @@ export async function getGamePlayerBalance(event, context, callback) {
  */
 export async function gamePlayerBalance(event, context, callback) {
     console.log(event);
-    let userName = event.headers.pathParameters.userName;
+    let userName = event.pathParameters.userName;
     //验证token
-    let [err, userInfo] = await Util.jwtVerify(event.headers["X-Amz-Security-Token"]);
+    let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
     if(err || !Object.is(userInfo.suffix+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
     //json转换
     
@@ -199,6 +199,13 @@ export async function gamePlayerBalance(event, context, callback) {
     if(!Object.is(action, 1) && !Object.is(action, -1)){
       return callback(null, ReHandler.fail(new CHeraErr(CODES.DataError)));
     }
+    //检查玩家点数是否足够 如果是玩家提现才检查，充值不需要
+    let userBillModel = new UserBillModel(requestParams);
+    if(action == -1){
+      let [pError, palyerBalance] = await userBillModel.getBalance();
+      if(pError) return callback(null, ReHandler.fail(action)); 
+      if(palyerBalance < +requestParams.amount) return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
+    }
     //获取商家
     let [merError, merchantInfo] = await new MerchantModel().findById(requestParams.buId);
     if(merError) return callback(null, ReHandler.fail(merError));
@@ -215,9 +222,7 @@ export async function gamePlayerBalance(event, context, callback) {
     if(mError) return callback(null, ReHandler.fail(mError));
     //保存玩家账单
     Object.assign(requestParams, {userName});
-    let userBillModel = new UserBillModel(requestParams);
-    let [uBalanceError, userAmount] = await userBillModel.handlerPoint();
-    if(uBalanceError) return callback(null, ReHandler.fail(uBalanceError));
+    
     let [saveError] = await userBillModel.save();
     if(saveError) return callback(null, ReHandler.fail(saveError));
 
