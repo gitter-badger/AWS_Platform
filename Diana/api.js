@@ -240,7 +240,7 @@ const logList = async (e, c, cb) => {
       '#role': 'role'
     },
     ExpressionAttributeValues: {
-      ':role': inparam.role
+      ':role': inparam.role + ''
     }
   })
   if (err) {

@@ -29,10 +29,7 @@ export class LogModel extends BaseModel {
         this.item = {
             ...this.baseitem,
             sn: Model.uuid(),
-            userId: Model.StringValue,
-            role: Model.StringValue,
-            suffix: Model.StringValue,
-            username: Model.StringValue
+            userId: Model.StringValue
         }
     }
     

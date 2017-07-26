@@ -7,39 +7,21 @@
       "username": "Platform_cheney",
       "parent": "00",
       "role": "1",
-      "userId": "6028eec6-96ec-492d-a36b-fd8d6981b76f",
-      "principalId": "6028eec6-96ec-492d-a36b-fd8d6981b76f"
+      "userId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783",
+      "principalId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
+    "username": "cmerchant1",
+    "password": "123456",
     "role": "100",
-    "displayName": "print110",
-    "rate": "1",
-    "managerEmail": "",
-    "hostName": "print110",
-    "hostContact": "print110",
-    "remark": "print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110",
-    "contractPeriod": [
-      "2017-07-10T16:00:00.000Z",
-      "2017-08-20T16:00:00.000Z"
-    ],
-    "isforever": false,
-    "points": "1",
-    "msn": 727,
-    "gameList": [
-      "英雄脸萌"
-    ],
-    "loginWhiteList": "print110",
-    "frontURL": "print110",
-    "username": "print110",
-    "password": "letojayepu",
-    "adminName": "print110",
-    "adminEmail": "print110@123.com",
-    "adminContact": "print110",
-    "suffix": "print110",
-    "merchantEmail": "print110@123.com"
+    "adminName": "cheneymerchant1",
+    "parent": "01",
+    "msn": "1",
+    "suffix": "CY1",
+    "displayName": "测试商户1"
   }
 }

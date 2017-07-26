@@ -93,7 +93,7 @@ const adminNew = async (e, c, cb) => {
  * 用户注册
  */
 const userNew = async (e, c, cb) => {
-  const errRes = { m: 'userNew error', input: e }
+  const errRes = { m: 'userNew error', /*input: e*/ }
   const res = { m: 'userNew' }
   // 从POST 的body中获取提交数据
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)

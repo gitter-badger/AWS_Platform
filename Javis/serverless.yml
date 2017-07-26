@@ -58,7 +58,7 @@ resources:
             AttributeType: S
           -
             AttributeName: displayId
-            AttributeType: S
+            AttributeType: N
         KeySchema:
           -
             AttributeName: role
