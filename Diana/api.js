@@ -235,6 +235,7 @@ const logList = async (e, c, cb) => {
     IndexName: 'LogRoleIndex',
     Limit: inparam.pageSize,
     ExclusiveStartKey: inparam.startKey,
+    ScanIndexForward: false,
     KeyConditionExpression: "#role = :role",
     ExpressionAttributeNames: {
       '#role': 'role'
