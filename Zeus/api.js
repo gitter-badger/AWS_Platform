@@ -787,7 +787,7 @@ export {
   userNew,                      // 创建新用户
   userGrabToken,                // 使用apiKey登录获取用户信息
   userChangeStatus,             // 变更用户状态
-  randomPassword,               // 随机密码
+
 
   managerList,                  // 建站商列表
   managerOne,                   // 建站商详情
@@ -802,16 +802,18 @@ export {
   checkMsn,                     // 检查msn是否被占用
   lockmsn,                      // 锁定/解锁msn
   msnRandom,                    // 随机线路号
-  captcha                       // 获取验证码
+  captcha,                      // 获取验证码
 
+  randomPassword                // 随机密码
+
+}
+
+// export {
   // gameNew,                      // 新建游戏
   // gameList,                     // 游戏列表
   // billList,                     // 流水列表
   // billOne,                       
   // depositPoints,                // 存点
   // withdrawPoints,               // 取点
-}
-
-// export {
 //   exquery
 // }

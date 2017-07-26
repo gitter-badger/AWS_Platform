@@ -91,12 +91,12 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-
-  # exquery:
-  #   handler: api.exquery
-  #   events:
-  #     -
-  #       http:
-  #         path: exquery
-  #         method: get
-  #         cors: true
+  logList: #日志列表，接口编号：
+    handler: api.logList
+    events:
+      -
+        http:
+          path: logList
+          method: post
+          cors: true
+          authorizer: tokenAuth
