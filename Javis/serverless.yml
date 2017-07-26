@@ -332,7 +332,7 @@ resources:
         
         GlobalSecondaryIndexes:
           -
-            IndexName: LogRoleIndex
+            IndexName: LogRoleCreatedAtIndex
             KeySchema:
               -
                 AttributeName: role
