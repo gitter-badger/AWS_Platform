@@ -58,7 +58,7 @@ resources:
             AttributeType: S
           -
             AttributeName: displayId
-            AttributeType: S
+            AttributeType: N
         KeySchema:
           -
             AttributeName: role
@@ -281,10 +281,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/larry
     ZeusPlatformCaptcha:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -351,9 +347,4 @@ resources:
               WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-<<<<<<< HEAD
           WriteCapacityUnits: 1
-
-=======
-          WriteCapacityUnits: 1
->>>>>>> origin/larry

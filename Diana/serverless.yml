@@ -33,6 +33,7 @@ provider:
             - ":"
             - Ref: AWS::AccountId
             - ":table/Zeus*"
+          
 
 functions:
   tokenAuth:
@@ -100,12 +101,39 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  helpGenreList: 
+    handler: api_server.helpGenreList
+    events:
+      -
+        http:
+          path: /help/genres/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  helpCreateGenre: 
+    handler: api_server.createHelpGenre
+    events:
+      -
+        http:
+          path: /help/genre/create/{userId}
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  createHelp: 
+    handler: api_server.createHelp
+    events:
+      -
+        http:
+          path: /help/create
+          method: post
+          cors: true
+          authorizer: tokenAuth
 resources:
   Resources:
-    DianaPlatformHelp:
+    ZeusPlatformHelp:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: DianaPlatformHelp
+        TableName: ZeusPlatformHelp
         AttributeDefinitions:
           -
             AttributeName: sn
@@ -113,9 +141,6 @@ resources:
           -
             AttributeName: userId
             AttributeType: S
-          -
-            AttributeName: createAt
-            AttributeType: N
         KeySchema:
           -
             AttributeName: sn

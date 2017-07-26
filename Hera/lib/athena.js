@@ -2,7 +2,7 @@
 import AWS from "aws-sdk";
 
 AWS.config.update({
-    region : "us-east-2"
+    region : "ap-southeast-1"
 })
 
 const dbClient = new AWS.DynamoDB.DocumentClient();

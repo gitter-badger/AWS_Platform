@@ -197,7 +197,6 @@ export class BaseModel{
         })
     }
     db$(action, params){
-        Object.assign(params, {TableName : this.tableName});
         return this.dbClient[action](params).promise();
     }
 }

@@ -26,21 +26,21 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
-  gamePlayerRegister:
+  gamePlayerRegister: #玩家注册
     handler: openApi.gamePlayerRegister
     events:
       - http:
           path: /player/register
           method: post
           cors: true
-  gamePlayerLogin:
+  gamePlayerLogin:     #玩家登陆
     handler: openApi.gamePlayerLogin
     events:
       - http:
           path: /player
           method: post
           cors: true
-  gamePlayerBalance:
+  gamePlayerBalance:    #玩家充值/提现
     handler: openApi.gamePlayerBalance
     events:
       - http:
@@ -48,7 +48,7 @@ functions:
           method: post
           cors: true
           #authorizer: tokenAuth
-  getGamePlayerBalance:
+  getGamePlayerBalance:  #获取余额
     handler: openApi.getGamePlayerBalance
     events:
       - http:
