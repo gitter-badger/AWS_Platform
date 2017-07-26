@@ -121,6 +121,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     ...CheckUser,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
     parentName: parentUser.username,
+    parentSuffix: parentUser.suffix,
     points: 0.0
   }
   const [saveUserErr, saveUserRet] = await saveUser(User)
