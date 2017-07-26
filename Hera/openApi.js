@@ -28,7 +28,7 @@ export async function gamePlayerRegister(event, context, callback) {
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "userName", type:"S", min:6, max :12},
       {name : "userPwd", type:"S", min:6, max :16},
-      {name : "buId", type:"S", min:1},
+      {name : "buId", type:"N"},
       {name : "apiKey", type:"S", min:1},
       {name : "userType", type:"N", equal:1},
       {name : "gamePlatform", type:"S", equal:gamePlatform}
@@ -41,12 +41,11 @@ export async function gamePlayerRegister(event, context, callback) {
 
   //检查商户信息是否正确
   const merchant = new MerchantModel();
-  const [queryMerchantError, merchantInfo] = await merchant.findById(buId);
+  const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);
   if(queryMerchantError) return callback(null, ReHandler.fail(queryMerchantError));
   if(!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   } 
-
     
   //判断用户是否存在
   userName = `${merchantInfo.suffix}_${userName}`;
@@ -82,7 +81,7 @@ export async function gamePlayerLogin(event, context, callback) {
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "userName", type:"S", min:6, max :12},
       {name : "userPwd", type:"S", min:6, max :16},
-      {name : "buId", type:"S", min:1},
+      {name : "buId", type:"N"},
       {name : "apiKey", type:"S", min:1},
       {name : "gamePlatform", type:"S", equal:gamePlatform}
   ], requestParams);
@@ -93,7 +92,7 @@ export async function gamePlayerLogin(event, context, callback) {
   let {buId, userName, userPwd, apiKey, gamePlatform} = requestParams;
   //检查商户信息是否正确
   const merchant = new MerchantModel();
-  const [queryMerchantError, merchantInfo] = await merchant.findById(buId);
+  const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);
   if(queryMerchantError) return callback(null, ReHandler.fail(queryMerchantError));
   if(!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
@@ -149,7 +148,7 @@ export async function getGamePlayerBalance(event, context, callback) {
 
   //检查商户信息是否正确
   const merchant = new MerchantModel();
-  const [queryMerchantError, merchantInfo] = await merchant.findById(requestParams.buId);
+  const [queryMerchantError, merchantInfo] = await merchant.findById(+requestParams.buId);
   if(queryMerchantError) return callback(null, ReHandler.fail(queryMerchantError));
   if(!merchantInfo){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
@@ -182,7 +181,7 @@ export async function gamePlayerBalance(event, context, callback) {
 
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
-        {name : "buId", type:"S", min:1},
+        {name : "buId", type:"N"},
         {name : "amount", type:"N", min:0},
         {name : "userName", type:"S", min:1},
         {name : "action", type:"N"},
@@ -207,7 +206,7 @@ export async function gamePlayerBalance(event, context, callback) {
       if(palyerBalance < +requestParams.amount) return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
     }
     //获取商家
-    let [merError, merchantInfo] = await new MerchantModel().findById(requestParams.buId);
+    let [merError, merchantInfo] = await new MerchantModel().findById(+requestParams.buId);
     if(merError) return callback(null, ReHandler.fail(merError));
     if(!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
     userName = `${merchantInfo.suffix}_${userName}`;

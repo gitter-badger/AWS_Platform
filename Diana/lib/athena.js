@@ -2,7 +2,7 @@
 import AWS from "aws-sdk";
 
 AWS.config.update({
-    region : "ap-southeast-1"
+    region : "us-east-2"
 })
 
 const dbClient = new AWS.DynamoDB.DocumentClient();
@@ -197,7 +197,6 @@ export class BaseModel{
         })
     }
     db$(action, params){
-        Object.assign(params, {TableName : this.tableName});
         return this.dbClient[action](params).promise();
     }
 }
@@ -284,7 +283,7 @@ export class Util{
 class AError{
     constructor(code, msg){
         this.code = code;
-        this.msg = EMSG[code.toString()];
+        this.errMsg = EMSG[code.toString()];
     }
 }
 

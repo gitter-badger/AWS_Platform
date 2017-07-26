@@ -33,6 +33,7 @@ provider:
             - ":"
             - Ref: AWS::AccountId
             - ":table/Zeus*"
+          
 
 functions:
   tokenAuth:
@@ -109,3 +110,62 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  helpGenreList: 
+    handler: api_server.helpGenreList
+    events:
+      -
+        http:
+          path: /help/genres/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  helpCreateGenre: 
+    handler: api_server.createHelpGenre
+    events:
+      -
+        http:
+          path: /help/genre/create/{userId}
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  createHelp: 
+    handler: api_server.createHelp
+    events:
+      -
+        http:
+          path: /help/create
+          method: post
+          cors: true
+          authorizer: tokenAuth
+resources:
+  Resources:
+    ZeusPlatformHelp:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformHelp
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: userIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
