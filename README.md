@@ -1184,6 +1184,25 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/waterfall/
     ],
     "code": "0"
 }
+```
 
-
+#### 日志列表（Diana）
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/logList
+```
+- Token Header
+```
+- Body
+```
+{
+    "role": "100",
+    "pageSize": 1,
+    "startKey": {"role":"100","sn":"032bc778-651a-4f71-8495-c5cc86620a47","userId":"25f76130-e04b-4b9f-9a20-1836a75fe419"}
+}
+```
+有
+```
+- Response
+```
 ```
