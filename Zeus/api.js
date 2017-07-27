@@ -66,7 +66,7 @@ const adminNew = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  const [tokenErr, token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
@@ -75,6 +75,11 @@ const adminNew = async (e, c, cb) => {
   if (registAdminErr) {
     return ResErr(cb, registAdminErr)
   }
+  // 操作日志记录
+  userInfo.action = '创建管理员帐号'
+  userInfo.operateToken = token
+  new LogModel().addOperate(Model.addSourceIP(e, userInfo), registAdminErr, adminUser)
+
   return ResOK(cb, { payload: adminUser })
 }
 /**
