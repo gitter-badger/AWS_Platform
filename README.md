@@ -775,7 +775,6 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
 ```
 - Body
-
 ```
 {
   "gameName": "英雄脸萌2",
@@ -845,6 +844,93 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/gameChang
 {
     "gameType": "2",
     "gameId": "136869ee-635a-4cd4-af10-850ba44b0006",
+    "status": 1
+}
+```
+有
+```
+- Response
+```
+```
+
+#### 新增厂商（Diana）
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/companyNew
+```
+- Body
+```
+{
+    "companyName": "测试企业2",
+    "companyDesc": "这是一个测试企业",
+    "companyContactWay": "18780004427",
+    "companyEmail": "18780004427@qiye.com",
+    "companyRegion": "欧洲",
+    "companyContract": "合同",
+    "license": "执照",
+    "remark": "类型，分成比"
+}
+```
+- Response
+```
+{
+    "m": "companyNew",
+    "payload": {},
+    "code": "0"
+}
+```
+** 管理客户端没有操作界面
+
+#### 获取厂商列表（Diana）
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/companyList
+```
+- BODY
+```
+{
+}
+
+```
+- Response
+{
+    "m": "companyList",
+    "payload": {
+        "Items": [
+            {
+                "companyRegion": "欧洲",
+                "license": "执照",
+                "companyDesc": "这是一个测试企业",
+                "remark": "类型，分成比",
+                "companyId": "769643e0-101c-4e4d-9b7d-fe709e725db6",
+                "companyName": "测试企业",
+                "updatedAt": 1501158167883,
+                "companyContract": "合同",
+                "createdAt": 1501158167883,
+                "companyContactWay": "18780004427",
+                "companyEmail": "18780004427@qiye.com"
+            }
+        ],
+        "Count": 1,
+        "ScannedCount": 1
+    },
+    "code": "0"
+}
+```
+
+-
+#### 变更厂商状态
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/companyChangeStatus
+```
+- Token Header
+```
+- Body
+```
+{
+    "companyName": "测试企业",
+    "companyId": "3ec6cf7a-6479-43a0-aca4-16b5b582180d",
     "status": 1
 }
 ```
