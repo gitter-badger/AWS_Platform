@@ -77,7 +77,7 @@ functions:
           path: /player/forzen/{userName}
           method: get
           cors: true
-          authorizer: tokenAuth
+          authorizer:  tokenAuth
 resources:
   Resources:
     HeraGamePlayer:
