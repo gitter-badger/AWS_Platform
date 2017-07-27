@@ -58,6 +58,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  gameOne:
+    handler: api.gameOne
+    events:
+      -
+        http:
+          path: gameOne/{gameType}/{gameId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
   gameChangeStatus: 
     handler: api.gameChangeStatus
     events:

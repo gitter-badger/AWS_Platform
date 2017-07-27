@@ -81,6 +81,23 @@ const gameList = async (e, c, cb) => {
 }
 
 /**
+ * 单个游戏
+ */
+const gameOne = async (e, c, cb) => {
+  const errRes = { m: 'gameOne err'/*, input: e*/ }
+  const res = { m: 'gameOne' }
+  const [paramsErr, gameParams] = Model.pathParams(e)
+  if (paramsErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  let [err, ret] = await new GameModel().getOne(gameParams.gameType,gameParams.gameId)
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  return ResOK(cb, { ...res, payload: ret })
+}
+
+/**
  * 游戏状态变更，接口编号：
  */
 const gameChangeStatus = async (e, c, cb) => {
@@ -363,6 +380,7 @@ export {
   gameNew,                      // 新建游戏
   gameList,                     // 游戏列表
   gameChangeStatus,             // 游戏状态变更
+  gameOne,                      // 单个游戏
 
   companyNew,                   // 新建厂商
   companyList,                  // 游戏厂商

@@ -807,7 +807,10 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
   "gameType": "2",（0：棋牌，1：视频，2：真人）
   "gameStatus": "1"（0：删除，1：在线，2：下线，3：维护，4：故障）,
   "gameRecommend": "我最猛",
-  "gameImg": "http://placehold.it/250x250"
+  "gameImg": "http://placehold.it/250x250",
+  "company":{},
+  "ip":"127.0.0.1",
+  "port":"8080"
 }
 ```
 - Response

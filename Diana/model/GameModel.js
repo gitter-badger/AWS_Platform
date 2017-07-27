@@ -144,6 +144,32 @@ export class GameModel extends BaseModel {
                 })
         })
     }
+    /**
+     * 查询单个游戏
+     * @param {*} gameType 
+     * @param {*} gameId 
+     */
+    getOne(gameType, gameId) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                KeyConditionExpression: 'gameType = :gameType and gameId = :gameId',
+                ExpressionAttributeValues: {
+                    ':gameType': gameType,
+                    ':gameId': gameId
+                }
+            }
+            this.db$('query', params)
+                .then((res) => {
+                    if(res.Items.length > 0){
+                        res = res.Items[0]
+                    }
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), false])
+                })
+        })
+    }
 }
 
 
