@@ -17,15 +17,12 @@
 # API
 
 **注意:**
-
 API的域名在每个部署节点上是不同的.( [ hostName ] 和 [ stage ] ). 请作为可变配置处理.
-
 ```
   https://[hostName]/[stage]/[resouces]
 ```
 
 #### 错误码定义
-
 ```
 /* 在请求的Response里面的code字段 一定包含如下编码之一 */
 {
@@ -59,12 +56,8 @@ API的域名在每个部署节点上是不同的.( [ hostName ] 和 [ stage ] ).
 }
 ```
 
-
-
 #### 通过apiKey 获取token
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/token
 ```
@@ -73,9 +66,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
 ```
 不需要
 ```
-
 - Body
-
 ```
 {
   "username": "merchant002",
@@ -83,11 +74,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
   "suffix": "YB"
 }
 ```
-
 - Response
-
 ```
-
 /*
   成功则返回用户信息以及token
   客户端缓存此token 用作后续请求的认证字段
@@ -111,7 +99,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
     },
     "code": "0"
 }
-
 /* 错误: 用户未找到 */
 {
   "m": "grab user token error"
@@ -121,24 +108,18 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
   },
   "code": "22011"
 }
-
-
 ```
+
 #### 创建第一个系统管理员，接口编号0
-
 - URL
-
 ```
   POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/beings
 ```
-
 - Token Header
-
 ```
   不需要
 ```
 - Body
-
 ```
 {
   "username": "Faker001",
@@ -149,25 +130,20 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
 ```
 
 - Response
-
 ```
 {
   "code": 0,
   "payload":{}
 }
 ```
-
 ** 部署和测试阶段使用的接口,正式发布版本也不会作为可访问api
 
 #### 创建管理员账号
-
 - URL
-
 ```
  POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/admins
 ```
 - Body
-
 ```
 {
   "username": "Faker001",
@@ -176,14 +152,12 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/tok
   "adminName": "Faker"
 }
 ```
+
 #### 创建线路商 / 商户用户
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
 ```
-
 - Token Header
 
 ```
@@ -192,10 +166,8 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
   }
 ```
 - Body
-
 ```
 /*创建一个直属于平台的商户*/
-
 {
     "username": "merchant002",
     "password": "111111",
@@ -208,7 +180,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
 }
 ```
 - Response
-
 ```
 /*创建成功,返回账户信息*/
 {
@@ -231,15 +202,11 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users
 }
 ```
 #### 生成随机管理员密码
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/random_password
 ```
-
 - Response
-
 ```
 {
     "m": "randomPassword",
@@ -276,14 +243,11 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/captcha
 ```
 
 #### 平台管理员 / 线路商 / 商户 登录
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/auth
 ```
 - Token Header
-
 ```
 不需要
 ```
@@ -298,9 +262,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
       "captcha": "1234"
   }
   ```
-
   - 线路商
-
   ```
   {
     "username": "manager001",
@@ -310,7 +272,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
     "captcha": "1234"
   }
   ```
-
   - 商户
 
   ```
@@ -322,7 +283,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
     "captcha": "1234"
   }
   ```
-
 - Response
 
 ```
@@ -342,7 +302,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/users/aut
     },
     "code": "0"
 }
-
 /*直属商户的返回*/
 {
     "m": "userAuth",
@@ -401,28 +360,22 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/admins
 }
 ```
 
-
 #### 下级建站商列表
-
 - URL
-
 ```
 GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers
 ```
 - Token Header
-
 ```
 {
   "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYTkxNDk5ZS0yN2RiLTRjMzItYTNkYy00MmQyYzNiNjM2YjciLCJ1c2VybmFtZSI6Ik5CX21hbmFnZXIwMDEiLCJwYXJlbnQiOiIzZWZhYjA0Yi05MDY1LTQ4ZTgtOTcwMC03MzA1MjBiMzQzOWMiLCJyb2xlIjoiMTAiLCJkaXNwbGF5SWQiOjE0MDA0MCwiaWF0IjoxNTAwMjA2MTYzfQ.Foo7YiGbXnLgqkJzinfAjiVIvGxZDTWfwao7a05XxK4"
 }
 ```
 - Query
-
 ```
 无
 ```
 - Response
-
 ```
 /* 管理员创建的直属建站商列表 */
 {
@@ -474,11 +427,8 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers
 }
 ```
 
-
 #### 获取某个userId的建站线路商
-
 - URL
-
 ```
 GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{id}
 ```
@@ -490,7 +440,6 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{
 }
 ```
 - Response
-
 ```
 {
     "m": "managerOne",
@@ -541,43 +490,33 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{
 ```
 
 #### 编辑某个建站线路商
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{id}
 ```
-
 - Path Params
-
 ```
 {
   "id": "52d1e927-6261-43f9-b4f3-4b59ace35795"
 }
 ```
-
 - Response
-
+```
 ```
 
-```
 #### 获取某个商户
-
 - URL
-
 ```
 GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants/{id}
 ```
 
 - Path Params
-
 ```
 {
   "id":"6409482d-a6b0-4541-9caa-7b25644da4c1"
 }
 ```
 - Response
-
 ```
 {
     "m": "merchantOne",
@@ -654,7 +593,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/userChang
 #### 检查给定线路号是否可用
 
 - URL
-
 ```
 GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/{msn}
 ```
@@ -672,7 +610,6 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/
 }
 ```
 - Response
-
 ```
 /* https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/check_msn/007 */
 /* 线路号 007 未被占用*/
@@ -760,7 +697,6 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/msnRandom
 ```
 
 #### 获取当前可用的线路商列表  ( 创建线路商或者商户时的可选所属线路商列表 )
-
 - URL
 
 ```
@@ -782,14 +718,11 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/avalible_m
 ```
 
 #### 获取下级商户列表
-
 - URL
-
 ```
 GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants
 ```
 - Response
-
 ```
 {
     "m": "merchantList",
@@ -837,9 +770,7 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants
 
 
 #### 新增游戏（Diana）
-
 - URL
-
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
 ```
@@ -854,9 +785,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
   "gameImg": "http://placehold.it/250x250"
 }
 ```
-
 - Response
-
 ```
 {
     "m": "gameNew",
@@ -867,27 +796,20 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
 ** 管理客户端没有操作界面
 
 #### 获取游戏列表（Diana）
-
 - URL
-
 ```
 GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games/{gameType}
 ```
-
 - Query
-
 ```
 {
   '0':'TableGame',
   '1':'VideoGame',
   '2':'LiveGame'
 }
-
-
 gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多个游戏类型通过 ',' 分割
 ```
 - Response
-
 ```
 {
     "m": "gamelist",
@@ -910,8 +832,30 @@ gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多�
     "code": "0"
 }
 ```
-#### 转账（Diana）
 
+-
+#### 变更游戏状态
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/gameChangeStatus
+```
+- Token Header
+```
+- Body
+```
+{
+    "gameType": "2",
+    "gameId": "136869ee-635a-4cd4-af10-850ba44b0006",
+    "status": 1
+}
+```
+有
+```
+- Response
+```
+```
+
+#### 转账（Diana）
 **注意**
 存点和取点的接口中的fromUserId无论任何情况都是代表转账的账户发起源头（存-取+）
 - URL
@@ -952,8 +896,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/billTrans
     },
     "code": "0"
 }
-
-
 /* 找不到用户错误 */
 {
     "m": "billTransfer err",
@@ -965,8 +907,98 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/billTrans
 }
 ```
 
-#### 存点（Diana）
+#### 查询某个用户的点数余额（Diana）
+- URL
+```
+ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/bills/{userId}
+```
+- Path Params
+```
+{
+  "userId": "ed598eb7-d471-43ce-bcea-c89989227145"
+}
+```
+- Token
+```
+需要
+只能是管理员账号 或者是该用户本人
+```
+- Response
+```
+{
+    "payload": {
+        "balance": 200000,
+        "userId": "e116fce7-cc24-4262-91fe-f7d7e93b5995"
+    },
+    "code": "0"
+}
+```
 
+#### 获取某个用户的账单流水列表（Diana）
+- URL
+```
+GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/waterfall/{userId}
+```
+- Token
+```
+需要
+只有管理员或者查询用户本人可以调用此接口
+```
+- Path Params
+
+```
+{
+  "userId":"341a07f4-3d54-4d35-9016-10b623c9bcce"
+}
+```
+- Response
+
+```
+{
+    "payload": [
+        {
+            "action": -1,
+            "fromRole": "1",
+            "fromUser": "Platform_Fade001",
+            "updatedAt": 1500610227778,
+            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+            "amount": -100000,
+            "toRole": "10",
+            "createdAt": 1500610227778,
+            "toUser": "WO_Woh001",
+            "operator": "Platform_Fade001",
+            "sn": "7fa79b1a-c281-4b3e-8504-c6413143b13e",
+            "oldBalance": 100000000,
+            "balance": 99900000
+        }
+    ],
+    "code": "0"
+}
+```
+
+#### 日志列表（Diana）
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/logList
+```
+- Token Header
+```
+- Body
+```
+{
+    "role": "100",
+    "pageSize": 1,
+    "startKey": {"role":"100","sn":"032bc778-651a-4f71-8495-c5cc86620a47","userId":"25f76130-e04b-4b9f-9a20-1836a75fe419"}
+}
+```
+有
+```
+- Response
+```
+```
+
+
+#### 存点（Diana）（暂时不用，使用转账接口替换）
 **注意**
 存点和取点的接口中的fromUserId无论任何情况都是代表转账的账户发起源头（存-取+）
 - URL
@@ -1007,8 +1039,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_p
     },
     "code": "0"
 }
-
-
 /* 找不到用户错误 */
 {
     "m": "depositPoints err",
@@ -1020,7 +1050,7 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/deposit_p
 }
 ```
 
-##### 取点（Diana）
+##### 取点（Diana）（暂时不用，使用转账接口替换）
 - URL
 ```
 POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_points
@@ -1056,7 +1086,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
     },
     "code": "0"
 }
-
 /* 找不到用户错误 */
 {
     "m": "withdrawPoints err",
@@ -1066,215 +1095,4 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/withdraw_
     },
     "code": "22011"
 }
-```
-#### 查询某个用户的点数余额（Diana）
-
-- URL
-
-```
- GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/bills/{userId}
-```
-
-- Path Params
-
-```
-{
-  "userId": "ed598eb7-d471-43ce-bcea-c89989227145"
-}
-```
-
-- Token
-
-```
-需要
-只能是管理员账号 或者是该用户本人
-```
-
-- Response
-
-```
-{
-    "payload": {
-        "balance": 200000,
-        "userId": "e116fce7-cc24-4262-91fe-f7d7e93b5995"
-    },
-    "code": "0"
-}
-
-```
-
-
-#### 获取某个用户的账单流水列表（Diana）
-
-- URL
-
-```
-GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/waterfall/{userId}
-```
-
-- Token
-
-```
-需要
-
-只有管理员或者查询用户本人可以调用此接口
-```
-
-- Path Params
-
-```
-{
-  "userId":"341a07f4-3d54-4d35-9016-10b623c9bcce"
-}
-```
-
-- Response
-
-```
-{
-    "payload": [
-        {
-            "action": -1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "updatedAt": 1500610227778,
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "amount": -100000,
-            "toRole": "10",
-            "createdAt": 1500610227778,
-            "toUser": "WO_Woh001",
-            "operator": "Platform_Fade001",
-            "sn": "7fa79b1a-c281-4b3e-8504-c6413143b13e",
-            "oldBalance": 100000000,
-            "balance": 99900000
-        },
-        {
-            "action": -1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "updatedAt": 1500629611991,
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "amount": -100,
-            "toRole": "100",
-            "createdAt": 1500629611991,
-            "toUser": "MM_儿童而问题儿童",
-            "operator": "Platform_Fade001",
-            "sn": "648ed89a-4348-4472-a3b5-be1837b85a46",
-            "oldBalance": 199900000,
-            "balance": 199899900
-        },
-        {
-            "action": -1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "updatedAt": 1500654576650,
-            "amount": -30000,
-            "toRole": "10",
-            "createdAt": 1500654576650,
-            "toUser": "MG_manager1001",
-            "operator": "Platform_Fade001",
-            "sn": "2d50eb11-96e6-4444-bd27-b2a1271a9c37",
-            "oldBalance": 299899900,
-            "balance": 299869900
-        },
-        {
-            "action": -1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "updatedAt": 1500654737866,
-            "amount": -30000,
-            "toRole": "10",
-            "createdAt": 1500654737866,
-            "toUser": "MQ_manager1002",
-            "operator": "Platform_Fade001",
-            "sn": "c14f36db-9c75-4402-a601-cee6b01d80a9",
-            "oldBalance": 399869900,
-            "balance": 399839900
-        },
-        {
-            "action": -1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "updatedAt": 1500737872119,
-            "amount": -1000,
-            "toRole": "10",
-            "createdAt": 1500737872119,
-            "toUser": "Y3_Ytest3",
-            "operator": "管理员",
-            "sn": "0cc29ee2-961a-43c4-8533-4504ed47b3e5",
-            "oldBalance": 499839900,
-            "balance": 499838900
-        },
-        {
-            "action": -1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "updatedAt": 1500781649288,
-            "amount": -1000,
-            "toRole": "10",
-            "createdAt": 1500781649288,
-            "toUser": "Y3_Ytest3",
-            "operator": "管理员",
-            "sn": "f5655b03-dbec-412a-85e5-d3dcb46975c1",
-            "oldBalance": 599838900,
-            "balance": 599837900
-        },
-        {
-            "action": 1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "updatedAt": 1500781707284,
-            "amount": 1000,
-            "toRole": "10",
-            "createdAt": 1500781707284,
-            "toUser": "Y3_Ytest3",
-            "operator": "管理员",
-            "sn": "27e1435e-f85c-47da-9877-cc24381721f9",
-            "oldBalance": 699837900,
-            "balance": 699838900
-        },
-        {
-            "action": 1,
-            "fromRole": "1",
-            "fromUser": "Platform_Fade001",
-            "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
-            "updatedAt": 1500782178101,
-            "amount": 1000,
-            "toRole": "10",
-            "createdAt": 1500782178101,
-            "toUser": "Y3_Ytest3",
-            "operator": "Platform_Fade001",
-            "sn": "fd51c172-4ed2-45e7-97bc-3d6108ee769a",
-            "oldBalance": 799838900,
-            "balance": 799839900
-        }
-    ],
-    "code": "0"
-}
-```
-
-#### 日志列表（Diana）
-- URL
-```
-POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/logList
-```
-- Token Header
-```
-- Body
-```
-{
-    "role": "100",
-    "pageSize": 1,
-    "startKey": {"role":"100","sn":"032bc778-651a-4f71-8495-c5cc86620a47","userId":"25f76130-e04b-4b9f-9a20-1836a75fe419"}
-}
-```
-有
-```
-- Response
-```
 ```
