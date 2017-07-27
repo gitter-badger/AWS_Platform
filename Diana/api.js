@@ -261,10 +261,10 @@ const companyNew = async (e, c, cb) => {
   }
 
   // 获取令牌，只有管理员有权限
-  // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-  // if (tokenErr) {
-  //   return ResErr(cb, tokenErr)
-  // }
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
 
   const [addCompanyErr, addCompanyRet] = await new CompanyModel().addCompany(companyInfo)
   if (addCompanyErr) {
@@ -285,10 +285,10 @@ const companyList = async (e, c, cb) => {
   }
 
   // 获取令牌，只有管理员有权限
-  // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-  // if (tokenErr) {
-  //   return ResErr(cb, tokenErr)
-  // }
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
 
   const [err, ret] = await new CompanyModel().listCompany(inparam)
   if (err) {
@@ -313,10 +313,10 @@ const companyChangeStatus = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
   // 获取令牌，只有管理员有权限
-  // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-  // if (tokenErr) {
-  //   return ResErr(cb, tokenErr)
-  // }
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
   // 业务操作
   const [err, ret] = await new CompanyModel().changeStatus(inparam.companyName, inparam.companyId, inparam.status)
   if (err) {
