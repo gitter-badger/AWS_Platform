@@ -35,33 +35,14 @@ export class CompanyModel extends BaseModel {
 
     /**
      * 添加厂商
-     * @param {*} gameInfo 
+     * @param {*} companyInfo 
      */
-    async addCompany(gameInfo) {
-        const gameName = gameInfo.gameName
-        const gameType = gameInfo.gameType
-        const gameStatus = parseInt(gameInfo.gameStatus)
-        const kindId = parseInt(gameInfo.kindId)
-        // 参数合法性校验
-        if (!GameTypeEnum[gameType]) {
-            return [BizErr.ParamErr('Game type not exist'), 0]
-        }
-        if (Trim(gameName).length < 1) {
-            return [BizErr.ParamErr('Need a game name'), 0]
-        }
-        if (!_.isNumber(kindId)) {
-            return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
-        }
-        if (!_.isNumber(gameStatus) || (parseInt(gameStatus) < 0 || parseInt(gameStatus) > 4)) {
-            return [BizErr.ParamErr('gameStatus should provided 0/1/2/3/4')]
-        }
+    async addCompany(companyInfo) {
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
-            IndexName: 'GameNameIndex',
-            KeyConditionExpression: 'gameType = :gameType and gameName = :gameName',
+            KeyConditionExpression: 'companyName = :companyName',
             ExpressionAttributeValues: {
-                ':gameName': gameName,
-                ':gameType': gameType
+                ':companyName': companyInfo.companyName
             }
         })
         if (existErr) {
@@ -73,7 +54,7 @@ export class CompanyModel extends BaseModel {
         // 保存
         const [putErr, putRet] = await this.putItem({
             ...this.item,
-            ...gameInfo
+            ...companyInfo
         })
         if (putErr) {
             return [putErr, 0]
@@ -86,29 +67,7 @@ export class CompanyModel extends BaseModel {
      * @param {*} inparams
      */
     async listCompany(inparams) {
-        if (Empty(inparams)) {
-            return [BizErr.ParamMissErr(), 0]
-        }
-        const inputTypes = inparams.gameType.split(',')
-        const gameTypes = _.filter(inputTypes, (type) => {
-            return !!GameTypeEnum[type]
-        })
-        if (gameTypes.length === 0) {
-            return [BizErr.ParamErr('game type is missing'), 0]
-        }
-        // 组装条件
-        const ranges = _.map(gameTypes, (t, index) => {
-            return `gameType = :t${index}`
-        }).join(' OR ')
-        const values = _.reduce(gameTypes, (result, t, index) => {
-            result[`:t${index}`] = t
-            return result
-        }, {})
-        console.info(values)
         const [err, ret] = await this.scan({
-            IndexName: 'GameTypeIndex',
-            FilterExpression: ranges,
-            ExpressionAttributeValues: values
         })
         if (err) {
             return [err, 0]

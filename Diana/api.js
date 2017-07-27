@@ -28,6 +28,7 @@ import { GameModel } from './model/GameModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 import { UserModel } from './model/UserModel'
+import { CompanyModel } from './model/CompanyModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -250,6 +251,54 @@ const logList = async (e, c, cb) => {
   }
 }
 
+/**
+ * 创建厂商
+ */
+const companyNew = async (e, c, cb) => {
+  const errRes = { m: 'companyNew err', input: e }
+  const res = { m: 'companyNew' }
+  const [jsonParseErr, companyInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+
+  // 获取令牌，只有管理员有权限
+  // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  // if (tokenErr) {
+  //   return ResErr(cb, tokenErr)
+  // }
+
+  const [addCompanyErr, addCompanyRet] = await new CompanyModel().addCompany(companyInfo)
+  if (addCompanyErr) {
+    return ResFail(cb, { ...errRes, err: addCompanyErr }, addCompanyErr.code)
+  }
+  return ResOK(cb, { ...res, payload: addCompanyRet })
+}
+
+/**
+ * 厂商列表
+ */
+const companyList = async (e, c, cb) => {
+  const errRes = { m: 'companyList err'/*, input: e*/ }
+  const res = { m: 'companyList' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+
+  // 获取令牌，只有管理员有权限
+  // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  // if (tokenErr) {
+  //   return ResErr(cb, tokenErr)
+  // }
+
+  const [err, ret] = await new CompanyModel().listCompany(inparam)
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  return ResOK(cb, { ...res, payload: ret })
+}
+
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -287,6 +336,9 @@ export {
   gameNew,                      // 新建游戏
   gameList,                     // 游戏列表
   gameChangeStatus,             // 游戏状态变更
+
+  companyNew,                   // 新建游戏
+  companyList,                  // 游戏列表
 
   billList,                     // 流水列表
   billOne,

@@ -103,6 +103,24 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  companyNew:
+    handler: api.companyNew
+    events:
+      -
+        http:
+          path: companyNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  companyList:
+    handler: api.companyList
+    events:
+      -
+        http:
+          path: companyList
+          method: post
+          cors: true
+          authorizer: tokenAuth
   helpGenreList: 
     handler: api_server.helpGenreList
     events:

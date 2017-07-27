@@ -14,13 +14,12 @@
       "sourceIp": "127.0.0.1"
     }
   },
-  "body":
-{
-  "username": "NAtest002",
-  "password": "111111",
-  "role": "1",
-  "adminName": "ceshi",
-  "adminEmail": "1@q.com",
-  "adminContact": "这是一个管理员哈，他需要权限"
-}
+  "body": {
+    "username": "NAtest003",
+    "password": "111111",
+    "role": "1",
+    "adminName": "ceshi",
+    "adminEmail": "1@q.com",
+    "adminContact": "联系人测试"
+  }
 }
