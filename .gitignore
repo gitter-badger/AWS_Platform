@@ -59,3 +59,4 @@ typings/
 # mac hidden files
 .DS_Store
 package-lock.json
+.idea
