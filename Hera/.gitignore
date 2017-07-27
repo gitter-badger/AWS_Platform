@@ -39,5 +39,5 @@ jspm_packages
 .webpack
 .serverless
 .idea
-./package-lock.json
-.idea/
+package-lock.json
+.idea
