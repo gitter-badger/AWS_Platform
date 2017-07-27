@@ -1,5 +1,5 @@
 # Zeus
-用户管理模块<br>
+用户管理模块（平台管理员，线路商，商户，验证码，线路号）<br>
 **接口文档地址：https://documenter.getpostman.com/view/2425376/zeus/6fePLbS**
 # Diana
 其他模块（日志，厂商，游戏，订单）<br>
