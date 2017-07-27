@@ -65,7 +65,7 @@ const gameList = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   let [err, ret] = [1, 1]
-  if (!gameParams.parent) {
+  if (!gameParams.parent || gameParams.parent == RoleCodeEnum['PlatformAdmin']) {
     [err, ret] = await new GameModel().listGames(gameParams)
   } else {
     [err, ret] = await new UserModel().queryUserById(gameParams.parent)
