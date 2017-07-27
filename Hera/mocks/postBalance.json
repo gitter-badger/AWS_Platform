@@ -1,5 +1,5 @@
 {
-    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\", \"amount\":\"1\",  \"action\":\"1\"}",
+    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\", \"amount\":\"10\",  \"action\":\"1\"}",
     "pathParameters" : {
             "userName" : "lisichen"
         },

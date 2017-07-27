@@ -44,7 +44,6 @@ export class UserBillModel extends athena.BaseModel {
                 ":userName" : userName
             }
         }
-        console.log(scanParams);
         return new Promise((reslove, reject) => {
             this.db$("scan", scanParams).then((result)=>{
                 return reslove([null, result.Items]);
