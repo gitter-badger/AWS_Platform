@@ -110,7 +110,7 @@ const gameChangeStatus = async (e, c, cb) => {
 }
 
 /**
- * 单个账单详情
+ * 用户余额
  */
 const billOne = async (e, c, cb) => {
   const [paramsErr, params] = Model.pathParams(e)
@@ -369,10 +369,10 @@ export {
   companyChangeStatus,          // 厂商状态变更
 
   billList,                     // 流水列表
-  billOne,
-  billTransfer,
+  billOne,                      // 用户余额
+  billTransfer,                 // 转账
 
-  logList                      // 日志列表
+  logList                       // 日志列表
 
   // depositPoints,                // 存点
   // withdrawPoints,               // 取点

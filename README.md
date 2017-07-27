@@ -509,7 +509,6 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/
 ```
 GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants/{id}
 ```
-
 - Path Params
 ```
 {
@@ -565,6 +564,33 @@ GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants/
     },
     "code": "0"
 }
+```
+
+#### 更新某个商户
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/merchants/{id}
+```
+- BODY
+```
+需要更新的完整商户对象
+```
+- Response
+```
+```
+
+#### 更新某个线路商
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/managers/{id}
+```
+- BODY
+```
+需要更新的完整线路商对象
+```
+```
+- Response
+```
 ```
 
 -
