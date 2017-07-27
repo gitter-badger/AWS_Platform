@@ -22,6 +22,7 @@ export {
   RoleCodeEnum,
   RoleModels,
   GameTypeEnum,
+  GameStatusEnum,
   MSNStatusEnum,
   BillModel,
   RoleDisplay,

@@ -848,10 +848,10 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
 ```
 {
   "gameName": "英雄脸萌2",
+  "gameType": "2",（0：棋牌，1：视频，2：真人）
+  "gameStatus": "1"（0：删除，1：在线，2：下线，3：维护，4：故障）,
   "gameRecommend": "我最猛",
-  "gameType": "2",
-  "gameImg": "http://placehold.it/250x250",
-  "gameStatus": "01"
+  "gameImg": "http://placehold.it/250x250"
 }
 ```
 

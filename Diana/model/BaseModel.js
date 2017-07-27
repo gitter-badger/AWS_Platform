@@ -126,7 +126,9 @@ export class BaseModel {
             }
             this.db$('query', params)
                 .then((res) => {
-                    const exist = res ? true : false
+                    let exist = false
+                    if(res && !res.Items){exist = true}
+                    if(res && res.Items && res.Items.length > 0){exist = true}
                     return reslove([0, exist])
                 }).catch((err) => {
                     return reslove([BizErr.DBErr(err.toString()), false])

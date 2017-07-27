@@ -48,6 +48,7 @@ functions:
           path: games
           method: post
           cors: true
+          authorizer: tokenAuth
   gameList:
     handler: api.gameList
     events:
@@ -56,6 +57,16 @@ functions:
           path: games/{gameType}
           method: get
           cors: true
+          authorizer: tokenAuth
+  gameChangeStatus: 
+    handler: api.gameChangeStatus
+    events:
+      -
+        http:
+          path: gameChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
   billTransfer:
     handler: api.billTransfer
     events:
@@ -89,15 +100,6 @@ functions:
       -
         http:
           path: logList
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  gameChangeStatus: 
-    handler: api.gameChangeStatus
-    events:
-      -
-        http:
-          path: /gameChangeStatus
           method: post
           cors: true
           authorizer: tokenAuth

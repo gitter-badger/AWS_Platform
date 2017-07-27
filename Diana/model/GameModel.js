@@ -24,13 +24,13 @@ export class GameModel extends BaseModel {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.ZeusPlatformBill,
+            TableName: Tables.ZeusPlatformGame,
         }
         // 设置对象属性
         this.item = {
             ...this.baseitem,
             gameType: Model.StringValue,
-            gameId: Model.StringValue
+            gameId: Model.uuid()
         }
     }
 
@@ -41,8 +41,9 @@ export class GameModel extends BaseModel {
     async addGame(gameInfo) {
         const gameName = gameInfo.gameName
         const gameType = gameInfo.gameType
+        const gameStatus = parseInt(gameInfo.gameStatus)
         const kindId = parseInt(gameInfo.kindId)
-
+        // 参数合法性校验
         if (!GameTypeEnum[gameType]) {
             return [BizErr.ParamErr('Game type not exist'), 0]
         }
@@ -52,36 +53,68 @@ export class GameModel extends BaseModel {
         if (!_.isNumber(kindId)) {
             return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
         }
-        const query = {
-            TableName: Tables.ZeusPlatformGame,
+        if (!_.isNumber(gameStatus) || (parseInt(gameStatus) < 0 || parseInt(gameStatus) > 4)) {
+            return [BizErr.ParamErr('gameStatus should provided 0/1/2/3/4')]
+        }
+        // 判断是否重复
+        const [existErr, exist] = await this.isExist({
             IndexName: 'GameNameIndex',
             KeyConditionExpression: 'gameType = :gameType and gameName = :gameName',
             ExpressionAttributeValues: {
                 ':gameName': gameName,
                 ':gameType': gameType
             }
+        })
+        if (existErr) {
+            return [existErr, 0]
         }
-        const [queryErr, queryRet] = await Store$('query', query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        if (queryRet.Items.length > 0) {
+        if (exist) {
             return [BizErr.ItemExistErr(), 0]
         }
-        const Game = {
-            ...Model.baseModel(),
-            ...gameInfo,
-            gameId: Model.uuid()
-        }
-        const put = {
-            TableName: Tables.ZeusPlatformGame,
-            Item: Game
-        }
-        const [putErr, putRet] = await Store$('put', put)
+        // 保存
+        const [putErr, putRet] = await this.putItem({
+            ...this.item,
+            ...gameInfo
+        })
         if (putErr) {
             return [putErr, 0]
         }
         return [0, putRet]
+    }
+
+    /**
+     * 游戏列表
+     * @param {*} pathParams 
+     */
+    async listGames(pathParams) {
+        if (Empty(pathParams)) {
+            return [BizErr.ParamMissErr(), 0]
+        }
+        const inputTypes = pathParams.gameType.split(',')
+        const gameTypes = _.filter(inputTypes, (type) => {
+            return !!GameTypeEnum[type]
+        })
+        if (gameTypes.length === 0) {
+            return [BizErr.ParamErr('game type is missing'), 0]
+        }
+        // 组装条件
+        const ranges = _.map(gameTypes, (t, index) => {
+            return `gameType = :t${index}`
+        }).join(' OR ')
+        // 
+        const values = _.reduce(gameTypes, (result, t, index) => {
+            result[`:t${index}`] = t
+            return result
+        }, {})
+        const [err, ret] = await this.scan({
+            IndexName: 'GameTypeIndex',
+            FilterExpression: ranges,
+            ExpressionAttributeValues: values
+        })
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
     }
 }
 

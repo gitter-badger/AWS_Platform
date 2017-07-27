@@ -17,7 +17,6 @@ import {
   MSNStatusEnum,
   BizErr
 } from './lib/all'
-import { AddGame, ListGames } from './biz/dao'
 import {
   BillTransfer,
   QueryBillUser,
@@ -54,13 +53,13 @@ const gameNew = async (e, c, cb) => {
  * 游戏列表
  */
 const gameList = async (e, c, cb) => {
-  const errRes = { m: 'gamelist err', input: e }
+  const errRes = { m: 'gamelist err'/*, input: e*/ }
   const res = { m: 'gamelist' }
   const [paramsErr, gameParams] = Model.pathParams(e)
   if (paramsErr) {
-    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
+    return ResErr(cb, jsonParseErr)
   }
-  const [err, ret] = await ListGames(gameParams)
+  const [err, ret] = await new GameModel().listGames(gameParams)
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   }
