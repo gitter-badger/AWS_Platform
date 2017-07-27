@@ -101,11 +101,11 @@ export class GameModel extends BaseModel {
         const ranges = _.map(gameTypes, (t, index) => {
             return `gameType = :t${index}`
         }).join(' OR ')
-        // 
         const values = _.reduce(gameTypes, (result, t, index) => {
             result[`:t${index}`] = t
             return result
         }, {})
+        console.info(values)
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,
