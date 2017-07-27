@@ -10,6 +10,9 @@ import {UserHelpModel, UserHelpGenreModel} from "./model/UserHelpModel";
 import {UserModel} from "./model/UserModel";
 
 
+import {RoleCodeEnum} from "./lib/Consts";
+
+
 /**
  * 创建帮助中心类别
  * @param {*} event 
@@ -17,16 +20,37 @@ import {UserModel} from "./model/UserModel";
  * @param {*} callback 
  */
 export async function createHelpGenre(event, context, callback) {
+  console.log(event);
     //json转换
-  let [parserErr, requestParams] = Util.parseJSON(event.body);
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+  
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+      return ResErr(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+      return ResErr(cb, e)
+  }
+  
+    //json转换
+  // let [parserErr, requestParams] = Util.parseJSON(event.body);
+  
   if(parserErr) Fail(parserErr);
 
   //检查参数是否合法
   let [checkAttError, errorParams] = Util.checkProperties([
-      {name : "userId", type:"S"},
       {name : "genre", type:"S"},
       {name : "parent", type:"S"}
   ], requestParams);
+  requestParams.userId = tokenInfo.userId;
+
+  //判断是否有权限(商户不能创建帮助中心)
+  if(tokenInfo.role == RoleCodeEnum.Merchant){
+    // return callback(null, Fail(new ));
+  }
+
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, Fail(checkAttError));
@@ -157,14 +181,4 @@ export async function findHelpItems(event, context, callback){
 export async function updateHelp(event, context, callback){
 
  
-}
-
-/**
- * 删除帮助
- * @param {*} event 
- * @param {*} context 
- * @param {*} callback 
- */
-export async function removeHelp(event, context, callback){
-
 }

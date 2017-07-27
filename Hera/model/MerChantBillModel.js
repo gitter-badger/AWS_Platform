@@ -18,8 +18,8 @@ export class MerchantBillModel extends athena.BaseModel {
         this.toRole = RoleCodeEnum.Player;
         this.operator = userName;
         this.userName = userName;
-        this.createAt = Date.now();
-        this.updateAt = Date.now();
+        this.createdAt = Date.now();
+        this.updatedAt = Date.now();
     }
 
     async getBlance(){

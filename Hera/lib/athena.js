@@ -84,7 +84,32 @@ export class BaseModel{
             });
         })
     }
-
+    async scan(conditions){
+        let filterExpression = "";
+        let expressionAttributeValues = {};
+        for(let key in conditions){
+            filterExpression += `${key}=:${key} and `;
+            expressionAttributeValues[`:${key}`] = conditions[key];
+        }
+        let scanOpts = undefined;
+        if(filterExpression.length!=0){
+            filterExpression = filterExpression.substr(0, filterExpression.length-4);
+            scanOpts = {
+                FilterExpression : filterExpression,
+                ExpressionAttributeValues:expressionAttributeValues
+            }
+        }
+        return new Promise((reslove, reject) => {
+            this.db$("scan", scanOpts).then((result) => {
+                result = result || {};
+                result.Items = result.Items || [];
+                return reslove([null, result.Items]);
+            }).catch((err) => {
+                console.log(err);
+                return reslove([new AError(CODES.DB_ERROR, err.stack), []]);
+            });
+        })
+    }
     async page({pageNumber, pageSize, conditions = {}, returnValues= [], scanIndexForward, indexName}){
         let page = new Page(pageNumber, pageSize);
         let opts = {

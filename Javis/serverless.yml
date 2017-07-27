@@ -34,6 +34,31 @@ functions:
           path: /generate_token
           method: post
           cors: true
+  #统计开始
+  overview: #统计总览
+    handler: api_sta.overview
+    events:
+      -
+        http:
+          path: /statistics/overview
+          method: get
+          cors: true
+  agentCount: #总统计，包含9个小接口
+    handler: api_sta.sumStatistics
+    events:
+      -
+        http:
+          path: /statistics
+          method: get
+          cors: true
+  salePointsInfo: 
+    handler: api_sta.salePointsInfo
+    events:
+      -
+        http:
+          path: /statistics/month/week
+          method: get
+          cors: true
 resources:
   Resources:
     ZeusPlatformUser:

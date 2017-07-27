@@ -32,19 +32,30 @@ const ResFail = (callback, res) => callback(null, ReHandler.fail(res))
  * @param {*} cb 
  */
 export async function gamePlayerList(event, context, cb) {
+    console.log(event);
+    //json转换
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
+    if(parserErr) return callback(null, ReHandler.fail(parserErr));
+    
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
         return ResErr(cb, tokenErr)
     }
-    let role = token.role;
-    let displayId = token.displayId;
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    if(e) {
+        return ResErr(cb, e)
+    }
+
+    let role = tokenInfo.role;
+    let displayId = tokenInfo.displayId;
     let userModel = new UserModel();
     let err, userList;
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
-        [err, userList] = await userModel.list();
+        [err, userList] = await userModel.scan(requestParams);
     }else if(role == RoleCodeEnum.Merchant) { //如果是商家
-        [err, userList] = await userModel.list(displayId);
+        Object.assign(requestParams, {buId:displayId})
+        [err, userList] = await userModel.scan(requestParams);
         userList.forEach(function(element) {
             delete element.userPwd
         }, this);
@@ -65,14 +76,12 @@ export async function gamePlayerList(event, context, cb) {
  */
 export async function gamePlayerInfo(event, context, cb) {
     let userName = event.pathParameters.userName;
-    let userInfo = {billList:[]};
     let userModel = new UserModel({userName});
     let userBillModel = new UserBillModel();
     let [err, user] = await userModel.get({userName});
     if(err){
         return ResFail(cb, billError)
     }
-    console.log(user);
     userInfo.merchantName = user.merchantName;
     userInfo.msn = user.msn;
     userInfo.updateAt = user.updateAt;

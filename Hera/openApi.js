@@ -122,7 +122,7 @@ export async function gamePlayerLogin(event, context, callback) {
   let [updateError] = await user.update({userName: userName},{ token: loginToken,updateAt:Date.now()});
   if(updateError) return callback(null, ReHandler.fail(updateError));
   callback(null, ReHandler.success({
-      data:{token : loginToken}
+      data:{token : loginToken, msn:merchantInfo}
   }));
 }
 

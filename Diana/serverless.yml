@@ -115,7 +115,7 @@ functions:
     events:
       -
         http:
-          path: /help/genres/{userId}
+          path: /help/genres
           method: get
           cors: true
           authorizer: tokenAuth
@@ -124,7 +124,7 @@ functions:
     events:
       -
         http:
-          path: /help/genre/create/{userId}
+          path: /help/genre/create
           method: post
           cors: true
           authorizer: tokenAuth
