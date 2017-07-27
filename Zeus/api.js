@@ -22,8 +22,6 @@ import {
   ListChildUsers,
   ListAvalibleManagers,
   TheAdmin,
-  AddGame,
-  ListGames,
   CheckMSN,
   FormatMSN,
   UserUpdate,
@@ -180,11 +178,10 @@ const userChangeStatus = async (e, c, cb) => {
  * 管理员列表
  */
 const adminList = async (e, c, cb) => {
-  const [tokenErr, token] = await Model.currentToken(e)
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  // check the token  must admin
   const [err, admins] = await ListAllAdmins(token)
   if (err) {
     return ResErr(cb, err)
@@ -611,15 +608,4 @@ export {
   captcha,                      // 获取验证码
 
   randomPassword                // 随机密码
-
 }
-
-// export {
-  // gameNew,                      // 新建游戏
-  // gameList,                     // 游戏列表
-  // billList,                     // 流水列表
-  // billOne,                       
-  // depositPoints,                // 存点
-  // withdrawPoints,               // 取点
-//   exquery
-// }

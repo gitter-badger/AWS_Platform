@@ -65,6 +65,16 @@ export const Model = {
     }
     return [0,e.requestContext.authorizer]
   },
+  currentRoleToken: async (e, roleCode) => {
+    if (!e || !e.requestContext.authorizer) {
+      return [BizErr.TokenErr(), 0]
+    } else {
+      if (e.requestContext.authorizer.role != roleCode) {
+        return [BizErr.RoleTokenErr(), 0]
+      }
+    }
+    return [0, e.requestContext.authorizer]
+  },
   token: (userInfo)=>{
     return JwtSign({
       ...userInfo,

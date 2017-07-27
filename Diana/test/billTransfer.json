@@ -15,15 +15,10 @@
         }
     },
     "body": {
-        "toRole": "100",
-        "toUser": "CY1_cmerchant1",
-        "amount": 1000.00,
-        "fromUserId": "1df0dc09-38df-40d1-a8ec-228aca473011"
+        "fromUserId": "6ed87d20-5344-47ac-9534-c1aad25bd64f",
+        "toRole": "1",
+        "toUser": "Platform_lijun001",
+        "amount": 500.00
     }
+    
 }
-// "body": {
-    //     "fromUserId": "1df0dc09-38df-40d1-a8ec-228aca473011",
-    //     "toRole": "100",
-    //     "toUser": "CY1_cmerchant1",
-    //     "amount": 1000.00
-    // }

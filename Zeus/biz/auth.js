@@ -9,14 +9,13 @@ import {
   Pick,
   Keys,
   Omit,
-  GenderEnum,
-  StatusEnum,
   RoleCodeEnum,
   RoleModels,
   RoleDisplay,
   MSNStatusEnum
 } from '../lib/all'
-import { CheckMSN, CheckBalance, DepositTo } from './dao'
+import { CheckMSN } from './dao'
+import { BillTransfer, CheckBalance } from './bill'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 
@@ -122,6 +121,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     ...CheckUser,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
     parentName: parentUser.username,
+    parentSuffix: parentUser.suffix,
     points: 0.0
   }
   const [saveUserErr, saveUserRet] = await saveUser(User)
@@ -132,7 +132,8 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
-  const [depositErr, depositRet] = await DepositTo(parentUser, {
+  parentUser.operatorToken = token
+  const [depositErr, depositRet] = await BillTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
     amount: Math.min(depositPoints, balance), // 有多少扣多少
