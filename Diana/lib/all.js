@@ -23,6 +23,7 @@ export {
   RoleModels,
   GameTypeEnum,
   GameStatusEnum,
+  CompanyStatusEnum,
   MSNStatusEnum,
   BillModel,
   RoleDisplay,

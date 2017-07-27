@@ -92,10 +92,8 @@ const gameChangeStatus = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   // 参数校验
-  if (!inparam.gameType || !inparam.gameId || !inparam.status) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
-  } else {
-    inparam.pageSize = parseInt(inparam.pageSize)
+  if (!inparam.gameType || !inparam.gameId) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
   // 获取令牌，只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -221,7 +219,7 @@ const logList = async (e, c, cb) => {
   }
   // 参数校验
   if (!inparam.pageSize || !inparam.role) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   } else {
     inparam.pageSize = parseInt(inparam.pageSize)
   }
@@ -255,7 +253,7 @@ const logList = async (e, c, cb) => {
  * 创建厂商
  */
 const companyNew = async (e, c, cb) => {
-  const errRes = { m: 'companyNew err', input: e }
+  const errRes = { m: 'companyNew err'/*, input: e*/ }
   const res = { m: 'companyNew' }
   const [jsonParseErr, companyInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
@@ -299,6 +297,35 @@ const companyList = async (e, c, cb) => {
   return ResOK(cb, { ...res, payload: ret })
 }
 
+/**
+ * 厂商状态变更，接口编号：
+ */
+const companyChangeStatus = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'companyChangeStatus error' }
+  const res = { m: 'companyChangeStatus' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  // 参数校验
+  if (!inparam.companyName || !inparam.companyId) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 获取令牌，只有管理员有权限
+  // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  // if (tokenErr) {
+  //   return ResErr(cb, tokenErr)
+  // }
+  // 业务操作
+  const [err, ret] = await new CompanyModel().changeStatus(inparam.companyName, inparam.companyId, inparam.status)
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -337,8 +364,9 @@ export {
   gameList,                     // 游戏列表
   gameChangeStatus,             // 游戏状态变更
 
-  companyNew,                   // 新建游戏
-  companyList,                  // 游戏列表
+  companyNew,                   // 新建厂商
+  companyList,                  // 游戏厂商
+  companyChangeStatus,          // 厂商状态变更
 
   billList,                     // 流水列表
   billOne,

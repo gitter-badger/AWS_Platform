@@ -4,9 +4,8 @@ import {
     Codes,
     BizErr,
     RoleCodeEnum,
-    GameStatusEnum,
+    CompanyStatusEnum,
     RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
@@ -29,7 +28,8 @@ export class CompanyModel extends BaseModel {
         this.item = {
             ...this.baseitem,
             companyName: Model.StringValue,
-            companyId: Model.uuid()
+            companyId: Model.uuid(),
+            companyStatus: CompanyStatusEnum.Enable
         }
     }
 
@@ -76,32 +76,32 @@ export class CompanyModel extends BaseModel {
     }
 
     /**
-     * 更新游戏状态
-     * @param {游戏类型} gameType 
-     * @param {游戏ID} gameId 
+     * 更新厂商状态
+     * @param {厂商名称} companyName 
+     * @param {厂商ID} companyId 
      * @param {需要变更的状态} status 
      */
-    // changeStatus(gameType, gameId, status) {
-    //     return new Promise((reslove, reject) => {
-    //         const params = {
-    //             ...this.params,
-    //             Key: {
-    //                 'gameType': gameType,
-    //                 'gameId': gameId
-    //             },
-    //             UpdateExpression: "SET gameStatus = :status",
-    //             ExpressionAttributeValues: {
-    //                 ':status': status
-    //             }
-    //         }
-    //         this.db$('update', params)
-    //             .then((res) => {
-    //                 return reslove([0, res])
-    //             }).catch((err) => {
-    //                 return reslove([BizErr.DBErr(err.toString()), 0])
-    //             })
-    //     })
-    // }
+    changeStatus(companyName, companyId, status) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                Key: {
+                    'companyName': companyName,
+                    'companyId': companyId
+                },
+                UpdateExpression: "SET companyStatus = :status",
+                ExpressionAttributeValues: {
+                    ':status': status
+                }
+            }
+            this.db$('update', params)
+                .then((res) => {
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), 0])
+                })
+        })
+    }
 }
 
 

@@ -26,6 +26,10 @@ export const GameStatusEnum = {
   Error: 4,
   Delete: 0
 }
+export const CompanyStatusEnum = {
+  Enable: 1,
+  Disable: 0
+}
 export const RoleCodeEnum = {
   'SuperAdmin': '0',
   'PlatformAdmin': '1',

@@ -121,6 +121,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  companyChangeStatus:
+    handler: api.companyChangeStatus
+    events:
+      -
+        http:
+          path: companyChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
   helpGenreList: 
     handler: api_server.helpGenreList
     events:
