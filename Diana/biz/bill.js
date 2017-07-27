@@ -46,7 +46,6 @@ export const BillTransfer = async (from, billInfo) => {
   if (fromUser == billInfo.toUser) {
     return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
   }
-
   const Bill = {
     ...Model.baseModel(),
     ...Pick({

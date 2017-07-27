@@ -137,7 +137,8 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
     amount: Math.min(depositPoints, balance), // 有多少扣多少
-    operator: token.username
+    operator: token.username,
+    remark: '初始点数'
   })
   var orderId = depositRet.sn
   if (depositErr) {

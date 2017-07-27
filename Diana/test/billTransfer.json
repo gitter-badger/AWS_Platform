@@ -14,11 +14,6 @@
             "sourceIp": "127.0.0.1"
         }
     },
-    "body": {
-        "fromUserId": "6ed87d20-5344-47ac-9534-c1aad25bd64f",
-        "toRole": "1",
-        "toUser": "Platform_lijun001",
-        "amount": 500.00
-    }
+    "body": {"fromUserId":"d7e1cd3a-e648-4f3a-a6c6-13ce6180151b","toRole":"1","toUser":"AUE_NAc1112","amount":"1.00","remark":"1"}
     
 }
