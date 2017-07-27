@@ -44,7 +44,7 @@ functions:
     handler: openApi.gamePlayerBalance
     events:
       - http:
-          path: /player/{username}/balance
+          path: /player/{userName}/balance
           method: post
           cors: true
   getGamePlayerBalance:  #获取余额
@@ -66,7 +66,15 @@ functions:
     handler: managerApi.gamePlayerInfo
     events:
       - http:
-          path: /player/bill/{userId}
+          path: /player/bill/{userName}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  gamePlayerForzen:  #冻结/解冻玩家 1解冻,2,冻结
+    handler: managerApi.gamePlayerForzen
+    events:
+      - http:
+          path: /player/forzen/{userName}
           method: get
           cors: true
           authorizer: tokenAuth

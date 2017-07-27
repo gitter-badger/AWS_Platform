@@ -22,7 +22,7 @@ import {RoleCodeEnum} from "./lib/Consts";
 
 
 const ResOK = (callback, res) => callback(null, ReHandler.success(res))
-const ResFail = (callback, res) => callback(null, ReHandler.fail(res, code))
+const ResFail = (callback, res) => callback(null, ReHandler.fail(res))
 
 
 /**
@@ -86,4 +86,26 @@ export async function gamePlayerInfo(event, context, cb) {
     return ResOK(cb, userInfo);
 }
 
+/**
+ * 冻结解冻玩家
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+export async function gamePlayerForzen(event, context, cb){
+    //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) {
+      return ResFail(cb, parserErr);
+  }
+  let userName = event.pathParameters.userName;
+  let state = +requestParams.state;
+
+  var userModel = new UserModel();
+  let [err] = await userModel.update({userName},{state})
+  if(err) {
+      return ResFail(cb, err);
+  }
+  ResOK(cb, {state});
+}
 
