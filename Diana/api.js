@@ -67,6 +67,49 @@ const gameList = async (e, c, cb) => {
 }
 
 /**
+ * 游戏状态变更，接口编号：
+ */
+const gameChangeStatus = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'gameChangeStatus error' }
+  const res = { m: 'gameChangeStatus' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  // 参数校验
+  if (!inparam.pageSize || !inparam.role) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
+  } else {
+    inparam.pageSize = parseInt(inparam.pageSize)
+  }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  const [err, ret] = await new GameModel().update({
+    IndexName: 'LogRoleIndex',
+    Limit: inparam.pageSize,
+    ExclusiveStartKey: inparam.startKey,
+    ScanIndexForward: false,
+    KeyConditionExpression: "#role = :role",
+    ExpressionAttributeNames: {
+      '#role': 'role'
+    },
+    ExpressionAttributeValues: {
+      ':role': inparam.role + ''
+    }
+  })
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
+/**
  * 单个账单详情
  */
 const billOne = async (e, c, cb) => {
@@ -206,48 +249,6 @@ const logList = async (e, c, cb) => {
   }
 }
 
-/**
- * 游戏状态变更，接口编号：
- */
-const gameChangeStatus = async (e, c, cb) => {
-  // 数据输入，转换，校验
-  const errRes = { m: 'gameChangeStatus error' }
-  const res = { m: 'gameChangeStatus' }
-  const [jsonParseErr, inparam] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
-  }
-  // 参数校验
-  if (!inparam.pageSize || !inparam.role) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
-  } else {
-    inparam.pageSize = parseInt(inparam.pageSize)
-  }
-  // 获取令牌，只有管理员有权限
-  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-  if (tokenErr) {
-    return ResErr(cb, tokenErr)
-  }
-  // 业务操作
-  const [err, ret] = await new GameModel().update({
-    IndexName: 'LogRoleIndex',
-    Limit: inparam.pageSize,
-    ExclusiveStartKey: inparam.startKey,
-    ScanIndexForward: false,
-    KeyConditionExpression: "#role = :role",
-    ExpressionAttributeNames: {
-      '#role': 'role'
-    },
-    ExpressionAttributeValues: {
-      ':role': inparam.role + ''
-    }
-  })
-  if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
-  } else {
-    return ResOK(cb, { ...res, payload: ret })
-  }
-}
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
