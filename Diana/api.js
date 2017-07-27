@@ -27,6 +27,7 @@ import {
 import { GameModel } from './model/GameModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
+import { UserModel } from './model/UserModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -55,13 +56,25 @@ const gameNew = async (e, c, cb) => {
 const gameList = async (e, c, cb) => {
   const errRes = { m: 'gamelist err'/*, input: e*/ }
   const res = { m: 'gamelist' }
-  const [paramsErr, gameParams] = Model.pathParams(e)
-  if (paramsErr) {
+  // const [paramsErr, gameParams] = Model.pathParams(e)
+  // if (paramsErr) {
+  //   return ResErr(cb, jsonParseErr)
+  // }
+  const [jsonParseErr, gameParams] = JSONParser(e && e.body)
+  if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  const [err, ret] = await new GameModel().listGames(gameParams)
+  let [err, ret] = [1, 1]
+  if (!gameParams.parent) {
+    [err, ret] = await new GameModel().listGames(gameParams)
+  } else {
+    [err, ret] = await new UserModel().queryUserById(gameParams.parent)
+  }
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  if (gameParams.parent) {
+    ret = ret.gameList
   }
   return ResOK(cb, { ...res, payload: ret })
 }

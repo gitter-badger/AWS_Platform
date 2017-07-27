@@ -1,5 +1,6 @@
 {
-  "pathParameters": {
+  "body": {
+    "parent":"ba2ec4bc-53e4-47c1-b362-f4a0d11917bf",
     "gameType": "1,2"
   }
 }

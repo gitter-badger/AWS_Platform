@@ -54,8 +54,8 @@ functions:
     events:
       -
         http:
-          path: games/{gameType}
-          method: get
+          path: gameList
+          method: post
           cors: true
           authorizer: tokenAuth
   gameChangeStatus: 

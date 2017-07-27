@@ -798,16 +798,15 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games
 #### 获取游戏列表（Diana）
 - URL
 ```
-GET - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/games/{gameType}
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/gameList
 ```
-- Query
+- BODY
 ```
 {
-  '0':'TableGame',
-  '1':'VideoGame',
-  '2':'LiveGame'
+    gameType: '0,1,2',  // 通过传人游戏类型参数来获取游戏列表. 多个游戏类型通过 ',' 分割('0':'TableGame','1':'VideoGame','2':'LiveGame')
+    parent: '28c89106-6947-4198-8aab-3ef1b8fccb9f'（如果没有则不传这个属性）
 }
-gameType: '0,2,1'  // 通过传人游戏类型参数来获取游戏列表. 多个游戏类型通过 ',' 分割
+
 ```
 - Response
 ```
