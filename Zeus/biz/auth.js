@@ -194,6 +194,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
     return [BizErr.PasswordErr(), 0]
   }
   // 更新用户信息
+  User.lastIP = UserLoginInfo.lastIP
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, User]

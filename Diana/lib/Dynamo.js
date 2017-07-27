@@ -27,6 +27,7 @@ const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformRole = 'ZeusPlatformRole'
 const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
+const ZeusPlatformCompany = 'ZeusPlatformCompany'
 const ZeusPlatformGame = 'ZeusPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
@@ -37,6 +38,7 @@ export const Tables = {
   ZeusPlatformRole,
   ZeusPlatformPlayer,
   ZeusPlatformBill,
+  ZeusPlatformCompany,
   ZeusPlatformGame,
   ZeusPlatformMSN,
   ZeusPlatformCaptcha,

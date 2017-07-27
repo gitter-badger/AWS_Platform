@@ -14,10 +14,13 @@
       "sourceIp": "127.0.0.1"
     }
   },
-  "body": {
-    "username": "test002",
-    "password": "123456",
-    "role": "1",
-    "adminName": "test002"
-  }
+  "body":
+{
+  "username": "NAtest002",
+  "password": "111111",
+  "role": "1",
+  "adminName": "ceshi",
+  "adminEmail": "1@q.com",
+  "adminContact": "这是一个管理员哈，他需要权限"
+}
 }
