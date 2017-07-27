@@ -16,7 +16,7 @@ import {
   Omit
 } from '../lib/all'
 import _ from 'lodash'
-
+import { CheckUserBalance } from './bill'
 /**
  * 查询管理员详情
  * @param {*} token 
@@ -86,6 +86,11 @@ export const ListChildUsers = async (token, roleCode) => {
   const users = _.map(queryRet.Items, (item) => {
     return Omit(item, ['passhash'])
   })
+  // 查询每个用户余额
+  for(let user of users){
+    let [balanceErr,balance] = await CheckUserBalance(user)
+    user.balance = balance
+  }
   return [0, users]
 }
 
