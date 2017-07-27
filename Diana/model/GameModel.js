@@ -116,6 +116,34 @@ export class GameModel extends BaseModel {
         }
         return [0, ret]
     }
+
+    /**
+     * 更新游戏状态
+     * @param {游戏类型} gameType 
+     * @param {游戏ID} gameId 
+     * @param {需要变更的状态} status 
+     */
+    changeStatus(gameType, gameId, status) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                Key: {
+                    'gameType': gameType,
+                    'gameId': gameId
+                },
+                UpdateExpression: "SET gameStatus = :status",
+                ExpressionAttributeValues: {
+                    ':status': status
+                }
+            }
+            this.db$('update', params)
+                .then((res) => {
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), 0])
+                })
+        })
+    }
 }
 
 

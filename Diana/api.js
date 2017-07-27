@@ -75,10 +75,10 @@ const gameChangeStatus = async (e, c, cb) => {
   const res = { m: 'gameChangeStatus' }
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResErr(cb, jsonParseErr)
   }
   // 参数校验
-  if (!inparam.pageSize || !inparam.role) {
+  if (!inparam.gameType || !inparam.gameId || !inparam.status) {
     return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
   } else {
     inparam.pageSize = parseInt(inparam.pageSize)
@@ -89,19 +89,7 @@ const gameChangeStatus = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [err, ret] = await new GameModel().update({
-    IndexName: 'LogRoleIndex',
-    Limit: inparam.pageSize,
-    ExclusiveStartKey: inparam.startKey,
-    ScanIndexForward: false,
-    KeyConditionExpression: "#role = :role",
-    ExpressionAttributeNames: {
-      '#role': 'role'
-    },
-    ExpressionAttributeValues: {
-      ':role': inparam.role + ''
-    }
-  })
+  const [err, ret] = await new GameModel().changeStatus(inparam.gameType, inparam.gameId, inparam.status)
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {
