@@ -3,7 +3,7 @@ let  athena  = require("./lib/athena");
 
 import {CODES, CHeraErr} from "./lib/Codes";
 
-import {ReHandler} from "./lib/Response";
+import {ReHandler, JwtVerify} from "./lib/Response";
 
 import {Model} from "./lib/Dynamo"
 
@@ -32,7 +32,7 @@ const ResFail = (callback, res) => callback(null, ReHandler.fail(res))
  * @param {*} cb 
  */
 export async function gamePlayerList(event, context, cb) {
-    const [tokenErr, token] = await Model.currentToken(event)
+    const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
         return ResErr(cb, tokenErr)
     }
@@ -87,7 +87,7 @@ export async function gamePlayerInfo(event, context, cb) {
 }
 
 /**
- * 冻结解冻玩家
+ * 冻结/解冻玩家
  * @param {*} event 
  * @param {*} context 
  * @param {*} cb 
@@ -109,3 +109,21 @@ export async function gamePlayerForzen(event, context, cb){
   ResOK(cb, {state});
 }
 
+// TOKEN验证
+export const jwtverify = async (e, c, cb) => {
+  // get the token from event.authorizationToken
+  const token = e.authorizationToken.split(' ')
+  if (token[0] !== 'Bearer') {
+    return c.fail('Unauthorized: wrong token type')
+  }
+  // verify it and return the policy statements
+  const [err,
+    userInfo] = await JwtVerify(token[1]);
+  if (err || !userInfo) {
+    console.log(JSON.stringify(err), JSON.stringify(userInfo));
+    return c.fail('Unauthorized')
+  }
+
+  return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+
+}

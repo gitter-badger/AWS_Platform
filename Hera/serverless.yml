@@ -26,6 +26,9 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
+  tokenAuth:
+    handler: managerApi.jwtverify
+    integration: lambda
   gamePlayerRegister: #玩家注册
     handler: openApi.gamePlayerRegister
     events:
@@ -77,7 +80,7 @@ functions:
           path: /player/forzen/{userName}
           method: get
           cors: true
-          authorizer:  tokenAuth
+          authorizer: tokenAuth
 resources:
   Resources:
     HeraGamePlayer:
