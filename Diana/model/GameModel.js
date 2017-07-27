@@ -133,7 +133,7 @@ export class GameModel extends BaseModel {
                 },
                 UpdateExpression: "SET gameStatus = :status",
                 ExpressionAttributeValues: {
-                    ':status': status
+                    ':status': parseInt(status)
                 }
             }
             this.db$('update', params)
