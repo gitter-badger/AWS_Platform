@@ -16,56 +16,6 @@ import {
 import _ from 'lodash'
 
 /**
- * 添加游戏
- * @param {*} gameInfo 
- */
-export const AddGame = async(gameInfo) => {
-  const gameName = gameInfo.gameName
-  const gameType = gameInfo.gameType
-  const kindId = parseInt(gameInfo.kindId)
-
-  if (!GameTypeEnum[gameType]) {
-    return [BizErr.ParamErr('Game type not exist'),0]
-  }
-  if (Trim(gameName).length < 1) {
-    return [BizErr.ParamErr('Need a game name'),0]
-  }
-  if (!_.isNumber(kindId)) {
-    return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
-  }
-  const query = {
-    TableName: Tables.ZeusPlatformGame,
-    IndexName: 'GameNameIndex',
-    KeyConditionExpression:'gameType = :gameType and gameName = :gameName',
-    ExpressionAttributeValues:{
-      ':gameName':gameName,
-      ':gameType':gameType
-    }
-  }
-  const [queryErr,queryRet] = await Store$('query',query)
-  if (queryErr) {
-    return [queryErr,0]
-  }
-  if (queryRet.Items.length > 0) {
-    return [BizErr.ItemExistErr(),0]
-  }
-  const Game = {
-    ...Model.baseModel(),
-    ...gameInfo,
-    gameId: Model.uuid()
-  }
-  const put = {
-    TableName: Tables.ZeusPlatformGame,
-    Item:Game
-  }
-  const [putErr,putRet] = await Store$('put',put)
-  if (putErr) {
-    return [putErr,0]
-  }
-  return [0,putRet]
-}
-
-/**
  * 游戏列表
  * @param {*} pathParams 
  */

@@ -17,7 +17,7 @@ import {
   MSNStatusEnum,
   BizErr
 } from './lib/all'
-import {AddGame,ListGames} from './biz/dao'
+import { AddGame, ListGames } from './biz/dao'
 import {
   BillTransfer,
   QueryBillUser,
@@ -25,7 +25,7 @@ import {
   CheckUserBalance,
   QueryUserById
 } from './biz/bill'
-import { UserModel } from './model/UserModel'
+import { GameModel } from './model/GameModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
@@ -41,9 +41,9 @@ const gameNew = async (e, c, cb) => {
   const res = { m: 'gameNew' }
   const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResErr(cb, jsonParseErr)
   }
-  const [addGameInfoErr, addGameRet] = await AddGame(gameInfo)
+  const [addGameInfoErr, addGameRet] = await new GameModel().addGame(gameInfo)
   if (addGameInfoErr) {
     return ResFail(cb, { ...errRes, err: addGameInfoErr }, addGameInfoErr.code)
   }
@@ -115,7 +115,7 @@ const billList = async (e, c, cb) => {
   if (queryErr) {
     return ResErr(cb, queryErr)
   }
-  return ResOK(cb, {payload: bills})
+  return ResOK(cb, { payload: bills })
 }
 
 /*
@@ -178,16 +178,59 @@ const logList = async (e, c, cb) => {
   // 参数校验
   if (!inparam.pageSize || !inparam.role) {
     return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
-  }else{
+  } else {
     inparam.pageSize = parseInt(inparam.pageSize)
   }
   // 获取令牌，只有管理员有权限
-  const [tokenErr, token] = await Model.currentRoleToken(e,RoleCodeEnum['PlatformAdmin'])
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
   const [err, ret] = await new LogModel().query({
+    IndexName: 'LogRoleIndex',
+    Limit: inparam.pageSize,
+    ExclusiveStartKey: inparam.startKey,
+    ScanIndexForward: false,
+    KeyConditionExpression: "#role = :role",
+    ExpressionAttributeNames: {
+      '#role': 'role'
+    },
+    ExpressionAttributeValues: {
+      ':role': inparam.role + ''
+    }
+  })
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
+/**
+ * 游戏状态变更，接口编号：
+ */
+const gameChangeStatus = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'gameChangeStatus error' }
+  const res = { m: 'gameChangeStatus' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  // 参数校验
+  if (!inparam.pageSize || !inparam.role) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
+  } else {
+    inparam.pageSize = parseInt(inparam.pageSize)
+  }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  const [err, ret] = await new GameModel().update({
     IndexName: 'LogRoleIndex',
     Limit: inparam.pageSize,
     ExclusiveStartKey: inparam.startKey,
@@ -242,10 +285,12 @@ export {
 
   gameNew,                      // 新建游戏
   gameList,                     // 游戏列表
+  gameChangeStatus,             // 游戏状态变更
 
   billList,                     // 流水列表
   billOne,
   billTransfer,
+
   logList                      // 日志列表
 
   // depositPoints,                // 存点

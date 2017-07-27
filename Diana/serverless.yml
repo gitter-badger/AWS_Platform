@@ -65,24 +65,6 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  # depositPoints:
-  #   handler: api.depositPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: deposit_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # withdrawPoints:
-  #   handler: api.withdrawPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: withdraw_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
   billOne:
     handler: api.billOne
     events:
@@ -107,6 +89,15 @@ functions:
       -
         http:
           path: logList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  gameChangeStatus: 
+    handler: api.gameChangeStatus
+    events:
+      -
+        http:
+          path: /gameChangeStatus
           method: post
           cors: true
           authorizer: tokenAuth
@@ -137,35 +128,21 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-resources:
-  Resources:
-    ZeusPlatformHelp:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ZeusPlatformHelp
-        AttributeDefinitions:
-          -
-            AttributeName: sn
-            AttributeType: S
-          -
-            AttributeName: userId
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: sn
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          -
-            IndexName: userIdIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+  # depositPoints:
+  #   handler: api.depositPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: deposit_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # withdrawPoints:
+  #   handler: api.withdrawPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: withdraw_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
