@@ -130,6 +130,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  companyOne:
+    handler: api.companyOne
+    events:
+      -
+        http:
+          path: companyOne/{companyName}/{companyId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
   companyChangeStatus:
     handler: api.companyChangeStatus
     events:

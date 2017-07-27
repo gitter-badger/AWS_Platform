@@ -102,6 +102,33 @@ export class CompanyModel extends BaseModel {
                 })
         })
     }
+
+    /**
+     * 查询单个厂商
+     * @param {*} companyName
+     * @param {*} companyId
+     */
+    getOne(companyName, companyId) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                KeyConditionExpression: 'companyName = :companyName and companyId = :companyId',
+                ExpressionAttributeValues: {
+                    ':companyName': companyName,
+                    ':companyId': companyId
+                }
+            }
+            this.db$('query', params)
+                .then((res) => {
+                    if(res.Items.length > 0){
+                        res = res.Items[0]
+                    }
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), false])
+                })
+        })
+    }
 }
 
 

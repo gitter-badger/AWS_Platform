@@ -315,6 +315,23 @@ const companyList = async (e, c, cb) => {
 }
 
 /**
+ * 单个厂商
+ */
+const companyOne = async (e, c, cb) => {
+  const errRes = { m: 'companyOne err'/*, input: e*/ }
+  const res = { m: 'companyOne' }
+  const [paramsErr, companyParams] = Model.pathParams(e)
+  if (paramsErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  let [err, ret] = await new CompanyModel().getOne(companyParams.companyName,companyParams.companyId)
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  return ResOK(cb, { ...res, payload: ret })
+}
+
+/**
  * 厂商状态变更，接口编号：
  */
 const companyChangeStatus = async (e, c, cb) => {
@@ -384,6 +401,7 @@ export {
 
   companyNew,                   // 新建厂商
   companyList,                  // 游戏厂商
+  companyOne,                   // 单个厂商
   companyChangeStatus,          // 厂商状态变更
 
   billList,                     // 流水列表

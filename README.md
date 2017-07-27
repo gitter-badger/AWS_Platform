@@ -860,6 +860,35 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/gameList
 }
 ```
 
+#### 获取游戏详情（Diana）
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/gameOne/{type}/{gameId}
+```
+- TOKEN
+```
+有
+```
+- Response
+```
+{
+    "m": "gamelist",
+    "payload": {
+            {
+                "gameName": "英雄脸萌9",
+                "gameStatus": "01",
+                "updatedAt": 1500342495172,
+                "gameImg": "http://placehold.it/250x250",
+                "createdAt": 1500342495172,
+                "gameType": "0",
+                "gameId": "28c89106-6947-4198-8aab-3ef1b8fccb9f",
+                "gameRecommend": "我最猛"
+            }
+    },
+    "code": "0"
+}
+```
+
 -
 #### 变更游戏状态
 - URL
@@ -942,6 +971,38 @@ POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/companyLi
         ],
         "Count": 1,
         "ScannedCount": 1
+    },
+    "code": "0"
+}
+```
+
+#### 获取厂商详情（Diana）
+- URL
+```
+POST - https://5yg0kn84ng.execute-api.ap-southeast-1.amazonaws.com/dev/companyOne/{companyName}/{companyId}
+```
+- TOKEN
+```
+有
+```
+- Response
+```
+{
+    "m": "gamelist",
+    "payload": {
+            {
+                "companyRegion": "欧洲",
+                "license": "执照",
+                "companyDesc": "这是一个测试企业",
+                "remark": "类型，分成比",
+                "companyId": "769643e0-101c-4e4d-9b7d-fe709e725db6",
+                "companyName": "测试企业",
+                "updatedAt": 1501158167883,
+                "companyContract": "合同",
+                "createdAt": 1501158167883,
+                "companyContactWay": "18780004427",
+                "companyEmail": "18780004427@qiye.com"
+            }
     },
     "code": "0"
 }
