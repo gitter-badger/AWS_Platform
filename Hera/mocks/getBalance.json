@@ -1,9 +1,9 @@
 {
-    "queryStringParameters": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"merchantID_4\",  \"gamePlatform\":\"NA\"}",
+    "queryStringParameters": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\"}",
     "pathParameters" : {
-            "userName" : "lisichen11"
+            "userName" : "lisichen"
         },
     "headers":{
-        "X-Amz-Security-Token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkhBX2xpc2ljaGVuMTEiLCJzdWZmaXgiOiJIQSIsImlhdCI6MTUwMDk5MzE2M30.F4tWdL8IGuZ-ATbkTZjuNvK0073ow22Yd95MPQeE02o"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BX2xpc2ljaGVuIiwic3VmZml4IjoiTkEiLCJpYXQiOjE1MDEwNzcwMTF9.yl-GBqQTUeOWj9v5A_bX-nsOSdK9jHeyW1Y0bstGyic"
     }
 }

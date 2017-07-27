@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 const jwtVerify = Bluebird.promisify(jwt.verify)
 
 const responseTemplate = (statusCode, body, code, headers = {}) => {
-    console.log("pppppppppppppp");
   headers = {
     ...headers,
     'Access-Control-Allow-Origin': '*',
