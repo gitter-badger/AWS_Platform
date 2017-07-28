@@ -95,6 +95,102 @@ export class UserModel extends BaseModel {
         })
     }
 
+    /**
+     * 用户更新
+     * @param {*} userData 
+     */
+    async userUpdate(userData) {
+        const [err, updateRet] = await this.putItem({
+            ...userData,
+            updatedAt: Model.timeStamp()
+        })
+        if (err) {
+            return [err, 0]
+        }
+        return [0, updateRet]
+    }
+
+    /**
+     * 查询用户
+     * @param {*} userId 
+     * @param {*} role 
+     */
+    async getUser(userId, role) {
+        const [queryErr, queryRet] = await this.query({
+            KeyConditionExpression: '#userId = :userId and #role = :role',
+            ExpressionAttributeValues: {
+                ':role': role,
+                ':userId': userId
+            },
+            ExpressionAttributeNames: {
+                '#userId': 'userId',
+                '#role': 'role'
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        if (queryRet.Items.length - 1 != 0) {
+            return [BizErr.UserNotFoundErr(), 0]
+        }
+        const User = queryRet.Items[0]
+        return [0, User]
+    }
+
+    /**
+     * 查询管理员详情
+     * @param {*} token 
+     */
+    async theAdmin(token) {
+        return await this.getUser(token.userId, token.role)
+    }
+
+    /**
+     * 查看可用管理员
+     */
+    async listAvalibleManagers() {
+        const [queryErr, queryRet] = await this.query({
+            IndexName: 'RoleSuffixIndex',
+            KeyConditionExpression: '#role = :role',
+            ExpressionAttributeNames: {
+                '#role': 'role'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['Manager']
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const viewList = _.map(queryRet.Items, (item) => {
+            return {
+                value: item.userId,
+                label: item.suffix
+            }
+        })
+        return [0, viewList]
+    }
+
+    /**
+     * 查询管理员列表
+     * @param {*} token 
+     */
+    async listAllAdmins(token) {
+        const [queryErr, adminRet] = await this.query({
+            KeyConditionExpression: '#role = :role',
+            ExpressionAttributeNames: {
+                '#role': 'role'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['PlatformAdmin']
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        return [0, adminRet.Items]
+    }
+
     // const params = {
     //     ...this.params,
     //     Key: {

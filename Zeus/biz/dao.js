@@ -17,35 +17,6 @@ import {
 } from '../lib/all'
 import _ from 'lodash'
 import { CheckUserBalance } from './bill'
-/**
- * 查询管理员详情
- * @param {*} token 
- */
-export const TheAdmin = async (token) => {
-  return await GetUser(token.userId, token.role)
-}
-
-/**
- * 查询管理员列表
- * @param {*} token 
- */
-export const ListAllAdmins = async (token) => {
-  const query = {
-    TableName: Tables.ZeusPlatformUser,
-    KeyConditionExpression: '#role = :role',
-    ExpressionAttributeNames: {
-      '#role': 'role'
-    },
-    ExpressionAttributeValues: {
-      ':role': RoleCodeEnum['PlatformAdmin']
-    }
-  }
-  const [queryErr, adminRet] = await Store$('query', query)
-  if (queryErr) {
-    return [queryErr, 0]
-  }
-  return [0, adminRet.Items]
-}
 
 /**
  * 查看下级用户
@@ -94,53 +65,9 @@ export const ListChildUsers = async (token, roleCode) => {
   return [0, users]
 }
 
-/**
- * 查看可用管理员
- */
-export const ListAvalibleManagers = async () => {
-  const query = {
-    TableName: Tables.ZeusPlatformUser,
-    IndexName: 'RoleSuffixIndex',
-    KeyConditionExpression: '#role = :role',
-    ExpressionAttributeNames: {
-      '#role': 'role'
-    },
-    ExpressionAttributeValues: {
-      ':role': RoleCodeEnum['Manager']
-    }
-  }
-  const [queryErr, queryRet] = await Store$('query', query)
-  if (queryErr) {
-    return [queryErr, 0]
-  }
-  const viewList = _.map(queryRet.Items, (item) => {
-    return {
-      value: item.userId,
-      label: item.suffix
-    }
-  })
-  return [0, viewList]
-}
 
-/**
- * 用户更新
- * @param {*} userData 
- */
-export const UserUpdate = async (userData) => {
-  const User = {
-    ...userData,
-    updatedAt: Model.timeStamp()
-  }
-  const put = {
-    TableName: Tables.ZeusPlatformUser,
-    Item: User
-  }
-  const [err, updateRet] = await Store$('put', put)
-  if (err) {
-    return [err, 0]
-  }
-  return [0, updateRet]
-}
+
+
 
 /**
  * 查询用户
@@ -165,60 +92,7 @@ export const QueryUserById = async (userId) => {
   return [0, querySet.Items[0]]
 }
 
-/**
- * 查询用户
- * @param {*} userId 
- * @param {*} role 
- */
-export const GetUser = async (userId, role) => {
-  const query = {
-    TableName: Tables.ZeusPlatformUser,
-    KeyConditionExpression: '#userId = :userId and #role = :role',
-    ExpressionAttributeValues: {
-      ':role': role,
-      ':userId': userId
-    },
-    ExpressionAttributeNames: {
-      '#userId': 'userId',
-      '#role': 'role'
-    }
-  }
-  const [queryErr, queryRet] = await Store$('query', query)
-  if (queryErr) {
-    return [queryErr, 0]
-  }
-  if (queryRet.Items.length - 1 != 0) {
-    return [BizErr.UserNotFoundErr(), 0]
-  }
-  const User = queryRet.Items[0]
-  return [0, User]
-}
 
-/**
- * 检查MSN
- * @param {*} param 
- */
-export const CheckMSN = async (param) => {
-  const query = {
-    TableName: Tables.ZeusPlatformMSN,
-    KeyConditionExpression: '#msn = :msn',
-    FilterExpression: '#status = :usedStatus or #status = :lockStatus',
-    ExpressionAttributeNames: {
-      '#msn': 'msn',
-      '#status': 'status'
-    },
-    ExpressionAttributeValues: {
-      ':msn': param.msn.toString(),
-      ':usedStatus': MSNStatusEnum['Used'],
-      ':lockStatus': MSNStatusEnum['Locked']
-    }
-  }
-  const [queryErr, queryRet] = await Store$('query', query)
-  if (queryErr) {
-    return [queryErr, 0]
-  }
-  return [0, (queryRet.Items.length == 0)]
-}
 
 /**
  * 格式化线路号

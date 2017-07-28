@@ -4,27 +4,19 @@ import {
   Codes,
   JSONParser,
   Model,
-  Tables,
   StatusEnum,
-  GenderEnum,
+  MSNStatusEnum,
   RoleCodeEnum,
   RoleEditProps,
   Trim,
   Pick,
   JwtVerify,
   GeneratePolicyDocument,
-  MSNStatusEnum,
   BizErr
 } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
 import {
-  ListAllAdmins,
-  ListChildUsers,
-  ListAvalibleManagers,
-  TheAdmin,
-  CheckMSN,
-  UserUpdate,
-  GetUser
+  ListChildUsers
 } from './biz/dao'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
@@ -203,7 +195,7 @@ const adminList = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [err, admins] = await ListAllAdmins(token)
+  const [err, admins] = await new UserModel().listAllAdmins(token)
   // 结果返回
   if (err) {
     return ResErr(cb, err)
@@ -221,7 +213,7 @@ const adminCenter = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [err, admin] = await TheAdmin(token)
+  const [err, admin] = await new UserModel().theAdmin(token)
   // 结果返回
   if (err) {
     return ResErr(cb, err)
@@ -264,7 +256,7 @@ const managerOne = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
   // 业务操作
-  const [managerErr, manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
+  const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
   // 结果返回
   if (managerErr) {
     return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
@@ -286,7 +278,7 @@ const managerUpdate = async (e, c, cb) => {
   if (tokenErr) {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
-  const [managerErr, manager] = await GetUser(params.id, RoleCodeEnum['Manager'])
+  const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
     return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
   }
@@ -299,7 +291,7 @@ const managerUpdate = async (e, c, cb) => {
     ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
   // 业务操作
-  const [updateErr, updateRet] = await UserUpdate(Manager)
+  const [updateErr, updateRet] = await new UserModel().userUpdate(Manager)
   // 操作日志记录
   params.operateAction = '更新线路商信息'
   params.operateToken = token
@@ -328,7 +320,7 @@ const merchantOne = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
   // 业务操作
-  const [merchantErr, merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
+  const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Merchant'])
   // 结果返回
   if (merchantErr) {
     return ResFail(cb, { ...errRes, err: merchantErr }, merchantErr.code)
@@ -371,7 +363,7 @@ const merchantUpdate = async (e, c, cb) => {
   if (tokenErr) {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
-  const [merchantErr, merchant] = await GetUser(params.id, RoleCodeEnum['Merchant'])
+  const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
     return ResFail(cb, { ...errRes, err: merchantErr }, merchantErr.code)
   }
@@ -383,7 +375,7 @@ const merchantUpdate = async (e, c, cb) => {
     ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
   // 业务操作
-  const [updateErr, updateRet] = await UserUpdate(Merchant)
+  const [updateErr, updateRet] = await new UserModel().userUpdate(Merchant)
   // 操作日志记录
   params.operateAction = '更新商户信息'
   params.operateToken = token
@@ -410,7 +402,7 @@ const randomPassword = (e, c, cb) => {
 const avalibleManagers = async (e, c, cb) => {
   const errRes = { m: 'avalibleManagers err', input: e }
   const res = { m: 'avalibleManagers' }
-  const [err, ret] = await ListAvalibleManagers()
+  const [err, ret] = await new UserModel().listAvalibleManagers()
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   }
@@ -465,7 +457,7 @@ const checkMsn = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
   }
   // 业务操作
-  const [checkErr, checkRet] = await CheckMSN(params)
+  const [checkErr, checkRet] = await new MsnModel().checkMSN(params)
   if (checkErr) {
     return ResFail(cb, { ...errRes, err: checkErr }, checkErr.code)
   }

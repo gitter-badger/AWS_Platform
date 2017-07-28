@@ -32,5 +32,29 @@ export class MsnModel extends BaseModel {
             userId: Model.StringValue
         }
     }
-    
+
+    /**
+     * 检查MSN
+     * @param {*} param 
+     */
+    async checkMSN(param) {
+        const [queryErr, queryRet] = await this.query({
+            KeyConditionExpression: '#msn = :msn',
+            FilterExpression: '#status = :usedStatus or #status = :lockStatus',
+            ExpressionAttributeNames: {
+                '#msn': 'msn',
+                '#status': 'status'
+            },
+            ExpressionAttributeValues: {
+                ':msn': param.msn.toString(),
+                ':usedStatus': MSNStatusEnum['Used'],
+                ':lockStatus': MSNStatusEnum['Locked']
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        return [0, (queryRet.Items.length == 0)]
+    }
+
 }

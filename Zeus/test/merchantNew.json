@@ -15,13 +15,13 @@
     }
   },
   "body": {
-    "username": "cmerchant3",
+    "username": "cmerchant4",
     "password": "123456",
     "role": "100",
-    "adminName": "cheneymerchant3",
+    "adminName": "cheneymerchant4",
     "parent": "01",
-    "msn":"3",
-    "suffix":"CY3",
-    "displayName": "测试商户3"
+    "msn":"4",
+    "suffix":"CY4",
+    "displayName": "测试商户4"
 }
 }
