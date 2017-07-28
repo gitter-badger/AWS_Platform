@@ -3,18 +3,16 @@ import {
     Store$,
     Codes,
     BizErr,
-    StatusEnum,
-    RoleCodeEnum,
-    MSNStatusEnum,
-    RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
-    BillActionEnum,
     Keys,
     Pick,
-    Omit
+    Omit,
+    StatusEnum,
+    RoleCodeEnum,
+    MSNStatusEnum,
+    RoleModels
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'

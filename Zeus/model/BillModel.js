@@ -3,17 +3,16 @@ import {
     Store$,
     Codes,
     BizErr,
-    RoleCodeEnum,
-    MSNStatusEnum,
-    RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
-    BillActionEnum,
     Keys,
     Pick,
-    Omit
+    Omit,
+    BillMo,
+    BillActionEnum,
+    RoleCodeEnum,
+    RoleModels
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
@@ -111,13 +110,13 @@ export class BillModel extends BaseModel {
         const Bill = {
             ...Model.baseModel(),
             ...Pick({
-                ...BillModel(),
+                ...BillMo(),
                 ...billInfo,
                 fromUser: fromInparam.username,
                 fromRole: fromInparam.role,
                 action: 0,
                 operator: from.operatorToken.username
-            }, Keys(BillModel()))
+            }, Keys(BillMo()))
         }
         const batch = {
             RequestItems: {

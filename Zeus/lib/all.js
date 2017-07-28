@@ -23,7 +23,7 @@ export {
   RoleModels,
   GameTypeEnum,
   MSNStatusEnum,
-  BillModel,
+  BillMo,
   RoleDisplay,
   RoleEditProps
 }

@@ -32,7 +32,7 @@ export const GameTypeEnum = {
   '1': 'VideoGame',
   '2': 'LiveGame'
 }
-export const BillModel = function () {
+export const BillMo = function () {
   return {
     sn: Model.uuid(),
     fromRole: Model.StringValue,

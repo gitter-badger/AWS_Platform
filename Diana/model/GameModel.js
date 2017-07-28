@@ -3,17 +3,14 @@ import {
     Store$,
     Codes,
     BizErr,
-    RoleCodeEnum,
-    GameStatusEnum,
-    RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
-    BillActionEnum,
     Keys,
     Pick,
-    Omit
+    Omit,
+    RoleCodeEnum,
+    RoleModels
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'

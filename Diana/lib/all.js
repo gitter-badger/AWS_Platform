@@ -25,7 +25,7 @@ export {
   GameStatusEnum,
   CompanyStatusEnum,
   MSNStatusEnum,
-  BillModel,
+  BillMo,
   RoleDisplay,
   RoleEditProps
 }
