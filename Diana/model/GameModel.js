@@ -10,6 +10,7 @@ import {
     Pick,
     Omit,
     RoleCodeEnum,
+    GameTypeEnum,
     RoleModels
 } from '../lib/all'
 import _ from 'lodash'
