@@ -8,7 +8,7 @@ import {CODES, CHeraErr} from "../lib/Codes";
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({userName, action, amount, userId, msn, merchantName, operator, type} = {}) {
+    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
         this.userId = userId
@@ -16,6 +16,10 @@ export class UserBillModel extends athena.BaseModel {
         this.userName = userName;
         this.msn = msn;
         this.type = type;
+        this.fromRole = fromRole;
+        this.toRole = toRole;
+        this.fromUser = fromUser;
+        this.toUser = toUser;
         this.merchantName = merchantName;
         this.originalAmount = 0;
         this.operator = operator;

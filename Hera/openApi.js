@@ -5,6 +5,8 @@ import {CODES, CHeraErr} from "./lib/Codes";
 
 import {ReHandler} from "./lib/Response";
 
+import {RoleCodeEnum} from "./lib/Consts"
+
 
 import {MerchantModel} from "./model/MerchantModel";
 
@@ -12,7 +14,7 @@ import {UserModel} from "./model/UserModel";
 
 import {UserBillModel} from "./model/UserBillModel";
 
-import {MerchantBillModel} from "./model/MerchantBillModel";
+import {MerchantBillModel,Action} from "./model/MerchantBillModel";
 
 import {Util} from "./lib/Util"
 
@@ -200,6 +202,7 @@ export async function gamePlayerBalance(event, context, callback) {
       return callback(null, ReHandler.fail(checkAttError));
     } 
     let action = +requestParams.action;
+    
     let merchantAmount = -action * (+requestParams.amount);
 
     if(!Object.is(action, 1) && !Object.is(action, -1)){
@@ -214,6 +217,18 @@ export async function gamePlayerBalance(event, context, callback) {
     if(!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
     userName = `${merchantInfo.suffix}_${userName}`;
     requestParams.userName = userName;
+
+    if(action == Action.recharge) {
+      requestParams.fromRole = RoleCodeEnum.Merchant;
+      requestParams.toRole = RoleCodeEnum.Player;
+      requestParams.fromUser = merchantInfo.username;
+      requestParams.toUser = userName;
+    }else {
+      requestParams.fromRole = RoleCodeEnum.Player;
+      requestParams.toRole = RoleCodeEnum.Merchant;
+      requestParams.fromUser = userName;
+      requestParams.toUser = merchantInfo.username;
+    }
 
     //检查玩家点数是否足够 如果是玩家提现才检查，充值不需要
     let userBillModel = new UserBillModel(requestParams);

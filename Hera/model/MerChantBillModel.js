@@ -8,14 +8,16 @@ import {CODES, CHeraErr} from "../lib/Codes";
 
 
 export class MerchantBillModel extends athena.BaseModel {
-    constructor({userId, action, amount, userName, operator} = {}) {
+    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser} = {}) {
         super(TABLE_NAMES.PLATFORM_BILL);
         this.sn = Util.uuid();
         this.userId = userId;
         this.action = +action;
         this.amount = (this.action == -1 ? -amount : +amount).toFixed(2);
-        this.formRole = RoleCodeEnum.Player;
-        this.toRole = RoleCodeEnum.Player;
+        this.fromRole = fromRole;
+        this.toRole = toRole;
+        this.fromUser = fromUser;
+        this.toUser = toUser;
         this.operator = userName;
         this.userName = userName;
         this.createdAt = Date.now();
