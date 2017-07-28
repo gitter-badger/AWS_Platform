@@ -15,9 +15,7 @@ import {
   BizErr
 } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
-import {
-  ListChildUsers
-} from './biz/dao'
+import { CheckUserBalance } from './biz/bill'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
@@ -233,10 +231,15 @@ const managerList = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [err, ret] = await ListChildUsers(token, RoleCodeEnum.Manager)
+  const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Manager)
   // 结果返回
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  // 查询每个用户余额
+  for (let user of ret) {
+      let [balanceErr, balance] = await CheckUserBalance(user)
+      user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -340,10 +343,15 @@ const merchantList = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
   // 业务操作
-  const [err, ret] = await ListChildUsers(token, RoleCodeEnum.Merchant)
+  const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Merchant)
   // 结果返回
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  // 查询每个用户余额
+  for (let user of ret) {
+      let [balanceErr, balance] = await CheckUserBalance(user)
+      user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })
 }

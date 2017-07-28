@@ -138,9 +138,20 @@ export const QueryBillUser = async (token, fromUserId) => {
   if (!fromUserId) {
     fromUserId = token.userId
   }
-  const [err, user] = await QueryUserById(fromUserId)
+  // 通过userId查询用户信息
+  const [err, user] = await Store$('query', {
+    TableName: Tables.ZeusPlatformUser,
+    IndexName: 'UserIdIndex',
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': fromUserId
+    }
+  })
   if (err) {
     return [err, 0]
+  }
+  if (querySet.Items.length - 1 != 0) {
+    return [BizErr.UserNotFoundErr(), 0]
   }
   if (token.role == RoleCodeEnum['PlatformAdmin']) {
     return [0, user]
@@ -149,30 +160,6 @@ export const QueryBillUser = async (token, fromUserId) => {
     return [BizErr.TokenErr('current token user  cant operate this user'), 0]
   }
   return [0, user]
-}
-
-/**
- * 查询用户
- * @param {*} userId 
- */
-export const QueryUserById = async (userId) => {
-  const query = {
-    TableName: Tables.ZeusPlatformUser,
-    IndexName: 'UserIdIndex',
-    KeyConditionExpression: 'userId = :userId',
-    ExpressionAttributeValues: {
-      ':userId': userId
-    }
-  }
-  const [err, querySet] = await Store$('query', query)
-  if (err) {
-    return [err, 0]
-  }
-  if (querySet.Items.length - 1 != 0) {
-    return [BizErr.UserNotFoundErr(), 0]
-  }
-
-  return [0, querySet.Items[0]]
 }
 
 // ==================== 以下是内部方法 ====================
