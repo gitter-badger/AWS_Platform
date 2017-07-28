@@ -15,7 +15,7 @@ import {
     Pick,
     Omit
 } from '../lib/all'
-
+import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
 export class BillModel extends BaseModel {
