@@ -53,8 +53,8 @@ export const BillTransfer = async (from, billInfo) => {
     ...Pick({
       ...BillModel(),
       ...billInfo,
-      fromUser: FromInparam.username,
-      fromRole: FromInparam.role,
+      fromUser: fromInparam.username,
+      fromRole: fromInparam.role,
       action: 0,
       operator: from.operatorToken.username
     }, Keys(BillModel()))
