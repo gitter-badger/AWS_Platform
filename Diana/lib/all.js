@@ -20,11 +20,11 @@ export {
   StatusEnum,
   BillActionEnum,
   RoleCodeEnum,
-  RoleModels,
   GameTypeEnum,
   GameStatusEnum,
   CompanyStatusEnum,
   MSNStatusEnum,
+  RoleModels,
   BillMo,
   RoleDisplay,
   RoleEditProps
