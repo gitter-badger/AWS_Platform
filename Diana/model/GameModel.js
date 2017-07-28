@@ -38,8 +38,8 @@ export class GameModel extends BaseModel {
      */
     async addGame(gameInfo) {
         // 数据类型处理
-        gameInfo['gameType'] = gameInfo['gameType'].toString()
-        gameInfo['gameStatus'] = GameStatusEnum.Online;
+        gameInfo.gameType = gameInfo.gameType.toString()
+        gameInfo.gameStatus = GameStatusEnum.Online;
         gameInfo.gameRecommend = gameInfo.gameRecommend || Model.StringValue
         gameInfo.gameImg = gameInfo.gameImg || Model.StringValue
         gameInfo.company = gameInfo.company || Model.StringValue
