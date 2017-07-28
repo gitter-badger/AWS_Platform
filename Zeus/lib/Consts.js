@@ -41,7 +41,8 @@ export const BillModel = function () {
     toUser: Model.StringValue,
     action: Model.NumberValue,
     amount: Model.NumberValue,
-    operator: Model.StringValue
+    operator: Model.StringValue,
+    remark: Model.StringValue
   }
 }
 
