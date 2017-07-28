@@ -13,7 +13,6 @@ import {
   RoleDisplay,
   MSNStatusEnum
 } from '../lib/all'
-import { BillTransfer } from './bill'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
@@ -133,7 +132,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [queryBalanceErr, 0]
   }
   parentUser.operatorToken = token
-  const [depositErr, depositRet] = await BillTransfer(parentUser, {
+  const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
     amount: Math.min(depositPoints, balance), // 有多少扣多少
