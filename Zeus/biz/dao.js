@@ -87,8 +87,8 @@ export const ListChildUsers = async (token, roleCode) => {
     return Omit(item, ['passhash'])
   })
   // 查询每个用户余额
-  for(let user of users){
-    let [balanceErr,balance] = await CheckUserBalance(user)
+  for (let user of users) {
+    let [balanceErr, balance] = await CheckUserBalance(user)
     user.balance = balance
   }
   return [0, users]
@@ -199,11 +199,6 @@ export const GetUser = async (userId, role) => {
  * @param {*} param 
  */
 export const CheckMSN = async (param) => {
-  // get a number from event
-  // const [formatErr,msn] = FormatMSN(param)
-  // if (formatErr) {
-  //   return [formatErr,0]
-  // }
   const query = {
     TableName: Tables.ZeusPlatformMSN,
     KeyConditionExpression: '#msn = :msn',
@@ -229,15 +224,15 @@ export const CheckMSN = async (param) => {
  * 格式化线路号
  * @param {*} param 
  */
-export const FormatMSN = function (param) {
-  try {
-    if (isNaN(parseFloat(param.msn)) || 1000.0 - parseFloat(param.msn) >= 1000.0 || 1000.0 - parseFloat(param.msn) <= 0) {
-      return [BizErr.ParamErr('msn is [1,999]')]
-    }
-    const formatedMsn = ((parseFloat(param.msn) * 0.001).toFixed(3) + '').substring(2)
-    return [0, formatedMsn]
-  } catch (e) {
-    return [BizErr.ParamErr(e.toString()), 0]
-  }
-}
+// export const FormatMSN = function (param) {
+//   try {
+//     if (isNaN(parseFloat(param.msn)) || 1000.0 - parseFloat(param.msn) >= 1000.0 || 1000.0 - parseFloat(param.msn) <= 0) {
+//       return [BizErr.ParamErr('msn is [1,999]')]
+//     }
+//     const formatedMsn = ((parseFloat(param.msn) * 0.001).toFixed(3) + '').substring(2)
+//     return [0, formatedMsn]
+//   } catch (e) {
+//     return [BizErr.ParamErr(e.toString()), 0]
+//   }
+// }
 

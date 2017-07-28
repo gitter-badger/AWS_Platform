@@ -209,10 +209,10 @@ const billList = async (e, c, cb) => {
  * 转账
  */
 const billTransfer = async (e, c, cb) => {
-  const errRes = { m: 'depositPoints err'/*, input: e*/ }
-  const res = { m: 'depositPoints' }
+  const errRes = { m: 'billTransfer err'/*, input: e*/ }
+  const res = { m: 'billTransfer' }
   // 入参数据转换
-  const [jsonParseErr, depositInfo] = JSONParser(e && e.body)
+  const [jsonParseErr, transferInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
@@ -222,7 +222,7 @@ const billTransfer = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 获取转账账户
-  const [queryErr, fromUser] = await QueryBillUser(token, depositInfo.fromUserId)
+  const [queryErr, fromUser] = await QueryBillUser(token, transferInfo.fromUserId)
   if (queryErr) {
     return ResFail(cb, queryErr)
   }
@@ -233,8 +233,8 @@ const billTransfer = async (e, c, cb) => {
     return ResErr(cb, userBalanceErr)
   }
   const [depositBillErr, depositBillRet] = await BillTransfer(fromUser, {
-    ...depositInfo,
-    amount: Math.min(userBalance, depositInfo.amount)
+    ...transferInfo,
+    amount: Math.min(userBalance, transferInfo.amount)
   })
   if (depositBillErr) {
     return ResErr(cb, depositBillErr)
