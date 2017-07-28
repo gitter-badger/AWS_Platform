@@ -169,6 +169,14 @@ functions:
           path: random_password
           method: post
           cors: true
+  updatePassword: #重置密码
+    handler: api.updatePassword
+    events:
+      -
+        http:
+          path: updatePassword
+          method: post
+          cors: true
   avalibleManagers: #可用线路商列表
     handler: api.avalibleManagers
     events:

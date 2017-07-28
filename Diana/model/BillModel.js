@@ -165,6 +165,9 @@ export class BillModel extends BaseModel {
         // 数据类型处理
         fromInparam.role = fromInparam.role.toString()
         billInfo.toRole = billInfo.toRole.toString()
+        if(!billInfo.remark){
+            billInfo.remark = Model.StringValue
+        }
         // 存储账单流水
         const Bill = {
             ...Model.baseModel(),

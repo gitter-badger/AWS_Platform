@@ -166,7 +166,7 @@ const userChangeStatus = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 只有管理员有权限
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+  if (token.role != RoleCodeEnum['PlatformAdmin']) {
     return [BizErr.TokenErr('must admin token'), 0]
   }
   // 更新用户状态
@@ -396,6 +396,52 @@ const merchantUpdate = async (e, c, cb) => {
 }
 
 /**
+ * 更新密码
+ */
+const updatePassword = async (e, c, cb) => {
+  const errRes = { m: 'updatePassword error'/*, input: e*/ }
+  const res = { m: 'updatePassword' }
+  // 入参转换和校验
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  if (!inparam.userId || !inparam.password) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 只有管理员有权限
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && (token.userId != inparam.userId)) {
+    return [BizErr.TokenErr('no right!'), 0]
+  }
+  // 查询用户
+  const [queryErr, user] = await new UserModel().queryUserById(inparam.userId)
+  if (queryErr) {
+    return ResFail(cb, { ...errRes, err: queryErr }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+  // 更新用户密码
+  user.password = inparam.password
+  user.passhash = Model.hashGen(user.password)
+  const [err, ret] = await new UserModel().userUpdate(user)
+  // 操作日志记录
+  inparam.operateAction = '修改密码'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
+/**
  * 随机密码
  */
 const randomPassword = (e, c, cb) => {
@@ -520,7 +566,7 @@ const lockmsn = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 只有管理员有权限
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+  if (token.role != RoleCodeEnum['PlatformAdmin']) {
     return [BizErr.TokenErr('must admin token'), 0]
   }
   // 查询msn
@@ -664,5 +710,6 @@ export {
   msnRandom,                    // 随机线路号
   captcha,                      // 获取验证码
 
+  updatePassword,               // 更新密码
   randomPassword                // 随机密码
 }
