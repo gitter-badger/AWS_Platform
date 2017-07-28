@@ -157,8 +157,8 @@ functions:
     events:
       -
         http:
-          path: childList
-          method: get/{userId}/{childRole}
+          path: childList/{userId}/{childRole}
+          method: get
           cors: true
           authorizer: tokenAuth
   merchantUpdate: #更新商户信息

@@ -242,8 +242,8 @@ const managerList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-      let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-      user.balance = balance
+    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
+    user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -353,8 +353,8 @@ const merchantList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-      let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-      user.balance = balance
+    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
+    user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -367,13 +367,20 @@ const childList = async (e, c, cb) => {
   const errRes = { m: 'childList err', input: e }
   const res = { m: 'childList' }
   const [paramsErr, params] = Model.pathParams(e)
-  if (paramsErr || !params.role || !params.userId) {
+  if (paramsErr) {
     return ResErr(cb, paramsErr)
+  }
+  if (paramsErr || !params.childRole || !params.userId) {
+    return ResErr(cb, BizErr.InparamErr())
   }
   // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
+  }
+  // 只能查看自己下级
+  if (parseInt(token.role) >= parseInt(params.childRole)) {
+    return ResErr(cb, BizErr.InparamErr('no right'))
   }
   // 业务操作
   const [err, ret] = await new UserModel().listChildUsers(params, params.childRole)
@@ -383,8 +390,8 @@ const childList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-      let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-      user.balance = balance
+    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
+    user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -548,7 +555,7 @@ const checkMsn = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: checkErr }, checkErr.code)
   }
   // 结果返回
-  return ResOK(cb, {...res,payload: {avalible: Boolean(checkRet)}})
+  return ResOK(cb, { ...res, payload: { avalible: Boolean(checkRet) } })
 }
 /**
  * 随机线路号
@@ -695,7 +702,7 @@ const jwtverify = async (e, c, cb) => {
     return c.fail('Unauthorized: wrong token type')
   }
   // verify it and return the policy statements
-  const [err,userInfo] = await JwtVerify(token[1])
+  const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
@@ -726,6 +733,7 @@ export {
   userNew,                      // 创建新用户
   userGrabToken,                // 使用apiKey登录获取用户信息
   userChangeStatus,             // 变更用户状态
+  childList,                    // 下级用户列表
 
   managerList,                  // 建站商列表
   managerOne,                   // 建站商详情
