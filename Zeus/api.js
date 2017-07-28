@@ -4,22 +4,22 @@ import {
   Codes,
   JSONParser,
   Model,
-  StatusEnum,
-  MSNStatusEnum,
-  RoleCodeEnum,
-  RoleEditProps,
   Trim,
   Pick,
   JwtVerify,
   GeneratePolicyDocument,
-  BizErr
+  BizErr,
+  StatusEnum,
+  MSNStatusEnum,
+  RoleCodeEnum,
+  RoleEditProps
 } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
-import { CheckUserBalance } from './biz/bill'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
+import { BillModel } from './model/BillModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -238,7 +238,7 @@ const managerList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-      let [balanceErr, balance] = await CheckUserBalance(user)
+      let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
       user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })
@@ -350,7 +350,7 @@ const merchantList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-      let [balanceErr, balance] = await CheckUserBalance(user)
+      let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
       user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })

@@ -13,10 +13,11 @@ import {
   RoleDisplay,
   MSNStatusEnum
 } from '../lib/all'
-import { BillTransfer, CheckBalance } from './bill'
+import { BillTransfer } from './bill'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
+import { BillModel } from '../model/BillModel'
 
 /**
  * 接口编号：0
@@ -127,7 +128,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  const [queryBalanceErr, balance] = await CheckBalance(token, parentUser)
+  const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }

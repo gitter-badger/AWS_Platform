@@ -33,6 +33,46 @@ export class BillModel extends BaseModel {
         }
     }
 
+    /**
+     * 查询用户余额
+     * @param {*} user 
+     */
+    async checkUserBalance(user) {
+        if (user.points == undefined || user.points == null) {
+            return [BizErr.ParamErr('User dont have base points'), 0]
+        }
+        const baseBalance = parseFloat(user.points)
+        const [queryErr, bills] = await this.query({
+            IndexName: 'UserIdIndex',
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeValues: {
+                ':userId': user.userId
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const sums = _.reduce(bills.Items, (sum, bill) => {
+            return sum + parseFloat(bill.amount)
+        }, 0.0)
+
+        return [0, baseBalance + sums]
+    }
+    
+    /**
+     * 返回某个账户下的余额
+     * @param {*} token 
+     * @param {*} user 
+     */
+    async checkBalance(token, user) {
+        // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
+        // 当前登录用户只能查询自己的balance
+        if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
+            return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
+        }
+        return await this.checkUserBalance(user)
+    }
+
     // async batchSave() {
     //     const batch = {
     //         RequestItems: {
