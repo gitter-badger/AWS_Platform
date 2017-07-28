@@ -84,7 +84,7 @@ export class UserModel extends BaseModel {
                     ':status': status
                 }
             }
-            this.db$('update', params)
+            this.updateItem(params)
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
@@ -216,7 +216,7 @@ export class UserModel extends BaseModel {
      * @param {*} username 
      */
     async queryUserBySuffix(role, suffix, username) {
-        return await this.query$({
+        return await this.query({
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#suffix = :suffix and #role = :role',
             FilterExpression: '#username = :username',
