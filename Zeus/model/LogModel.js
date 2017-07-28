@@ -86,8 +86,10 @@ export class LogModel extends BaseModel {
     }
 
     /**
-     * 添加登录日志
-     * @param {*} loginUserRet 
+     * 添加操作日志
+     * @param {*} inparam 
+     * @param {*} error 
+     * @param {*} result 
      */
     addOperate(inparam, error, result) {
         let userId = inparam.operateToken.userId
@@ -96,7 +98,7 @@ export class LogModel extends BaseModel {
         let username = inparam.operateToken.username
         let lastIP = inparam.lastIP
         let type = 'operate'
-        let action = inparam.action
+        let action = inparam.operateAction
         let inparams = inparam
         let ret = 'Y'
         let detail = result

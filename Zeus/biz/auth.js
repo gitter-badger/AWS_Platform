@@ -5,7 +5,6 @@ import {
   BizErr,
   Model,
   Trim,
-  Empty,
   Pick,
   Keys,
   Omit,
@@ -14,10 +13,10 @@ import {
   RoleDisplay,
   MSNStatusEnum
 } from '../lib/all'
-import { CheckMSN } from './dao'
 import { BillTransfer, CheckBalance } from './bill'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
+import { MsnModel } from '../model/MsnModel'
 
 /**
  * 接口编号：0
@@ -101,7 +100,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   }
   // 如果是创建商户，检查msn是否可用
   if (CheckUser.role === RoleCodeEnum['Merchant']) {
-    const [checkMSNErr, checkMSNRet] = await CheckMSN({ msn: CheckUser.msn })
+    const [checkMSNErr, checkMSNRet] = await new MsnModel().checkMSN({ msn: CheckUser.msn })
     if (checkMSNErr) {
       return [checkMSNErr, 0]
     }
@@ -172,7 +171,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   const username = UserLoginInfo.username
   const suffix = UserLoginInfo.suffix
   // 查询用户信息
-  const [queryUserErr, queryUserRet] = await queryUserBySuffix(roleCode, suffix, username)
+  const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(roleCode, suffix, username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
@@ -292,7 +291,7 @@ const queryParent = async (token, userId) => {
     // 能够有子节点的只能是管理员或者线路商
     role = RoleCodeEnum['Manager']
   }
-  const [err, user] = await queryUserById(id, role)
+  const [err, user] = await new UserModel().queryUserById(id)
   if (err) {
     return [err, 0]
   }
@@ -363,7 +362,7 @@ const saveUser = async (userInfo) => {
 const checkUserBySuffix = async (role, suffix, username) => {
   // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
   if (role === RoleCodeEnum['PlatformAdmin']) {
-    return await queryUserBySuffix(role, suffix, username)
+    return await new UserModel().queryUserBySuffix(role, suffix, username)
   }
   // 对于其他用户，角色和前缀具有联合唯一性
   const query = {
@@ -382,48 +381,3 @@ const checkUserBySuffix = async (role, suffix, username) => {
   return await Store$('query', query)
 }
 
-// 根据角色，前缀，用户名查询唯一用户
-const queryUserBySuffix = async (role, suffix, username) => {
-  const query = {
-    TableName: Tables.ZeusPlatformUser,
-    IndexName: 'RoleSuffixIndex',
-    KeyConditionExpression: '#suffix = :suffix and #role = :role',
-    FilterExpression: '#username = :username',
-    ExpressionAttributeNames: {
-      '#role': 'role',
-      '#suffix': 'suffix',
-      '#username': 'username'
-    },
-    ExpressionAttributeValues: {
-      ':suffix': suffix,
-      ':role': role,
-      ':username': `${suffix}_${username}`
-    }
-  }
-  return await Store$('query', query)
-}
-
-// 根据角色和用户ID查询唯一用户
-const queryUserById = async (userId, role) => {
-  const query = {
-    TableName: Tables.ZeusPlatformUser,
-    IndexName: 'UserIdIndex',
-    KeyConditionExpression: 'userId = :userId',
-    FilterExpression: '#role = :role',
-    ExpressionAttributeNames: {
-      '#role': 'role'
-    },
-    ExpressionAttributeValues: {
-      ':userId': userId,
-      ':role': role
-    }
-  }
-  const [queryErr, ret] = await Store$('query', query)
-  if (queryErr) {
-    return [queryErr, 0]
-  }
-  if (ret.Items.length - 1 != 0) {
-    return [BizErr.ItemExistErr('user more than one'), 0]
-  }
-  return [0, ret.Items[0]]
-}

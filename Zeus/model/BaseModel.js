@@ -40,8 +40,8 @@ export class BaseModel {
     }
 
     /**
-     * 插入单项
-     * @param {*} item 
+     * 更新单项
+     * @param {*} item
      */
     putItem(item) {
         return new Promise((reslove, reject) => {

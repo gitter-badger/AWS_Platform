@@ -63,7 +63,14 @@ const gameNew = async (e, c, cb) => {
   // if (!_.isNumber(kindId)) {
   //     return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
   // }
+  // 业务操作
   const [addGameInfoErr, addGameRet] = await new GameModel().addGame(gameInfo)
+
+  // 操作日志记录
+  gameInfo.operateAction = '创建游戏'
+  gameInfo.operateToken = token
+  new LogModel().addOperate(gameInfo, addGameInfoErr, addGameRet)
+
   if (addGameInfoErr) {
     return ResFail(cb, { ...errRes, err: addGameInfoErr }, addGameInfoErr.code)
   }
@@ -302,6 +309,12 @@ const companyNew = async (e, c, cb) => {
   }
 
   const [addCompanyErr, addCompanyRet] = await new CompanyModel().addCompany(companyInfo)
+
+  // 操作日志记录
+  companyInfo.operateAction = '创建厂商'
+  companyInfo.operateToken = token
+  new LogModel().addOperate(companyInfo, addCompanyErr, addCompanyRet)
+
   if (addCompanyErr) {
     return ResFail(cb, { ...errRes, err: addCompanyErr }, addCompanyErr.code)
   }
@@ -371,6 +384,12 @@ const companyChangeStatus = async (e, c, cb) => {
   }
   // 业务操作
   const [err, ret] = await new CompanyModel().changeStatus(inparam.companyName, inparam.companyId, inparam.status)
+
+  // 操作日志记录
+  inparam.operateAction = '厂商状态变更'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
+
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {
