@@ -87,14 +87,15 @@ export class GameModel extends BaseModel {
             return [BizErr.ParamErr('game type is missing'), 0]
         }
         // 组装条件
-        const ranges = _.map(gameTypes, (t, index) => {
+        let ranges = _.map(gameTypes, (t, index) => {
             return `gameType = :t${index}`
         }).join(' OR ')
+        ranges += ' AND gameStatus <> :gameStatus'
         const values = _.reduce(gameTypes, (result, t, index) => {
             result[`:t${index}`] = t
             return result
         }, {})
-        console.info(values)
+        values[':gameStatus'] = 0
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,
