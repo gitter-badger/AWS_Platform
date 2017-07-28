@@ -177,6 +177,7 @@ functions:
           path: updatePassword
           method: post
           cors: true
+          authorizer: tokenAuth
   avalibleManagers: #可用线路商列表
     handler: api.avalibleManagers
     events:
