@@ -33,15 +33,16 @@ const Utils = {
         if(!date) {
             date = new Date();
         }
-        let day = date.getDate();
-        date.setDate(date.getDate() - day);
+        date.setDate(1);
         this.setFirst(date);
         return date.getTime();
     },
-    getMonthEndTime : function(){
-        let date = new Date();
-        let day = date.getDate();
-        date.setDate(date.getDate() - day);
+    getMonthEndTime : function(date){
+        if(!date) {
+            date = new Date();
+        }
+        date.setMonth(date.getMonth()+1);
+        date.setDate(0);
         this.setEnd(date);
         return date.getTime();
     },
@@ -49,7 +50,7 @@ const Utils = {
         date.setHours(0);
         date.setMinutes(0);
         date.setSeconds(0);
-        date.setMilliseconds(0);
+        date.setMilliseconds(1);
     },
     setEnd(date){
         date.setHours(23);
@@ -73,7 +74,8 @@ const Utils = {
  */
 const overview = async (event, context, cb) => {
   //json转换
-  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters);
+  event = event || {};
+  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters || {});
   if(parserErr) return callback(null, Fail(parserErr));
   let type = requestParams.type ? +requestParams.type :1; //1,线路商数量 2,售出点数 3，成交量 4,累计收益
   let userModel = new PlatformUserModel();
@@ -106,11 +108,11 @@ const overview = async (event, context, cb) => {
 const salePointsInfo = async (event, context, cb) => {
 
   //json转换
-  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters);
+  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters || "{}");
   if(parserErr){
        return callback(null, Fail(parserErr));
   }
-  let type = +requestParams.type || 2;
+  let type = +requestParams.type || 2; 
   let mode = +requestParams.mode || 1;
   let billModel = new PlatformBillModel();
   let firstTime = 0, endTime = 0, preFirstTime = 0, preEndTime = 0;
@@ -126,8 +128,13 @@ const salePointsInfo = async (event, context, cb) => {
   } else { //本月
     firstTime = Utils.getMonthFirstTime();
     endTime = Utils.getMonthEndTime();
+    let date1 = new Date(firstTime);
+    let date2 = new Date(endTime);
+    date1.setMonth(date1.getMonth()-1);
+    date2.setMonth(date2.getMonth()-1);
+    preFirstTime = date1.getTime();
+    preEndTime = date2.getTime();
   }
-
   let [error, currentList] = await billModel.statistics(type, firstTime, endTime);  
   let [err, preList] = await billModel.statistics(type, preFirstTime, preEndTime);  
   if(error || err) {
@@ -140,7 +147,7 @@ const salePointsInfo = async (event, context, cb) => {
   preList.forEach(function(element){
       preNumber += element.num;
   })
-  cb(null, Success({currNumber:currentNumber, preNumber:preNumber}));
+  cb(null, Success({data:{currNumber:currentNumber, preNumber:preNumber}}));
 }
 
 /**
@@ -150,16 +157,17 @@ const salePointsInfo = async (event, context, cb) => {
  * @param {*} cb 
  */
 const statisticsDetail = async (event, context, cb) => {
-    //json转换
+  //json转换
+  event = event || {};
   let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters);
   if(parserErr){
        return callback(null, Fail(parserErr));
   }
   let type = +requestParams.type || 2;
   let startTime = +requestParams.startTime || 0;
-  let entTime = +requestParams.endTime || Date.now();
+  let endTime = +requestParams.endTime || Date.now();
   let billModel = new PlatformBillModel();
-  let [error, list] = await billModel.statistics(type, firstTime, endTime);  
+  let [error, list] = await billModel.statistics(type, startTime, endTime);  
   if(error) {
         return cb(null, Fail(error));
   }
@@ -172,6 +180,7 @@ const statisticsDetail = async (event, context, cb) => {
     returnObj[timeStr] = returnObj[timeStr] || 0;
     returnObj[timeStr] += item.num;
   })
+  
   cb(null, Success({data:returnObj}));
 }
 

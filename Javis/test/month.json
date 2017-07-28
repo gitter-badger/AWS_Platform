@@ -1,3 +1,6 @@
 {
-   "queryStringParameters": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"type\":\"1\",  \"type\":\"2\"}"
+   "queryStringParameters": {
+       "type" : 3,
+       "mode" : 2
+   }
 }
