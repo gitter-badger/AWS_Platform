@@ -14,6 +14,17 @@ provider:
   name: aws
   runtime: nodejs6.10
   region: ap-southeast-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
   initData:
     handler: api.initData
@@ -43,7 +54,7 @@ functions:
           path: /statistics/overview
           method: get
           cors: true
-  salePointsInfo:  //本周本月统计
+  salePointsInfo:  #本周本月统计
     handler: api_sta.salePointsInfo
     events:
       -
@@ -51,7 +62,7 @@ functions:
           path: /statistics/month/week
           method: get
           cors: true
-  statisticsDetail:  //详情
+  statisticsDetail:  #详情
     handler: api_sta.statisticsDetail
     events:
       -
@@ -59,7 +70,7 @@ functions:
           path: /statistics/detail
           method: get
           cors: true
-  statisticsList:  //某一天的记录数据
+  statisticsList:  #某一天的记录数据
     handler: api_sta.list
     events:
       -

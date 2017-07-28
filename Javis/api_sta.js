@@ -81,7 +81,7 @@ const overview = async (event, context, cb) => {
   let error, sumInfo =0, array;
   if(type ==1) {
     [error, sumInfo] = await userModel.lineMerchantCount();
-  }else { //售出点数 
+  }else { 
     [error, array] = await billModel.statistics(type);
     for(let i =0; i < array.length; i++){
         sumInfo += array[i].num;
@@ -191,7 +191,27 @@ const statisticsListByDay = async(event, context ,cb) => {
   let firstTime = Utils.setFirst(new Date(requestParams.date)).getTime();
   let endTime = Utils.setEnd(new Date(requestParams.date)).getTime();
   let billModel = new PlatformBillModel();
+  let userModel = new PlatformUserModel();
+
   let [error, list] = await billModel.statistics(5, firstTime, endTime);  
+  if(error){
+      return callback(null, Fail(error));
+  }
+  let uids = list.map((item) => item.userId);
+
+  let [err, userList] = await userModel.findByUids(uids);
+
+  list.forEach((item) => {
+      let user = userList.find((t) => Object.is(t.userId, item.userId));
+      Object.assign(item, {
+          displayId : user.displayId,
+          displayName : user.displayName,
+          rate : user.rate,
+          points : item.amount,
+          amount : points*(1-rate)*1
+      });
+  })
+  cb(null, Success({data:list}));
   
 }
 

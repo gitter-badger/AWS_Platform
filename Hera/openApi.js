@@ -122,7 +122,7 @@ export async function gamePlayerLogin(event, context, callback) {
   let [updateError] = await user.update({userName: userName},{ token: loginToken,updateAt:Date.now()});
   if(updateError) return callback(null, ReHandler.fail(updateError));
   callback(null, ReHandler.success({
-      data:{token : loginToken, msn:merchantInfo}
+      data:{token : loginToken, msn:merchantInfo.msn}
   }));
 }
 
@@ -191,7 +191,6 @@ export async function gamePlayerBalance(event, context, callback) {
     let [checkAttError, errorParams] = athena.Util.checkProperties([
         {name : "buId", type:"N"},
         {name : "amount", type:"N", min:0},
-        {name : "userName", type:"S", min:1},
         {name : "action", type:"N"},
     ], requestParams);
 

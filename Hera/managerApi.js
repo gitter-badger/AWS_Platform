@@ -39,11 +39,11 @@ export async function gamePlayerList(event, context, cb) {
     
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
-        return ResErr(cb, tokenErr)
+        return ResFail(cb, tokenErr)
     }
     const [e, tokenInfo] = await JwtVerify(token[1])
     if(e) {
-        return ResErr(cb, e)
+        return ResFail(cb, e)
     }
 
     let role = tokenInfo.role;

@@ -33,7 +33,7 @@ export const JwtVerify = async (data) => {
     const decoded = await jwtVerify(data,TOKEN_SECRET)
     return [0,decoded]
   } catch (e) {
-    return [BizErr.TokenErr(),0]
+    return [e,0]
   }
 }
 

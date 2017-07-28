@@ -23,7 +23,7 @@ export class UserBillModel extends athena.BaseModel {
         this.updateAt = Date.now();
         this.amount = +amount;
         if(this.action == Action.reflect) this.amount = -this.amount;
-        this.type = this.action == Action.recharge ? Type.recharge : Type.reflect
+        this.type = this.action == Action.recharge ? Type.recharge : Type.withdrawals
     }
 
     async getBalance(){
