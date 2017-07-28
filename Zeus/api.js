@@ -244,6 +244,13 @@ const managerList = async (e, c, cb) => {
   for (let user of ret) {
     let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
     user.balance = balance
+    // 查询已用商户已用数量
+    const [err, ret] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
+    if(ret && ret.Items){
+      user.merchantUsedCount = ret.Items.length
+    }else{
+      user.merchantUsedCount = 0
+    }
   }
   return ResOK(cb, { ...res, payload: ret })
 }
