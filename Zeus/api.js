@@ -20,6 +20,7 @@ import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
+import {pushUserInfo} from "./lib/TcpUtil"
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -100,7 +101,11 @@ const userNew = async (e, c, cb) => {
   if (registerUserErr) {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
-  return ResOK(cb, { ...res, payload: resgisterUserRet })
+  ResOK(cb, { ...res, payload: resgisterUserRet });
+  
+  //推送信息给A3服务器
+  pushUserInfo(resgisterUserRet);
+
 }
 
 /**
