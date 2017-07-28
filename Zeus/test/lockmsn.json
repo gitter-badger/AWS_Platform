@@ -9,10 +9,10 @@
   "requestContext": {
     "authorizer": {
       "username": "cheney",
-      "userId": "ed598eb7-d471-43ce-bcea-c89989227145",
+      "userId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783",
       "parent": "00",
       "role": "1",
-      "principalId": "ed598eb7-d471-43ce-bcea-c89989227145"
+      "principalId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783"
     },
     "identity": {
       "sourceIp": "127.0.0.1"

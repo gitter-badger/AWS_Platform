@@ -20,6 +20,7 @@ import _ from 'lodash'
  * 转账
  */
 export const BillTransfer = async (from, billInfo) => {
+  // 输入数据校验
   if (Empty(billInfo)) {
     return [BizErr.ParamMissErr(), 0]
   }
@@ -33,26 +34,27 @@ export const BillTransfer = async (from, billInfo) => {
   if (!Role || Role.points === undefined) {
     return [BizErr.ParamErr('role error'), 0]
   }
-  const UserProps = Pick({
+  const fromInparam = Pick({
     ...Role,
     ...from
   }, Keys(Role))
-  const initPoints = UserProps.points
-  const fromUser = UserProps.username
-  const fromRole = UserProps.role
-  if (!fromRole || !fromUser) {
+  if (!fromInparam.role || !fromInparam.username) {
     return [BizErr.ParamErr('Param error,invalid transfer. from** null')]
   }
-  if (fromUser == billInfo.toUser) {
+  if (fromInparam.username == billInfo.toUser) {
     return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
   }
+  // 数据类型处理
+  fromInparam.role = fromInparam.role.toString()
+  billInfo.toRole = billInfo.toRole.toString()
+  // 存储账单流水
   const Bill = {
     ...Model.baseModel(),
     ...Pick({
       ...BillModel(),
       ...billInfo,
-      fromUser: fromUser,
-      fromRole: fromRole,
+      fromUser: fromInparam.username,
+      fromRole: fromInparam.role,
       action: 0,
       operator: from.operatorToken.username
     }, Keys(BillModel()))
@@ -74,7 +76,7 @@ export const BillTransfer = async (from, billInfo) => {
           PutRequest: {
             Item: {
               ...Bill,
-              amount: Bill.amount,
+              amount: Bill.amount * (1.0),
               action: 1,
               userId: to.userId
             }

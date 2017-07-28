@@ -46,7 +46,7 @@ functions:
           path: beings
           method: post
           cors: true
-  adminList: # 管理员列表
+  adminList: #管理员列表
     handler: api.adminList
     events:
       -
@@ -55,7 +55,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  adminCenter: # 管理员个人中心
+  adminCenter: #管理员个人中心
     handler: api.adminCenter
     events:
       -
@@ -64,7 +64,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  adminNew:
+  adminNew: #创建管理员
     handler: api.adminNew
     events:
       -
@@ -73,7 +73,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  userNew:
+  userNew: #注册新用户
     handler: api.userNew
     events:
       -
@@ -82,7 +82,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  userAuth:
+  userAuth: #用户登录
     handler: api.userAuth
     events:
       -
@@ -90,7 +90,7 @@ functions:
           path: users/auth
           method: post
           cors: true
-  userGrabToken:
+  userGrabToken: #获取用户TOKEN
     handler: api.userGrabToken
     events:
       -
@@ -98,7 +98,7 @@ functions:
           path: users/token
           method: post
           cors: true
-  userChangeStatus:
+  userChangeStatus: #变更用户状态
     handler: api.userChangeStatus
     events:
       -
@@ -107,7 +107,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  managerList:
+  managerList: #线路商列表
     handler: api.managerList
     events:
       -
@@ -116,7 +116,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  managerOne:
+  managerOne: #获取线路商信息
     handler: api.managerOne
     events:
       -
@@ -125,7 +125,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  merchantOne:
+  merchantOne: #获取商户信息
     handler: api.merchantOne
     events:
       -
@@ -134,7 +134,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  managerUpdate:
+  managerUpdate: #更新线路商
     handler: api.managerUpdate
     events:
       -
@@ -143,7 +143,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  merchantList:
+  merchantList: #商户列表
     handler: api.merchantList
     events:
       -
@@ -152,7 +152,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  merchantUpdate:
+  merchantUpdate: #更新商户信息
     handler: api.merchantUpdate
     events:
       -
@@ -161,7 +161,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  randomPassword:
+  randomPassword: #随机密码
     handler: api.randomPassword
     events:
       -
@@ -169,7 +169,7 @@ functions:
           path: random_password
           method: post
           cors: true
-  avalibleManagers:
+  avalibleManagers: #可用线路商列表
     handler: api.avalibleManagers
     events:
       -
@@ -178,7 +178,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  checkMsn:
+  checkMsn: #校验MSN
     handler: api.checkMsn
     events:
       -

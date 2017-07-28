@@ -4,9 +4,8 @@ import {
     Codes,
     BizErr,
     RoleCodeEnum,
-    GameStatusEnum,
+    CompanyStatusEnum,
     RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
@@ -18,37 +17,33 @@ import {
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
-const tableName = "ZeusPlatformGame"
-export class GameModel extends BaseModel {
+export class CompanyModel extends BaseModel {
     constructor() {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.ZeusPlatformGame,
+            TableName: Tables.ZeusPlatformCompany,
         }
         // 设置对象属性
         this.item = {
             ...this.baseitem,
-            gameType: Model.StringValue,
-            gameId: Model.uuid()
+            companyName: Model.StringValue,
+            companyId: Model.uuid()
         }
     }
 
     /**
-     * 添加游戏
-     * @param {*} gameInfo 
+     * 添加厂商
+     * @param {*} companyInfo 
      */
-    async addGame(gameInfo) {
+    async addCompany(companyInfo) {
         // 数据类型处理
-        gameInfo['gameType'] = gameInfo['gameType'].toString()
-        gameInfo['gameStatus'] = GameStatusEnum.Online
+        companyInfo['companyStatus'] = CompanyStatusEnum.Enable
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
-            IndexName: 'GameNameIndex',
-            KeyConditionExpression: 'gameType = :gameType and gameName = :gameName',
+            KeyConditionExpression: 'companyName = :companyName',
             ExpressionAttributeValues: {
-                ':gameType': gameInfo.gameType,
-                ':gameName': gameInfo.gameName
+                ':companyName': companyInfo.companyName
             }
         })
         if (existErr) {
@@ -60,7 +55,7 @@ export class GameModel extends BaseModel {
         // 保存
         const [putErr, putRet] = await this.putItem({
             ...this.item,
-            ...gameInfo
+            ...companyInfo
         })
         if (putErr) {
             return [putErr, 0]
@@ -69,33 +64,11 @@ export class GameModel extends BaseModel {
     }
 
     /**
-     * 游戏列表
-     * @param {*} pathParams 
+     * 厂商列表
+     * @param {*} inparams
      */
-    async listGames(pathParams) {
-        if (Empty(pathParams)) {
-            return [BizErr.ParamMissErr(), 0]
-        }
-        const inputTypes = pathParams.gameType.split(',')
-        const gameTypes = _.filter(inputTypes, (type) => {
-            return !!GameTypeEnum[type]
-        })
-        if (gameTypes.length === 0) {
-            return [BizErr.ParamErr('game type is missing'), 0]
-        }
-        // 组装条件
-        const ranges = _.map(gameTypes, (t, index) => {
-            return `gameType = :t${index}`
-        }).join(' OR ')
-        const values = _.reduce(gameTypes, (result, t, index) => {
-            result[`:t${index}`] = t
-            return result
-        }, {})
-        console.info(values)
+    async listCompany(inparams) {
         const [err, ret] = await this.scan({
-            IndexName: 'GameTypeIndex',
-            FilterExpression: ranges,
-            ExpressionAttributeValues: values
         })
         if (err) {
             return [err, 0]
@@ -104,22 +77,22 @@ export class GameModel extends BaseModel {
     }
 
     /**
-     * 更新游戏状态
-     * @param {游戏类型} gameType 
-     * @param {游戏ID} gameId 
+     * 更新厂商状态
+     * @param {厂商名称} companyName 
+     * @param {厂商ID} companyId 
      * @param {需要变更的状态} status 
      */
-    changeStatus(gameType, gameId, status) {
+    changeStatus(companyName, companyId, status) {
         return new Promise((reslove, reject) => {
             const params = {
                 ...this.params,
                 Key: {
-                    'gameType': gameType,
-                    'gameId': gameId
+                    'companyName': companyName,
+                    'companyId': companyId
                 },
-                UpdateExpression: "SET gameStatus = :status",
+                UpdateExpression: "SET companyStatus = :status",
                 ExpressionAttributeValues: {
-                    ':status': parseInt(status)
+                    ':status': status
                 }
             }
             this.db$('update', params)
@@ -130,24 +103,25 @@ export class GameModel extends BaseModel {
                 })
         })
     }
+
     /**
-     * 查询单个游戏
-     * @param {*} gameType 
-     * @param {*} gameId 
+     * 查询单个厂商
+     * @param {*} companyName
+     * @param {*} companyId
      */
-    getOne(gameType, gameId) {
+    getOne(companyName, companyId) {
         return new Promise((reslove, reject) => {
             const params = {
                 ...this.params,
-                KeyConditionExpression: 'gameType = :gameType and gameId = :gameId',
+                KeyConditionExpression: 'companyName = :companyName and companyId = :companyId',
                 ExpressionAttributeValues: {
-                    ':gameType': gameType,
-                    ':gameId': gameId
+                    ':companyName': companyName,
+                    ':companyId': companyId
                 }
             }
             this.db$('query', params)
                 .then((res) => {
-                    if (res.Items.length > 0) {
+                    if(res.Items.length > 0){
                         res = res.Items[0]
                     }
                     return reslove([0, res])

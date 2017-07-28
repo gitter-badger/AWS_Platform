@@ -48,14 +48,34 @@ functions:
           path: games
           method: post
           cors: true
+          authorizer: tokenAuth
   gameList:
     handler: api.gameList
     events:
       -
         http:
-          path: games/{gameType}
+          path: gameList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  gameOne:
+    handler: api.gameOne
+    events:
+      -
+        http:
+          path: gameOne/{gameType}/{gameId}
           method: get
           cors: true
+          authorizer: tokenAuth
+  gameChangeStatus: 
+    handler: api.gameChangeStatus
+    events:
+      -
+        http:
+          path: gameChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
   billTransfer:
     handler: api.billTransfer
     events:
@@ -65,24 +85,6 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  # depositPoints:
-  #   handler: api.depositPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: deposit_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # withdrawPoints:
-  #   handler: api.withdrawPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: withdraw_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
   billOne:
     handler: api.billOne
     events:
@@ -107,6 +109,42 @@ functions:
       -
         http:
           path: logList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  companyNew:
+    handler: api.companyNew
+    events:
+      -
+        http:
+          path: companyNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  companyList:
+    handler: api.companyList
+    events:
+      -
+        http:
+          path: companyList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  companyOne:
+    handler: api.companyOne
+    events:
+      -
+        http:
+          path: companyOne/{companyName}/{companyId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  companyChangeStatus:
+    handler: api.companyChangeStatus
+    events:
+      -
+        http:
+          path: companyChangeStatus
           method: post
           cors: true
           authorizer: tokenAuth
@@ -137,35 +175,21 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-resources:
-  Resources:
-    ZeusPlatformHelp:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ZeusPlatformHelp
-        AttributeDefinitions:
-          -
-            AttributeName: sn
-            AttributeType: S
-          -
-            AttributeName: userId
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: sn
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          -
-            IndexName: userIdIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+  # depositPoints:
+  #   handler: api.depositPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: deposit_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # withdrawPoints:
+  #   handler: api.withdrawPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: withdraw_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth

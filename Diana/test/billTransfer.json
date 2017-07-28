@@ -14,6 +14,11 @@
             "sourceIp": "127.0.0.1"
         }
     },
-    "body": {"fromUserId":"d7e1cd3a-e648-4f3a-a6c6-13ce6180151b","toRole":"1","toUser":"AUE_NAc1112","amount":"1.00","remark":"1"}
-    
+    "body": {
+        "fromUserId": "d7e1cd3a-e648-4f3a-a6c6-13ce6180151b",
+        "toRole": "1",
+        "toUser": "AUE_NAc1112",
+        "amount": "1.00",
+        "remark": "1"
+    }
 }
