@@ -52,6 +52,7 @@ export class BaseModel {
                     ...item
                 }
             }
+            
             this.db$('put', params)
                 .then((res) => {
                     return reslove([false, res])

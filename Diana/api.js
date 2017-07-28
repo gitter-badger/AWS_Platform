@@ -5,6 +5,7 @@ import {
   JSONParser,
   Model,
   Tables,
+  GameTypeEnum,
   BillActionEnum,
   StatusEnum,
   GenderEnum,
@@ -38,12 +39,24 @@ const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
  * 创建游戏
  */
 const gameNew = async (e, c, cb) => {
+  // 入参转换
   const errRes = { m: 'gameNew err', input: e }
   const res = { m: 'gameNew' }
   const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
+
+  // 参数合法性校验
+  if (!GameTypeEnum[gameInfo.gameType]) {
+    return ResErr(cb, [BizErr.ParamErr('游戏类型不能为空'), 0])
+  }
+  if (!gameInfo.gameName) {
+    return ResErr(cb, [BizErr.ParamErr('游戏名称不能为空'), 0])
+  }
+  // if (!_.isNumber(kindId)) {
+  //     return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
+  // }
   const [addGameInfoErr, addGameRet] = await new GameModel().addGame(gameInfo)
   if (addGameInfoErr) {
     return ResFail(cb, { ...errRes, err: addGameInfoErr }, addGameInfoErr.code)
@@ -90,7 +103,7 @@ const gameOne = async (e, c, cb) => {
   if (paramsErr) {
     return ResErr(cb, jsonParseErr)
   }
-  let [err, ret] = await new GameModel().getOne(gameParams.gameType,gameParams.gameId)
+  let [err, ret] = await new GameModel().getOne(gameParams.gameType, gameParams.gameId)
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   }
@@ -324,7 +337,7 @@ const companyOne = async (e, c, cb) => {
   if (paramsErr) {
     return ResErr(cb, jsonParseErr)
   }
-  let [err, ret] = await new CompanyModel().getOne(companyParams.companyName,companyParams.companyId)
+  let [err, ret] = await new CompanyModel().getOne(companyParams.companyName, companyParams.companyId)
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   }

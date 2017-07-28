@@ -1,9 +1,11 @@
 {
   "body": {
-    "gameName": "英雄脸萌2",
+    "gameName": "英雄脸萌1",
     "gameRecommend": "我最猛",
-    "gameType": "2",
+    "gameType": "1",
     "gameImg": "http://placehold.it/250x250",
-    "gameStatus": "1"
+    "company": null,
+    "ip": "127.0.0.1",
+    "port": "8080"
   }
 }

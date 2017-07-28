@@ -39,30 +39,16 @@ export class GameModel extends BaseModel {
      * @param {*} gameInfo 
      */
     async addGame(gameInfo) {
-        const gameName = gameInfo.gameName
-        const gameType = gameInfo.gameType
-        const gameStatus = parseInt(gameInfo.gameStatus)
-        const kindId = parseInt(gameInfo.kindId)
-        // 参数合法性校验
-        if (!GameTypeEnum[gameType]) {
-            return [BizErr.ParamErr('Game type not exist'), 0]
-        }
-        if (Trim(gameName).length < 1) {
-            return [BizErr.ParamErr('Need a game name'), 0]
-        }
-        if (!_.isNumber(kindId)) {
-            return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
-        }
-        if (!_.isNumber(gameStatus) || (parseInt(gameStatus) < 0 || parseInt(gameStatus) > 4)) {
-            return [BizErr.ParamErr('gameStatus should provided 0/1/2/3/4')]
-        }
+        // 数据类型处理
+        gameInfo['gameType'] = gameInfo['gameType'].toString()
+        gameInfo['gameStatus'] = GameStatusEnum.Online
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             IndexName: 'GameNameIndex',
             KeyConditionExpression: 'gameType = :gameType and gameName = :gameName',
             ExpressionAttributeValues: {
-                ':gameName': gameName,
-                ':gameType': gameType
+                ':gameType': gameInfo.gameType,
+                ':gameName': gameInfo.gameName
             }
         })
         if (existErr) {
@@ -161,7 +147,7 @@ export class GameModel extends BaseModel {
             }
             this.db$('query', params)
                 .then((res) => {
-                    if(res.Items.length > 0){
+                    if (res.Items.length > 0) {
                         res = res.Items[0]
                     }
                     return reslove([0, res])
