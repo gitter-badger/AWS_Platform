@@ -47,6 +47,12 @@ const gameNew = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
 
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+
   // 参数合法性校验
   if (!GameTypeEnum[gameInfo.gameType]) {
     return ResErr(cb, [BizErr.ParamErr('游戏类型不能为空'), 0])
@@ -289,7 +295,6 @@ const companyNew = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-
   // 获取令牌，只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {

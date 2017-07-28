@@ -28,8 +28,7 @@ export class CompanyModel extends BaseModel {
         this.item = {
             ...this.baseitem,
             companyName: Model.StringValue,
-            companyId: Model.uuid(),
-            companyStatus: CompanyStatusEnum.Enable
+            companyId: Model.uuid()
         }
     }
 
@@ -38,6 +37,8 @@ export class CompanyModel extends BaseModel {
      * @param {*} companyInfo 
      */
     async addCompany(companyInfo) {
+        // 数据类型处理
+        companyInfo['companyStatus'] = CompanyStatusEnum.Enable
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'companyName = :companyName',
