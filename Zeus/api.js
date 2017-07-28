@@ -246,8 +246,8 @@ const managerList = async (e, c, cb) => {
     user.balance = balance
     // 查询已用商户已用数量
     const [err, ret] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
-    if(ret && ret.Items){
-      user.merchantUsedCount = ret.Items.length
+    if(ret && ret.length > 0){
+      user.merchantUsedCount = ret.length
     }else{
       user.merchantUsedCount = 0
     }
