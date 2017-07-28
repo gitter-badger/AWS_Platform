@@ -152,6 +152,15 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
+  childList: #下级列表
+    handler: api.childList
+    events:
+      -
+        http:
+          path: childList
+          method: get/{userId}/{childRole}
+          cors: true
+          authorizer: tokenAuth
   merchantUpdate: #更新商户信息
     handler: api.merchantUpdate
     events:

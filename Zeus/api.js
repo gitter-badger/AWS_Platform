@@ -90,6 +90,10 @@ const userNew = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
+  //创建用户账号的只能是管理员或线路商
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Manager']) {
+    return [BizErr.TokenErr('must admin/manager token'), 0]
+  }
   // 业务操作
   const [registerUserErr, resgisterUserRet] = await RegisterUser(token, Model.addSourceIP(e, userInfo))
   // 操作日志记录
@@ -314,7 +318,6 @@ const merchantOne = async (e, c, cb) => {
   const errRes = { m: 'merchantOne err', input: e }
   const res = { m: 'merchantOne' }
   const [paramsErr, params] = Model.pathParams(e)
-
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
@@ -344,6 +347,36 @@ const merchantList = async (e, c, cb) => {
   }
   // 业务操作
   const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Merchant)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  // 查询每个用户余额
+  for (let user of ret) {
+      let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
+      user.balance = balance
+  }
+  return ResOK(cb, { ...res, payload: ret })
+}
+
+/**
+ * 获取下级用户列表
+ */
+const childList = async (e, c, cb) => {
+  // 入参校验
+  const errRes = { m: 'childList err', input: e }
+  const res = { m: 'childList' }
+  const [paramsErr, params] = Model.pathParams(e)
+  if (paramsErr || !params.role || !params.userId) {
+    return ResErr(cb, paramsErr)
+  }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  const [err, ret] = await new UserModel().listChildUsers(params, params.childRole)
   // 结果返回
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)

@@ -65,10 +65,6 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
  * @param {*} userInfo 输入用户信息
  */
 export const RegisterUser = async (token = {}, userInfo = {}) => {
-  //创建管理员账号的只能是管理员
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
-  }
   if (userInfo.points < 0) {
     return [BizErr.ParamErr('points cant less then 0 for new user'), 0]
   }
