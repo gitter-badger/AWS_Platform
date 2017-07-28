@@ -175,9 +175,31 @@ const statisticsDetail = async (event, context, cb) => {
   cb(null, Success({data:returnObj}));
 }
 
+/**
+ * 获取某一天的记录
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+const statisticsListByDay = async(event, context ,cb) => {
+
+  //json转换
+  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters);
+  if(parserErr){
+       return callback(null, Fail(parserErr));
+  }
+  let firstTime = Utils.setFirst(new Date(requestParams.date)).getTime();
+  let endTime = Utils.setEnd(new Date(requestParams.date)).getTime();
+  let billModel = new PlatformBillModel();
+  let [error, list] = await billModel.statistics(5, firstTime, endTime);  
+  
+}
+
 
 
 export{
     overview, //总统计
     salePointsInfo, //本周，本月销售统计
+    statisticsDetail, //详情
+    statisticsListByDay,   //list
 }

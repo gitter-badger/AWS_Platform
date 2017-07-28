@@ -1,4 +1,4 @@
-# Serverless ES7 async/await
+# 玩家注册
 
 A Serverless service that adds ES7 async/await support. Part of the [Serverless Stack](http://serverless-stack.com) guide.
 

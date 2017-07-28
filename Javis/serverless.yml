@@ -43,20 +43,28 @@ functions:
           path: /statistics/overview
           method: get
           cors: true
-  agentCount: #总统计，包含9个小接口
-    handler: api_sta.sumStatistics
-    events:
-      -
-        http:
-          path: /statistics
-          method: get
-          cors: true
-  salePointsInfo: 
+  salePointsInfo:  //本周本月统计
     handler: api_sta.salePointsInfo
     events:
       -
         http:
           path: /statistics/month/week
+          method: get
+          cors: true
+  statisticsDetail:  //详情
+    handler: api_sta.statisticsDetail
+    events:
+      -
+        http:
+          path: /statistics/detail
+          method: get
+          cors: true
+  statisticsList:  //某一天的记录数据
+    handler: api_sta.list
+    events:
+      -
+        http:
+          path: /statistics/day/list
           method: get
           cors: true
 resources:

@@ -21,7 +21,7 @@ export class PlatformBillModel extends athena.BaseModel {
      */
     async statistics(type, beginTime, endTime){
         // 售出， 成交量，累计收益
-        let methods = [null,null, sale, volume, profit]
+        let methods = [null,null, sale, volume, profit, list]
         let opts = {
             FilterExpression : "(formRole=:role or formRole=:role2) and toRole=:toRole and #action = :action ",
             ExpressionAttributeNames : {
@@ -51,29 +51,6 @@ export class PlatformBillModel extends athena.BaseModel {
                     return a.createdAt > b.createdAt
                 })
                 return reslove( methods[type](records));
-                let array = [];
-                let flag = splitTimes && splitTimes.length>0
-                if(flag) {
-                    let splitSum = 0;
-                    let split = [];
-                    for(let i = 0; i < splitTimes.length; i++){
-                        let time = splitTimes[i];
-                        for(let j = 0; j < records.length; j ++){
-                            let createdAt = records[j].createdAt;
-                            if(createdAt > time){
-                                array.push(split);
-                                split = [];
-                                records = records.slice(j, records.length);
-                                break;
-                            }else{
-                                split.push(records[j]);
-                            }
-                        }
-                    }
-                }else{
-                    array = records;
-                }
-                return reslove([null, obj]);
             }).catch((err) => {
                 return reslove([err, []]);
             })
@@ -89,38 +66,20 @@ function sale(array){
         array[i].num = amount;
     }
     return [null, array];
-    return;
-    let returnValues = [];
-    if(flag){
-        for(let i = 0; i < array.length; i++){
-            let timeSplitRecord = array[i];
-            let sum = 0;
-            for(let j = 0; j < timeSplitRecord.length; j++){
-                sum += timeSplitRecord[j].amount;
-            }   
-            returnValues.push(sum);
-        }
-    }else{
-        let sum = 0;
-        for(let i = 0; i < array.length; i++){
-            sum += array[i].amount
-        }
-        returnValues.push(sum);
-    }
-    
-    return returnValues;
 }
 
 /**
  * 成交量
  */
-function volume(array, flag){
+function volume(array){
     for(let i =0; i < array.length; i++){
         array[i].num = 1;
     }
     return [null, array];
 }
-
+function list(array){
+    return array;
+}
 /**
  * 累计收益
  * @param {*} array 
@@ -147,27 +106,4 @@ async function profit(array){
         item.num = money;
     }
     return [null, array]
-    return;
-
-    if(splitTimes && splitTimes.length > 0){
-        for(let i =0; i < array.length; i++){
-            let ele = array[i];
-            let sumMoney = 0;
-            for(let j = 0; j < ele.length; j++){
-                let item = ele[j];
-                let money = item.amount*(1-(+item.rat || 0));  //现金=点数*(1-成数)*点数单价
-                sumMoney += money;
-            }
-            returnValues.push(sumMoney);
-        }
-    }else {
-        let sumMoney = 0;
-        for(let i =0; i < array.length; i++){
-            let item = array[i];
-            let money = item.amount*(1-(+item.rat || 0));  //现金=点数*(1-成数)*点数单价
-            sumMoney += money;
-        }
-        returnValues = [sumMoney]
-    }
-    return [null, returnValues];
 }
