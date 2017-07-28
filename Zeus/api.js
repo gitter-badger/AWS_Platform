@@ -71,14 +71,15 @@ const adminNew = async (e, c, cb) => {
   }
 
   const [registAdminErr, adminUser] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
-  if (registAdminErr) {
-    return ResErr(cb, registAdminErr)
-  }
+
   // 操作日志记录
-  userInfo.action = '创建管理员帐号'
+  userInfo.operateAction = '创建管理员帐号'
   userInfo.operateToken = token
   new LogModel().addOperate(Model.addSourceIP(e, userInfo), registAdminErr, adminUser)
 
+  if (registAdminErr) {
+    return ResErr(cb, registAdminErr)
+  }
   return ResOK(cb, { payload: adminUser })
 }
 /**
@@ -97,10 +98,15 @@ const userNew = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   const [registerUserErr, resgisterUserRet] = await RegisterUser(token, Model.addSourceIP(e, userInfo))
+
+  // 操作日志记录
+  userInfo.operateAction = '创建用户'
+  userInfo.operateToken = token
+  new LogModel().addOperate(Model.addSourceIP(e, userInfo), registerUserErr, resgisterUserRet)
+
   if (registerUserErr) {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
-
   return ResOK(cb, { ...res, payload: resgisterUserRet })
 }
 
@@ -117,7 +123,8 @@ const userAuth = async (e, c, cb) => {
   }
   // 用户登录
   const [loginUserErr, loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
-  // 日志记录
+
+  // 登录日志
   new LogModel().addLogin(Model.addSourceIP(e, userLoginInfo), loginUserErr, Model.addSourceIP(e, loginUserRet))
 
   if (loginUserErr) {
@@ -171,6 +178,12 @@ const userChangeStatus = async (e, c, cb) => {
   }
   // 更新用户状态
   const [err, ret] = await new UserModel().changeStatus(inparam.role, inparam.userId, inparam.status)
+
+  // 操作日志记录
+  inparam.operateAction = '变更用户状态'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
+
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {
@@ -246,7 +259,7 @@ const managerOne = async (e, c, cb) => {
   return ResOK(cb, { ...res, payload: manager })
 }
 /**
- * 更新管理员信息
+ * 更新线路商信息
  */
 const managerUpdate = async (e, c, cb) => {
   const errRes = { m: 'managerUpdate err', input: e }
@@ -272,6 +285,12 @@ const managerUpdate = async (e, c, cb) => {
     ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
   const [updateErr, updateRet] = await UserUpdate(Manager)
+
+  // 操作日志记录
+  params.operateAction = '更新线路商信息'
+  params.operateToken = token
+  new LogModel().addOperate(params, updateErr, updateRet)
+
   if (updateErr) {
     return ResFail(cb, { ...errRes, err: updateErr }, updateErr.code)
   }
@@ -345,7 +364,14 @@ const merchantUpdate = async (e, c, cb) => {
   const Merchant = {
     ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
+  // 业务操作
   const [updateErr, updateRet] = await UserUpdate(Merchant)
+
+  // 操作日志记录
+  params.operateAction = '更新商户信息'
+  params.operateToken = token
+  new LogModel().addOperate(params, updateErr, updateRet)
+
   if (updateErr) {
     return ResFail(cb, { ...errRes, err: updateErr }, updateErr.code)
   }
@@ -496,6 +522,12 @@ const lockmsn = async (e, c, cb) => {
     if (queryRet.Items.length == 0) {
       const msn = { msn: params.msn, userId: '0', status: MSNStatusEnum.Locked }
       const [err, ret] = await new MsnModel().putItem(msn)
+
+      // 操作日志记录
+      params.operateAction = '锁定线路号'
+      params.operateToken = token
+      new LogModel().addOperate(params, err, ret)
+
       if (err) {
         return ResFail(cb, { ...errRes, err: err }, err.code)
       } else {
@@ -515,6 +547,12 @@ const lockmsn = async (e, c, cb) => {
           userId: '0'
         }
       })
+
+      // 操作日志记录
+      params.operateAction = '解锁线路号'
+      params.operateToken = token
+      new LogModel().addOperate(params, err, ret)
+
       if (err) {
         return ResFail(cb, { ...errRes, err: err }, err.code)
       } else {
