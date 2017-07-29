@@ -19,11 +19,9 @@ import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
-<<<<<<< HEAD
 import {pushUserInfo} from "./lib/TcpUtil"
-=======
 import { BillModel } from './model/BillModel'
->>>>>>> larry
+
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
