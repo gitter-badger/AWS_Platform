@@ -19,11 +19,8 @@ import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
-<<<<<<< HEAD
 import {pushUserInfo} from "./lib/TcpUtil"
-=======
 import { BillModel } from './model/BillModel'
->>>>>>> larry
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -109,9 +106,17 @@ const userNew = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
   ResOK(cb, { ...res, payload: resgisterUserRet });
-  
+  let pushInfo = {
+    username : resgisterUserRet.username,
+    role : resgisterUserRet.role,
+    userId : resgisterUserRet.userId,
+    displayName : resgisterUserRet.displayName,
+    headUrl : "00",
+    parent : resgisterUserRet.parent
+
+  }
   //推送信息给A3服务器
-  pushUserInfo(resgisterUserRet);
+  pushUserInfo(pushInfo);
 
 }
 

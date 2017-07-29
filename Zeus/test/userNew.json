@@ -4,10 +4,10 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_cheney",
+      "username": "Platform_NAtest003",
       "parent": "00",
       "role": "1",
-      "userId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783",
+      "userId": "69777f73-2581-4311-8618-df774e6c619d",
       "principalId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783"
     },
     "identity": {
@@ -15,7 +15,7 @@
     }
   },
   "body": {
-      "username": "cmerchant1",
+      "username": "cmerchant12",
       "password": "123456",
       "role": "100",
       "adminName": "cheneymerchant1",
