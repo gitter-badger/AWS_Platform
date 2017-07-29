@@ -265,19 +265,8 @@ const logList = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [err, ret] = await new LogModel().query({
-    IndexName: 'LogRoleIndex',
-    Limit: inparam.pageSize,
-    ExclusiveStartKey: inparam.startKey,
-    ScanIndexForward: false,
-    KeyConditionExpression: "#role = :role",
-    ExpressionAttributeNames: {
-      '#role': 'role'
-    },
-    ExpressionAttributeValues: {
-      ':role': inparam.role + ''
-    }
-  })
+  let [err, ret] = await new LogModel().page(inparam)
+  // 结果返回
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {
