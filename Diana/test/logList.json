@@ -15,7 +15,7 @@
     }
   },
   "body": {
-    "role": "1",
+    "role": "10",
     "pageSize": 20,
     "startKey": null,
     "type": "login"

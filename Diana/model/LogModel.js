@@ -34,39 +34,55 @@ export class LogModel extends BaseModel {
      * 分页查询日志
      * @param {*} inparam 
      */
-    async page(inparam) {
-        let log = { Items: [], LastEvaluatedKey: {} }
-        let [err, ret] = [0, 0]
-        while (log.Items.length < inparam.pageSize && log.LastEvaluatedKey) {
-            [err, ret] = await this.query({
-                IndexName: 'LogRoleIndex',
-                Limit: inparam.pageSize,
-                ExclusiveStartKey: inparam.startKey,
-                ScanIndexForward: false,
-                KeyConditionExpression: "#role = :role",
-                FilterExpression: "#type = :type",
-                ExpressionAttributeNames: {
-                    '#role': 'role',
-                    '#type': 'type'
-                },
-                ExpressionAttributeValues: {
-                    ':role': inparam.role.toString(),
-                    ':type': inparam.type
-                }
-            })
-            if (err) {
-                return [err, 0]
+    async logPage(inparam) {
+        return await this.page({
+            IndexName: 'LogRoleIndex',
+            Limit: inparam.pageSize,
+            ExclusiveStartKey: inparam.startKey,
+            ScanIndexForward: false,
+            KeyConditionExpression: "#role = :role",
+            FilterExpression: "#type = :type",
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#type': 'type'
+            },
+            ExpressionAttributeValues: {
+                ':role': inparam.role.toString(),
+                ':type': inparam.type
             }
-            // 追加数据
-            if (log.Items.length > 0) {
-                log.Items.push(...ret.Items)
-                log.LastEvaluatedKey = ret.LastEvaluatedKey
-            } else {
-                log = ret
-            }
-            inparam.startKey = ret.LastEvaluatedKey
-        }
-        return [err, ret]
+        }, inparam)
+        // let log = { Items: [], LastEvaluatedKey: {} }
+        // let [err, ret] = [0, 0]
+        // while (log.Items.length < inparam.pageSize && log.LastEvaluatedKey) {
+        // [err, ret] = await this.query({
+        //     IndexName: 'LogRoleIndex',
+        //     Limit: inparam.pageSize,
+        //     ExclusiveStartKey: inparam.startKey,
+        //     ScanIndexForward: false,
+        //     KeyConditionExpression: "#role = :role",
+        //     FilterExpression: "#type = :type",
+        //     ExpressionAttributeNames: {
+        //         '#role': 'role',
+        //         '#type': 'type'
+        //     },
+        //     ExpressionAttributeValues: {
+        //         ':role': inparam.role.toString(),
+        //         ':type': inparam.type
+        //     }
+        // })
+        //     if (err) {
+        //         return [err, 0]
+        //     }
+        //     // 追加数据
+        //     if (log.Items.length > 0) {
+        //         log.Items.push(...ret.Items)
+        //         log.LastEvaluatedKey = ret.LastEvaluatedKey
+        //     } else {
+        //         log = ret
+        //     }
+        //     inparam.startKey = ret.LastEvaluatedKey
+        // }
+        // return [err, ret]
     }
 
     /**

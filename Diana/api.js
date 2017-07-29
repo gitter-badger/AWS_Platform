@@ -265,7 +265,7 @@ const logList = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  let [err, ret] = await new LogModel().page(inparam)
+  let [err, ret] = await new LogModel().logPage(inparam)
   // 结果返回
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
