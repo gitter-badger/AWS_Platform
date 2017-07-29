@@ -13,11 +13,5 @@
     "identity": {
       "sourceIp": "127.0.0.1"
     }
-  },
-  "body": {
-    "role": "10",
-    "pageSize": 20,
-    "startKey": null,
-    "type": "login"
   }
 }

@@ -7,39 +7,12 @@
       "username": "Platform_cheney",
       "parent": "00",
       "role": "1",
-      "userId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783",
-      "principalId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783"
+      "userId": "eb827426-695c-4df1-8205-ba2e14153b49",
+      "principalId": "eb827426-695c-4df1-8205-ba2e14153b49"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
-  "body": {
-    "role": "100",
-    "displayName": "print110",
-    "rate": "1",
-    "managerEmail": "",
-    "hostName": "print110",
-    "hostContact": "print110",
-    "remark": "print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110print110",
-    "contractPeriod": [
-      "2017-07-10T16:00:00.000Z",
-      "2017-08-20T16:00:00.000Z"
-    ],
-    "isforever": false,
-    "points": "1",
-    "msn": 727,
-    "gameList": [
-      "英雄脸萌"
-    ],
-    "loginWhiteList": "print110",
-    "frontURL": "print110",
-    "username": "print110",
-    "password": "letojayepu",
-    "adminName": "print110",
-    "adminEmail": "print110@123.com",
-    "adminContact": "print110",
-    "suffix": "print110",
-    "merchantEmail": "print110@123.com"
-  }
+  "body": {"role":"10","suffix":"NB","displayName":"test001","rate":"10","managerEmail":"1@q.com","remark":"nnnnn","hostName":"nnnn","hostContact":"nn","contractPeriod":["2017-07-26T16:00:00.000Z","2017-08-29T16:00:00.000Z"],"isforever":false,"points":"100000","limit":"5","gameList":[{"gameName":"SaraGame2","port":"8080","gameStatus":1,"company":null,"updatedAt":1501228663716,"gameImg":"http://placehold.it/250x250","ip":"127.0.0.1","createdAt":1501228663716,"gameType":"2","gameId":"e9437b61-d178-4917-bf15-73a3cc671f55","gameRecommend":"SamSara1"},{"gameName":"SaraGame","port":"8080","gameStatus":1,"company":null,"updatedAt":1501228629387,"gameImg":"http://placehold.it/250x250","ip":"127.0.0.1","createdAt":1501228629387,"gameType":"1","gameId":"c1e5ee76-ead4-4d3b-8843-2f713725502f","gameRecommend":"SamSara"},{"gameName":"SaraGame1","port":"8080","gameStatus":1,"company":null,"updatedAt":1501228648638,"gameImg":"http://placehold.it/250x250","ip":"127.0.0.1","createdAt":1501228648638,"gameType":"0","gameId":"01adc24c-8cd2-4b9b-bf49-43f0d67af5de","gameRecommend":"SamSara1"}],"username":"NBtest0001","password":"3N_cSrD","adminName":"1","adminEmail":"1@q.com","adminContact":"1"}
 }

@@ -3,17 +3,16 @@ import {
     Store$,
     Codes,
     BizErr,
-    RoleCodeEnum,
-    GameStatusEnum,
-    RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
-    BillActionEnum,
     Keys,
     Pick,
-    Omit
+    Omit,
+    RoleCodeEnum,
+    GameTypeEnum,
+    GameStatusEnum,
+    RoleModels
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
@@ -40,8 +39,13 @@ export class GameModel extends BaseModel {
      */
     async addGame(gameInfo) {
         // 数据类型处理
-        gameInfo['gameType'] = gameInfo['gameType'].toString()
-        gameInfo['gameStatus'] = GameStatusEnum.Online
+        gameInfo.gameType = gameInfo.gameType.toString()
+        gameInfo.gameStatus = GameStatusEnum.Online;
+        gameInfo.gameRecommend = gameInfo.gameRecommend || Model.StringValue
+        gameInfo.gameImg = gameInfo.gameImg || Model.StringValue
+        gameInfo.company = gameInfo.company || Model.StringValue
+        gameInfo.ip = gameInfo.ip || Model.StringValue
+        gameInfo.port = gameInfo.port || Model.StringValue
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             IndexName: 'GameNameIndex',
@@ -84,14 +88,15 @@ export class GameModel extends BaseModel {
             return [BizErr.ParamErr('game type is missing'), 0]
         }
         // 组装条件
-        const ranges = _.map(gameTypes, (t, index) => {
+        let ranges = _.map(gameTypes, (t, index) => {
             return `gameType = :t${index}`
         }).join(' OR ')
+        ranges += ' AND gameStatus <> :gameStatus'
         const values = _.reduce(gameTypes, (result, t, index) => {
             result[`:t${index}`] = t
             return result
         }, {})
-        console.info(values)
+        values[':gameStatus'] = 0
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,

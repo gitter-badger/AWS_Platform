@@ -13,10 +13,10 @@ import {
   RoleDisplay,
   MSNStatusEnum
 } from '../lib/all'
-import { BillTransfer, CheckBalance } from './bill'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
+import { BillModel } from '../model/BillModel'
 
 /**
  * 接口编号：0
@@ -65,10 +65,6 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
  * @param {*} userInfo 输入用户信息
  */
 export const RegisterUser = async (token = {}, userInfo = {}) => {
-  //创建管理员账号的只能是管理员
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
-  }
   if (userInfo.points < 0) {
     return [BizErr.ParamErr('points cant less then 0 for new user'), 0]
   }
@@ -127,12 +123,12 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  const [queryBalanceErr, balance] = await CheckBalance(token, parentUser)
+  const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
   parentUser.operatorToken = token
-  const [depositErr, depositRet] = await BillTransfer(parentUser, {
+  const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
     amount: Math.min(depositPoints, balance), // 有多少扣多少

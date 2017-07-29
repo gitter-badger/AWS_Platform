@@ -152,6 +152,15 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
+  childList: #下级列表
+    handler: api.childList
+    events:
+      -
+        http:
+          path: childList/{userId}/{childRole}
+          method: get
+          cors: true
+          authorizer: tokenAuth
   merchantUpdate: #更新商户信息
     handler: api.merchantUpdate
     events:
@@ -169,6 +178,15 @@ functions:
           path: random_password
           method: post
           cors: true
+  updatePassword: #重置密码
+    handler: api.updatePassword
+    events:
+      -
+        http:
+          path: updatePassword
+          method: post
+          cors: true
+          authorizer: tokenAuth
   avalibleManagers: #可用线路商列表
     handler: api.avalibleManagers
     events:

@@ -3,16 +3,15 @@ import {
     Store$,
     Codes,
     BizErr,
-    RoleCodeEnum,
-    CompanyStatusEnum,
-    RoleModels,
     Trim,
     Empty,
     Model,
-    BillActionEnum,
     Keys,
     Pick,
-    Omit
+    Omit,
+    RoleCodeEnum,
+    RoleModels,
+    CompanyStatusEnum
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
@@ -38,7 +37,12 @@ export class CompanyModel extends BaseModel {
      */
     async addCompany(companyInfo) {
         // 数据类型处理
-        companyInfo['companyStatus'] = CompanyStatusEnum.Enable
+        companyInfo.companyStatus = CompanyStatusEnum.Enable
+        companyInfo.companyDesc = companyInfo.companyDesc || Model.StringValue
+        companyInfo.companyContract = companyInfo.companyContract || Model.StringValue
+        companyInfo.companyEmail = companyInfo.companyEmail || Model.StringValue
+        companyInfo.license = companyInfo.license || Model.StringValue
+        companyInfo.remark = companyInfo.remark || Model.StringValue
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'companyName = :companyName',
@@ -50,7 +54,7 @@ export class CompanyModel extends BaseModel {
             return [existErr, 0]
         }
         if (exist) {
-            return [BizErr.ItemExistErr(), 0]
+            return [BizErr.ItemExistErr('运营商已存在'), 0]
         }
         // 保存
         const [putErr, putRet] = await this.putItem({

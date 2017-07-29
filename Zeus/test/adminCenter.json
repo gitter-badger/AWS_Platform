@@ -13,12 +13,5 @@
         "identity": {
             "sourceIp": "127.0.0.1"
         }
-    },
-    "body": {
-        "fromUserId": "438a0d8c-e55e-4df9-ba83-3e2372037985",
-        "toRole": "100",
-        "toUser": "NNNA_test0001",
-        "amount": "500.00",
-        "remark": ""
     }
 }

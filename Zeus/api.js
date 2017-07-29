@@ -4,23 +4,26 @@ import {
   Codes,
   JSONParser,
   Model,
-  StatusEnum,
-  MSNStatusEnum,
-  RoleCodeEnum,
-  RoleEditProps,
   Trim,
   Pick,
   JwtVerify,
   GeneratePolicyDocument,
-  BizErr
+  BizErr,
+  StatusEnum,
+  MSNStatusEnum,
+  RoleCodeEnum,
+  RoleEditProps
 } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
-import { CheckUserBalance } from './biz/bill'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
+<<<<<<< HEAD
 import {pushUserInfo} from "./lib/TcpUtil"
+=======
+import { BillModel } from './model/BillModel'
+>>>>>>> larry
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -90,6 +93,10 @@ const userNew = async (e, c, cb) => {
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
+  }
+  //创建用户账号的只能是管理员或线路商
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Manager']) {
+    return [BizErr.TokenErr('must admin/manager token'), 0]
   }
   // 业务操作
   const [registerUserErr, resgisterUserRet] = await RegisterUser(token, Model.addSourceIP(e, userInfo))
@@ -171,7 +178,7 @@ const userChangeStatus = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 只有管理员有权限
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+  if (token.role != RoleCodeEnum['PlatformAdmin']) {
     return [BizErr.TokenErr('must admin token'), 0]
   }
   // 更新用户状态
@@ -243,8 +250,15 @@ const managerList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-      let [balanceErr, balance] = await CheckUserBalance(user)
-      user.balance = balance
+    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
+    user.balance = balance
+    // 查询已用商户已用数量
+    const [err, ret] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
+    if(ret && ret.length > 0){
+      user.merchantUsedCount = ret.length
+    }else{
+      user.merchantUsedCount = 0
+    }
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -319,7 +333,6 @@ const merchantOne = async (e, c, cb) => {
   const errRes = { m: 'merchantOne err', input: e }
   const res = { m: 'merchantOne' }
   const [paramsErr, params] = Model.pathParams(e)
-
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
@@ -355,8 +368,45 @@ const merchantList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-      let [balanceErr, balance] = await CheckUserBalance(user)
-      user.balance = balance
+    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
+    user.balance = balance
+  }
+  return ResOK(cb, { ...res, payload: ret })
+}
+
+/**
+ * 获取下级用户列表
+ */
+const childList = async (e, c, cb) => {
+  // 入参校验
+  const errRes = { m: 'childList err', input: e }
+  const res = { m: 'childList' }
+  const [paramsErr, params] = Model.pathParams(e)
+  if (paramsErr) {
+    return ResErr(cb, paramsErr)
+  }
+  if (paramsErr || !params.childRole || !params.userId) {
+    return ResErr(cb, BizErr.InparamErr())
+  }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 只能查看自己下级
+  if (parseInt(token.role) >= parseInt(params.childRole)) {
+    return ResErr(cb, BizErr.InparamErr('no right'))
+  }
+  // 业务操作
+  const [err, ret] = await new UserModel().listChildUsers(params, params.childRole)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  }
+  // 查询每个用户余额
+  for (let user of ret) {
+    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
+    user.balance = balance
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -398,6 +448,51 @@ const merchantUpdate = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: updateErr }, updateErr.code)
   }
   return ResOK(cb, { ...res, payload: updateRet })
+}
+
+/**
+ * 更新密码
+ */
+const updatePassword = async (e, c, cb) => {
+  const errRes = { m: 'updatePassword error'/*, input: e*/ }
+  const res = { m: 'updatePassword' }
+  // 入参转换和校验
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  if (!inparam.userId || !inparam.password) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 只有管理员有权限
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && (token.userId != inparam.userId)) {
+    return [BizErr.TokenErr('no right!'), 0]
+  }
+  // 查询用户
+  const [queryErr, user] = await new UserModel().queryUserById(inparam.userId)
+  if (queryErr) {
+    return ResFail(cb, { ...errRes, err: queryErr }, err.code)
+  }
+  // 更新用户密码
+  user.password = inparam.password
+  user.passhash = Model.hashGen(user.password)
+  console.info(user)
+  const [err, ret] = await new UserModel().userUpdate(user)
+  // 操作日志记录
+  inparam.operateAction = '修改密码'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
 }
 
 /**
@@ -475,7 +570,7 @@ const checkMsn = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: checkErr }, checkErr.code)
   }
   // 结果返回
-  return ResOK(cb, {...res,payload: {avalible: Boolean(checkRet)}})
+  return ResOK(cb, { ...res, payload: { avalible: Boolean(checkRet) } })
 }
 /**
  * 随机线路号
@@ -525,7 +620,7 @@ const lockmsn = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 只有管理员有权限
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
+  if (token.role != RoleCodeEnum['PlatformAdmin']) {
     return [BizErr.TokenErr('must admin token'), 0]
   }
   // 查询msn
@@ -622,7 +717,7 @@ const jwtverify = async (e, c, cb) => {
     return c.fail('Unauthorized: wrong token type')
   }
   // verify it and return the policy statements
-  const [err,userInfo] = await JwtVerify(token[1])
+  const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
@@ -653,6 +748,7 @@ export {
   userNew,                      // 创建新用户
   userGrabToken,                // 使用apiKey登录获取用户信息
   userChangeStatus,             // 变更用户状态
+  childList,                    // 下级用户列表
 
   managerList,                  // 建站商列表
   managerOne,                   // 建站商详情
@@ -669,5 +765,6 @@ export {
   msnRandom,                    // 随机线路号
   captcha,                      // 获取验证码
 
+  updatePassword,               // 更新密码
   randomPassword                // 随机密码
 }

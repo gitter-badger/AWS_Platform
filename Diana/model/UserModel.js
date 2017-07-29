@@ -3,18 +3,15 @@ import {
     Store$,
     Codes,
     BizErr,
-    StatusEnum,
-    RoleCodeEnum,
-    MSNStatusEnum,
-    RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
-    BillActionEnum,
     Keys,
     Pick,
-    Omit
+    Omit,
+    StatusEnum,
+    RoleCodeEnum,
+    RoleModels
 } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
@@ -113,6 +110,34 @@ export class UserModel extends BaseModel {
             return [BizErr.UserNotFoundErr(), 0]
         }
         return [0, ret.Items[0]]
+    }
+
+    /**
+     * 根据角色和带前缀的用户名查询唯一用户
+     * @param {*} role 
+     * @param {*} username 
+     */
+    async getUserByName(role, username) {
+        const [queryErr, queryRet] = await this.query({
+            IndexName: 'RoleUsernameIndex',
+            KeyConditionExpression: '#role = :role and #username = :username',
+            ExpressionAttributeNames: {
+                '#username': 'username',
+                '#role': 'role'
+            },
+            ExpressionAttributeValues: {
+                ':username': username,
+                ':role': role
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const User = queryRet.Items[0]
+        if (!User) {
+            return [BizErr.UserNotFoundErr(), 0]
+        }
+        return [0, User]
     }
 
     // const params = {
