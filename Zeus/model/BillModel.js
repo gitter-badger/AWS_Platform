@@ -55,11 +55,12 @@ export class BillModel extends BaseModel {
         const sums = _.reduce(bills.Items, (sum, bill) => {
             return sum + parseFloat(bill.amount)
         }, 0.0)
-        const lastBill = bills.Items[bills.Items.length -1]
+        let lastBill = bills.Items[bills.Items.length - 1]
+        lastBill = lastBill || {}
         lastBill.lastBalance = baseBalance + sums
         return [0, lastBill]
     }
-    
+
     /**
      * 返回某个账户下的余额
      * @param {*} token 
@@ -71,7 +72,11 @@ export class BillModel extends BaseModel {
         if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
             return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
         }
-        return await this.checkUserBalance(user).lastBalance
+        let [err, res] = await this.checkUserBalance(user)
+        if (err) {
+            return [err, 0]
+        }
+        return [0, res.lastBalance]
     }
 
     /**
