@@ -248,8 +248,9 @@ const managerList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-    user.balance = balance
+    let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+    user.balance = lastBill.lastBalance
+    user.lastBill = lastBill
     // 查询已用商户已用数量
     const [err, ret] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
     if(ret && ret.length > 0){
@@ -367,7 +368,8 @@ const merchantList = async (e, c, cb) => {
   // 查询每个用户余额
   for (let user of ret) {
     let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-    user.balance = balance
+    user.balance = lastBill.lastBalance
+    user.lastBill = lastBill
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -404,7 +406,8 @@ const childList = async (e, c, cb) => {
   // 查询每个用户余额
   for (let user of ret) {
     let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-    user.balance = balance
+    user.balance = lastBill.lastBalance
+    user.lastBill = lastBill
   }
   return ResOK(cb, { ...res, payload: ret })
 }

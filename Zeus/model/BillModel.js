@@ -34,7 +34,7 @@ export class BillModel extends BaseModel {
     }
 
     /**
-     * 查询用户余额
+     * 查询用户余额和最后一条账单记录
      * @param {*} user 
      */
     async checkUserBalance(user) {
@@ -55,8 +55,9 @@ export class BillModel extends BaseModel {
         const sums = _.reduce(bills.Items, (sum, bill) => {
             return sum + parseFloat(bill.amount)
         }, 0.0)
-
-        return [0, baseBalance + sums]
+        const lastBill = bills.Items[bills.Items.length -1]
+        lastBill.lastBalance = baseBalance + sums
+        return [0, lastBill]
     }
     
     /**
@@ -70,7 +71,7 @@ export class BillModel extends BaseModel {
         if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
             return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
         }
-        return await this.checkUserBalance(user)
+        return await this.checkUserBalance(user).lastBalance
     }
 
     /**
