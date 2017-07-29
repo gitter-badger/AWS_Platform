@@ -107,13 +107,12 @@ const userNew = async (e, c, cb) => {
   }
   ResOK(cb, { ...res, payload: resgisterUserRet });
   let pushInfo = {
-    username : resgisterUserRet.username,
+    name : resgisterUserRet.username,
     role : resgisterUserRet.role,
-    userId : resgisterUserRet.userId,
-    displayName : resgisterUserRet.displayName,
-    headUrl : "00",
-    parent : resgisterUserRet.parent
-
+    id : resgisterUserRet.userId,
+    nickName : resgisterUserRet.displayName,
+    headPic : "00",
+    parentId : resgisterUserRet.parent
   }
   //推送信息给A3服务器
   pushUserInfo(pushInfo);

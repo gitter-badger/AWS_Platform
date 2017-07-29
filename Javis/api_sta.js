@@ -51,12 +51,14 @@ const Utils = {
         date.setMinutes(0);
         date.setSeconds(0);
         date.setMilliseconds(1);
+        return date;
     },
     setEnd(date){
         date.setHours(23);
         date.setMinutes(59);
         date.setSeconds(59);
         date.setMilliseconds(999);
+        return date;
     },
     formatDay(date){
         return this.toNumberTwo(date.getMonth()+1) + "-"+ this.toNumberTwo(date.getDate());
@@ -202,7 +204,9 @@ const statisticsListByDay = async(event, context ,cb) => {
   let billModel = new PlatformBillModel();
   let userModel = new PlatformUserModel();
 
-  let [error, list] = await billModel.statistics(5, firstTime, endTime);  
+  let [error, list] = await billModel.statistics(5, firstTime, endTime); 
+  console.log("111111111111111");
+  console.log(list); 
   if(error){
       return callback(null, Fail(error));
   }
