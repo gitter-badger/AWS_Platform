@@ -71,7 +71,7 @@ functions:
           method: get
           cors: true
   statisticsList:  #某一天的记录数据
-    handler: api_sta.list
+    handler: api_sta.statisticsListByDay
     events:
       -
         http:

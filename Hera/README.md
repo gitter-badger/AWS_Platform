@@ -1,4 +1,5 @@
-# 玩家注册
+# 接口地址
+https://documenter.getpostman.com/view/2351856/player/6mz2uwv
 
 A Serverless service that adds ES7 async/await support. Part of the [Serverless Stack](http://serverless-stack.com) guide.
 

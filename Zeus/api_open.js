@@ -14,7 +14,7 @@ const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
-const SECRET = "123456";
+const SECRET = "abc";
 
 export function gameLoginSign(event, context, callback){
     //json转换

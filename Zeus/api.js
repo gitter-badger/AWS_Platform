@@ -22,7 +22,6 @@ import { LogModel } from './model/LogModel'
 import {pushUserInfo} from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
 
-
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
@@ -107,9 +106,16 @@ const userNew = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
   ResOK(cb, { ...res, payload: resgisterUserRet });
-  
+  let pushInfo = {
+    name : resgisterUserRet.username,
+    role : resgisterUserRet.role,
+    id : resgisterUserRet.userId,
+    nickName : resgisterUserRet.displayName,
+    headPic : "00",
+    parentId : resgisterUserRet.parent
+  }
   //推送信息给A3服务器
-  pushUserInfo(resgisterUserRet);
+  pushUserInfo(pushInfo);
 
 }
 

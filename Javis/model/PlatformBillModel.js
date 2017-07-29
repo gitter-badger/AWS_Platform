@@ -78,7 +78,7 @@ function volume(array){
     return [null, array];
 }
 function list(array){
-    return array;
+    return [null, array];
 }
 /**
  * 累计收益
