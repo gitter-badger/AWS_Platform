@@ -105,7 +105,7 @@ const userNew = async (e, c, cb) => {
   if (registerUserErr) {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
-  ResOK(cb, { ...res, payload: resgisterUserRet });
+  return ResOK(cb, { ...res, payload: resgisterUserRet });
   let pushInfo = {
     name : resgisterUserRet.username,
     role : resgisterUserRet.role,
@@ -115,7 +115,7 @@ const userNew = async (e, c, cb) => {
     parentId : resgisterUserRet.parent
   }
   //推送信息给A3服务器
-  pushUserInfo(pushInfo);
+  // pushUserInfo(pushInfo);
 
 }
 
