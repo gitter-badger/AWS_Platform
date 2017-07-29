@@ -100,6 +100,7 @@ export class GameModel extends BaseModel {
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,
+            ScanIndexForward: false,
             ExpressionAttributeValues: values
         })
         if (err) {

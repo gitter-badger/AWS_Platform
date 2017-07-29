@@ -198,6 +198,9 @@ resources:
           -
             AttributeName: gameName
             AttributeType: S
+          -
+            AttributeName: createdAt
+            AttributeType: N
         KeySchema:
           -
             AttributeName: gameType
@@ -226,6 +229,9 @@ resources:
               -
                 AttributeName: gameType
                 KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
