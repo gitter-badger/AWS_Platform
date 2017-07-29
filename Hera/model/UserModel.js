@@ -1,4 +1,5 @@
 let  athena  = require("../lib/athena");
+let {RoleCodeEnum} = require("../lib/Consts");
 import {TABLE_NAMES} from "../config";
 import {Util} from "../lib/Util"
 
@@ -14,6 +15,7 @@ export class UserModel extends athena.BaseModel {
         this.userName = userName;
         this.userPwd = userPwd;
         this.buId = +buId;
+        this.role = RoleCodeEnum.Player;
         this.state = state || State.normal;
         this.updateAt = Date.now();
         this.createAt = Date.now();

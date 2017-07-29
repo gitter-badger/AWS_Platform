@@ -221,6 +221,14 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
+  gameSign: #游戏管理后台登录sign
+    handler: api_open.gameLoginSign
+    events:
+      -
+        http:
+          path: /game/sign
+          method: post
+          cors: true
   # exquery:
   #   handler: api.exquery
   #   events:
