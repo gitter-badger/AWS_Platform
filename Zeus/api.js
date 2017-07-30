@@ -313,10 +313,12 @@ const managerUpdate = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
+  // 获取更新属性和新密码HASH
   const Manager = {
     ...manager,
     ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
+  Manager.passhash = Model.hashGen(Manager.password)
   // 业务操作
   const [updateErr, updateRet] = await new UserModel().userUpdate(Manager)
   // 操作日志记录
@@ -441,9 +443,11 @@ const merchantUpdate = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
+  // 获取更新属性和新密码HASH
   const Merchant = {
     ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
+  Merchant.passhash = Model.hashGen(Merchant.password)
   // 业务操作
   const [updateErr, updateRet] = await new UserModel().userUpdate(Merchant)
   // 操作日志记录

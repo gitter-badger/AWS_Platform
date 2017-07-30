@@ -74,7 +74,8 @@ const PlatformBaseBizRole = function () {
     gender: GenderEnum.Male,
     lastIP: Model.StringValue,
     enabledAt: Model.timeStamp(),
-    loginAt: Model.timeStamp()
+    loginAt: Model.timeStamp(),
+    isforever: false
   }
 }
 export const RoleEditProps = {
@@ -91,7 +92,8 @@ export const RoleEditProps = {
     'adminName',
     'adminEmail',
     'adminContact',
-    'contractPeriod'
+    'contractPeriod',
+    'password'
   ],
   '100': [
     'hostName',
@@ -106,7 +108,8 @@ export const RoleEditProps = {
     'adminName',
     'adminEmail',
     'adminContact',
-    'contractPeriod'
+    'contractPeriod',
+    'password'
   ],
   '1000': [],
   '10000': []
