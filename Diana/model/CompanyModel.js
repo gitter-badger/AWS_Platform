@@ -27,7 +27,8 @@ export class CompanyModel extends BaseModel {
         this.item = {
             ...this.baseitem,
             companyName: Model.StringValue,
-            companyId: Model.uuid()
+            companyId: Model.uuid(),
+            companyKey: Model.uuid()
         }
     }
 
