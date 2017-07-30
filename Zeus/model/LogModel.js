@@ -63,6 +63,10 @@ export class LogModel extends BaseModel {
                 detail = '帐号过期'
                 userStatus = StatusEnum.Disable
             }
+            if (loginUserErr.code == Codes.UserLocked) {
+                detail = '帐号锁定'
+                userStatus = StatusEnum.Disable
+            }
         }
         this.putItem({
             ...this.item,
