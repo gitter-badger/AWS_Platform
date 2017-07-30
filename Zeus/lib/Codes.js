@@ -27,6 +27,7 @@ export const Codes = {
   AddUserError: '21000',
   DuplicateUser: '21001',
   UserNotFound: '22011',
+  UserLocked: '22012',
   InsufficientBalance: '10002',
   TransferError: '10003',
   RepeatTransferError: '11000',
@@ -53,6 +54,9 @@ export const BizErr = {
   },
   UserNotFoundErr:(errMsg = 'User not found') => {
     return {code:Codes.UserNotFound,err:errMsg}
+  },
+  UserLockedErr:(errMsg = 'User locked') => {
+    return {code:Codes.UserLocked,err:errMsg}
   },
   PasswordErr:(errMsg = 'password error') => {
     return {code:Codes.PasswordError,err:errMsg}

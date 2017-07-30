@@ -8,6 +8,7 @@ import {
   Pick,
   Keys,
   Omit,
+  StatusEnum,
   RoleCodeEnum,
   RoleModels,
   RoleDisplay,
@@ -178,15 +179,19 @@ export const LoginUser = async (userLoginInfo = {}) => {
     return [BizErr.DBErr(), 0]
   }
   const User = queryUserRet.Items[0]
-  // 检查非管理员的有效期
-  const [periodErr, periodRet] = await new UserModel().checkContractPeriod(User)
-  if (periodErr) {
-    return [periodErr, User]
-  }
   // 校验用户密码
   const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
   if (!valid) {
     return [BizErr.PasswordErr(), 0]
+  }
+  // 检查非管理员的有效期
+  const [periodErr, periodRet] = await new UserModel().checkContractPeriod(User)
+  if (periodErr) {
+    return [periodErr, 0]
+  }
+  // 检查用户是否被锁定
+  if (User.status == StatusEnum.Disable) {
+    return [BizErr.UserLockedErr(), 0]
   }
   // 更新用户信息
   User.lastIP = UserLoginInfo.lastIP
