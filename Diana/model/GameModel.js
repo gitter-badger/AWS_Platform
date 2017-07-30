@@ -107,7 +107,7 @@ export class GameModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
-        return [0, ret]
+        return [0, ret.Items]
     }
 
     /**
