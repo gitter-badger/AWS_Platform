@@ -19,7 +19,7 @@ import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
-import {pushUserInfo} from "./lib/TcpUtil"
+import { pushUserInfo } from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -107,12 +107,12 @@ const userNew = async (e, c, cb) => {
   }
   return ResOK(cb, { ...res, payload: resgisterUserRet });
   let pushInfo = {
-    name : resgisterUserRet.username,
-    role : resgisterUserRet.role,
-    id : resgisterUserRet.userId,
-    nickName : resgisterUserRet.displayName,
-    headPic : "00",
-    parentId : resgisterUserRet.parent
+    name: resgisterUserRet.username,
+    role: resgisterUserRet.role,
+    id: resgisterUserRet.userId,
+    nickName: resgisterUserRet.displayName,
+    headPic: "00",
+    parentId: resgisterUserRet.parent
   }
   //推送信息给A3服务器
   // pushUserInfo(pushInfo);
@@ -259,9 +259,9 @@ const managerList = async (e, c, cb) => {
     user.lastBill = lastBill
     // 查询已用商户已用数量
     const [err, ret] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
-    if(ret && ret.length > 0){
+    if (ret && ret.length > 0) {
       user.merchantUsedCount = ret.length
-    }else{
+    } else {
       user.merchantUsedCount = 0
     }
   }
@@ -731,7 +731,16 @@ const jwtverify = async (e, c, cb) => {
   }
   // 有效期校验
   console.info('解密')
-  console.info(userInfo) 
+  console.info(Math.floor(new Date().getTime() / 1000))
+  console.info(userInfo.iat)
+  console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
+  // if(new Date().getTime - userInfo.iat > 100000){
+  //   return c.fail('Token expire')
+  // }
+  // TOKEN是否有效校验（判断密码是否一致）
+  // if(!userInfo.password){
+  //   return c.fail('Token locked')
+  // }
   // 结果返回
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 
