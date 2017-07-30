@@ -729,6 +729,9 @@ const jwtverify = async (e, c, cb) => {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
+  // 有效期校验
+  console.info('解密')
+  console.info(userInfo) 
   // 结果返回
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 
