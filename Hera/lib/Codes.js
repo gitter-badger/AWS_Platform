@@ -11,6 +11,7 @@ export const CODES = {
     passwordError : 10005,
     Frozen : 10006,
     merBalIns : 10007,
+    palyerIns : 10008,
     TokenError : 11000,
 }
 
@@ -24,7 +25,8 @@ const errorMessage = {
   "10005" : "密码错误",
   "10006" : "账号已被禁止",
   "11000" : "token错误",
-  "10007" : "商家点数不足"
+  "10007" : "商家点数不足",
+  "10008" : "玩家点数不足",
 }
 
 

@@ -1,0 +1,21 @@
+{
+  "pathParameters": {
+    "msn": "4",
+    "status": "2"
+  },
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX2NoZW5leSIsInBhc3N3b3JkIjoiMTIzNDU2Iiwic3VmZml4IjoiUGxhdGZvcm0iLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJTdXBlckFkbWluIiwidXNlcklkIjoiNjAyOGVlYzYtOTZlYy00OTJkLWEzNmItZmQ4ZDY5ODFiNzZmIiwicm9sZSI6IjEiLCJkaXNwbGF5TmFtZSI6IuW5s-WPsOeuoeeQhuWRmCIsImlhdCI6MTUwMDg4ODg4N30.R7rqnXF7t7GBQFgL6OI81VEllJPAtTMaJUcYBHCcaqI"
+  },
+  "requestContext": {
+    "authorizer": {
+      "username": "cheney",
+      "userId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783",
+      "parent": "00",
+      "role": "1",
+      "principalId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783"
+    },
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    }
+  }
+}

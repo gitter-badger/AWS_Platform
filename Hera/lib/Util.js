@@ -42,9 +42,9 @@ export class Util{
         authResponse.principalId = principalId;
         authResponse.context = {}
         authResponse.context.username = userInfo.username
-        // authResponse.context.role = userInfo.role
-        // authResponse.context.userId = userInfo.userId
-        // authResponse.context.parent = userInfo.parent
+        authResponse.context.role = userInfo.role
+        authResponse.context.userId = userInfo.userId
+        authResponse.context.parent = userInfo.parent
         if (effect && resource) {
             var policyDocument = {};
             policyDocument.Version = '2012-10-17'; // default version

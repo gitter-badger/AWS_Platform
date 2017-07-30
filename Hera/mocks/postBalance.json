@@ -1,7 +1,9 @@
 {
-    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"merchantID_4\",  \"gamePlatform\":\"NA\",  \"amount\":\"1\",  \"action\":\"1\"}",
+    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\", \"amount\":\"10\",  \"action\":\"1\"}",
     "pathParameters" : {
-        "userName" : "lisichen"
-    },
-    "authorizationToken" : ""
+            "userName" : "lisichen"
+        },
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BX2xpc2ljaGVuIiwic3VmZml4IjoiTkEiLCJpYXQiOjE1MDEwNzcwMTF9.yl-GBqQTUeOWj9v5A_bX-nsOSdK9jHeyW1Y0bstGyic"
+    }
 }

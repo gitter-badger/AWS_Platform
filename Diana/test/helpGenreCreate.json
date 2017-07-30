@@ -1,0 +1,6 @@
+{
+    "queryStringParameters": "{\"genre\":\"类目1\", \"genre\":\"0\"}",
+    "requestContext" : {
+        "authorizer" : [0,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik5BX2NoZW53ZW4iLCJtc24iOiIxMDAiLCJzdWZmaXgiOiJOQSIsInVzZXJJZCI6ImFiYyIsInJvbGUiOiIxMDAiLCJkaXNwbGF5TmFtZSI6IuWVhuaIt-WQjeensCIsImFwaUtleSI6ImEiLCJkaXNwbGF5SWQiOjEyMywidXBkYXRlZEF0IjoxNTAxMTI2NDk2MTY5LCJpYXQiOjE1MDExMjY0NjZ9.fTvG7nLDpdYH8psPFo1dPZvFEsMY1y7M_9t82dbB9RU"]
+    }
+}

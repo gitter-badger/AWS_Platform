@@ -1,27 +1,27 @@
 {
   "headers": {
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX0Zha2VyMDAxIiwicGFzc3dvcmQiOiIxMTExMTEiLCJzdWZmaXgiOiJQbGF0Zm9ybSIsInBhcmVudCI6IjAwIiwicGFyZW50TmFtZSI6IlN1cGVyQWRtaW4iLCJ1c2VySWQiOiIxNjVjNjYyYi1hMmYyLTQ4ZDEtOTUyNS1hMzczMmI3NTAxNzUiLCJyb2xlIjoiMSIsImRpc3BsYXlOYW1lIjoi5bmz5Y-w566h55CG5ZGYIiwiaWF0IjoxNTAwNTE3MDkxfQ.d4lkKqX0Z3mESeHIsvKGR4tbfdO6VD-63zMoM7bel_M"
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX2NoZW5leSIsInBhc3N3b3JkIjoiMTIzNDU2Iiwic3VmZml4IjoiUGxhdGZvcm0iLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJTdXBlckFkbWluIiwidXNlcklkIjoiNjAyOGVlYzYtOTZlYy00OTJkLWEzNmItZmQ4ZDY5ODFiNzZmIiwicm9sZSI6IjEiLCJkaXNwbGF5TmFtZSI6IuW5s-WPsOeuoeeQhuWRmCIsImlhdCI6MTUwMDk3Mzg5OX0.2TQMNV3yBDYoBKaUtU0bwTNuAPeaGGAovZ8JN-DZ5pE"
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_Faker001",
-      "userId": "55f3f486-4c78-44f6-8721-fa5d5efa1bb9",
+      "username": "Platform_cheney",
       "parent": "00",
       "role": "1",
-      "suffix": "Platform"
-
+      "userId": "eb827426-695c-4df1-8205-ba2e14153b49",
+      "principalId": "eb827426-695c-4df1-8205-ba2e14153b49"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "username": "Duplicate002",
-    "adminName": "abc",
-    "password": "111111",
-    "role": "10",
-    "suffix": "F2",
-    "points": 1000.00,
-    "adminName": "Benji"
-  }
+    "username": "cmerchant4",
+    "password": "123456",
+    "role": "100",
+    "adminName": "cheneymerchant4",
+    "parent": "01",
+    "msn":"4",
+    "suffix":"CY4",
+    "displayName": "测试商户4"
+}
 }

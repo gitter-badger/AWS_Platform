@@ -22,6 +22,7 @@ provider:
           - dynamodb:PutItem
           - dynamodb:Query
           - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
           - dynamodb:BatchWriteItem
           - dynamodb:Scan
         Resource:
@@ -45,7 +46,7 @@ functions:
           path: beings
           method: post
           cors: true
-  adminList:
+  adminList: #管理员列表
     handler: api.adminList
     events:
       -
@@ -53,8 +54,8 @@ functions:
           path: admins
           method: get
           cors: true
-          authorizer:
-  adminCenter:
+          authorizer: tokenAuth
+  adminCenter: #管理员个人中心
     handler: api.adminCenter
     events:
       -
@@ -63,7 +64,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  adminNew:
+  adminNew: #创建管理员
     handler: api.adminNew
     events:
       -
@@ -72,7 +73,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  userNew:
+  userNew: #注册新用户
     handler: api.userNew
     events:
       -
@@ -81,7 +82,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  userAuth:
+  userAuth: #用户登录
     handler: api.userAuth
     events:
       -
@@ -89,7 +90,7 @@ functions:
           path: users/auth
           method: post
           cors: true
-  userGrabToken:
+  userGrabToken: #获取用户TOKEN
     handler: api.userGrabToken
     events:
       -
@@ -97,7 +98,16 @@ functions:
           path: users/token
           method: post
           cors: true
-  managerList:
+  userChangeStatus: #变更用户状态
+    handler: api.userChangeStatus
+    events:
+      -
+        http:
+          path: userChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  managerList: #线路商列表
     handler: api.managerList
     events:
       -
@@ -106,7 +116,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  managerOne:
+  managerOne: #获取线路商信息
     handler: api.managerOne
     events:
       -
@@ -115,7 +125,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  merchantOne:
+  merchantOne: #获取商户信息
     handler: api.merchantOne
     events:
       -
@@ -124,7 +134,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  managerUpdate:
+  managerUpdate: #更新线路商
     handler: api.managerUpdate
     events:
       -
@@ -133,7 +143,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  merchantList:
+  merchantList: #商户列表
     handler: api.merchantList
     events:
       -
@@ -142,7 +152,16 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  merchantUpdate:
+  childList: #下级列表
+    handler: api.childList
+    events:
+      -
+        http:
+          path: childList/{userId}/{childRole}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  merchantUpdate: #更新商户信息
     handler: api.merchantUpdate
     events:
       -
@@ -151,7 +170,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  randomPassword:
+  randomPassword: #随机密码
     handler: api.randomPassword
     events:
       -
@@ -159,7 +178,16 @@ functions:
           path: random_password
           method: post
           cors: true
-  avalibleManagers:
+  updatePassword: #重置密码
+    handler: api.updatePassword
+    events:
+      -
+        http:
+          path: updatePassword
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  avalibleManagers: #可用线路商列表
     handler: api.avalibleManagers
     events:
       -
@@ -168,60 +196,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-
-  gameNew:
-    handler: api.gameNew
-    events:
-      -
-        http:
-          path: games
-          method: post
-          cors: true
-  gameList:
-    handler: api.gameList
-    events:
-      -
-        http:
-          path: games/{gameType}
-          method: get
-          cors: true
-  depositPoints:
-    handler: api.depositPoints
-    events:
-      -
-        http:
-          path: deposit_points
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  withdrawPoints:
-    handler: api.withdrawPoints
-    events:
-      -
-        http:
-          path: withdraw_points
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  billOne:
-    handler: api.billOne
-    events:
-      -
-        http:
-          path: bills/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  billList:
-    handler: api.billList
-    events:
-      -
-        http:
-          path: waterfall/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  checkMsn:
+  checkMsn: #校验MSN
     handler: api.checkMsn
     events:
       -
@@ -237,6 +212,41 @@ functions:
           path: captcha
           method: post
           cors: true
+  msnList: #获取线路号列表，接口编号：
+    handler: api.msnList
+    events:
+      -
+        http:
+          path: msnList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  lockmsn: #锁定/解锁线路号，接口编号：
+    handler: api.lockmsn
+    events:
+      -
+        http:
+          path: lockmsn/{msn}/{status}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  msnRandom: #随机线路号，接口编号：
+    handler: api.msnRandom
+    events:
+      -
+        http:
+          path: msnRandom
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  gameSign: #游戏管理后台登录sign
+    handler: api_open.gameLoginSign
+    events:
+      -
+        http:
+          path: /game/sign
+          method: post
+          cors: true
   # exquery:
   #   handler: api.exquery
   #   events:
@@ -245,3 +255,55 @@ functions:
   #         path: exquery
   #         method: get
   #         cors: true
+  # gameNew:
+  #   handler: api.gameNew
+  #   events:
+  #     -
+  #       http:
+  #         path: games
+  #         method: post
+  #         cors: true
+  # gameList:
+  #   handler: api.gameList
+  #   events:
+  #     -
+  #       http:
+  #         path: games/{gameType}
+  #         method: get
+  #         cors: true
+  # depositPoints:
+  #   handler: api.depositPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: deposit_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # withdrawPoints:
+  #   handler: api.withdrawPoints
+  #   events:
+  #     -
+  #       http:
+  #         path: withdraw_points
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # billOne:
+  #   handler: api.billOne
+  #   events:
+  #     -
+  #       http:
+  #         path: bills/{userId}
+  #         method: get
+  #         cors: true
+  #         authorizer: tokenAuth
+  # billList:
+  #   handler: api.billList
+  #   events:
+  #     -
+  #       http:
+  #         path: waterfall/{userId}
+  #         method: get
+  #         cors: true
+  #         authorizer: tokenAuth

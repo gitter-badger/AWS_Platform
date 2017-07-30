@@ -1,17 +1,10 @@
 import {
-    Tables,
     Store$,
     Codes,
     BizErr,
-    RoleCodeEnum,
-    MSNStatusEnum,
-    RoleModels,
-    GameTypeEnum,
     Trim,
     Empty,
     Model,
-    BillModel,
-    BillActionEnum,
     Keys,
     Pick,
     Omit
@@ -27,7 +20,7 @@ export class BaseModel {
      * 构造方法，设置基础对象属性
      */
     constructor() {
-        this.baseitem = Model.baseModel
+        this.baseitem = Model.baseModel()
     }
 
     /**
@@ -40,8 +33,8 @@ export class BaseModel {
     }
 
     /**
-     * 插入单项
-     * @param {*} item 
+     * 更新单项
+     * @param {*} item
      */
     putItem(item) {
         return new Promise((reslove, reject) => {
@@ -142,13 +135,31 @@ export class BaseModel {
     /**
      * 查询数据
      */
-    query(conditions) {
+    query(conditions = {}) {
         return new Promise((reslove, reject) => {
             const params = {
                 ...this.params,
                 ...conditions
             }
             this.db$('query', params)
+                .then((res) => {
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), false])
+                })
+        })
+    }
+
+    /**
+     * 全表查询数据
+     */
+    scan(conditions = {}) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                ...conditions
+            }
+            this.db$('scan', params)
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {

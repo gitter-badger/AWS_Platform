@@ -53,8 +53,11 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
+yarn.lock
 
 # dotenv environment variables file
 .env
 # mac hidden files
 .DS_Store
+package-lock.json
+.idea

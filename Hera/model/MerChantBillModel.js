@@ -1,21 +1,27 @@
 let  athena  = require("../lib/athena");
 import {TABLE_NAMES} from "../config";
-import {Util} from "../lib/Util"
+import {Util} from "../lib/Util";
+import {RoleCodeEnum} from "../lib/Consts"
 
 import {CODES, CHeraErr} from "../lib/Codes";
 
 
 
 export class MerchantBillModel extends athena.BaseModel {
-    constructor({userId, action, amount, userName} = {}) {
+    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser} = {}) {
         super(TABLE_NAMES.PLATFORM_BILL);
         this.sn = Util.uuid();
         this.userId = userId;
         this.action = +action;
         this.amount = (this.action == -1 ? -amount : +amount).toFixed(2);
+        this.fromRole = fromRole;
+        this.toRole = toRole;
+        this.fromUser = fromUser;
+        this.toUser = toUser;
         this.operator = userName;
-        this.createAt = Date.now();
-        this.updateAt = Date.now();
+        this.userName = userName;
+        this.createdAt = Date.now();
+        this.updatedAt = Date.now();
     }
 
     async getBlance(){
@@ -54,4 +60,9 @@ export class MerchantBillModel extends athena.BaseModel {
 export const Action = {
     recharge : 1,  //增加
     reflect : -1 //减少
+}
+
+export const Type = {
+    recharge : 1, //中心钱包转入到平台钱包
+    reflect : 2,  //平台钱包转入中心钱包
 }

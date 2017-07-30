@@ -13,39 +13,74 @@ custom:
 provider:
   name: aws
   runtime: nodejs6.10
-#  region: ap-southeast-1
-  region: us-east-2
+  region: ap-southeast-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
-  gamePlayerRegister:
+  tokenAuth:
+    handler: managerApi.jwtverify
+    integration: lambda
+  gamePlayerRegister: #玩家注册
     handler: openApi.gamePlayerRegister
     events:
       - http:
           path: /player/register
           method: post
           cors: true
-  gamePlayerLogin:
+  gamePlayerLogin:     #玩家登陆
     handler: openApi.gamePlayerLogin
     events:
       - http:
           path: /player
           method: post
           cors: true
-  gamePlayerBalance:
+  gamePlayerBalance:    #玩家充值/提现
     handler: openApi.gamePlayerBalance
     events:
       - http:
-          path: /player/{username}/balance
+          path: /player/{userName}/balance
           method: post
           cors: true
-          #authorizer: tokenAuth
-  getGamePlayerBalance:
+  getGamePlayerBalance:  #获取余额
     handler: openApi.getGamePlayerBalance
     events:
       - http:
           path: /player/{userName}/balance
           method: get
           cors: true
-          #authorizer: tokenAuth
+  gamePlayerList:  #获取玩家列表
+    handler: managerApi.gamePlayerList
+    events:
+      - http:
+          path: /player/list
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  gamePlayerInfo:  #玩家详情页面
+    handler: managerApi.gamePlayerInfo
+    events:
+      - http:
+          path: /player/bill/{userName}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  gamePlayerForzen:  #冻结/解冻玩家 1解冻,2,冻结
+    handler: managerApi.gamePlayerForzen
+    events:
+      - http:
+          path: /player/forzen/{userName}
+          method: get
+          cors: true
+          authorizer: tokenAuth
 resources:
   Resources:
     HeraGamePlayer:

@@ -10,6 +10,9 @@ export const Codes = {
   JSONParseError: '50006',
   NoSuffixError:'50007',
   MsnExistError: '50008',
+  MsnUsedError: '50009',
+  MsnNotExistError: '50010',
+  MsnFullError: '50011',
   Busy: '44004',
   ParamError: '47003',
   IPBlock: '44900',
@@ -24,10 +27,13 @@ export const Codes = {
   AddUserError: '21000',
   DuplicateUser: '21001',
   UserNotFound: '22011',
+  UserLocked: '22012',
   InsufficientBalance: '10002',
   TransferError: '10003',
   RepeatTransferError: '11000',
-  InparamError: '60001'
+  InparamError: '60001',
+  CaptchaErr: '60002',
+  MerchantPeriodErr: '60003' 
 }
 
 export const BizErr = {
@@ -49,6 +55,12 @@ export const BizErr = {
   UserNotFoundErr:(errMsg = 'User not found') => {
     return {code:Codes.UserNotFound,err:errMsg}
   },
+  UserLockedErr:(errMsg = 'User locked') => {
+    return {code:Codes.UserLocked,err:errMsg}
+  },
+  PasswordErr:(errMsg = 'password error') => {
+    return {code:Codes.PasswordError,err:errMsg}
+  },
   ParamMissErr: (errMsg = 'params missing') => {
     return {code: Codes.ParamMiss, err: errMsg}
   },
@@ -57,6 +69,9 @@ export const BizErr = {
   },
   NoSuffixErr: (errMsg = 'no suffix error')=>{
     return {code:Codes.NoSuffixError,err:errMsg}
+  },
+  MerchantPeriodErr: (errMsg = 'MerchantPeriodErr') => {
+    return {code: Codes.MerchantPeriodErr, err: errMsg}
   },
   ItemExistErr: (errMsg = 'data item is exist')=>{
     return {code:Codes.ItemDuplicate,err:errMsg}
@@ -67,10 +82,22 @@ export const BizErr = {
   MsnExistErr: (errMsg = 'MSN number is exist') =>{
     return {code:Codes.MsnExistError,err:errMsg}
   },
+  MsnUsedError: (errMsg = 'MSN is used') =>{
+    return {code:Codes.MsnUsedError,err:errMsg}
+  },
+  MsnNotExistError: (errMsg = 'MSN is used') =>{
+    return {code:Codes.MsnNotExistError,err:errMsg}
+  },
+  MsnFullError: (errMsg = 'MSN full') =>{
+    return {code:Codes.MsnFullError,err:errMsg}
+  },
   InsufficientBalanceErr: (errMsg = 'InsufficientBalance') => {
     return {code: Codes.InsufficientBalance,err:errMsg}
   },
   InparamErr: (errMsg = 'InparamError') => {
     return  {code : Codes.InparamError, err: errMsg}
+  },
+  CaptchaErr: (errMsg = 'CaptchaErr') => {
+    return  {code : Codes.CaptchaErr, err: errMsg}
   }
 }

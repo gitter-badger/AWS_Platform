@@ -1,7 +1,9 @@
 {
-    "queryStringParameters": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"merchantID_4\",  \"gamePlatform\":\"NA\"}",
+    "queryStringParameters": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\"}",
     "pathParameters" : {
-        "username" : "lisichen"
-    },
-    "authorizationToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkhBX2xpc2ljaGVuIiwiaWF0IjoxNTAwOTg5MzI0fQ.PqouByRz1UIXbS9nO6RD68q3Qgj8vvv85L08IPBmjBs"
+            "userName" : "lisichen"
+        },
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BX2xpc2ljaGVuIiwic3VmZml4IjoiTkEiLCJpYXQiOjE1MDEwNzcwMTF9.yl-GBqQTUeOWj9v5A_bX-nsOSdK9jHeyW1Y0bstGyic"
+    }
 }

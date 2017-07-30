@@ -13,8 +13,18 @@ custom:
 provider:
   name: aws
   runtime: nodejs6.10
-#  region: ap-southeast-1
-  region: us-east-2
+  region: ap-southeast-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
   initData:
     handler: api.initData
@@ -34,6 +44,39 @@ functions:
         http:
           path: /generate_token
           method: post
+          cors: true
+  #统计开始
+  overview: #统计总览
+    handler: api_sta.overview
+    events:
+      -
+        http:
+          path: /statistics/overview
+          method: get
+          cors: true
+  salePointsInfo:  #本周本月统计
+    handler: api_sta.salePointsInfo
+    events:
+      -
+        http:
+          path: /statistics/month/week
+          method: get
+          cors: true
+  statisticsDetail:  #详情
+    handler: api_sta.statisticsDetail
+    events:
+      -
+        http:
+          path: /statistics/detail
+          method: get
+          cors: true
+  statisticsList:  #某一天的记录数据
+    handler: api_sta.statisticsListByDay
+    events:
+      -
+        http:
+          path: /statistics/day/list
+          method: get
           cors: true
 resources:
   Resources:
@@ -59,7 +102,7 @@ resources:
             AttributeType: S
           -
             AttributeName: displayId
-            AttributeType: S
+            AttributeType: N
         KeySchema:
           -
             AttributeName: role
@@ -155,6 +198,9 @@ resources:
           -
             AttributeName: gameName
             AttributeType: S
+          -
+            AttributeName: createdAt
+            AttributeType: N
         KeySchema:
           -
             AttributeName: gameType
@@ -183,6 +229,9 @@ resources:
               -
                 AttributeName: gameType
                 KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
@@ -205,7 +254,7 @@ resources:
             AttributeName: userId
             AttributeType: S
           -
-            AttributeName: createAt
+            AttributeName: createdAt
             AttributeType: N
 
         KeySchema:
@@ -224,8 +273,19 @@ resources:
                 AttributeName: userId
                 KeyType: HASH
               -
-                AttributeName: createAt
+                AttributeName: createdAt
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: UserIdIndexSec
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
@@ -238,7 +298,7 @@ resources:
                 AttributeName: sn
                 KeyType: HASH
               -
-                AttributeName: createAt
+                AttributeName: createdAt
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -271,6 +331,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
     ZeusPlatformCaptcha:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -289,6 +350,73 @@ resources:
             KeyType: HASH
           -
             AttributeName: usage
+            KeyType: RANGE
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    ZeusPlatformLog:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformLog
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: S
+          -
+            AttributeName: role
+            AttributeType: S
+          -
+            AttributeName: createdAt
+            AttributeType: N
+
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+          -
+            AttributeName: userId
+            KeyType: RANGE
+        
+        GlobalSecondaryIndexes:
+          -
+            IndexName: LogRoleIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    ZeusPlatformCompany:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformCompany
+        AttributeDefinitions:
+          -
+            AttributeName: companyName
+            AttributeType: S
+          -
+            AttributeName: companyId
+            AttributeType: S
+
+        KeySchema:
+          -
+            AttributeName: companyName
+            KeyType: HASH
+          -
+            AttributeName: companyId
             KeyType: RANGE
 
         ProvisionedThroughput:
