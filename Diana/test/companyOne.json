@@ -3,8 +3,8 @@
     "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX0ZhZGUwMDEiLCJwYXNzd29yZCI6IjExMTExMSIsInN1ZmZpeCI6IlBsYXRmb3JtIiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInVzZXJJZCI6ImVkNTk4ZWI3LWQ0NzEtNDNjZS1iY2VhLWM4OTk4OTIyNzE0NSIsInJvbGUiOiIxIiwiZGlzcGxheU5hbWUiOiLlubPlj7DnrqHnkIblkZgiLCJpYXQiOjE1MDA3MDEzMjN9.Wo2ZKXtfY6q3MraIoQra5MrJHP_S0JSE4qQ6KUevTmQ"
   },
   "pathParameters": {
-    "companyName": "测试企业",
-    "companyId": "3ec6cf7a-6479-43a0-aca4-16b5b582180d"
+    "companyName": "%E5%8D%81%E5%A4%A7",
+    "companyId": "f655a0be-3f56-45d3-acd5-11722b07c492"
   },
   "requestContext": {
     "authorizer": {
