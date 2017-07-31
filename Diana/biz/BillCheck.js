@@ -11,5 +11,6 @@ export class BillCheck {
             { name: "amount", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
+        return [checkAttError, errorParams]
     }
 }

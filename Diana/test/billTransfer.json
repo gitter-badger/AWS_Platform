@@ -15,10 +15,10 @@
         }
     },
     "body": {
-        "fromUserId": "438a0d8c-e55e-4df9-ba83-3e2372037985",
+        "fromUserId": "eb827426-695c-4df1-8205-ba2e14153b49",
         "toRole": "100",
-        "toUser": "NNNA_test0001",
+        "toUser": "CY1_cmerchant1",
         "amount": "500.00",
-        "remark": ""
+        "remark": "测试"
     }
 }
