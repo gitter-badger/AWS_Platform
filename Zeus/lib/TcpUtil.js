@@ -8,14 +8,18 @@ const proId = 9;  //协议
 export const pushUserInfo =  (body) => {
     let client = new net.Socket();
     let buffer = buildPayload(proId, JSON.stringify(body));
-    client.connect(PORT, HOST, function() {
-        client.write(JSON.stringify(body));
-    });
-    client.on('data', function(data) {
-        console.log('DATA: ' + data);
-        // 完全关闭连接
-        client.destroy();
-    });
+    return new Promise((reslove, reject) => {
+        client.connect(PORT, HOST, function() {
+            client.write(JSON.stringify(body));
+        });
+        client.on('data', function(data) {
+            console.log('DATA: ' + data);
+            reslove([null, data]);
+            // 完全关闭连接
+            client.destroy();
+        });
+    })
+    
     
 }
 

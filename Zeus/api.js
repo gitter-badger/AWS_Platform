@@ -106,17 +106,24 @@ const userNew = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
   ResOK(cb, { ...res, payload: resgisterUserRet });
-  let pushInfo = {
-    name : resgisterUserRet.username,
-    role : resgisterUserRet.role,
-    id : resgisterUserRet.userId,
-    nickName : resgisterUserRet.displayName,
-    headPic : "00",
-    parentId : resgisterUserRet.parent
-  }
-  //推送信息给A3服务器
-  pushUserInfo(pushInfo);
-
+  //只有真人游戏才推送给真人游戏服务器
+  let gameList = resgisterUserRet.gameList;
+  let game = gameList.find((game) => {
+    return game.gameId == 30000
+  })
+  // if(game) {
+    let pushInfo = {
+      name : resgisterUserRet.username,
+      role : resgisterUserRet.role,
+      id : resgisterUserRet.userId,
+      nickName : resgisterUserRet.displayName,
+      headPic : "00",
+      parentId : resgisterUserRet.parent
+    }
+    //推送信息给A3服务器
+    pushUserInfo(pushInfo);
+  // }
+  
 }
 
 /**
