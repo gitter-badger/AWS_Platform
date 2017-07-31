@@ -21,6 +21,7 @@ import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { pushUserInfo } from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
+const athena = require("./lib/athena")
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -58,6 +59,19 @@ const adminNew = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+    { name: "username", type: "S", min: 6, max: 16 },
+    { name: "password", type: "S", min: 6, max: 16 },
+    { name: "role", type: "N", min: 1, max: 100 },
+    { name: "adminName", type: "S", min: 1, max: 16 },
+    { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+    { name: "adminContact", type: "S", min: 1, max: 16 }
+  ], userInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams });
+    return ResErr(cb, checkAttError)
+  }
   // 要求管理员角色
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
@@ -85,6 +99,30 @@ const userNew = async (e, c, cb) => {
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+    { name: "username", type: "S", min: 6, max: 16 },
+    { name: "password", type: "S", min: 6, max: 16 },
+    { name: "role", type: "N", min: 1, max: 100 },
+    { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
+    { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+    { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+    { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+    { name: "adminName", type: "NS", min: 1, max: 16 },
+    { name: "managerName", type: "NS", min: 1, max: 16 },
+    { name: "merchantName", type: "NS", min: 1, max: 16 },
+    { name: "adminContact", type: "NS", min: 1, max: 16 },
+    { name: "displayName", type: "S", min: 1, max: 16 },
+    { name: "remark", type: "NS", min: 1, max: 100 },
+    { name: "hostName", type: "S", min: 1, max: 16 },
+    { name: "hostContact", type: "S", min: 1, max: 16 },
+    { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
+    { name: "limit", type: "N", min: 1, max: 10 }
+  ], userInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams });
+    return ResErr(cb, checkAttError)
   }
   // 获取身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
