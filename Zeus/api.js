@@ -435,7 +435,7 @@ const childList = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 只能查看自己下级
-  if (parseInt(token.role) >= parseInt(params.childRole)) {
+  if (parseInt(token.role) > parseInt(params.childRole)) {
     return ResErr(cb, BizErr.InparamErr('no right'))
   }
   // 业务操作
