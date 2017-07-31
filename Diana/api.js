@@ -23,6 +23,8 @@ import { UserModel } from './model/UserModel'
 import { CompanyModel } from './model/CompanyModel'
 
 import { BillCheck } from './biz/BillCheck'
+import { GameCheck } from './biz/GameCheck'
+import { CompanyCheck } from './biz/CompanyCheck'
 
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -40,7 +42,12 @@ const gameNew = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new GameCheck().checkGame(gameInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
   // 获取令牌，只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
@@ -290,6 +297,12 @@ const companyNew = async (e, c, cb) => {
   const [jsonParseErr, companyInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new CompanyCheck().checkCompany(companyInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 获取令牌，只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
