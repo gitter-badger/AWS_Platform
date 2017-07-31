@@ -33,7 +33,8 @@ export const Codes = {
   RepeatTransferError: '11000',
   InparamError: '60001',
   CaptchaErr: '60002',
-  MerchantPeriodErr: '60003' 
+  MerchantPeriodStartErr: '60003',
+  MerchantPeriodEndErr: '60004'
 }
 
 export const BizErr = {
@@ -70,7 +71,10 @@ export const BizErr = {
   NoSuffixErr: (errMsg = 'no suffix error')=>{
     return {code:Codes.NoSuffixError,err:errMsg}
   },
-  MerchantPeriodErr: (errMsg = 'MerchantPeriodErr') => {
+  MerchantPeriodEndErr: (errMsg = '帐号已过期') => {
+    return {code: Codes.MerchantPeriodErr, err: errMsg}
+  },
+  MerchantPeriodStartErr: (errMsg = '帐号尚未生效') => {
     return {code: Codes.MerchantPeriodErr, err: errMsg}
   },
   ItemExistErr: (errMsg = 'data item is exist')=>{

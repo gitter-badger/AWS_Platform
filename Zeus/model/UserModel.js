@@ -46,13 +46,17 @@ export class UserModel extends BaseModel {
                 console.info('起始时间：' + start)
                 console.info('结束时间：' + end)
                 console.info('当前时间：' + now)
+                // 帐号未生效
+                if(start > now){
+                    return [BizErr.MerchantPeriodStartErr(), 0]
+                }
                 // 过期则冻结帐号
-                if (start > now || now > end) {
+                if (now > end) {
                     const [err, ret] = await this.changeStatus(user.role, user.userId, StatusEnum.Disable)
                     if (err) {
                         return [BizErr.DBErr(err.toString()), 0]
                     }
-                    return [BizErr.MerchantPeriodErr(), 0]
+                    return [BizErr.MerchantPeriodEndErr(), 0]
                 }
             } else {
                 console.info('有效期永久')
