@@ -349,17 +349,26 @@ const managerUpdate = async (e, c, cb) => {
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
+  // 入参转化
+  const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkUser(managerInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams });
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
+  // 业务操作
   const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
     return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
-  }
-  const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
   // 获取更新属性和新密码HASH
   const Manager = {
@@ -479,17 +488,25 @@ const merchantUpdate = async (e, c, cb) => {
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
+  const [jsonParseErr, merchantInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkUser(merchantInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams });
+    return ResErr(cb, checkAttError)
+  }
+  // 身份令牌校验
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
+  // 业务操作
   const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
     return ResFail(cb, { ...errRes, err: merchantErr }, merchantErr.code)
-  }
-  const [jsonParseErr, merchantInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
   // 获取更新属性和新密码HASH
   const Merchant = {
