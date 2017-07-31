@@ -1,16 +1,19 @@
 var net = require('net');
 
-const HOST = '192.168.3.98';
+const HOST = '47.88.192.69';
 const PORT = 20003;
 const proId = 9;  //协议
-
+import {
+  BizErr
+} from '../lib/all'
 
 export const pushUserInfo =  (body) => {
     let client = new net.Socket();
     let buffer = buildPayload(proId, JSON.stringify(body));
     return new Promise((reslove, reject) => {
+        console.log("请求连接");
         client.connect(PORT, HOST, function() {
-            client.write(JSON.stringify(body));
+            client.write(buffer);
         });
         client.on('data', function(data) {
             console.log('DATA: ' + data);
@@ -18,6 +21,9 @@ export const pushUserInfo =  (body) => {
             // 完全关闭连接
             client.destroy();
         });
+        client.on("error", function(err){
+            reslove([BizErr.TcpErr(), 0]);
+        })
     })
     
     

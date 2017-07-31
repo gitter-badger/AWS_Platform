@@ -6,7 +6,6 @@ import {
   Model,
   Tables,
   GameTypeEnum,
-  BillActionEnum,
   StatusEnum,
   GenderEnum,
   RoleCodeEnum,
@@ -15,7 +14,6 @@ import {
   Pick,
   JwtVerify,
   GeneratePolicyDocument,
-  MSNStatusEnum,
   BizErr
 } from './lib/all'
 import { GameModel } from './model/GameModel'
@@ -33,7 +31,7 @@ const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
  */
 const gameNew = async (e, c, cb) => {
   // 入参转换
-  const errRes = { m: 'gameNew err', input: e }
+  const errRes = { m: 'gameNew err'/*, input: e*/ }
   const res = { m: 'gameNew' }
   const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
@@ -331,11 +329,18 @@ const companyList = async (e, c, cb) => {
  * 单个厂商
  */
 const companyOne = async (e, c, cb) => {
+  // 入参转换
   const errRes = { m: 'companyOne err'/*, input: e*/ }
   const res = { m: 'companyOne' }
   const [paramsErr, companyParams] = Model.pathParams(e)
   if (paramsErr) {
     return ResErr(cb, jsonParseErr)
+  }
+  // 参数校验
+  if (!companyParams.companyName || !companyParams.companyId) {
+    return ResErr(cb, BizErr.InparamErr())
+  } else {
+    companyParams.companyName = decodeURIComponent(companyParams.companyName)
   }
   let [err, ret] = await new CompanyModel().getOne(companyParams.companyName, companyParams.companyId)
   if (err) {

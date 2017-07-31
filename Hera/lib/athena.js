@@ -41,6 +41,13 @@ export class BaseModel{
             expressionAttributeValues[`:${key}`] = conditions[key];
         }
         keyConditionExpression = keyConditionExpression.substr(0, keyConditionExpression.length-4);
+        console.log({
+                // Key:key,
+                KeyConditionExpression : keyConditionExpression,
+                ExpressionAttributeValues:expressionAttributeValues,
+                IndexName: indexName,
+                ReturnValues : returnValues.join(",")
+            });
         return new Promise((reslove, reject) => {
             this.db$("query",{
                 // Key:key,

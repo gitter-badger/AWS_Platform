@@ -11,7 +11,6 @@ const State = {
 export class UserModel extends athena.BaseModel {
     constructor({userName, userPwd, buId, state, merchantName,  msn} = {}) {
         super(TABLE_NAMES.TABLE_USER);
-        this.userId = Util.uuid();
         this.userName = userName;
         this.userPwd = userPwd;
         this.buId = +buId;
@@ -34,6 +33,24 @@ export class UserModel extends athena.BaseModel {
     }
     cryptoPassword(){
         this.userPwd = Util.sha256(this.userPwd);
+    }
+    async save(len, num){
+        len = len || 6;
+        num = num || -1;
+        this.userId = Util.userId(len);
+        let [err, userInfo] = await this.get({userId:this.userId},[], "userIdIndex");
+        num ++;
+        if(err) return [err, 0];
+        if(userInfo) { //重新找
+            num ++;
+            if(num%2 ==0) {
+                num = 0;
+                len ++;
+            }
+            this.save(len, num);
+        }else {
+            return super.save();
+        }
     }
     list(buId){
         let scanParams = {

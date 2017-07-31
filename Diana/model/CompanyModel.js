@@ -27,7 +27,8 @@ export class CompanyModel extends BaseModel {
         this.item = {
             ...this.baseitem,
             companyName: Model.StringValue,
-            companyId: Model.uuid()
+            companyId: Model.uuid(),
+            companyKey: Model.uuid()
         }
     }
 
@@ -57,14 +58,15 @@ export class CompanyModel extends BaseModel {
             return [BizErr.ItemExistErr('运营商已存在'), 0]
         }
         // 保存
-        const [putErr, putRet] = await this.putItem({
+        const item = {
             ...this.item,
             ...companyInfo
-        })
+        }
+        const [putErr, putRet] = await this.putItem(item)
         if (putErr) {
             return [putErr, 0]
         }
-        return [0, putRet]
+        return [0, item]
     }
 
     /**

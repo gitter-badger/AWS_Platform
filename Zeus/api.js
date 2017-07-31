@@ -19,7 +19,6 @@ import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
-import {pushUserInfo} from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -105,25 +104,9 @@ const userNew = async (e, c, cb) => {
   if (registerUserErr) {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
-  ResOK(cb, { ...res, payload: resgisterUserRet });
-  //只有真人游戏才推送给真人游戏服务器
-  let gameList = resgisterUserRet.gameList;
-  let game = gameList.find((game) => {
-    return game.gameId == 30000
-  })
-  // if(game) {
-    let pushInfo = {
-      name : resgisterUserRet.username,
-      role : resgisterUserRet.role,
-      id : resgisterUserRet.userId,
-      nickName : resgisterUserRet.displayName,
-      headPic : "00",
-      parentId : resgisterUserRet.parent
-    }
-    //推送信息给A3服务器
-    pushUserInfo(pushInfo);
-  // }
-  
+
+  return ResOK(cb, { ...res, payload: resgisterUserRet });
+ 
 }
 
 /**
@@ -152,7 +135,7 @@ const userAuth = async (e, c, cb) => {
  * 获取用户TOKEN
  */
 const userGrabToken = async (e, c, cb) => {
-  const errRes = { m: 'userGrabToken error', input: e }
+  const errRes = { m: 'userGrabToken error'/*, input: e*/ }
   const res = { m: 'userGrabToken' }
   // username suffix role and apiKey
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
@@ -247,7 +230,7 @@ const adminCenter = async (e, c, cb) => {
  */
 const managerList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerList error', input: e }
+  const errRes = { m: 'managerList error'/*, input: e*/ }
   const res = { m: 'managerList' }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -261,13 +244,14 @@ const managerList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-    user.balance = balance
+    let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+    user.balance = lastBill.lastBalance
+    user.lastBill = lastBill
     // 查询已用商户已用数量
     const [err, ret] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
-    if(ret && ret.length > 0){
+    if (ret && ret.length > 0) {
       user.merchantUsedCount = ret.length
-    }else{
+    } else {
       user.merchantUsedCount = 0
     }
   }
@@ -278,7 +262,7 @@ const managerList = async (e, c, cb) => {
  */
 const managerOne = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerOne err', input: e }
+  const errRes = { m: 'managerOne err'/*, input: e*/ }
   const res = { m: 'managerOne' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -301,8 +285,8 @@ const managerOne = async (e, c, cb) => {
  */
 const managerUpdate = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerUpdate err', input: e }
-  const res = { m: 'managerUpdate', input: e }
+  const errRes = { m: 'managerUpdate err'/*, input: e*/ }
+  const res = { m: 'managerUpdate' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
@@ -319,10 +303,12 @@ const managerUpdate = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
+  // 获取更新属性和新密码HASH
   const Manager = {
     ...manager,
     ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
+  Manager.passhash = Model.hashGen(Manager.password)
   // 业务操作
   const [updateErr, updateRet] = await new UserModel().userUpdate(Manager)
   // 操作日志记录
@@ -341,7 +327,7 @@ const managerUpdate = async (e, c, cb) => {
  */
 const merchantOne = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantOne err', input: e }
+  const errRes = { m: 'merchantOne err'/*, input: e*/ }
   const res = { m: 'merchantOne' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -365,7 +351,7 @@ const merchantOne = async (e, c, cb) => {
  */
 const merchantList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantList err', input: e }
+  const errRes = { m: 'merchantList err'/*, input: e*/ }
   const res = { m: 'merchantList' }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -379,8 +365,9 @@ const merchantList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-    user.balance = balance
+    let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+    user.balance = lastBill.lastBalance
+    user.lastBill = lastBill
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -390,7 +377,7 @@ const merchantList = async (e, c, cb) => {
  */
 const childList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'childList err', input: e }
+  const errRes = { m: 'childList err'/*, input: e*/ }
   const res = { m: 'childList' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr) {
@@ -416,8 +403,9 @@ const childList = async (e, c, cb) => {
   }
   // 查询每个用户余额
   for (let user of ret) {
-    let [balanceErr, balance] = await new BillModel().checkUserBalance(user)
-    user.balance = balance
+    let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+    user.balance = lastBill.lastBalance
+    user.lastBill = lastBill
   }
   return ResOK(cb, { ...res, payload: ret })
 }
@@ -427,7 +415,7 @@ const childList = async (e, c, cb) => {
  */
 const merchantUpdate = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantUpdate err', input: e }
+  const errRes = { m: 'merchantUpdate err'/*, input: e*/ }
   const res = { m: 'merchantUpdate' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -445,9 +433,11 @@ const merchantUpdate = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
+  // 获取更新属性和新密码HASH
   const Merchant = {
     ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
   }
+  Merchant.passhash = Model.hashGen(Merchant.password)
   // 业务操作
   const [updateErr, updateRet] = await new UserModel().userUpdate(Merchant)
   // 操作日志记录
@@ -519,7 +509,7 @@ const randomPassword = (e, c, cb) => {
  * 可用线路商
  */
 const avalibleManagers = async (e, c, cb) => {
-  const errRes = { m: 'avalibleManagers err', input: e }
+  const errRes = { m: 'avalibleManagers err'/*, input: e*/ }
   const res = { m: 'avalibleManagers' }
   const [err, ret] = await new UserModel().listAvalibleManagers()
   if (err) {
@@ -569,7 +559,7 @@ const msnList = async (e, c, cb) => {
  */
 const checkMsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'checkMsn err', input: e }
+  const errRes = { m: 'checkMsn err'/*, input: e*/ }
   const res = { m: 'checkMsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
@@ -619,7 +609,7 @@ const msnRandom = async (e, c, cb) => {
  */
 const lockmsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'lockmsn err', input: e }
+  const errRes = { m: 'lockmsn err'/*, input: e*/ }
   const res = { m: 'lockmsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
@@ -733,6 +723,18 @@ const jwtverify = async (e, c, cb) => {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
+  // 有效期校验
+  console.info('解密')
+  console.info(Math.floor(new Date().getTime() / 1000))
+  console.info(userInfo.iat)
+  console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
+  // if(new Date().getTime - userInfo.iat > 100000){
+  //   return c.fail('Token expire')
+  // }
+  // TOKEN是否有效校验（判断密码是否一致）
+  // if(!userInfo.password){
+  //   return c.fail('Token locked')
+  // }
   // 结果返回
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 

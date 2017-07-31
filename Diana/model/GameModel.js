@@ -62,14 +62,15 @@ export class GameModel extends BaseModel {
             return [BizErr.ItemExistErr(), 0]
         }
         // 保存
-        const [putErr, putRet] = await this.putItem({
+        const item = {
             ...this.item,
             ...gameInfo
-        })
+        }
+        const [putErr, putRet] = await this.putItem(item)
         if (putErr) {
             return [putErr, 0]
         }
-        return [0, putRet]
+        return [0, item]
     }
 
     /**
@@ -100,12 +101,13 @@ export class GameModel extends BaseModel {
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,
+            ScanIndexForward: false,
             ExpressionAttributeValues: values
         })
         if (err) {
             return [err, 0]
         }
-        return [0, ret]
+        return [0, ret.Items]
     }
 
     /**

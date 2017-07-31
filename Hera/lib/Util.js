@@ -58,6 +58,13 @@ export class Util{
         }
         return authResponse;
     }
+    /**
+     * 获取长度len位的随机Id;
+     */
+    static userId(len){
+        let number = Number.parseInt(Math.random()*Math.pow(10,len));
+        return number;
+    }
     static uuid(){
         return uid();
     }

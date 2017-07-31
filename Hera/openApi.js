@@ -67,7 +67,6 @@ export async function gamePlayerRegister(event, context, callback) {
   if(existError) return callback(null, ReHandler.fail(existError));
   //用户已经注册
   if(flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.userAlreadyRegister)));
-
   //生成密码hash
   user.cryptoPassword();
   let [userSaveError, userInfo] = await user.save();
@@ -120,7 +119,7 @@ export async function gamePlayerLogin(event, context, callback) {
   let flag = user.vertifyPassword(userInfo.userPwd);
   
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
-  let loginToken = Util.createTokenJWT({userName,suffix:merchantInfo.suffix});
+  let loginToken = Util.createTokenJWT({userName,suffix:merchantInfo.suffix,userId:userInfo.userId});
   let [updateError] = await user.update({userName: userName},{ token: loginToken,updateAt:Date.now()});
   if(updateError) return callback(null, ReHandler.fail(updateError));
   callback(null, ReHandler.success({
@@ -271,4 +270,86 @@ export async function gamePlayerBalance(event, context, callback) {
     callback(null, ReHandler.success({
       data:{amount : userSumAmount}
     }));
+}
+
+/**
+ * A3游戏登陆
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+export async function gamePlayerA3Login(event, context, callback) {
+  //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+
+  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+    //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "userId", type:"N"},
+      {name : "userPwd", type:"S", min:6, max :16}
+  ], requestParams);
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return callback(null, ReHandler.fail(checkAttError));
+  } 
+
+  let {userId, userPwd, msn} = requestParams;
+
+
+  let user = new UserModel(requestParams);
+  let [userExistError, userInfo] = await user.get({userId:+userId},[], "userIdIndex");
+  if(userExistError) return callback(null, ReHandler.fail(userExistError));
+  if(!userInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+  //账号已冻结
+  if(userInfo.state == 2) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
+  //验证密码
+  let flag = user.vertifyPassword(userInfo.userPwd);
+  
+  if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
+  let suffix = userInfo.userName.split("_")[0];
+  let loginToken = Util.createTokenJWT({userName : userInfo.userName, suffix:suffix, userId:+userId});
+  let [updateError] = await user.update({userName: userInfo.userName},{ token: loginToken,updateAt:Date.now()});
+  if(updateError) return callback(null, ReHandler.fail(updateError));
+  callback(null, ReHandler.success({
+      data:{token : loginToken}
+  }));
+}
+
+
+/**
+ * 用户余额（A3）
+ * @param event
+ * @param context
+ * @param callback
+ */
+export async function getA3GamePlayerBalance(event, context, callback) {
+ 
+    //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters);
+
+  
+
+  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+  //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "userId", type:"N"}
+  ], requestParams);
+  let userId = +requestParams.userId;
+
+  //验证token
+  let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
+  console.log("aaaaaaaaaaaaaaaaaa");
+  console.log(userInfo);
+  if(err ||  !userInfo || !Object.is(userId, userInfo.userId)){
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
+  }
+  
+  let userBill = new UserBillModel(userInfo);
+  console.log(typeof +userId);
+
+  let [bError, balance] = await userBill.getBalance();
+  if(bError) return callback(null, ReHandler.fail(bError));
+  callback(null, ReHandler.success({
+      data :{balance : balance}
+  }));
 }

@@ -15,12 +15,12 @@
     }
   },
   "body": {
-    "gameName": "asd",
+    "gameName": "大英雄11",
     "gameType": "1",
     "company": "1",
-    "port": "asdsad",
-    "ip": "asd",
-    "gameRecommend": "asdas",
+    "port": "127.0.0.1",
+    "ip": "8080",
+    "gameRecommend": "推荐信息",
     "gameImg": ""
   }
 }

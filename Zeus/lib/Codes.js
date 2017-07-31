@@ -27,12 +27,14 @@ export const Codes = {
   AddUserError: '21000',
   DuplicateUser: '21001',
   UserNotFound: '22011',
+  UserLocked: '22012',
   InsufficientBalance: '10002',
   TransferError: '10003',
   RepeatTransferError: '11000',
   InparamError: '60001',
   CaptchaErr: '60002',
-  MerchantPeriodErr: '60003' 
+  MerchantPeriodErr: '60003', 
+  TcpError : '60004'
 }
 
 export const BizErr = {
@@ -53,6 +55,9 @@ export const BizErr = {
   },
   UserNotFoundErr:(errMsg = 'User not found') => {
     return {code:Codes.UserNotFound,err:errMsg}
+  },
+  UserLockedErr:(errMsg = 'User locked') => {
+    return {code:Codes.UserLocked,err:errMsg}
   },
   PasswordErr:(errMsg = 'password error') => {
     return {code:Codes.PasswordError,err:errMsg}
@@ -93,7 +98,11 @@ export const BizErr = {
   InparamErr: (errMsg = 'InparamError') => {
     return  {code : Codes.InparamError, err: errMsg}
   },
+
   CaptchaErr: (errMsg = 'CaptchaErr') => {
     return  {code : Codes.CaptchaErr, err: errMsg}
+  },
+  TcpErr: (errMsg = 'tcp connection error') => {
+    return  {code : Codes.TcpError, err: errMsg}
   }
 }
