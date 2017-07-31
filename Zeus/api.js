@@ -145,7 +145,7 @@ const userAuth = async (e, c, cb) => {
  * 获取用户TOKEN
  */
 const userGrabToken = async (e, c, cb) => {
-  const errRes = { m: 'userGrabToken error', input: e }
+  const errRes = { m: 'userGrabToken error'/*, input: e*/ }
   const res = { m: 'userGrabToken' }
   // username suffix role and apiKey
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
@@ -240,7 +240,7 @@ const adminCenter = async (e, c, cb) => {
  */
 const managerList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerList error', input: e }
+  const errRes = { m: 'managerList error'/*, input: e*/ }
   const res = { m: 'managerList' }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -272,7 +272,7 @@ const managerList = async (e, c, cb) => {
  */
 const managerOne = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerOne err', input: e }
+  const errRes = { m: 'managerOne err'/*, input: e*/ }
   const res = { m: 'managerOne' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -295,8 +295,8 @@ const managerOne = async (e, c, cb) => {
  */
 const managerUpdate = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerUpdate err', input: e }
-  const res = { m: 'managerUpdate', input: e }
+  const errRes = { m: 'managerUpdate err'/*, input: e*/ }
+  const res = { m: 'managerUpdate' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
@@ -337,7 +337,7 @@ const managerUpdate = async (e, c, cb) => {
  */
 const merchantOne = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantOne err', input: e }
+  const errRes = { m: 'merchantOne err'/*, input: e*/ }
   const res = { m: 'merchantOne' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -361,7 +361,7 @@ const merchantOne = async (e, c, cb) => {
  */
 const merchantList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantList err', input: e }
+  const errRes = { m: 'merchantList err'/*, input: e*/ }
   const res = { m: 'merchantList' }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -387,7 +387,7 @@ const merchantList = async (e, c, cb) => {
  */
 const childList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'childList err', input: e }
+  const errRes = { m: 'childList err'/*, input: e*/ }
   const res = { m: 'childList' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr) {
@@ -425,7 +425,7 @@ const childList = async (e, c, cb) => {
  */
 const merchantUpdate = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantUpdate err', input: e }
+  const errRes = { m: 'merchantUpdate err'/*, input: e*/ }
   const res = { m: 'merchantUpdate' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -519,7 +519,7 @@ const randomPassword = (e, c, cb) => {
  * 可用线路商
  */
 const avalibleManagers = async (e, c, cb) => {
-  const errRes = { m: 'avalibleManagers err', input: e }
+  const errRes = { m: 'avalibleManagers err'/*, input: e*/ }
   const res = { m: 'avalibleManagers' }
   const [err, ret] = await new UserModel().listAvalibleManagers()
   if (err) {
@@ -569,7 +569,7 @@ const msnList = async (e, c, cb) => {
  */
 const checkMsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'checkMsn err', input: e }
+  const errRes = { m: 'checkMsn err'/*, input: e*/ }
   const res = { m: 'checkMsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
@@ -619,7 +619,7 @@ const msnRandom = async (e, c, cb) => {
  */
 const lockmsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'lockmsn err', input: e }
+  const errRes = { m: 'lockmsn err'/*, input: e*/ }
   const res = { m: 'lockmsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
