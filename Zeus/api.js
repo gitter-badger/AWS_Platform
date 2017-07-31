@@ -64,7 +64,7 @@ const adminNew = async (e, c, cb) => {
   //检查参数是否合法
   let [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
   if (checkAttError) {
-    Object.assign(checkAttError, { params: errorParams });
+    Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
   // 要求管理员角色
@@ -120,7 +120,7 @@ const userNew = async (e, c, cb) => {
   if (registerUserErr) {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
-  return ResOK(cb, { ...res, payload: resgisterUserRet });
+  return ResOK(cb, { ...res, payload: resgisterUserRet })
   let pushInfo = {
     name: resgisterUserRet.username,
     role: resgisterUserRet.role,
@@ -130,7 +130,7 @@ const userNew = async (e, c, cb) => {
     parentId: resgisterUserRet.parent
   }
   //推送信息给A3服务器
-  // pushUserInfo(pushInfo);
+  // pushUserInfo(pushInfo)
 
 }
 
@@ -357,7 +357,7 @@ const managerUpdate = async (e, c, cb) => {
   //检查参数是否合法
   let [checkAttError, errorParams] = new UserCheck().checkUser(managerInfo)
   if (checkAttError) {
-    Object.assign(checkAttError, { params: errorParams });
+    Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
   // 获取令牌
@@ -495,7 +495,7 @@ const merchantUpdate = async (e, c, cb) => {
   //检查参数是否合法
   let [checkAttError, errorParams] = new UserCheck().checkUser(merchantInfo)
   if (checkAttError) {
-    Object.assign(checkAttError, { params: errorParams });
+    Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
   // 身份令牌校验
@@ -795,7 +795,7 @@ const jwtverify = async (e, c, cb) => {
   // verify it and return the policy statements
   const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
-    console.log(JSON.stringify(err), JSON.stringify(userInfo));
+    console.log(JSON.stringify(err), JSON.stringify(userInfo))
     return c.fail('Unauthorized')
   }
   // 有效期校验

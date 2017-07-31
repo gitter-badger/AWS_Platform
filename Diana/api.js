@@ -22,6 +22,9 @@ import { BillModel } from './model/BillModel'
 import { UserModel } from './model/UserModel'
 import { CompanyModel } from './model/CompanyModel'
 
+import { BillCheck } from './biz/BillCheck'
+
+
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
@@ -213,6 +216,12 @@ const billTransfer = async (e, c, cb) => {
   const [jsonParseErr, transferInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new BillCheck().checkBill(transferInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
