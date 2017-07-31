@@ -106,6 +106,7 @@ functions:
           path: checkUserExist
           method: post
           cors: true
+          authorizer: tokenAuth
   userChangeStatus: #变更用户状态
     handler: api.userChangeStatus
     events:
