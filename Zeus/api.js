@@ -200,6 +200,39 @@ const userChangeStatus = async (e, c, cb) => {
 }
 
 /**
+ * 检查用户是否被占用
+ */
+const checkUserExist = async (e, c, cb) => {
+  const errRes = { m: 'checkUserExist error'/*, input: e*/ }
+  const res = { m: 'checkUserExist' }
+  // 入参转换和校验
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  if (!inparam.role || !inparam.suffix || !inparam.username) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 只有管理员有权限
+  if (token.role != RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin token'), 0]
+  }
+  // 业务操作
+  let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
+/**
  * 管理员列表
  */
 const adminList = async (e, c, cb) => {
@@ -772,6 +805,7 @@ export {
   userGrabToken,                // 使用apiKey登录获取用户信息
   userChangeStatus,             // 变更用户状态
   childList,                    // 下级用户列表
+  checkUserExist,               // 检查用户是否被占用
 
   managerList,                  // 建站商列表
   managerOne,                   // 建站商详情

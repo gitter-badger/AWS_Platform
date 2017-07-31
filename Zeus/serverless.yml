@@ -98,6 +98,14 @@ functions:
           path: users/token
           method: post
           cors: true
+  checkUserExist: #检查用户是否被占用
+    handler: api.checkUserExist
+    events:
+      -
+        http:
+          path: checkUserExist
+          method: post
+          cors: true
   userChangeStatus: #变更用户状态
     handler: api.userChangeStatus
     events:
