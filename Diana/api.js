@@ -33,7 +33,7 @@ const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
  */
 const gameNew = async (e, c, cb) => {
   // 入参转换
-  const errRes = { m: 'gameNew err', input: e }
+  const errRes = { m: 'gameNew err'/*, input: e*/ }
   const res = { m: 'gameNew' }
   const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
