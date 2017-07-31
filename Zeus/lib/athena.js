@@ -262,7 +262,7 @@ export class Util {
     static checkProperty(value, type, min, max, equal) {
         switch (type) {
             case "S": {
-                if (!value) return [new AError(CODES.JSON_FORMAT_ERROR), null];
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
                 let strLength = value.length,
                     error = false;
                 if (min && strLength < min) error = true;
@@ -271,7 +271,7 @@ export class Util {
                 return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
             }
             case "N": {
-                if (!value) return [new AError(CODES.JSON_FORMAT_ERROR), null];
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
                 let [e, v] = this.parseNumber(value);
                 if (e) return [e, 0];
                 let error = false;
@@ -281,11 +281,11 @@ export class Util {
                 return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
             }
             case "J": {
-                if (!value) return [new AError(CODES.JSON_FORMAT_ERROR), null];
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
                 return this.parseJSON(value);
             }
             case "REG": {
-                if (!value) return [new AError(CODES.JSON_FORMAT_ERROR), null];
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
                 return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
             }
             case "NS": {
@@ -331,17 +331,17 @@ export class Util {
             if (checkErr) errorArray.push(name);
         }
         return Object.is(errorArray.length, 0) ? [null, errorArray] :
-            [new AError(CODES.JSON_FORMAT_ERROR), errorArray]
+            [new AError(CODES.INPARAM_ERROR), errorArray]
     }
 
     static parseNumber(v) {
         try {
             let value = +v;
-            if (Number.isNaN(value)) return [new AError(CODES.JSON_FORMAT_ERROR), null]
+            if (Number.isNaN(value)) return [new AError(CODES.INPARAM_ERROR), null]
             return [null, value];
         } catch (err) {
             console.log(err);
-            return [new AError(CODES.JSON_FORMAT_ERROR), null];
+            return [new AError(CODES.INPARAM_ERROR), null];
         }
     }
 }
@@ -361,5 +361,6 @@ const CODES = {
 
 const EMSG = {
     "10000": "数据错误",
+    "10001": "入参数据不合法",
     "500": "服务器错误"
 }
