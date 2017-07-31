@@ -21,7 +21,9 @@ import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { pushUserInfo } from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
-const athena = require("./lib/athena")
+
+import { UserCheck } from './biz/UserCheck'
+
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
@@ -60,14 +62,7 @@ const adminNew = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   //检查参数是否合法
-  let [checkAttError, errorParams] = athena.Util.checkProperties([
-    { name: "username", type: "S", min: 6, max: 16 },
-    { name: "password", type: "S", min: 6, max: 16 },
-    { name: "role", type: "N", min: 1, max: 100 },
-    { name: "adminName", type: "S", min: 1, max: 16 },
-    { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-    { name: "adminContact", type: "S", min: 1, max: 16 }
-  ], userInfo)
+  let [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
   if (checkAttError) {
     Object.assign(checkAttError, { params: errorParams });
     return ResErr(cb, checkAttError)
@@ -101,27 +96,9 @@ const userNew = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   //检查参数是否合法
-  let [checkAttError, errorParams] = athena.Util.checkProperties([
-    { name: "username", type: "S", min: 6, max: 16 },
-    { name: "password", type: "S", min: 6, max: 16 },
-    { name: "role", type: "N", min: 1, max: 100 },
-    { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
-    { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-    { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-    { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-    { name: "adminName", type: "NS", min: 1, max: 16 },
-    { name: "managerName", type: "NS", min: 1, max: 16 },
-    { name: "merchantName", type: "NS", min: 1, max: 16 },
-    { name: "adminContact", type: "NS", min: 1, max: 16 },
-    { name: "displayName", type: "S", min: 1, max: 16 },
-    { name: "remark", type: "NS", min: 1, max: 100 },
-    { name: "hostName", type: "S", min: 1, max: 16 },
-    { name: "hostContact", type: "S", min: 1, max: 16 },
-    { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
-    { name: "limit", type: "N", min: 1, max: 10 }
-  ], userInfo)
+  let [checkAttError, errorParams] = new UserCheck().checkUser(userInfo)
   if (checkAttError) {
-    Object.assign(checkAttError, { params: errorParams });
+    Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
   // 获取身份令牌
