@@ -6,7 +6,6 @@ import {
   Model,
   Tables,
   GameTypeEnum,
-  BillActionEnum,
   StatusEnum,
   GenderEnum,
   RoleCodeEnum,
@@ -15,7 +14,6 @@ import {
   Pick,
   JwtVerify,
   GeneratePolicyDocument,
-  MSNStatusEnum,
   BizErr
 } from './lib/all'
 import { GameModel } from './model/GameModel'

@@ -10,7 +10,6 @@ import {
     Pick,
     Omit,
     RoleCodeEnum,
-    MSNStatusEnum,
     RoleModels
 } from '../lib/all'
 
