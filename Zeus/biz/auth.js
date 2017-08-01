@@ -309,6 +309,16 @@ const getRole = async (code) => {
 
 // 保存用户
 const saveUser = async (userInfo) => {
+  // 线路商或商户，从编码池获取新编码
+  let [uucodeErr, uucodeRet] = [0, 0]
+  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role) {
+    [uucodeErr, uucodeRet] = await Model.uucode('displayId', 6)
+    if (uucodeErr) {
+      return [uucodeErr, 0]
+    }
+    userInfo.displayId = parseInt(uucodeRet)
+  }
+
   // 组装用户信息
   const baseModel = Model.baseModel()
   const roleDisplay = RoleDisplay[userInfo.role]
@@ -320,14 +330,9 @@ const saveUser = async (userInfo) => {
   }
   var saveConfig = { TableName: Tables.ZeusPlatformUser, Item: UserItem }
   var method = 'put'
+  
   // 如果是商户，还需要保存线路号
   if (RoleCodeEnum['Merchant'] === userInfo.role) {
-    // 从编码池获取新编码
-    let [uucodeErr, uucodeRet] = await Model.uucode('merchant', 6)
-    if (uucodeErr) {
-      return [uucodeErr, 0]
-    }
-    userInfo.displayId = parseInt(uucodeRet)
     saveConfig = {
       RequestItems: {
         'ZeusPlatformUser': [
@@ -351,16 +356,6 @@ const saveUser = async (userInfo) => {
               }
             }
           }
-        ],
-        'ZeusPlatformCode': [
-          {
-            PutRequest: {
-              Item: {
-                type: 'merchant',
-                code: uucodeRet
-              }
-            }
-          }
         ]
       }
     }
@@ -371,6 +366,11 @@ const saveUser = async (userInfo) => {
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
+  // End:记录生成的编码
+  if (uucodeRet) {
+    Store$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'displayId', code: uucodeRet } })
+  }
+
   const ret = Pick(UserItem, roleDisplay)
   return [0, ret]
 }
