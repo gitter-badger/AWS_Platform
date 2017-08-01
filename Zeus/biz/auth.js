@@ -44,7 +44,7 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
-  if (queryUserRet.Items.length) {
+  if (!queryUserRet) {
     return [BizErr.UserExistErr(), 0]
   }
   // 保存用户
@@ -86,7 +86,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
-  if (queryUserRet.Items.length) {
+  if (!queryUserRet) {
     return [BizErr.UserExistErr(), 0]
   }
   // 如果是创建商户，检查msn是否可用
