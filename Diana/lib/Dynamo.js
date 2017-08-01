@@ -52,8 +52,6 @@ export const Tables = {
  * 基础Model
  */
 export const Model = {
-  USERNAME_LIMIT: [6, 16], // 用户名长度限制
-  PASSWORD_PATTERN: [3, 16],
   StringValue: '0',
   NumberValue: 0.0,
   PlatformAdminDefaultPoints: 100000000.00,

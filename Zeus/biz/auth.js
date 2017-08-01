@@ -36,11 +36,7 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
     ...adminRole,
     ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
   }, Keys(adminRole))
-  // 检查用户数据
-  const [userParamErr, _] = userParamCheck(userInput)
-  if (userParamErr) {
-    return [userParamErr, 0]
-  }
+
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 查询用户是否已存在
   const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
@@ -82,10 +78,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   // 生成注册用户信息
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
-  const [userParamErr, _] = userParamCheck(userInput)
-  if (userParamErr) {
-    return [userParamErr, 0]
-  }
+
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 检查用户是否已经存在
   const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
@@ -260,26 +253,6 @@ export const UserGrabToken = async (userInfo = {}) => {
 }
 
 // ==================== 以下为内部方法 ====================
-
-// 检查用户数据合法性
-const userParamCheck = (userInfo) => {
-  if (userInfo.adminName === Model.StringValue) {
-    return [BizErr.ParamErr('adminName must set'), 0]
-  }
-  if (userInfo.suffix === Model.StringValue) {
-    return [BizErr.NoSuffixErr(), 0]
-  }
-  if (Trim(userInfo.username).length < Model.USERNAME_LIMIT[0]) {
-    return [BizErr.UsernameTooShortErr(), 0]
-  }
-  if (Trim(userInfo.username).length > Model.USERNAME_LIMIT[1]) {
-    return [BizErr.UsernameTooLongErr(), 0]
-  }
-  if (userInfo.password.length < Model.PASSWORD_PATTERN[0]) {
-    return [BizErr.ParamErr(), 0]
-  }
-  return [0, 0]
-}
 
 // 查询用户上级
 const queryParent = async (token, userId) => {
