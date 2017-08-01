@@ -19,7 +19,6 @@ import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
-import { pushUserInfo } from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
@@ -128,18 +127,9 @@ const userNew = async (e, c, cb) => {
   if (registerUserErr) {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
-  return ResOK(cb, { ...res, payload: resgisterUserRet })
-  let pushInfo = {
-    name: resgisterUserRet.username,
-    role: resgisterUserRet.role,
-    id: resgisterUserRet.userId,
-    nickName: resgisterUserRet.displayName,
-    headPic: "00",
-    parentId: resgisterUserRet.parent
-  }
-  //推送信息给A3服务器
-  // pushUserInfo(pushInfo)
 
+  return ResOK(cb, { ...res, payload: resgisterUserRet });
+ 
 }
 
 /**

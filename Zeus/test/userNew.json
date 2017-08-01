@@ -15,13 +15,18 @@
     }
   },
   "body": {
-      "username": "cmerchant12",
+      "username": "cmerchant312",
       "password": "123456",
       "role": "100",
-      "adminName": "cheneymerchant1",
-      "parent": "01",
-      "msn":"1",
-      "suffix":"CY1",
-      "displayName": "测试商户1"
+      "adminName": "cheneymerchant",
+      "parent": "7f1b1613-0d3c-4e53-90f6-f2d518e68556",
+      "msn":"47",
+      "suffix":"CY35",
+      "displayName": "测试商户14",
+      "gameList" : [
+        {
+          "gameId" : 30000
+        }
+      ]
   }
 }

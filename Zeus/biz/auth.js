@@ -18,6 +18,7 @@ import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
 import { BillModel } from '../model/BillModel'
+import { PushModel } from '../model/PushModel'
 
 /**
  * 接口编号：0
@@ -113,6 +114,13 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     parentSuffix: parentUser.suffix,
     points: 0.0
   }
+  //推送给游戏服务器(A3)
+  let pushModel = new PushModel(User);
+  let [pushErr, data] = await pushModel.push();
+  if(pushErr) {
+    return [pushErr, 0]
+  }
+  return;
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]

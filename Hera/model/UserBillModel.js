@@ -11,7 +11,7 @@ export class UserBillModel extends athena.BaseModel {
     constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
-        this.userId = userId
+        this.userId = +userId
         this.action = +action;
         this.userName = userName;
         this.msn = msn;
@@ -56,7 +56,16 @@ export class UserBillModel extends athena.BaseModel {
             })
         })
     }
-
+    async getBalanceByUid(userId){
+        let [err, records] = await this.get({userId}, ["userName","amount","userId"], "userIdIndex", true);
+        if(err) return [err, 0];
+        records = records || [];
+        let sumMount = 0;
+        records.forEach(function(element) {
+            sumMount += element.amount;
+        });
+        return [null, sumMount];
+    }
     carryPoint(){
         return this.save();
     }

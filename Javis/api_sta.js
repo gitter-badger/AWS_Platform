@@ -205,8 +205,6 @@ const statisticsListByDay = async(event, context ,cb) => {
   let userModel = new PlatformUserModel();
 
   let [error, list] = await billModel.statistics(5, firstTime, endTime); 
-  console.log("111111111111111");
-  console.log(list); 
   if(error){
       return callback(null, Fail(error));
   }

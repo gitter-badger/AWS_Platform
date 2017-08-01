@@ -43,6 +43,13 @@ functions:
           path: /player
           method: post
           cors: true
+  A3Login:     #玩家A3游戏登陆
+    handler: openApi.gamePlayerA3Login
+    events:
+      - http:
+          path: /game/login
+          method: post
+          cors: true
   gamePlayerBalance:    #玩家充值/提现
     handler: openApi.gamePlayerBalance
     events:
@@ -55,6 +62,13 @@ functions:
     events:
       - http:
           path: /player/{userName}/balance
+          method: get
+          cors: true
+  A3Balance:  #获取A3余额
+    handler: openApi.getA3GamePlayerBalance
+    events:
+      - http:
+          path: /game/player/balance
           method: get
           cors: true
   gamePlayerList:  #获取玩家列表
@@ -91,6 +105,9 @@ resources:
           -
             AttributeName: userName
             AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: N
         KeySchema:
           -
             AttributeName: userName
@@ -98,6 +115,18 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: userIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
     HeraGamePlayerBill:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -106,6 +135,9 @@ resources:
           -
             AttributeName: userName
             AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: N
           -
             AttributeName: createAt
             AttributeType: N
@@ -125,6 +157,17 @@ resources:
             KeySchema:
               -
                 AttributeName: userName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: userIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
