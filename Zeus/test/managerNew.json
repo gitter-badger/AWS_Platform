@@ -14,5 +14,41 @@
       "sourceIp": "127.0.0.1"
     }
   },
-  "body": {"role":"10","suffix":"QAA","displayName":"QAA","rate":"100","managerEmail":"QAA@q.com","remark":"11111","hostName":"1111","hostContact":"1111","contractPeriod":["2017-07-24T16:00:00.000Z","2017-07-26T16:00:00.000Z"],"isforever":false,"points":"100000","limit":"1","gameList":[{"gameName":"SaraGame","port":"8080","gameStatus":0,"company":null,"updatedAt":1501228629387,"gameImg":"http://placehold.it/250x250","ip":"127.0.0.1","createdAt":1501228629387,"gameType":"1","gameId":"c1e5ee76-ead4-4d3b-8843-2f713725502f","gameRecommend":"SamSara"}],"username":"testAQQQ","password":"testAQQQ123","adminName":"testAQQQ123","adminEmail":"testAQQQ123@q.com","adminContact":"testAQQQ123"}
+  "body": {
+    "role": "10",
+    "suffix": "QAA",
+    "displayName": "QAA",
+    "rate": "100",
+    "managerEmail": "QAA@q.com",
+    "remark": "11111",
+    "hostName": "1111",
+    "hostContact": "1111",
+    "contractPeriod": [
+      "2017-07-24T16:00:00.000Z",
+      "2017-07-26T16:00:00.000Z"
+    ],
+    "isforever": false,
+    "points": "100000",
+    "limit": "1",
+    "gameList": [
+      {
+        "gameName": "SaraGame",
+        "port": "8080",
+        "gameStatus": 0,
+        "company": null,
+        "updatedAt": 1501228629387,
+        "gameImg": "http://placehold.it/250x250",
+        "ip": "127.0.0.1",
+        "createdAt": 1501228629387,
+        "gameType": "1",
+        "gameId": "c1e5ee76-ead4-4d3b-8843-2f713725502f",
+        "gameRecommend": "SamSara"
+      }
+    ],
+    "username": "testAQQQ",
+    "password": "testAQQQ123",
+    "adminName": "testAQQQ123",
+    "adminEmail": "testAQQQ123@q.com",
+    "adminContact": "testAQQQ123"
+  }
 }

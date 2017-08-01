@@ -33,71 +33,75 @@ export const Codes = {
   RepeatTransferError: '11000',
   InparamError: '60001',
   CaptchaErr: '60002',
-  MerchantPeriodErr: '60003' 
+  MerchantPeriodStartErr: '60003',
+  MerchantPeriodEndErr: '60004'
 }
 
 export const BizErr = {
-  JSONParseErr: (errMsg = 'JSON format error') => {
+  JSONParseErr: (errMsg = 'JSON转换错误，请检查入参JSON格式') => {
     return {code: Codes.JSONParseError, err: errMsg}
   },
   DBErr: (errMsg = 'DBError') => {
     return {code: Codes.DBError, err: errMsg}
   },
-  UsernameTooShortErr: (errMsg = 'User name too short') => {
+  UsernameTooShortErr: (errMsg = '用户名太短') => {
     return {code: Codes.UsernameTooShort, err: errMsg}
   },
-  UsernameTooLongErr: (errMsg = 'User name too long') => {
+  UsernameTooLongErr: (errMsg = '用户名太长') => {
     return {code: Codes.UsernameTooLong, err: errMsg}
   },
-  UserExistErr: (errMsg = 'User already exist') => {
+  UserExistErr: (errMsg = '用户已存在') => {
     return {code: Codes.DuplicateUser, err: errMsg}
   },
-  UserNotFoundErr:(errMsg = 'User not found') => {
+  UserNotFoundErr:(errMsg = '用户未找到') => {
     return {code:Codes.UserNotFound,err:errMsg}
   },
-  UserLockedErr:(errMsg = 'User locked') => {
+  UserLockedErr:(errMsg = '用户已锁定') => {
     return {code:Codes.UserLocked,err:errMsg}
   },
-  PasswordErr:(errMsg = 'password error') => {
+  PasswordErr:(errMsg = '密码错误') => {
     return {code:Codes.PasswordError,err:errMsg}
   },
-  ParamMissErr: (errMsg = 'params missing') => {
+  ParamMissErr: (errMsg = '参数缺失') => {
     return {code: Codes.ParamMiss, err: errMsg}
   },
-  ParamErr: (errMsg = 'params error') => {
+  ParamErr: (errMsg = '参数错误') => {
     return {code: Codes.ParamError, err: errMsg}
   },
-  NoSuffixErr: (errMsg = 'no suffix error')=>{
+  NoSuffixErr: (errMsg = '缺少前缀')=>{
     return {code:Codes.NoSuffixError,err:errMsg}
   },
-  MerchantPeriodErr: (errMsg = 'MerchantPeriodErr') => {
+  MerchantPeriodEndErr: (errMsg = '帐号已过期') => {
     return {code: Codes.MerchantPeriodErr, err: errMsg}
   },
-  ItemExistErr: (errMsg = 'data item is exist')=>{
+  MerchantPeriodStartErr: (errMsg = '帐号尚未生效') => {
+    return {code: Codes.MerchantPeriodErr, err: errMsg}
+  },
+  ItemExistErr: (errMsg = '记录已存在')=>{
     return {code:Codes.ItemDuplicate,err:errMsg}
   },
-  TokenErr: (errMsg= 'Token error') =>{
+  TokenErr: (errMsg= '身份令牌错误') =>{
     return {code:Codes.TokenError,err:errMsg}
   },
-  MsnExistErr: (errMsg = 'MSN number is exist') =>{
+  MsnExistErr: (errMsg = '线路号已存在') =>{
     return {code:Codes.MsnExistError,err:errMsg}
   },
-  MsnUsedError: (errMsg = 'MSN is used') =>{
+  MsnUsedError: (errMsg = '线路号已占用') =>{
     return {code:Codes.MsnUsedError,err:errMsg}
   },
-  MsnNotExistError: (errMsg = 'MSN is used') =>{
+  MsnNotExistError: (errMsg = '线路号不存在') =>{
     return {code:Codes.MsnNotExistError,err:errMsg}
   },
-  MsnFullError: (errMsg = 'MSN full') =>{
+  MsnFullError: (errMsg = '线路号已全部分配') =>{
     return {code:Codes.MsnFullError,err:errMsg}
   },
   InsufficientBalanceErr: (errMsg = 'InsufficientBalance') => {
     return {code: Codes.InsufficientBalance,err:errMsg}
   },
-  InparamErr: (errMsg = 'InparamError') => {
+  InparamErr: (errMsg = '入参错误') => {
     return  {code : Codes.InparamError, err: errMsg}
   },
-  CaptchaErr: (errMsg = 'CaptchaErr') => {
+  CaptchaErr: (errMsg = '验证码错误') => {
     return  {code : Codes.CaptchaErr, err: errMsg}
   }
 }

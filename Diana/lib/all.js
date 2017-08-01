@@ -18,12 +18,10 @@ from './Dynamo'
 export {
   GenderEnum,
   StatusEnum,
-  BillActionEnum,
   RoleCodeEnum,
   GameTypeEnum,
   GameStatusEnum,
   CompanyStatusEnum,
-  MSNStatusEnum,
   RoleModels,
   BillMo,
   RoleDisplay,

@@ -9,11 +9,6 @@ export const StatusEnum = {
   Enable: 1,
   Disable: 0
 }
-
-export const BillActionEnum = {
-  Deposit: -1.0, // 存
-  Withdraw: 1.0 // 提
-}
 export const MSNStatusEnum = {
   Used: 1,
   Locked: 2,
@@ -26,11 +21,6 @@ export const RoleCodeEnum = {
   'Merchant': '100',
   'Agent': '1000',
   'Player': '10000'
-}
-export const GameTypeEnum = {
-  '0': 'TableGame',
-  '1': 'VideoGame',
-  '2': 'LiveGame'
 }
 export const BillMo = function () {
   return {

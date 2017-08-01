@@ -22,6 +22,11 @@ import { LogModel } from './model/LogModel'
 import { pushUserInfo } from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
 
+import { UserCheck } from './biz/UserCheck'
+import { CaptchaCheck } from './biz/CaptchaCheck'
+import { MsnCheck } from './biz/MsnCheck'
+
+
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
@@ -37,6 +42,12 @@ const eva = async (e, c, cb) => {
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 生成第一个管理员业务
   const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
@@ -57,6 +68,12 @@ const adminNew = async (e, c, cb) => {
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 要求管理员角色
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -86,6 +103,12 @@ const userNew = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkUser(userInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
   // 获取身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -105,7 +128,7 @@ const userNew = async (e, c, cb) => {
   if (registerUserErr) {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
-  return ResOK(cb, { ...res, payload: resgisterUserRet });
+  return ResOK(cb, { ...res, payload: resgisterUserRet })
   let pushInfo = {
     name: resgisterUserRet.username,
     role: resgisterUserRet.role,
@@ -115,7 +138,7 @@ const userNew = async (e, c, cb) => {
     parentId: resgisterUserRet.parent
   }
   //推送信息给A3服务器
-  // pushUserInfo(pushInfo);
+  // pushUserInfo(pushInfo)
 
 }
 
@@ -145,7 +168,7 @@ const userAuth = async (e, c, cb) => {
  * 获取用户TOKEN
  */
 const userGrabToken = async (e, c, cb) => {
-  const errRes = { m: 'userGrabToken error', input: e }
+  const errRes = { m: 'userGrabToken error'/*, input: e*/ }
   const res = { m: 'userGrabToken' }
   // username suffix role and apiKey
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
@@ -173,8 +196,11 @@ const userChangeStatus = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  if (!inparam.role || !inparam.userId) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkStatus(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
@@ -191,6 +217,39 @@ const userChangeStatus = async (e, c, cb) => {
   inparam.operateAction = '变更用户状态'
   inparam.operateToken = token
   new LogModel().addOperate(inparam, err, ret)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
+/**
+ * 检查用户是否被占用
+ */
+const checkUserExist = async (e, c, cb) => {
+  const errRes = { m: 'checkUserExist error'/*, input: e*/ }
+  const res = { m: 'checkUserExist' }
+  // 入参转换和校验
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  if (!inparam.role || !inparam.suffix || !inparam.username) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 只有管理员有权限
+  if (token.role != RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.TokenErr('must admin token'), 0]
+  }
+  // 业务操作
+  let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
   // 结果返回
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
@@ -240,7 +299,7 @@ const adminCenter = async (e, c, cb) => {
  */
 const managerList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerList error', input: e }
+  const errRes = { m: 'managerList error'/*, input: e*/ }
   const res = { m: 'managerList' }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -272,7 +331,7 @@ const managerList = async (e, c, cb) => {
  */
 const managerOne = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerOne err', input: e }
+  const errRes = { m: 'managerOne err'/*, input: e*/ }
   const res = { m: 'managerOne' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -295,23 +354,32 @@ const managerOne = async (e, c, cb) => {
  */
 const managerUpdate = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerUpdate err', input: e }
-  const res = { m: 'managerUpdate', input: e }
+  const errRes = { m: 'managerUpdate err'/*, input: e*/ }
+  const res = { m: 'managerUpdate' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
+  // 入参转化
+  const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkUser(managerInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
+  // 业务操作
   const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
     return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
-  }
-  const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
   // 获取更新属性和新密码HASH
   const Manager = {
@@ -337,7 +405,7 @@ const managerUpdate = async (e, c, cb) => {
  */
 const merchantOne = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantOne err', input: e }
+  const errRes = { m: 'merchantOne err'/*, input: e*/ }
   const res = { m: 'merchantOne' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
@@ -361,7 +429,7 @@ const merchantOne = async (e, c, cb) => {
  */
 const merchantList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantList err', input: e }
+  const errRes = { m: 'merchantList err'/*, input: e*/ }
   const res = { m: 'merchantList' }
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
@@ -387,7 +455,7 @@ const merchantList = async (e, c, cb) => {
  */
 const childList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'childList err', input: e }
+  const errRes = { m: 'childList err'/*, input: e*/ }
   const res = { m: 'childList' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr) {
@@ -402,7 +470,7 @@ const childList = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 只能查看自己下级
-  if (parseInt(token.role) >= parseInt(params.childRole)) {
+  if (parseInt(token.role) > parseInt(params.childRole)) {
     return ResErr(cb, BizErr.InparamErr('no right'))
   }
   // 业务操作
@@ -425,23 +493,31 @@ const childList = async (e, c, cb) => {
  */
 const merchantUpdate = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'merchantUpdate err', input: e }
+  const errRes = { m: 'merchantUpdate err'/*, input: e*/ }
   const res = { m: 'merchantUpdate' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
     return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
   }
+  const [jsonParseErr, merchantInfo] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkUser(merchantInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 身份令牌校验
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
   }
+  // 业务操作
   const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Merchant'])
   if (merchantErr) {
     return ResFail(cb, { ...errRes, err: merchantErr }, merchantErr.code)
-  }
-  const [jsonParseErr, merchantInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
   // 获取更新属性和新密码HASH
   const Merchant = {
@@ -472,8 +548,11 @@ const updatePassword = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  if (!inparam.userId || !inparam.password) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkUser(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
@@ -519,7 +598,7 @@ const randomPassword = (e, c, cb) => {
  * 可用线路商
  */
 const avalibleManagers = async (e, c, cb) => {
-  const errRes = { m: 'avalibleManagers err', input: e }
+  const errRes = { m: 'avalibleManagers err'/*, input: e*/ }
   const res = { m: 'avalibleManagers' }
   const [err, ret] = await new UserModel().listAvalibleManagers()
   if (err) {
@@ -569,7 +648,7 @@ const msnList = async (e, c, cb) => {
  */
 const checkMsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'checkMsn err', input: e }
+  const errRes = { m: 'checkMsn err'/*, input: e*/ }
   const res = { m: 'checkMsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
@@ -619,20 +698,22 @@ const msnRandom = async (e, c, cb) => {
  */
 const lockmsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'lockmsn err', input: e }
+  const errRes = { m: 'lockmsn err'/*, input: e*/ }
   const res = { m: 'lockmsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
     return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
   }
-  // 获取令牌
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new MsnCheck().checkMsnLock(params)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌,只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
-  }
-  // 只有管理员有权限
-  if (token.role != RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
   }
   // 查询msn
   const [queryErr, queryRet] = await new MsnModel().query({
@@ -703,9 +784,11 @@ const captcha = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  // 参数校验
-  if (!inparam.usage || !inparam.relKey) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new CaptchaCheck().checkCaptcha(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 业务操作
   inparam.code = randomNum(1000, 9999)
@@ -730,7 +813,7 @@ const jwtverify = async (e, c, cb) => {
   // verify it and return the policy statements
   const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
-    console.log(JSON.stringify(err), JSON.stringify(userInfo));
+    console.log(JSON.stringify(err), JSON.stringify(userInfo))
     return c.fail('Unauthorized')
   }
   // 有效期校验
@@ -772,6 +855,7 @@ export {
   userGrabToken,                // 使用apiKey登录获取用户信息
   userChangeStatus,             // 变更用户状态
   childList,                    // 下级用户列表
+  checkUserExist,               // 检查用户是否被占用
 
   managerList,                  // 建站商列表
   managerOne,                   // 建站商详情

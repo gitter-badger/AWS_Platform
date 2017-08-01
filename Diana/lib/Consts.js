@@ -9,16 +9,6 @@ export const StatusEnum = {
   Enable: 1,
   Disable: 0
 }
-
-export const BillActionEnum = {
-  Deposit: -1.0, // 存
-  Withdraw: 1.0 // 提
-}
-export const MSNStatusEnum = {
-  Used: 1,
-  Locked: 2,
-  Free: 0
-}
 export const GameStatusEnum = {
   Online: 1,
   Offline: 2,

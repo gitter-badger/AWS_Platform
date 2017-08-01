@@ -19,9 +19,15 @@
     "password": "123456",
     "role": "100",
     "adminName": "cheneymerchant4",
+    "adminEmail": "cheneymerchant4@test.com",
+    "hostName":"负责人名",
+    "hostContact":"负责人联系方式",
     "parent": "01",
-    "msn":"4",
-    "suffix":"CY4",
-    "displayName": "测试商户4"
-}
+    "msn": "4",
+    "suffix": "CY4",
+    "displayName": "测试商户4",
+    "rate":"100.00",
+    "points":"1000.00",
+    "limit":"6"
+  }
 }

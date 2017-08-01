@@ -35,22 +35,46 @@ export class LogModel extends BaseModel {
      * @param {*} inparam 
      */
     async logPage(inparam) {
-        return await this.page({
-            IndexName: 'LogRoleIndex',
-            Limit: inparam.pageSize,
-            ExclusiveStartKey: inparam.startKey,
-            ScanIndexForward: false,
-            KeyConditionExpression: "#role = :role",
-            FilterExpression: "#type = :type",
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#type': 'type'
-            },
-            ExpressionAttributeValues: {
-                ':role': inparam.role.toString(),
-                ':type': inparam.type
-            }
-        }, inparam)
+        // 管理员查询
+        if (!inparam.parent) {
+            return await this.page({
+                IndexName: 'LogRoleIndex',
+                Limit: inparam.pageSize,
+                ExclusiveStartKey: inparam.startKey,
+                ScanIndexForward: false,
+                KeyConditionExpression: "#role = :role",
+                FilterExpression: "#type = :type",
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#type': 'type'
+                },
+                ExpressionAttributeValues: {
+                    ':role': inparam.role.toString(),
+                    ':type': inparam.type
+                }
+            }, inparam)
+        }
+        // 线路商查询 
+        else {
+            return await this.page({
+                IndexName: 'LogRoleIndex',
+                Limit: inparam.pageSize,
+                ExclusiveStartKey: inparam.startKey,
+                ScanIndexForward: false,
+                KeyConditionExpression: "#role = :role",
+                FilterExpression: "#type = :type AND #parent = :parent",
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#type': 'type',
+                    '#parent': 'parent'
+                },
+                ExpressionAttributeValues: {
+                    ':role': inparam.role.toString(),
+                    ':type': inparam.type,
+                    ':parent': inparam.parent
+                }
+            }, inparam)
+        }
         // let log = { Items: [], LastEvaluatedKey: {} }
         // let [err, ret] = [0, 0]
         // while (log.Items.length < inparam.pageSize && log.LastEvaluatedKey) {
