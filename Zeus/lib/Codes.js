@@ -34,7 +34,9 @@ export const Codes = {
   InparamError: '60001',
   CaptchaErr: '60002',
   MerchantPeriodErr: '60003', 
-  TcpError : '60004'
+  TcpError : '60004',
+  CompanyNotExistError : "60005",
+  PushMerchantError : "60006"
 }
 
 export const BizErr = {
@@ -104,5 +106,11 @@ export const BizErr = {
   },
   TcpErr: (errMsg = 'tcp connection error') => {
     return  {code : Codes.TcpError, err: errMsg}
+  },
+  CompanyNotExistError : (errMsg = "company not exist") => {
+    return  {code : Codes.CompanyNotExistError, err: errMsg}
+  },
+  PushMerchantError : (errMsg = "company not exist") => {
+    return  {code : Codes.PushMerchantError, err: errMsg}
   }
 }

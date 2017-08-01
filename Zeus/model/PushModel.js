@@ -1,6 +1,7 @@
 let {RoleCodeEnum} = require("../lib/Consts");
 
 import { pushUserInfo } from "../lib/TcpUtil"
+import {GameModel} from "./GameModel"
 
 
 const State = {
@@ -8,19 +9,23 @@ const State = {
     forzen : 2 //冻结
 }
 
-export class CSModel{
-    constructor({username, role, userId, displayName,  headPic, parent, msn} = {}) {
-
+export class PushModel{
+    constructor({username, role, userId, displayName,  headPic, parent, msn, gameList} = {}) {
         this.username = username;
         this.role = role;
         this.id = userId,
         this.nickName = displayName;
-        this.headPic = headPic || "00";
+        this.headPic = headPic || "";
         this.parentId = parent;
         this.msn = msn;
+        this.gameList = this.setGameList(gameList)
     }
     push(){
-        console.log(this);
         return pushUserInfo(this);
+    }
+    setGameList(gameList){
+        gameList = gameList || [];
+        let list = gameList.map((game) => game.gameId);
+        return list;
     }
 }

@@ -1,9 +1,9 @@
 {
-    "queryStringParameters": "{\"userName\":\"lisichen\",\"userId\":\"644078\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\"}",
+    "queryStringParameters": "{\"userName\":\"lisichen\",\"userId\":\"16\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\"}",
     "pathParameters" : {
             "userName" : "lisichen"
         },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BX2xpc2ljaGVuIiwic3VmZml4IjoiTkEiLCJ1c2VySWQiOjY0NDA3OCwiaWF0IjoxNTAxNDk0MzIxfQ.7GpHvv2xS8ruC4orKs9jJCa61x_ODu-lLvRo5k0no9M"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMV9kYXkwMDMiLCJzdWZmaXgiOiJDWTEiLCJ1c2VySWQiOjE2LCJpYXQiOjE1MDE1NjUyOTV9.awZzaJcdGKIy3zTX4XcEFi3s-akJdipHKXDW70G5Zvo"
     }
 }

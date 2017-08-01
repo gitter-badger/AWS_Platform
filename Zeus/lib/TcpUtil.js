@@ -1,10 +1,12 @@
 var net = require('net');
 
-const HOST = '47.88.192.69';
+// const HOST = '47.88.192.69';
+const HOST = '192.168.3.98';
 const PORT = 20003;
 const proId = 9;  //协议
 import {
-  BizErr
+  BizErr,
+  Codes
 } from '../lib/all'
 
 export const pushUserInfo =  (body) => {
@@ -16,10 +18,16 @@ export const pushUserInfo =  (body) => {
             client.write(buffer);
         });
         client.on('data', function(data) {
-            console.log('DATA: ' + data);
-            reslove([null, data]);
+            // console.log(data.readUInt32LE(0,4).toString(10));
+            // console.log(data.readUInt32LE(4,8).toString(10));
+            let code = +data.readUInt32LE(8,12).toString(10);
             // 完全关闭连接
             client.destroy();
+            if(code != Codes.OK) {
+                reslove([BizErr.PushMerchantError(), {code:code}]);
+            }else {
+                reslove([null, 0]);
+            }
         });
         client.on("error", function(err){
             reslove([BizErr.TcpErr(), 0]);

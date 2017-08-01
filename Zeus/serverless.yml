@@ -247,6 +247,7 @@ functions:
           path: /game/sign
           method: post
           cors: true
+          authorizer: tokenAuth
   # exquery:
   #   handler: api.exquery
   #   events:

@@ -11,7 +11,7 @@ export class UserBillModel extends athena.BaseModel {
     constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
-        this.userId = userId
+        this.userId = +userId
         this.action = +action;
         this.userName = userName;
         this.msn = msn;

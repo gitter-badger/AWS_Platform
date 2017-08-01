@@ -62,8 +62,12 @@ export class Util{
      * 获取长度len位的随机Id;
      */
     static userId(len){
-        let number = Number.parseInt(Math.random()*Math.pow(10,len));
-        return number;
+        let number = Number.parseInt(Math.random()*Math.pow(10, len));
+        if(number > Math.pow(10, len-1) && number < Math.pow(10, len)){
+            return number;
+        }else {
+            return this.userId(len);
+        }
     }
     static uuid(){
         return uid();

@@ -137,7 +137,7 @@ resources:
             AttributeType: S
           -
             AttributeName: userId
-            AttributeType: S
+            AttributeType: N
           -
             AttributeName: createAt
             AttributeType: N

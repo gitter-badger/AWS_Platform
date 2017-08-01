@@ -1,9 +1,9 @@
 {
-    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\", \"amount\":\"10\",  \"action\":\"1\"}",
+    "body": "{\"userName\":\"day003\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"1002034\",  \"gamePlatform\":\"NA\", \"amount\":\"10\",  \"action\":\"1\"}",
     "pathParameters" : {
-            "userName" : "lisichen"
+            "userName" : "day003"
         },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BX2xpc2ljaGVuIiwic3VmZml4IjoiTkEiLCJpYXQiOjE1MDEwNzcwMTF9.yl-GBqQTUeOWj9v5A_bX-nsOSdK9jHeyW1Y0bstGyic"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMV9kYXkwMDMiLCJzdWZmaXgiOiJDWTEiLCJ1c2VySWQiOjI2ODU0OCwiaWF0IjoxNTAxNTcwNzAwfQ.1O24rt6Q1pWCVVaWPy5-JjmRoFjKo0n2P6XemK6-IbE"
     }
 }

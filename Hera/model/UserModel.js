@@ -7,9 +7,13 @@ const State = {
     normal : 1,  //正常,
     forzen : 2 //冻结
 }
+const SexEnum = {
+    man : 1,
+    woman : 2
+}
 
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex} = {}) {
         super(TABLE_NAMES.TABLE_USER);
         this.userName = userName;
         this.userPwd = userPwd;
@@ -42,12 +46,11 @@ export class UserModel extends athena.BaseModel {
         num ++;
         if(err) return [err, 0];
         if(userInfo) { //重新找
-            num ++;
             if(num%2 ==0) {
                 num = 0;
                 len ++;
             }
-            this.save(len, num);
+            return this.save(len, num);
         }else {
             return super.save();
         }

@@ -1,9 +1,7 @@
 
 {"body": {
-    "username" : "plat000001",
-    "suffix" : "HA",
-    "role" : "100",
+    "id" : "plat000001",
     "timestamp" : 15045747845,
-    "gameId" : "abc"
+    "gameId" : "123"
 }
 }

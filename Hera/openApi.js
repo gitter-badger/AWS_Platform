@@ -14,6 +14,8 @@ import {UserModel} from "./model/UserModel";
 
 import {UserBillModel} from "./model/UserBillModel";
 
+import {MSNModel} from "./model/MSNModel";
+
 import {MerchantBillModel,Action} from "./model/MerchantBillModel";
 
 import {Util} from "./lib/Util"
@@ -146,7 +148,6 @@ export async function getGamePlayerBalance(event, context, callback) {
   
     //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userName", type:"S", min:6, max :12},
       {name : "buId", type:"N", min:1},
       {name : "gamePlatform", type:"S", equal:gamePlatform}
   ], requestParams);
@@ -209,7 +210,6 @@ export async function gamePlayerBalance(event, context, callback) {
     }
     
     
-    
     //获取商家
     let [merError, merchantInfo] = await new MerchantModel().findById(+requestParams.buId);
     if(merError) return callback(null, ReHandler.fail(merError));
@@ -241,7 +241,6 @@ export async function gamePlayerBalance(event, context, callback) {
     let u = new UserModel();
     let [getUserError, user] = await u.get({userName});
     if(!user) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
-
     //商户点数变化
     let merchantBillModel = new MerchantBillModel(requestParams);
     merchantBillModel.action = -merchantBillModel.action;
@@ -251,14 +250,13 @@ export async function gamePlayerBalance(event, context, callback) {
     })
     let [mError, amount] = await merchantBillModel.handlerPoint();
     if(mError) return callback(null, ReHandler.fail(mError));
-
     //保存玩家账单
     userBillModel.userName = userName;
     userBillModel.userId = user.userId;
     userBillModel.originalAmount = palyerBalance;
+    console.log(userBillModel);
     let [saveError] = await userBillModel.save();
     if(saveError) return callback(null, ReHandler.fail(saveError));
-
     //查账
     let [getError, userSumAmount] = await userBillModel.getBalance();
     if(getError) return callback(null, ReHandler.fail(getError));
@@ -268,7 +266,7 @@ export async function gamePlayerBalance(event, context, callback) {
     if(updateError) return callback(null, ReHandler.fail(updateError));
 
     callback(null, ReHandler.success({
-      data:{amount : userSumAmount}
+      data:{balance : userSumAmount}
     }));
 }
 
@@ -285,7 +283,8 @@ export async function gamePlayerA3Login(event, context, callback) {
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
     //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userId", type:"N"},
+      {name : "userName", type:"S"},
+      {name :"msn", type:"S"},
       {name : "userPwd", type:"S", min:6, max :16}
   ], requestParams);
   if(checkAttError){
@@ -293,11 +292,20 @@ export async function gamePlayerA3Login(event, context, callback) {
     return callback(null, ReHandler.fail(checkAttError));
   } 
 
-  let {userId, userPwd, msn} = requestParams;
+  let {userName, userPwd, msn} = requestParams;
 
-
+  //根据线路号获取商家
+  let msnModel = new MSNModel();
+  let [msnError, merchantInfo] = await msnModel.findMerchantByMsn(msn);
+  if(msnError) {
+    return callback(null, ReHandler.fail(msnError));
+  }
+  if(!merchantInfo) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
+  }
+  userName = `${merchantInfo.suffix}_${userName}`; 
   let user = new UserModel(requestParams);
-  let [userExistError, userInfo] = await user.get({userId:+userId},[], "userIdIndex");
+  let [userExistError, userInfo] = await user.get({userName:userName});
   if(userExistError) return callback(null, ReHandler.fail(userExistError));
   if(!userInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   //账号已冻结
@@ -307,12 +315,29 @@ export async function gamePlayerA3Login(event, context, callback) {
   
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let suffix = userInfo.userName.split("_")[0];
-  let loginToken = Util.createTokenJWT({userName : userInfo.userName, suffix:suffix, userId:+userId});
+  let loginToken = Util.createTokenJWT({userName : userInfo.userName, suffix:suffix, userId:+userInfo.userId});
   let [updateError] = await user.update({userName: userInfo.userName},{ token: loginToken,updateAt:Date.now()});
   if(updateError) return callback(null, ReHandler.fail(updateError));
-  callback(null, ReHandler.success({
-      data:{token : loginToken}
-  }));
+
+  //获取余额
+  let userBill = new UserBillModel(userInfo);
+  let [bError, balance] = await userBill.getBalance();
+  if(bError) {
+    return callback(null, ReHandler.fail(updateError));
+  }
+
+  let callObj = {
+    data : {
+      token : loginToken,
+      balance : balance,
+      msn : userInfo.msn,
+      createAt : userInfo.createAt,
+      updateAt : userInfo.updateAt,
+      username : userName,
+      userId : userInfo.userId
+    }
+  }
+  callback(null, ReHandler.success(callObj));
 }
 
 
@@ -323,7 +348,6 @@ export async function gamePlayerA3Login(event, context, callback) {
  * @param callback
  */
 export async function getA3GamePlayerBalance(event, context, callback) {
- 
     //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters);
 
@@ -335,11 +359,8 @@ export async function getA3GamePlayerBalance(event, context, callback) {
       {name : "userId", type:"N"}
   ], requestParams);
   let userId = +requestParams.userId;
-
   //验证token
   let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
-  console.log("aaaaaaaaaaaaaaaaaa");
-  console.log(userInfo);
   if(err ||  !userInfo || !Object.is(userId, userInfo.userId)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
