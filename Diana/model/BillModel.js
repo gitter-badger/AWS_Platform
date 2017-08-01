@@ -138,10 +138,6 @@ export class BillModel extends BaseModel {
      * @param {*} billInfo 
      */
     async billTransfer(from, billInfo) {
-        // 输入数据校验
-        if (Empty(billInfo)) {
-            return [BizErr.ParamMissErr(), 0]
-        }
         // move out user input sn
         billInfo = Omit(billInfo, ['sn', 'fromRole', 'fromUser', 'action'])
         const [toUserErr, to] = await new UserModel().getUserByName(billInfo.toRole, billInfo.toUser)

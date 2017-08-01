@@ -8,6 +8,7 @@ const generatePassword = require('password-generator')
 AWS.config.update({ region: 'ap-southeast-1' })
 AWS.config.setPromisesDependency(require('bluebird'))
 
+// 数据库封装
 const dbClient = new AWS.DynamoDB.DocumentClient()
 const db$ = (action, params) => {
   return dbClient[action](params).promise()
@@ -22,12 +23,13 @@ export const Store$ = async (action, params) => {
   }
 }
 
-// table names
+// 所有数据库表
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'
+const ZeusPlatformCode = 'ZeusPlatformCode'
 
 const DianaPlatformGame = 'DianaPlatformGame'
 const DianaPlatformCompany = 'DianaPlatformCompany'
@@ -39,12 +41,16 @@ export const Tables = {
   ZeusPlatformMSN,
   ZeusPlatformCaptcha,
   ZeusPlatformLog,
-  
+  ZeusPlatformCode,
+
   DianaPlatformGame,
   DianaPlatformCompany,
   DianaPlatformTool
 }
 
+/**
+ * 基础Model
+ */
 export const Model = {
   USERNAME_LIMIT: [6, 16], // 用户名长度限制
   PASSWORD_PATTERN: [3, 16],
@@ -55,9 +61,47 @@ export const Model = {
   DefaultParentName: 'PlatformAdmin',
   NoParent: '00', // 没有
   NoParentName: 'SuperAdmin',
-  usn: () => (new Date()).getTime() % 1000000 + 100000,
+  /**
+   * 生成唯一编号
+   */
+  uucode: async (type, size) => {
+    const ret = await db$('query', {
+      TableName: Tables.ZeusPlatformCode,
+      KeyConditionExpression: '#type = :type',
+      ExpressionAttributeNames: {
+        '#type': 'type'
+      },
+      ExpressionAttributeValues: {
+        ':type': type,
+      }
+    })
+    // 所有编号都被占用
+    if (ret.Items.length >= Math.pow(10, size) - Math.pow(10, size - 1)) {
+      return [BizErr.CodeFullError(), 0]
+    }
+    // 所有占用编号组成数组
+    let codeArr = new Array()
+    for (let item of ret.Items) {
+      codeArr.push(parseInt(item.code))
+    }
+    // 获取指定位数的随机数
+    let randomCode = Math.floor((Math.random() + Math.floor(Math.random() * 9 + 1)) * Math.pow(10, size - 1))
+    // 判断随机线路号是否已被占用
+    while (codeArr.indexOf(randomCode) != -1) {
+      randomCode = Math.floor((Math.random() + Math.floor(Math.random() * 9 + 1)) * Math.pow(10, size - 1))
+    }
+    // 编号插入
+    // await db$('put', {
+    //   TableName: Tables.ZeusPlatformCode,
+    //   Item: {
+    //     type: type,
+    //     code: randomCode.toString()
+    //   }
+    // })
+    // 返回编号
+    return [0, randomCode.toString()]
+  },
   uuid: () => uid(),
-  displayId: () => (new Date()).getTime() % 1000000 + 100000,
   timeStamp: () => (new Date()).getTime(),
   currentToken: async (e) => {
     if (!e || !e.requestContext.authorizer) {

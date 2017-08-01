@@ -77,9 +77,6 @@ export class GameModel extends BaseModel {
      * @param {*} pathParams 
      */
     async listGames(pathParams) {
-        if (Empty(pathParams)) {
-            return [BizErr.ParamMissErr(), 0]
-        }
         const inputTypes = pathParams.gameType.split(',')
         const gameTypes = _.filter(inputTypes, (type) => {
             return !!GameTypeEnum[type]

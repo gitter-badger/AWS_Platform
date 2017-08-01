@@ -50,7 +50,7 @@ const UserRole = function () {
 const PlatformBaseBizRole = function () {
   return {
     ...UserRole(),
-    displayId: Model.displayId(),
+    displayId: Model.StringValue,
     displayName: Model.StringValue,
     suffix: Model.StringValue,
     limit: Model.NumberValue,

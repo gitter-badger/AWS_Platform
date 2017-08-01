@@ -2,6 +2,7 @@
 export const Codes = {
   OK: '0',
   Error: '-1',
+
   DBError: '50001',
   InputError: '50002',
   ItemNotFound: '50003',
@@ -13,6 +14,8 @@ export const Codes = {
   MsnUsedError: '50009',
   MsnNotExistError: '50010',
   MsnFullError: '50011',
+  CodeFullError: '50012',
+
   Busy: '44004',
   ParamError: '47003',
   IPBlock: '44900',
@@ -24,10 +27,12 @@ export const Codes = {
   UsernameTooLong: '40015',
   UsernameTooShort: '40016',
   PasswordError: '40017',
+
   AddUserError: '21000',
   DuplicateUser: '21001',
   UserNotFound: '22011',
   UserLocked: '22012',
+
   InsufficientBalance: '10002',
   TransferError: '10003',
   RepeatTransferError: '11000',
@@ -94,6 +99,9 @@ export const BizErr = {
   },
   MsnFullError: (errMsg = '线路号已全部分配') =>{
     return {code:Codes.MsnFullError,err:errMsg}
+  },
+  CodeFullError: (errMsg = '所有编号已分配') => {
+    return { code: Codes.CodeFullError, err: errMsg }
   },
   InsufficientBalanceErr: (errMsg = 'InsufficientBalance') => {
     return {code: Codes.InsufficientBalance,err:errMsg}

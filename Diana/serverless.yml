@@ -148,6 +148,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  toolNew:
+    handler: api.toolNew
+    events:
+      -
+        http:
+          path: toolNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
   helpGenreList: 
     handler: api_server.helpGenreList
     events:

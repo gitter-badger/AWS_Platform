@@ -322,6 +322,12 @@ const saveUser = async (userInfo) => {
   var method = 'put'
   // 如果是商户，还需要保存线路号
   if (RoleCodeEnum['Merchant'] === userInfo.role) {
+    // 从编码池获取新编码
+    let [uucodeErr, uucodeRet] = await Model.uucode('merchant', 6)
+    if (uucodeErr) {
+      return [uucodeErr, 0]
+    }
+    userInfo.displayId = parseInt(uucodeRet)
     saveConfig = {
       RequestItems: {
         'ZeusPlatformUser': [
@@ -342,6 +348,16 @@ const saveUser = async (userInfo) => {
                 status: MSNStatusEnum['Used'],
                 displayName: userInfo.displayName,
                 displayId: userInfo.displayId
+              }
+            }
+          }
+        ],
+        'ZeusPlatformCode': [
+          {
+            PutRequest: {
+              Item: {
+                type: 'merchant',
+                code: uucodeRet
               }
             }
           }

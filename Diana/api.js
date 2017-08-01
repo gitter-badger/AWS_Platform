@@ -21,10 +21,12 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 import { UserModel } from './model/UserModel'
 import { CompanyModel } from './model/CompanyModel'
+import { ToolModel } from './model/ToolModel'
 
 import { BillCheck } from './biz/BillCheck'
 import { GameCheck } from './biz/GameCheck'
 import { CompanyCheck } from './biz/CompanyCheck'
+import { ToolCheck } from './biz/ToolCheck'
 
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -53,7 +55,7 @@ const gameNew = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  
+
   // 业务操作
   const [addGameInfoErr, addGameRet] = await new GameModel().addGame(gameInfo)
 
@@ -400,6 +402,41 @@ const companyChangeStatus = async (e, c, cb) => {
   }
 }
 
+/**
+ * 创建道具
+ */
+const toolNew = async (e, c, cb) => {
+  // 入参转换
+  const errRes = { m: 'toolNew err'/*, input: e*/ }
+  const res = { m: 'toolNew' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new ToolCheck().checkTool(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  const [addInfoErr, addRet] = await new ToolModel().addTool(inparam)
+  // 操作日志记录
+  inparam.operateAction = '创建道具'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, addInfoErr, addRet)
+  // 返回结果
+  if (addInfoErr) {
+    return ResFail(cb, { ...errRes, err: addInfoErr }, addInfoErr.code)
+  }
+  return ResOK(cb, { ...res, payload: addRet })
+}
+
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -443,6 +480,8 @@ export {
   companyList,                  // 游戏厂商
   companyOne,                   // 单个厂商
   companyChangeStatus,          // 厂商状态变更
+
+  toolNew,                      // 创建道具
 
   billList,                     // 流水列表
   billOne,                      // 用户余额
