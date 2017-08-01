@@ -149,11 +149,38 @@ functions:
           cors: true
           authorizer: tokenAuth
   toolNew:
-    handler: api.toolNew
+    handler: api_tool.toolNew
     events:
       -
         http:
           path: toolNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolList:
+    handler: api_tool.toolList
+    events:
+      -
+        http:
+          path: toolList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolOne:
+    handler: api_tool.toolOne
+    events:
+      -
+        http:
+          path: toolOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolChangeStatus:
+    handler: api_tool.toolChangeStatus
+    events:
+      -
+        http:
+          path: toolChangeStatus
           method: post
           cors: true
           authorizer: tokenAuth

@@ -65,10 +65,77 @@ export class ToolModel extends BaseModel {
         if (putErr) {
             return [putErr, 0]
         }
-
         // End:记录生成的编码
         this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: uucodeRet } })
         return [0, item]
+    }
+
+    /**
+     * 道具列表
+     * @param {*} inparams
+     */
+    async list(inparams) {
+        const [err, ret] = await this.scan({
+        })
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret.Items]
+    }
+
+    /**
+     * 更新道具状态
+     * @param {道具} toolName 
+     * @param {道具ID} toolId 
+     * @param {需要变更的状态} status 
+     */
+    changeStatus(toolName, toolId, status) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                Key: {
+                    'toolName': toolName,
+                    'toolId': toolId
+                },
+                UpdateExpression: "SET toolStatus = :status",
+                ExpressionAttributeValues: {
+                    ':status': status
+                }
+            }
+            this.db$('update', params)
+                .then((res) => {
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), 0])
+                })
+        })
+    }
+
+    /**
+     * 查询单个道具
+     * @param {*} toolName
+     * @param {*} toolId
+     */
+    getOne(toolName, toolId) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                KeyConditionExpression: 'toolName = :toolName and toolId = :toolId',
+                ExpressionAttributeValues: {
+                    ':toolName': toolName,
+                    ':toolId': toolId
+                }
+            }
+            this.db$('query', params)
+                .then((res) => {
+                    if(res.Items.length > 0){
+                        res = res.Items[0]
+                    }
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), false])
+                })
+        })
     }
 }
 
