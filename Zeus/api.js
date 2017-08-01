@@ -23,6 +23,8 @@ import { pushUserInfo } from "./lib/TcpUtil"
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
+import { CaptchaCheck } from './biz/CaptchaCheck'
+import { MsnCheck } from './biz/MsnCheck'
 
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -40,6 +42,12 @@ const eva = async (e, c, cb) => {
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 生成第一个管理员业务
   const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
@@ -188,8 +196,11 @@ const userChangeStatus = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  if (!inparam.role || !inparam.userId) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkStatus(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
@@ -537,8 +548,11 @@ const updatePassword = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  if (!inparam.userId || !inparam.password) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkUser(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
@@ -690,14 +704,16 @@ const lockmsn = async (e, c, cb) => {
   if (paramErr) {
     return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
   }
-  // 获取令牌
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new MsnCheck().checkMsnLock(params)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌,只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
-  }
-  // 只有管理员有权限
-  if (token.role != RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
   }
   // 查询msn
   const [queryErr, queryRet] = await new MsnModel().query({
@@ -768,9 +784,11 @@ const captcha = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  // 参数校验
-  if (!inparam.usage || !inparam.relKey) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamError() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new CaptchaCheck().checkCaptcha(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 业务操作
   inparam.code = randomNum(1000, 9999)

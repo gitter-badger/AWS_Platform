@@ -12,8 +12,21 @@ export class CompanyCheck {
             { name: "companyRegion", type: "S", min: 1, max: 20 },
             { name: "companyContract", type: "NS", min: 1, max: 20 },
             { name: "license", type: "NS", min: 1, max: 20 },
-            { name: "remark", type: "S", min: 1, max: 200 }
+            { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查厂商状态变更入参
+     * @param {*} inparam 
+     */
+    checkStatus(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "companyName", type: "S", min: 1, max: 30 },
+            { name: "companyId", type: "S", min: 36, max: 36 },
+            { name: "status", type: "N", min: 0, max: 1 }]
+            , inparam)
         return [checkAttError, errorParams]
     }
 }

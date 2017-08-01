@@ -53,17 +53,7 @@ const gameNew = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-
-  // 参数合法性校验
-  if (!GameTypeEnum[gameInfo.gameType]) {
-    return ResErr(cb, [BizErr.ParamErr('游戏类型不能为空'), 0])
-  }
-  if (!gameInfo.gameName) {
-    return ResErr(cb, [BizErr.ParamErr('游戏名称不能为空'), 0])
-  }
-  // if (!_.isNumber(kindId)) {
-  //     return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
-  // }
+  
   // 业务操作
   const [addGameInfoErr, addGameRet] = await new GameModel().addGame(gameInfo)
 
@@ -135,9 +125,11 @@ const gameChangeStatus = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  // 参数校验
-  if (!inparam.gameType || !inparam.gameId) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new GameCheck().checkGame(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 获取令牌，只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -382,9 +374,11 @@ const companyChangeStatus = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  // 参数校验
-  if (!inparam.companyName || !inparam.companyId) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new CompanyCheck().checkStatus(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 获取令牌，只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])

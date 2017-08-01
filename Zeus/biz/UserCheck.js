@@ -12,6 +12,7 @@ export class UserCheck {
             { name: "adminContact", type: "S", min: 1, max: 16 },
             { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL }
         ], inparam)
+        return [checkAttError, errorParams]
     }
     /**
      * 检查普通用户
@@ -35,6 +36,31 @@ export class UserCheck {
             { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE }]
+            , inparam)
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查用户状态变更入参
+     * @param {*} inparam 
+     */
+    checkStatus(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "role", type: "N", min: 1, max: 100 },
+            { name: "userId", type: "S", min: 36, max: 36 },
+            { name: "status", type: "N", min: 0, max: 1 }]
+            , inparam)
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查用户密码变更
+     * @param {*} inparam 
+     */
+    checkPassword(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "userId", type: "S", min: 36, max: 36 },
+            { name: "password", type: "S", min: 6, max: 16 }]
             , inparam)
         return [checkAttError, errorParams]
     }
