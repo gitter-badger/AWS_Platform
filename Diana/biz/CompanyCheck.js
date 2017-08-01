@@ -7,10 +7,10 @@ export class CompanyCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "companyName", type: "S", min: 1, max: 20 },
             { name: "companyDesc", type: "NS", min: 1, max: 200 },
-            { name: "companyContactWay", type: "S", min: 1, max: 30 },
+            { name: "companyContactWay", type: "S", min: 1, max: 200 },
             { name: "companyEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
             { name: "companyRegion", type: "S", min: 1, max: 20 },
-            { name: "companyContract", type: "NS", min: 1, max: 20 },
+            { name: "companyContract", type: "NS", min: 1, max: 50 },
             { name: "license", type: "NS", min: 1, max: 20 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
