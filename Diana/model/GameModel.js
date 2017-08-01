@@ -17,13 +17,12 @@ import {
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
-const tableName = "ZeusPlatformGame"
 export class GameModel extends BaseModel {
     constructor() {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.ZeusPlatformGame,
+            TableName: Tables.DianaPlatformGame,
         }
         // 设置对象属性
         this.item = {

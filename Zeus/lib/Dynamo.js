@@ -24,8 +24,6 @@ export const Store$ = async (action, params) => {
 
 // table names
 const ZeusPlatformUser = 'ZeusPlatformUser'
-const ZeusPlatformRole = 'ZeusPlatformRole'
-const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformGame = 'ZeusPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
@@ -34,16 +32,12 @@ const ZeusPlatformLog = 'ZeusPlatformLog'
 
 export const Tables = {
   ZeusPlatformUser,
-  ZeusPlatformRole,
-  ZeusPlatformPlayer,
   ZeusPlatformBill,
   ZeusPlatformGame,
   ZeusPlatformMSN,
   ZeusPlatformCaptcha,
   ZeusPlatformLog
 }
-
-
 
 export const Model = {
   USERNAME_LIMIT: [6, 16], // 用户名长度限制
