@@ -399,10 +399,10 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ZeusPlatformCompany:
+    DianaPlatformCompany:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ZeusPlatformCompany
+        TableName: DianaPlatformCompany
         AttributeDefinitions:
           -
             AttributeName: companyName

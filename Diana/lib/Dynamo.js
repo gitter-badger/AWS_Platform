@@ -27,11 +27,11 @@ const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformRole = 'ZeusPlatformRole'
 const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
-const ZeusPlatformCompany = 'ZeusPlatformCompany'
 const ZeusPlatformGame = 'ZeusPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'
+const DianaPlatformCompany = 'DianaPlatformCompany'
 const DianaPlatformTool = 'DianaPlatformTool'
 
 export const Tables = {
@@ -39,11 +39,12 @@ export const Tables = {
   ZeusPlatformRole,
   ZeusPlatformPlayer,
   ZeusPlatformBill,
-  ZeusPlatformCompany,
   ZeusPlatformGame,
   ZeusPlatformMSN,
   ZeusPlatformCaptcha,
   ZeusPlatformLog,
+  
+  DianaPlatformCompany,
   DianaPlatformTool
 }
 

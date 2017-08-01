@@ -21,7 +21,7 @@ export class ToolModel extends BaseModel {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.ZeusPlatformCompany,
+            TableName: Tables.DianaPlatformTool,
         }
         // 设置对象属性
         this.item = {
