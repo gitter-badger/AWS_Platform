@@ -20,6 +20,10 @@ export const CompanyStatusEnum = {
   Enable: 1,
   Disable: 0
 }
+export const ToolStatusEnum = {
+  Enable: 1,
+  Disable: 0
+}
 export const RoleCodeEnum = {
   'SuperAdmin': '0',
   'PlatformAdmin': '1',

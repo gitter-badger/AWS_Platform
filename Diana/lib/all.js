@@ -22,6 +22,7 @@ export {
   GameTypeEnum,
   GameStatusEnum,
   CompanyStatusEnum,
+  ToolStatusEnum,
   RoleModels,
   BillMo,
   RoleDisplay,

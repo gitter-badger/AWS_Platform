@@ -32,6 +32,7 @@ const ZeusPlatformGame = 'ZeusPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'
+const DianaPlatformTool = 'DianaPlatformTool'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -42,7 +43,8 @@ export const Tables = {
   ZeusPlatformGame,
   ZeusPlatformMSN,
   ZeusPlatformCaptcha,
-  ZeusPlatformLog
+  ZeusPlatformLog,
+  DianaPlatformTool
 }
 
 export const Model = {
