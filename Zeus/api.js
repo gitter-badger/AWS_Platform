@@ -571,7 +571,6 @@ const updatePassword = async (e, c, cb) => {
   // 更新用户密码
   user.password = inparam.password
   user.passhash = Model.hashGen(user.password)
-  console.info(user)
   const [err, ret] = await new UserModel().userUpdate(user)
   // 操作日志记录
   inparam.operateAction = '修改密码'
@@ -813,7 +812,7 @@ const jwtverify = async (e, c, cb) => {
   // verify it and return the policy statements
   const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
-    console.log(JSON.stringify(err), JSON.stringify(userInfo))
+    console.error(JSON.stringify(err), JSON.stringify(userInfo))
     return c.fail('Unauthorized')
   }
   // 有效期校验
