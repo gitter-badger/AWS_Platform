@@ -120,7 +120,6 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if(pushErr) {
     return [pushErr, 0]
   }
-  return;
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
