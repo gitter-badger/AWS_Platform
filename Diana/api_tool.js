@@ -17,6 +17,7 @@ import {
   BizErr
 } from './lib/all'
 
+import { LogModel } from './model/LogModel'
 import { ToolModel } from './model/ToolModel'
 
 import { ToolCheck } from './biz/ToolCheck'
