@@ -1,0 +1,6 @@
+{
+    "pathParameters" : {
+        "userName" : "NA_lisichen"
+    },
+    "body": "{\"state\":\"1\", \"names\":[\"NA_lisichen\"]}"
+}

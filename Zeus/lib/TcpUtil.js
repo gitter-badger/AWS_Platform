@@ -10,6 +10,7 @@ export const pushUserInfo =  (body, host, port, proId) => {
     let buffer = buildPayload(proId, JSON.stringify(body));
     return new Promise((reslove, reject) => {
         console.log("请求连接");
+        console.log(port, host, proId);
         client.connect(port, host, function() {
             client.write(buffer);
         });

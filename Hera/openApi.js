@@ -348,7 +348,7 @@ async function gamePlayerA3Login(event, context, callback) {
       msn : userInfo.msn,
       createAt : userInfo.createAt,
       updateAt : userInfo.updateAt,
-      username : userName,
+      username : userName.split("_")[0],
       userId : userInfo.userId
     }
   }
