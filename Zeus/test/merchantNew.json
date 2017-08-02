@@ -15,17 +15,17 @@
     }
   },
   "body": {
-    "username": "cmmerchant1",
+    "username": "cmmerchant2",
     "password": "123456",
     "role": "100",
-    "adminName": "cheneymmerchant",
+    "merchantName": "cheneymmerchant",
+    "hostName": "负责人一号",
+    "hostContact": "18780004427",
     "parent": "01",
     "suffix": "CY1",
     "msn": "1",
     "displayName": "测试商户1",
     "rate": "90",
-    "hostName": "负责人一号",
-    "hostContact": "18780004427",
     "points": "1000",
     "limit": "5"
   }

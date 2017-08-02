@@ -26,6 +26,9 @@ export class UserCheck {
      * 检查普通用户
      */
     checkUser(inparam) {
+        if (passwordLevel(inparam.password) < 3) {
+            return ['密码强度不足', 'password']
+        }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
@@ -73,6 +76,9 @@ export class UserCheck {
      * @param {*} inparam 
      */
     checkPassword(inparam) {
+        if (passwordLevel(inparam.password) < 3) {
+            return ['密码强度不足', 'password']
+        }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "password", type: "S", min: 6, max: 16 }]
