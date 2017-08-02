@@ -19,23 +19,30 @@ export class UserCheck {
      */
     checkUser(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "username", type: "S", min: 6, max: 16 },
+            { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
+            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
+            { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
+            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "role", type: "N", min: 1, max: 100 },
-            { name: "adminName", type: "NS", min: 1, max: 16 },
-            { name: "managerName", type: "NS", min: 1, max: 16 },
-            { name: "merchantName", type: "NS", min: 1, max: 16 },
-            { name: "adminContact", type: "NS", min: 1, max: 16 },
-            { name: "displayName", type: "S", min: 1, max: 16 },
-            { name: "remark", type: "NS", min: 1, max: 100 },
-            { name: "hostName", type: "S", min: 1, max: 16 },
-            { name: "hostContact", type: "S", min: 1, max: 16 },
-            { name: "limit", type: "NN", min: 1, max: 10 },
-            { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
+            { name: "limit", type: "N", min: 1, max: 10 },
+            { name: "hostContact", type: "S", min: 5, max: 40 },
+
+            { name: "adminName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            { name: "adminContact", type: "NS", min: 1, max: 40 },
+
+            { name: "managerName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            { name: "managerContact", type: "NS", min: 5, max: 40 },
+
+            { name: "merchantName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE }]
+            { name: "merchantContact", type: "NS", min: 5, max: 40 },
+
+            { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
         return [checkAttError, errorParams]
     }
