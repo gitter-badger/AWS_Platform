@@ -20,6 +20,10 @@ export const CompanyStatusEnum = {
   Enable: 1,
   Disable: 0
 }
+export const ToolStatusEnum = {
+  Enable: 1,
+  Disable: 0
+}
 export const RoleCodeEnum = {
   'SuperAdmin': '0',
   'PlatformAdmin': '1',
@@ -60,7 +64,7 @@ const UserRole = function () {
 const PlatformBaseBizRole = function () {
   return {
     ...UserRole(),
-    displayId: Model.displayId(),
+    displayId: Model.StringValue,
     displayName: Model.StringValue,
     suffix: Model.StringValue,
     limit: Model.NumberValue,

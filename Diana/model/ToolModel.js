@@ -11,92 +11,93 @@ import {
     Omit,
     RoleCodeEnum,
     RoleModels,
-    CompanyStatusEnum
+    ToolStatusEnum
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
-export class CompanyModel extends BaseModel {
-    constructor() {
+export class ToolModel extends BaseModel {
+    constructor(uucode) {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.DianaPlatformCompany,
+            TableName: Tables.DianaPlatformTool,
         }
         // 设置对象属性
         this.item = {
             ...this.baseitem,
-            companyName: Model.StringValue,
-            companyId: Model.uuid(),
-            companyKey: Model.uuid()
+            toolName: Model.StringValue,
+            toolId: Model.StringValue
         }
     }
 
     /**
-     * 添加厂商
-     * @param {*} companyInfo 
+     * 添加道具
+     * @param {*} inparam 
      */
-    async addCompany(companyInfo) {
+    async addTool(inparam) {
+        // Start:从编号池获取新编号
+        let [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
+        if (uucodeErr) { return [uucodeErr, 0] }
+
         // 数据类型处理
-        companyInfo.companyStatus = CompanyStatusEnum.Enable
-        companyInfo.companyDesc = companyInfo.companyDesc || Model.StringValue
-        companyInfo.companyContract = companyInfo.companyContract || Model.StringValue
-        companyInfo.companyEmail = companyInfo.companyEmail || Model.StringValue
-        companyInfo.license = companyInfo.license || Model.StringValue
-        companyInfo.remark = companyInfo.remark || Model.StringValue
+        inparam.toolStatus = ToolStatusEnum.Enable
+        inparam.toolId = uucodeRet
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
-            KeyConditionExpression: 'companyName = :companyName',
+            KeyConditionExpression: 'toolName = :toolName',
             ExpressionAttributeValues: {
-                ':companyName': companyInfo.companyName
+                ':toolName': inparam.toolName
             }
         })
         if (existErr) {
             return [existErr, 0]
         }
         if (exist) {
-            return [BizErr.ItemExistErr('运营商已存在'), 0]
+            return [BizErr.ItemExistErr('道具已存在'), 0]
         }
         // 保存
         const item = {
             ...this.item,
-            ...companyInfo
+            ...inparam
         }
         const [putErr, putRet] = await this.putItem(item)
         if (putErr) {
             return [putErr, 0]
         }
+        // End:记录生成的编码
+        this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: uucodeRet } })
         return [0, item]
     }
 
     /**
-     * 厂商列表
+     * 道具列表
      * @param {*} inparams
      */
-    async listCompany(inparams) {
+    async list(inparams) {
         const [err, ret] = await this.scan({
         })
         if (err) {
             return [err, 0]
         }
-        return [0, ret]
+        return [0, ret.Items]
     }
 
     /**
-     * 更新厂商状态
-     * @param {厂商名称} companyName 
-     * @param {厂商ID} companyId 
+     * 更新道具状态
+     * @param {道具} toolName 
+     * @param {道具ID} toolId 
      * @param {需要变更的状态} status 
      */
-    changeStatus(companyName, companyId, status) {
+    changeStatus(toolName, toolId, status) {
         return new Promise((reslove, reject) => {
             const params = {
                 ...this.params,
                 Key: {
-                    'companyName': companyName,
-                    'companyId': companyId
+                    'toolName': toolName,
+                    'toolId': toolId
                 },
-                UpdateExpression: "SET companyStatus = :status",
+                UpdateExpression: "SET toolStatus = :status",
                 ExpressionAttributeValues: {
                     ':status': status
                 }
@@ -111,18 +112,18 @@ export class CompanyModel extends BaseModel {
     }
 
     /**
-     * 查询单个厂商
-     * @param {*} companyName
-     * @param {*} companyId
+     * 查询单个道具
+     * @param {*} toolName
+     * @param {*} toolId
      */
-    getOne(companyName, companyId) {
+    getOne(toolName, toolId) {
         return new Promise((reslove, reject) => {
             const params = {
                 ...this.params,
-                KeyConditionExpression: 'companyName = :companyName and companyId = :companyId',
+                KeyConditionExpression: 'toolName = :toolName and toolId = :toolId',
                 ExpressionAttributeValues: {
-                    ':companyName': companyName,
-                    ':companyId': companyId
+                    ':toolName': toolName,
+                    ':toolId': toolId
                 }
             }
             this.db$('query', params)

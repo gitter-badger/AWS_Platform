@@ -184,10 +184,10 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    ZeusPlatformGame:
+    DianaPlatformGame:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ZeusPlatformGame
+        TableName: DianaPlatformGame
         AttributeDefinitions:
           -
             AttributeName: gameType
@@ -330,13 +330,35 @@ resources:
           -
             AttributeName: userId
             AttributeType: S
-
         KeySchema:
           -
             AttributeName: msn
             KeyType: HASH
           -
             AttributeName: userId
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    ZeusPlatformCode:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformCode
+        AttributeDefinitions:
+          -
+            AttributeName: type
+            AttributeType: S
+          -
+            AttributeName: code
+            AttributeType: S
+
+        KeySchema:
+          -
+            AttributeName: type
+            KeyType: HASH
+          -
+            AttributeName: code
             KeyType: RANGE
 
         ProvisionedThroughput:
@@ -410,10 +432,10 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ZeusPlatformCompany:
+    DianaPlatformCompany:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ZeusPlatformCompany
+        TableName: DianaPlatformCompany
         AttributeDefinitions:
           -
             AttributeName: companyName
@@ -428,6 +450,29 @@ resources:
             KeyType: HASH
           -
             AttributeName: companyId
+            KeyType: RANGE
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    DianaPlatformTool:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: DianaPlatformTool
+        AttributeDefinitions:
+          -
+            AttributeName: toolName
+            AttributeType: S
+          -
+            AttributeName: toolId
+            AttributeType: S
+
+        KeySchema:
+          -
+            AttributeName: toolName
+            KeyType: HASH
+          -
+            AttributeName: toolId
             KeyType: RANGE
 
         ProvisionedThroughput:

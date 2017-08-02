@@ -37,18 +37,14 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
     ...adminRole,
     ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
   }, Keys(adminRole))
-  // 检查用户数据
-  const [userParamErr, _] = userParamCheck(userInput)
-  if (userParamErr) {
-    return [userParamErr, 0]
-  }
+
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 查询用户是否已存在
-  const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
+  const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
-  if (queryUserRet.Items.length) {
+  if (!queryUserRet) {
     return [BizErr.UserExistErr(), 0]
   }
   // 保存用户
@@ -83,17 +79,14 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   // 生成注册用户信息
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
-  const [userParamErr, _] = userParamCheck(userInput)
-  if (userParamErr) {
-    return [userParamErr, 0]
-  }
+
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 检查用户是否已经存在
-  const [queryUserErr, queryUserRet] = await checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
+  const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
-  if (queryUserRet.Items.length) {
+  if (!queryUserRet) {
     return [BizErr.UserExistErr(), 0]
   }
   // 如果是创建商户，检查msn是否可用
@@ -122,11 +115,13 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     points: 0.0
   }
   //推送给游戏服务器(A3)
+  /*
   let pushModel = new PushModel(User);
   let [pushErr, data] = await pushModel.push();
   if(pushErr) {
     return [pushErr, 0]
   }
+  */
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
@@ -268,26 +263,6 @@ export const UserGrabToken = async (userInfo = {}) => {
 
 // ==================== 以下为内部方法 ====================
 
-// 检查用户数据合法性
-const userParamCheck = (userInfo) => {
-  if (userInfo.adminName === Model.StringValue) {
-    return [BizErr.ParamErr('adminName must set'), 0]
-  }
-  if (userInfo.suffix === Model.StringValue) {
-    return [BizErr.NoSuffixErr(), 0]
-  }
-  if (Trim(userInfo.username).length < Model.USERNAME_LIMIT[0]) {
-    return [BizErr.UsernameTooShortErr(), 0]
-  }
-  if (Trim(userInfo.username).length > Model.USERNAME_LIMIT[1]) {
-    return [BizErr.UsernameTooLongErr(), 0]
-  }
-  if (userInfo.password.length < Model.PASSWORD_PATTERN[0]) {
-    return [BizErr.ParamErr(), 0]
-  }
-  return [0, 0]
-}
-
 // 查询用户上级
 const queryParent = async (token, userId) => {
   var id = 0, role = -1
@@ -316,6 +291,16 @@ const getRole = async (code) => {
 
 // 保存用户
 const saveUser = async (userInfo) => {
+  // 线路商或商户，从编码池获取新编码
+  let [uucodeErr, uucodeRet] = [0, 0]
+  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role) {
+    [uucodeErr, uucodeRet] = await Model.uucode('displayId', 6)
+    if (uucodeErr) {
+      return [uucodeErr, 0]
+    }
+    userInfo.displayId = parseInt(uucodeRet)
+  }
+
   // 组装用户信息
   const baseModel = Model.baseModel()
   const roleDisplay = RoleDisplay[userInfo.role]
@@ -327,6 +312,7 @@ const saveUser = async (userInfo) => {
   }
   var saveConfig = { TableName: Tables.ZeusPlatformUser, Item: UserItem }
   var method = 'put'
+  
   // 如果是商户，还需要保存线路号
   if (RoleCodeEnum['Merchant'] === userInfo.role) {
     saveConfig = {
@@ -362,31 +348,35 @@ const saveUser = async (userInfo) => {
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
+  // End:记录生成的编码
+  if (uucodeRet) {
+    Store$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'displayId', code: uucodeRet } })
+  }
+
   const ret = Pick(UserItem, roleDisplay)
   return [0, ret]
 }
 
 // 检查用户是否重复
-const checkUserBySuffix = async (role, suffix, username) => {
-  // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-  if (role === RoleCodeEnum['PlatformAdmin']) {
-    return await new UserModel().queryUserBySuffix(role, suffix, username)
-  }
-  console.log("aaaaaaaaaaaaaaa")
-  // 对于其他用户，角色和前缀具有联合唯一性
-  const query = {
-    TableName: Tables.ZeusPlatformUser,
-    IndexName: 'RoleSuffixIndex',
-    KeyConditionExpression: '#suffix = :suffix and #role = :role',
-    ExpressionAttributeNames: {
-      '#role': 'role',
-      '#suffix': 'suffix'
-    },
-    ExpressionAttributeValues: {
-      ':suffix': suffix,
-      ':role': role
-    }
-  }
-  return await Store$('query', query)
-}
+// const checkUserBySuffix = async (role, suffix, username) => {
+//   // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
+//   if (role === RoleCodeEnum['PlatformAdmin']) {
+//     return await new UserModel().queryUserBySuffix(role, suffix, username)
+//   }
+//   // 对于其他用户，角色和前缀具有联合唯一性
+//   const query = {
+//     TableName: Tables.ZeusPlatformUser,
+//     IndexName: 'RoleSuffixIndex',
+//     KeyConditionExpression: '#suffix = :suffix and #role = :role',
+//     ExpressionAttributeNames: {
+//       '#role': 'role',
+//       '#suffix': 'suffix'
+//     },
+//     ExpressionAttributeValues: {
+//       ':suffix': suffix,
+//       ':role': role
+//     }
+//   }
+//   return await Store$('query', query)
+// }
 

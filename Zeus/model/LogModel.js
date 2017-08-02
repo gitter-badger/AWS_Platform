@@ -43,6 +43,7 @@ export class LogModel extends BaseModel {
         let lastIP = loginUserRet.lastIP
         let lastLogin = new Date().getTime()
         let userStatus = StatusEnum.Enable
+        let parent = loginUserRet.parent ? loginUserRet.parent : '0'
         if (loginUserErr) {
             detail = '登录失败'
             role = userLoginInfo.role
@@ -70,6 +71,7 @@ export class LogModel extends BaseModel {
         }
         this.putItem({
             ...this.item,
+            parent: parent,
             userId: userId,
             role: role,
             suffix: suffix,

@@ -46,13 +46,17 @@ export class UserModel extends BaseModel {
                 console.info('起始时间：' + start)
                 console.info('结束时间：' + end)
                 console.info('当前时间：' + now)
+                // 帐号未生效
+                if(start > now){
+                    return [BizErr.MerchantPeriodStartErr(), 0]
+                }
                 // 过期则冻结帐号
-                if (start > now || now > end) {
+                if (now > end) {
                     const [err, ret] = await this.changeStatus(user.role, user.userId, StatusEnum.Disable)
                     if (err) {
                         return [BizErr.DBErr(err.toString()), 0]
                     }
-                    return [BizErr.MerchantPeriodErr(), 0]
+                    return [BizErr.MerchantPeriodEndErr(), 0]
                 }
             } else {
                 console.info('有效期永久')
@@ -143,7 +147,7 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 查看可用管理员
+     * 查看可用线路商
      */
     async listAvalibleManagers() {
         const [queryErr, queryRet] = await this.query({
@@ -159,12 +163,26 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-        const viewList = _.map(queryRet.Items, (item) => {
+
+        // 查询已用商户已用数量
+        let userArr = []
+        for (let user of queryRet.Items) {
+            const [err, childs] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
+            if (err) {
+                return [err, 0]
+            }
+            else if (childs.length < parseInt(user.limit)) {
+                userArr.push(user)
+            }
+        }
+
+        const viewList = _.map(userArr, (item) => {
             return {
                 value: item.userId,
                 label: item.suffix
             }
         })
+        console.info(viewList)
         return [0, viewList]
     }
 
@@ -232,6 +250,38 @@ export class UserModel extends BaseModel {
                 ':username': `${suffix}_${username}`
             }
         })
+    }
+
+    // 检查用户是否重复
+    async checkUserBySuffix(role, suffix, username) {
+        let [err, ret] = [0, 0]
+        // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
+        if (role === RoleCodeEnum['PlatformAdmin']) {
+            [err, ret] = await this.queryUserBySuffix(role, suffix, username)
+        } else {
+            // 对于其他用户，角色和前缀具有联合唯一性
+            [err, ret] = await this.query({
+                TableName: Tables.ZeusPlatformUser,
+                IndexName: 'RoleSuffixIndex',
+                KeyConditionExpression: '#suffix = :suffix and #role = :role',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#suffix': 'suffix'
+                },
+                ExpressionAttributeValues: {
+                    ':suffix': suffix,
+                    ':role': role
+                }
+            })
+        }
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, false]
+        } else {
+            return [0, true]
+        }
     }
 
     /**

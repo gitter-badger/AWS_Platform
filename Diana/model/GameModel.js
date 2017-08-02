@@ -17,13 +17,12 @@ import {
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
-const tableName = "ZeusPlatformGame"
 export class GameModel extends BaseModel {
     constructor() {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.ZeusPlatformGame,
+            TableName: Tables.DianaPlatformGame,
         }
         // 设置对象属性
         this.item = {
@@ -78,9 +77,6 @@ export class GameModel extends BaseModel {
      * @param {*} pathParams 
      */
     async listGames(pathParams) {
-        if (Empty(pathParams)) {
-            return [BizErr.ParamMissErr(), 0]
-        }
         const inputTypes = pathParams.gameType.split(',')
         const gameTypes = _.filter(inputTypes, (type) => {
             return !!GameTypeEnum[type]
