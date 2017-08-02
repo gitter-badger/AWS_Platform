@@ -71,6 +71,13 @@ functions:
           path: /game/player/balance
           method: get
           cors: true
+  playerRecord:  #获取玩家记录验证
+    handler: openApi.playerRecordValidate
+    events:
+      - http:
+          path: /game/player/balance
+          method: get
+          cors: true
   gamePlayerList:  #获取玩家列表
     handler: managerApi.gamePlayerList
     events:

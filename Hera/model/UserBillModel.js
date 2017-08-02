@@ -15,7 +15,6 @@ export class UserBillModel extends athena.BaseModel {
         this.action = +action;
         this.userName = userName;
         this.msn = msn;
-        this.type = type;
         this.fromRole = fromRole;
         this.toRole = toRole;
         this.fromUser = fromUser;
@@ -94,5 +93,6 @@ export const Action = {
 //账单类型
 export const Type = {
     recharge : 1, //中心钱包转入平台钱包
-    withdrawals : 2 //平台转入中心钱包
+    withdrawals : 2, //平台转入中心钱包
+    gameSettlement : 3 //游戏结算
 }

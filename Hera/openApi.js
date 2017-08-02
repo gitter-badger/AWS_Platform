@@ -18,6 +18,8 @@ import {MSNModel} from "./model/MSNModel";
 
 import {MerchantBillModel,Action} from "./model/MerchantBillModel";
 
+import {UserRecordModel} from "./model/UserRecordModel";
+
 import {Util} from "./lib/Util"
 
 
@@ -29,7 +31,7 @@ const gamePlatform = "NA"
  * @param {*} context 
  * @param {*} callback 
  */
-export async function gamePlayerRegister(event, context, callback) {
+async function gamePlayerRegister(event, context, callback) {
 
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
@@ -85,7 +87,7 @@ export async function gamePlayerRegister(event, context, callback) {
  * @param {*} context 
  * @param {*} callback 
  */
-export async function gamePlayerLogin(event, context, callback) {
+async function gamePlayerLogin(event, context, callback) {
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
 
@@ -135,7 +137,7 @@ export async function gamePlayerLogin(event, context, callback) {
  * @param context
  * @param callback
  */
-export async function getGamePlayerBalance(event, context, callback) {
+async function getGamePlayerBalance(event, context, callback) {
   console.log(event);  
   let userName = event.pathParameters.userName;
   //验证token
@@ -178,7 +180,7 @@ export async function getGamePlayerBalance(event, context, callback) {
  * @param context
  * @param callback
  */
-export async function gamePlayerBalance(event, context, callback) {
+async function gamePlayerBalance(event, context, callback) {
     console.log(event);
     let userName = event.pathParameters.userName;
     //验证token
@@ -283,7 +285,7 @@ export async function gamePlayerBalance(event, context, callback) {
  * @param {*} context 
  * @param {*} callback 
  */
-export async function gamePlayerA3Login(event, context, callback) {
+async function gamePlayerA3Login(event, context, callback) {
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
 
@@ -360,12 +362,9 @@ export async function gamePlayerA3Login(event, context, callback) {
  * @param context
  * @param callback
  */
-export async function getA3GamePlayerBalance(event, context, callback) {
-    //json转换
+async function getA3GamePlayerBalance(event, context, callback) {
+  //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters);
-
-  
-
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -386,4 +385,52 @@ export async function getA3GamePlayerBalance(event, context, callback) {
   callback(null, ReHandler.success({
       data :{balance : balance}
   }));
+}
+
+/**
+ * 玩家账单验证
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function playerRecordValidate(event, context, callback){
+  //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+  
+  if(!requestParams.list || requestParams.list.length == 0){
+    return;
+  }
+  let records = requestParams.list || [];
+  let userRecordModel = new UserRecordModel({recoreds});
+  let [err, valid, settlementInfo] = userRecordModel.validateRecords(records);
+  if(err) {
+    return callback(null, ReHandler.fail(err));
+  }
+  //判断转入金额是否和余额一致(还没有写)
+
+  //保存账单信息
+  let [saveErr] = userRecordModel.save();
+  if(saveErr) {
+    return callback(null, ReHandler.fail(saveErr));
+  }
+  if(!valid) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.billNotMatchErr)));
+  }
+
+  //更新余额
+  callback(null, ReHandler.success({
+      data :{balance : balance}
+  }));
+
+}
+
+export{
+  gamePlayerRegister, //玩家注册
+  gamePlayerLogin,    //玩家登陆
+  getGamePlayerBalance,  //用户余额
+  gamePlayerBalance,  //玩家充值提现
+  gamePlayerA3Login, //A3游戏登陆
+  getA3GamePlayerBalance, //用户余额（A3）
+  playerRecordValidate  //玩家账单验证
 }

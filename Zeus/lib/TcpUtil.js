@@ -1,20 +1,16 @@
 var net = require('net');
 
-const HOST = '47.88.192.69';
-// const HOST = '192.168.3.98';
-const PORT = 20003;
-const proId = 9;  //协议
 import {
   BizErr,
   Codes
 } from '../lib/all'
 
-export const pushUserInfo =  (body) => {
+export const pushUserInfo =  (body, host, port, proId) => {
     let client = new net.Socket();
     let buffer = buildPayload(proId, JSON.stringify(body));
     return new Promise((reslove, reject) => {
         console.log("请求连接");
-        client.connect(PORT, HOST, function() {
+        client.connect(port, host, function() {
             client.write(buffer);
         });
         client.on('data', function(data) {
