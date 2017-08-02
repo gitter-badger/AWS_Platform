@@ -59,7 +59,6 @@ const eva = async (e, c, cb) => {
 }
 
 /**
- * 接口编号：2
  * 创建管理员帐号
  */
 const adminNew = async (e, c, cb) => {
