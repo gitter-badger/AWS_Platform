@@ -13,6 +13,7 @@ export const CODES = {
     merBalIns : 10007,
     palyerIns : 10008,
     TokenError : 11000,
+    gameingError : 11001, //正在游戏中，不能转账
 }
 
 const errorMessage = {
@@ -27,6 +28,7 @@ const errorMessage = {
   "11000" : "token错误",
   "10007" : "商家点数不足",
   "10008" : "玩家点数不足",
+  "11001" : "玩家正在游戏中，不能进行转账操作"
 }
 
 

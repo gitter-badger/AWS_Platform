@@ -10,7 +10,7 @@ import {RoleCodeEnum} from "./lib/Consts"
 
 import {MerchantModel} from "./model/MerchantModel";
 
-import {UserModel} from "./model/UserModel";
+import {UserModel, PaymentState} from "./model/UserModel";
 
 import {UserBillModel} from "./model/UserBillModel";
 
@@ -142,7 +142,7 @@ export async function getGamePlayerBalance(event, context, callback) {
   let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
   if(err || !Object.is(userInfo.suffix+"_"+userName, userInfo.userName)) return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
     //json转换
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters);
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
 
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   
@@ -241,6 +241,13 @@ export async function gamePlayerBalance(event, context, callback) {
     let u = new UserModel();
     let [getUserError, user] = await u.get({userName});
     if(!user) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+    //玩家是否正在游戏中
+    /*
+    let gameing = u.isGames(user);
+    if(gameing) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
+    }
+    */
     //商户点数变化
     let merchantBillModel = new MerchantBillModel(requestParams);
     merchantBillModel.action = -merchantBillModel.action;
@@ -325,7 +332,13 @@ export async function gamePlayerA3Login(event, context, callback) {
   if(bError) {
     return callback(null, ReHandler.fail(updateError));
   }
-
+  //修改游戏状态（不能进行转账操作）
+  /*
+  let [upErr] = await user.update({userName:userName},{payState:PaymentState.forbid});
+  if(upErr) {
+    return callback(null, ReHandler.fail(upErr));
+  }
+  */
   let callObj = {
     data : {
       token : loginToken,

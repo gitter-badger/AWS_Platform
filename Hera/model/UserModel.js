@@ -11,9 +11,12 @@ const SexEnum = {
     man : 1,
     woman : 2
 }
-
+const PaymentState = {  //是否可以进行转账操作
+    allow :1 ,//允许
+    forbid : 2 //禁止（正在游戏中不能转账）
+}
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn, sex} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState} = {}) {
         super(TABLE_NAMES.TABLE_USER);
         this.userName = userName;
         this.userPwd = userPwd;
@@ -25,6 +28,7 @@ export class UserModel extends athena.BaseModel {
         this.merchantName = merchantName;
         this.balance = 0;
         this.msn = msn;
+        this.payState = paymentState || PaymentState.allow;
     }
 
 
@@ -34,6 +38,9 @@ export class UserModel extends athena.BaseModel {
      */
     isExist(userName) {
         return super.isExist({userName});
+    }
+    isGames(user) {
+        return user.payState == PaymentState.forbid;
     }
     cryptoPassword(){
         this.userPwd = Util.sha256(this.userPwd);

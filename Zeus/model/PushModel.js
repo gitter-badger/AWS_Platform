@@ -14,7 +14,7 @@ export class PushModel{
         this.username = username;
         this.role = role;
         this.id = userId,
-        this.nickName = displayName;
+        this.nickname = displayName;
         this.headPic = headPic || "";
         this.parentId = parent;
         this.msn = msn;
