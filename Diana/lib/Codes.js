@@ -31,7 +31,7 @@ export const Codes = {
 
   TransferError: '10003',
   RepeatTransferError: '11000',
-  
+
   InparamError: '60001',
   CaptchaErr: '60002',
   MerchantPeriodErr: '60003'
@@ -39,36 +39,36 @@ export const Codes = {
 
 export const BizErr = {
   JSONParseErr: (errMsg = 'JSON format error') => {
-    return { code: Codes.JSONParseError, err: errMsg }
+    return { code: Codes.JSONParseError, msg: errMsg }
   },
   DBErr: (errMsg = 'DBError') => {
-    return { code: Codes.DBError, err: errMsg }
+    return { code: Codes.DBError, msg: errMsg }
   },
   UserNotFoundErr: (errMsg = '用户未找到') => {
-    return { code: Codes.UserNotFound, err: errMsg }
+    return { code: Codes.UserNotFound, msg: errMsg }
   },
   ParamErr: (errMsg = '参数错误') => {
-    return { code: Codes.ParamError, err: errMsg }
+    return { code: Codes.ParamError, msg: errMsg }
   },
   MerchantPeriodErr: (errMsg = '帐号已过期') => {
-    return { code: Codes.MerchantPeriodErr, err: errMsg }
+    return { code: Codes.MerchantPeriodErr, msg: errMsg }
   },
   ItemExistErr: (errMsg = '记录已存在') => {
-    return { code: Codes.ItemDuplicate, err: errMsg }
+    return { code: Codes.ItemDuplicate, msg: errMsg }
   },
   TokenErr: (errMsg = '身份令牌错误') => {
-    return { code: Codes.TokenError, err: errMsg }
+    return { code: Codes.TokenError, msg: errMsg }
   },
   RoleTokenErr: (errMsg = '角色身份错误') => {
-    return { code: Codes.RoleTokenError, err: errMsg }
+    return { code: Codes.RoleTokenError, msg: errMsg }
   },
   CodeFullError: (errMsg = '所有编号已分配') => {
-    return { code: Codes.CodeFullError, err: errMsg }
+    return { code: Codes.CodeFullError, msg: errMsg }
   },
   InparamErr: (errMsg = '入参错误') => {
-    return { code: Codes.InparamError, err: errMsg }
+    return { code: Codes.InparamError, msg: errMsg }
   },
   CaptchaErr: (errMsg = '验证码错误') => {
-    return { code: Codes.CaptchaErr, err: errMsg }
+    return { code: Codes.CaptchaErr, msg: errMsg }
   }
 }

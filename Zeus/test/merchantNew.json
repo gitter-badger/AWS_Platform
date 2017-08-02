@@ -15,19 +15,18 @@
     }
   },
   "body": {
-    "username": "cmerchant4",
+    "username": "cmmerchant2",
     "password": "123456",
     "role": "100",
-    "adminName": "cheneymerchant4",
-    "adminEmail": "cheneymerchant4@test.com",
-    "hostName":"负责人名",
-    "hostContact":"负责人联系方式",
+    "merchantName": "cheneymmerchant",
+    "hostName": "负责人一号",
+    "hostContact": "18780004427",
     "parent": "01",
-    "msn": "4",
-    "suffix": "CY4",
-    "displayName": "测试商户4",
-    "rate":"100.00",
-    "points":"1000.00",
-    "limit":"6"
+    "suffix": "CY1",
+    "msn": "1",
+    "displayName": "测试商户1",
+    "rate": "90",
+    "points": "1000",
+    "limit": "5"
   }
 }

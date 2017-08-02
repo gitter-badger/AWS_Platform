@@ -38,7 +38,7 @@ const toolNew = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   //检查参数是否合法
-  let [checkAttError, errorParams] = new ToolCheck().checkTool(inparam)
+  let [checkAttError, errorParams] = new ToolCheck().check(inparam)
   if (checkAttError) {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
@@ -87,8 +87,8 @@ const toolList = async (e, c, cb) => {
 const toolOne = async (e, c, cb) => {
   const errRes = { m: 'toolOne err'/*, input: e*/ }
   const res = { m: 'toolOne' }
-  const [paramsErr, inparam] = Model.pathParams(e)
-  if (paramsErr) {
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
   let [err, ret] = await new ToolModel().getOne(inparam.toolName, inparam.toolId)

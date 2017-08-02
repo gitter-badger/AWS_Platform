@@ -59,7 +59,6 @@ const eva = async (e, c, cb) => {
 }
 
 /**
- * 接口编号：2
  * 创建管理员帐号
  */
 const adminNew = async (e, c, cb) => {
@@ -129,7 +128,7 @@ const userNew = async (e, c, cb) => {
   }
 
   return ResOK(cb, { ...res, payload: resgisterUserRet });
- 
+
 }
 
 /**
@@ -192,14 +191,10 @@ const userChangeStatus = async (e, c, cb) => {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
-  // 身份令牌
-  const [tokenErr, token] = await Model.currentToken(e)
+  // 身份令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
-  }
-  // 只有管理员有权限
-  if (token.role != RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
   }
   // 更新用户状态
   const [err, ret] = await new UserModel().changeStatus(inparam.role, inparam.userId, inparam.status)
@@ -229,17 +224,71 @@ const checkUserExist = async (e, c, cb) => {
   if (!inparam.role || !inparam.suffix || !inparam.username) {
     return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
-  // 身份令牌
-  const [tokenErr, token] = await Model.currentToken(e)
+  // 身份令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  // 只有管理员有权限
-  if (token.role != RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
-  }
   // 业务操作
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
+/**
+ * 检查前缀是否被占用
+ */
+const checkSuffixExist = async (e, c, cb) => {
+  const errRes = { m: 'checkSuffixExist error'/*, input: e*/ }
+  const res = { m: 'checkSuffixExist' }
+  // 入参转换和校验
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  if (!inparam.role || !inparam.suffix) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 身份令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, null)
+  // 结果返回
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
+/**
+ * 检查昵称是否被占用
+ */
+const checkNickExist = async (e, c, cb) => {
+  const errRes = { m: 'checkNickExist error'/*, input: e*/ }
+  const res = { m: 'checkNickExist' }
+  // 入参转换和校验
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  if (!inparam.role || !inparam.displayName) {
+    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+  }
+  // 身份令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  let [err, ret] = await new UserModel().checkNickExist(inparam.role, inparam.displayName)
   // 结果返回
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
@@ -845,6 +894,8 @@ export {
   userChangeStatus,             // 变更用户状态
   childList,                    // 下级用户列表
   checkUserExist,               // 检查用户是否被占用
+  checkSuffixExist,             // 检查前缀是否被占用
+  checkNickExist,               // 检查昵称是否被占用
 
   managerList,                  // 建站商列表
   managerOne,                   // 建站商详情

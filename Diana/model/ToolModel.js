@@ -39,10 +39,10 @@ export class ToolModel extends BaseModel {
         // Start:从编号池获取新编号
         let [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
         if (uucodeErr) { return [uucodeErr, 0] }
-
         // 数据类型处理
         inparam.toolStatus = ToolStatusEnum.Enable
         inparam.toolId = uucodeRet
+        inparam.remark = inparam.remark || Model.StringValue
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'toolName = :toolName',

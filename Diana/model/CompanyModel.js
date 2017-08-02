@@ -41,7 +41,6 @@ export class CompanyModel extends BaseModel {
         companyInfo.companyStatus = CompanyStatusEnum.Enable
         companyInfo.companyDesc = companyInfo.companyDesc || Model.StringValue
         companyInfo.companyContract = companyInfo.companyContract || Model.StringValue
-        companyInfo.companyEmail = companyInfo.companyEmail || Model.StringValue
         companyInfo.license = companyInfo.license || Model.StringValue
         companyInfo.remark = companyInfo.remark || Model.StringValue
         // 判断是否重复

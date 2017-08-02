@@ -27,17 +27,12 @@ import { PushModel } from '../model/PushModel'
  * @param {*} userInfo 输入用户信息
  */
 export const RegisterAdmin = async (token = {}, userInfo = {}) => {
-  // 创建管理员账号的只能是管理员
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
-  }
   // 默认值设置
   const adminRole = RoleModels[RoleCodeEnum['PlatformAdmin']]()
   const userInput = Pick({
     ...adminRole,
     ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
   }, Keys(adminRole))
-
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 查询用户是否已存在
   const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
@@ -63,23 +58,18 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
  * @param {*} userInfo 输入用户信息
  */
 export const RegisterUser = async (token = {}, userInfo = {}) => {
-  if (userInfo.points < 0) {
-    return [BizErr.ParamErr('points cant less then 0 for new user'), 0]
-  }
   // 检查角色码
-  const roleCode = userInfo.role
-  if (roleCode === RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.ParamErr('admin role cant create by this api'), 0]
+  if (userInfo.role === RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.ParamErr('该接口不能创建管理员角色'), 0]
   }
   // 根据角色码查询角色
-  const [roleNotFoundErr, bizRole] = await getRole(roleCode)
+  const [roleNotFoundErr, bizRole] = await getRole(userInfo.role)
   if (roleNotFoundErr) {
     return [roleNotFoundErr, 0]
   }
   // 生成注册用户信息
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
-
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 检查用户是否已经存在
   const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
@@ -88,6 +78,14 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   }
   if (!queryUserRet) {
     return [BizErr.UserExistErr(), 0]
+  }
+  // 检查昵称是否已经存在
+  const [queryNickErr, queryNickRet] = await new UserModel().checkNickExist(CheckUser.role, CheckUser.displayName)
+  if (queryNickErr) {
+    return [queryNickErr, 0]
+  }
+  if (!queryNickRet) {
+    return [BizErr.NickExistErr(), 0]
   }
   // 如果是创建商户，检查msn是否可用
   if (CheckUser.role === RoleCodeEnum['Merchant']) {
@@ -104,9 +102,8 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (queryParentErr) {
     return [queryParentErr, 0]
   }
-  // 无论填入多少点数. 产生用户时, 点数的起始为0.0
+  // 初始点数
   const depositPoints = parseFloat(CheckUser.points)
-  console.log('registerUser: points: ', depositPoints);
   const User = {
     ...CheckUser,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
@@ -122,19 +119,25 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [pushErr, 0]
   }
   */
+  // 保存创建用户
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
+  // 检查余额
   const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
+  if (depositPoints > balance) {
+    return [BizErr.BalanceErr(), 0]
+  }
+  // 开始转账
   parentUser.operatorToken = token
   const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
-    amount: Math.min(depositPoints, balance), // 有多少扣多少
+    amount: depositPoints,
     operator: token.username,
     remark: '初始点数'
   })
@@ -312,7 +315,7 @@ const saveUser = async (userInfo) => {
   }
   var saveConfig = { TableName: Tables.ZeusPlatformUser, Item: UserItem }
   var method = 'put'
-  
+
   // 如果是商户，还需要保存线路号
   if (RoleCodeEnum['Merchant'] === userInfo.role) {
     saveConfig = {
@@ -356,27 +359,3 @@ const saveUser = async (userInfo) => {
   const ret = Pick(UserItem, roleDisplay)
   return [0, ret]
 }
-
-// 检查用户是否重复
-// const checkUserBySuffix = async (role, suffix, username) => {
-//   // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-//   if (role === RoleCodeEnum['PlatformAdmin']) {
-//     return await new UserModel().queryUserBySuffix(role, suffix, username)
-//   }
-//   // 对于其他用户，角色和前缀具有联合唯一性
-//   const query = {
-//     TableName: Tables.ZeusPlatformUser,
-//     IndexName: 'RoleSuffixIndex',
-//     KeyConditionExpression: '#suffix = :suffix and #role = :role',
-//     ExpressionAttributeNames: {
-//       '#role': 'role',
-//       '#suffix': 'suffix'
-//     },
-//     ExpressionAttributeValues: {
-//       ':suffix': suffix,
-//       ':role': role
-//     }
-//   }
-//   return await Store$('query', query)
-// }
-
