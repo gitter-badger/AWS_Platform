@@ -359,27 +359,3 @@ const saveUser = async (userInfo) => {
   const ret = Pick(UserItem, roleDisplay)
   return [0, ret]
 }
-
-// 检查用户是否重复
-// const checkUserBySuffix = async (role, suffix, username) => {
-//   // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-//   if (role === RoleCodeEnum['PlatformAdmin']) {
-//     return await new UserModel().queryUserBySuffix(role, suffix, username)
-//   }
-//   // 对于其他用户，角色和前缀具有联合唯一性
-//   const query = {
-//     TableName: Tables.ZeusPlatformUser,
-//     IndexName: 'RoleSuffixIndex',
-//     KeyConditionExpression: '#suffix = :suffix and #role = :role',
-//     ExpressionAttributeNames: {
-//       '#role': 'role',
-//       '#suffix': 'suffix'
-//     },
-//     ExpressionAttributeValues: {
-//       ':suffix': suffix,
-//       ':role': role
-//     }
-//   }
-//   return await Store$('query', query)
-// }
-
