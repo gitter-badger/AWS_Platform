@@ -11,7 +11,7 @@ const SexEnum = {
     man : 1,
     woman : 2
 }
-const PaymentState = {  //是否可以进行转账操作
+export const PaymentState = {  //是否可以进行转账操作
     allow :1 ,//允许
     forbid : 2 //禁止（正在游戏中不能转账）
 }

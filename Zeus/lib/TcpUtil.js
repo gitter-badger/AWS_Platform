@@ -1,7 +1,7 @@
 var net = require('net');
 
-// const HOST = '47.88.192.69';
-const HOST = '192.168.3.98';
+const HOST = '47.88.192.69';
+// const HOST = '192.168.3.98';
 const PORT = 20003;
 const proId = 9;  //协议
 import {
