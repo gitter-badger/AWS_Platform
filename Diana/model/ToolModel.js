@@ -42,6 +42,7 @@ export class ToolModel extends BaseModel {
         // 数据类型处理
         inparam.toolStatus = ToolStatusEnum.Enable
         inparam.toolId = uucodeRet
+        inparam.remark = inparam.remark || Model.StringValue
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'toolName = :toolName',

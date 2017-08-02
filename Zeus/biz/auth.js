@@ -79,6 +79,14 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (!queryUserRet) {
     return [BizErr.UserExistErr(), 0]
   }
+  // 检查昵称是否已经存在
+  const [queryNickErr, queryNickRet] = await new UserModel().checkNickExist(CheckUser.role, CheckUser.displayName)
+  if (queryNickErr) {
+    return [queryNickErr, 0]
+  }
+  if (!queryNickRet) {
+    return [BizErr.NickExistErr(), 0]
+  }
   // 如果是创建商户，检查msn是否可用
   if (CheckUser.role === RoleCodeEnum['Merchant']) {
     const [checkMSNErr, checkMSNRet] = await new MsnModel().checkMSN({ msn: CheckUser.msn })

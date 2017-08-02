@@ -16,6 +16,7 @@ export const Codes = {
   MsnFullError: '50011',
   CodeFullError: '50012',
   BalanceError: '50013',
+  NickExistError: '50014',
 
   Busy: '44004',
   ParamError: '47003',
@@ -63,6 +64,9 @@ export const BizErr = {
   },
   UserExistErr: (errMsg = '用户已存在') => {
     return {code: Codes.DuplicateUser, err: errMsg}
+  },
+  NickExistErr: (errMsg = '昵称已存在') => {
+    return {code: Codes.NickExistError, err: errMsg}
   },
   UserNotFoundErr:(errMsg = '用户未找到') => {
     return {code:Codes.UserNotFound,err:errMsg}
