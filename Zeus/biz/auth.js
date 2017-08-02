@@ -27,10 +27,6 @@ import { PushModel } from '../model/PushModel'
  * @param {*} userInfo 输入用户信息
  */
 export const RegisterAdmin = async (token = {}, userInfo = {}) => {
-  // 创建管理员账号的只能是管理员
-  if (token.role !== RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.TokenErr('must admin token'), 0]
-  }
   // 默认值设置
   const adminRole = RoleModels[RoleCodeEnum['PlatformAdmin']]()
   const userInput = Pick({
@@ -63,23 +59,18 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
  * @param {*} userInfo 输入用户信息
  */
 export const RegisterUser = async (token = {}, userInfo = {}) => {
-  if (userInfo.points < 0) {
-    return [BizErr.ParamErr('points cant less then 0 for new user'), 0]
-  }
   // 检查角色码
-  const roleCode = userInfo.role
-  if (roleCode === RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.ParamErr('admin role cant create by this api'), 0]
+  if (userInfo.role === RoleCodeEnum['PlatformAdmin']) {
+    return [BizErr.ParamErr('该接口不能创建管理员角色'), 0]
   }
   // 根据角色码查询角色
-  const [roleNotFoundErr, bizRole] = await getRole(roleCode)
+  const [roleNotFoundErr, bizRole] = await getRole(userInfo.role)
   if (roleNotFoundErr) {
     return [roleNotFoundErr, 0]
   }
   // 生成注册用户信息
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
-
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 检查用户是否已经存在
   const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
