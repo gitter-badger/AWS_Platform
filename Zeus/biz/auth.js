@@ -112,13 +112,13 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     points: 0.0
   }
   //推送给游戏服务器(A3)
-  /*
+  
   let pushModel = new PushModel(User);
   let [pushErr, data] = await pushModel.push();
   if(pushErr) {
     return [pushErr, 0]
   }
-  */
+  
   // 保存创建用户
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
