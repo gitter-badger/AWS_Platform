@@ -107,6 +107,24 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  checkSuffixExist: #检查前缀是否被占用
+    handler: api.checkSuffixExist
+    events:
+      -
+        http:
+          path: checkSuffixExist
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  checkNickExist: #检查昵称是否被占用
+    handler: api.checkNickExist
+    events:
+      -
+        http:
+          path: checkNickExist
+          method: post
+          cors: true
+          authorizer: tokenAuth
   userChangeStatus: #变更用户状态
     handler: api.userChangeStatus
     events:

@@ -5,12 +5,17 @@ export class UserCheck {
      */
     checkAdmin(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "username", type: "S", min: 6, max: 16 },
+            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "role", type: "N", min: 1, max: 100 },
-            { name: "adminName", type: "S", min: 1, max: 16 },
-            { name: "adminContact", type: "S", min: 1, max: 16 },
-            { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL }
+            { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            { name: "adminContact", type: "S", min: 1, max: 40 },
+            { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+
+            { name: "displayName", type: "NREG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
+            { name: "hostContact", type: "NS", min: 5, max: 40 },
+
+            { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
         return [checkAttError, errorParams]
     }

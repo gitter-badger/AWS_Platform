@@ -47,7 +47,7 @@ export class UserModel extends BaseModel {
                 console.info('结束时间：' + end)
                 console.info('当前时间：' + now)
                 // 帐号未生效
-                if(start > now){
+                if (start > now) {
                     return [BizErr.MerchantPeriodStartErr(), 0]
                 }
                 // 过期则冻结帐号
@@ -274,6 +274,33 @@ export class UserModel extends BaseModel {
                 }
             })
         }
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, false]
+        } else {
+            return [0, true]
+        }
+    }
+
+    // 检查昵称是否重复
+    async checkNickExist(role, displayName) {
+        let [err, ret] = await this.query({
+            TableName: Tables.ZeusPlatformUser,
+            IndexName: 'RoleSuffixIndex',
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#displayName = :displayName',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#displayName': 'displayName'
+            },
+            ExpressionAttributeValues: {
+                ':role': role,
+                ':displayName': displayName
+            }
+        })
+
         if (err) {
             return [err, 0]
         }
