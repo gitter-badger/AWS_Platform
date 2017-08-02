@@ -33,7 +33,6 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
     ...adminRole,
     ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
   }, Keys(adminRole))
-
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 查询用户是否已存在
   const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
@@ -95,9 +94,8 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (queryParentErr) {
     return [queryParentErr, 0]
   }
-  // 无论填入多少点数. 产生用户时, 点数的起始为0.0
+  // 初始点数
   const depositPoints = parseFloat(CheckUser.points)
-  console.log('registerUser: points: ', depositPoints);
   const User = {
     ...CheckUser,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
@@ -113,19 +111,25 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [pushErr, 0]
   }
   */
+  // 保存创建用户
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
+  // 检查余额
   const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
+  if (depositPoints > balance) {
+    return [BizErr.BalanceErr(), 0]
+  }
+  // 开始转账
   parentUser.operatorToken = token
   const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
-    amount: Math.min(depositPoints, balance), // 有多少扣多少
+    amount: depositPoints,
     operator: token.username,
     remark: '初始点数'
   })
@@ -303,7 +307,7 @@ const saveUser = async (userInfo) => {
   }
   var saveConfig = { TableName: Tables.ZeusPlatformUser, Item: UserItem }
   var method = 'put'
-  
+
   // 如果是商户，还需要保存线路号
   if (RoleCodeEnum['Merchant'] === userInfo.role) {
     saveConfig = {

@@ -15,6 +15,7 @@ export const Codes = {
   MsnNotExistError: '50010',
   MsnFullError: '50011',
   CodeFullError: '50012',
+  BalanceError: '50013',
 
   Busy: '44004',
   ParamError: '47003',
@@ -117,8 +118,11 @@ export const BizErr = {
   CaptchaErr: (errMsg = '验证码错误') => {
     return  {code : Codes.CaptchaErr, err: errMsg}
   },
-  TcpErr: (errMsg = 'tcp connection error') => {
-    return  {code : Codes.TcpError, err: errMsg}
+  CaptchaErr: (errMsg = '验证码错误') => {
+    return  {code : Codes.CaptchaErr, err: errMsg}
+  },
+  BalanceErr: (errMsg = '余额不足') => {
+    return  {code : Codes.BalanceError, err: errMsg}
   },
   CompanyNotExistError : (errMsg = "company not exist") => {
     return  {code : Codes.CompanyNotExistError, err: errMsg}
