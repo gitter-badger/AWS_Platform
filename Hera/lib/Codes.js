@@ -13,6 +13,14 @@ export const CODES = {
     merBalIns : 10007,
     palyerIns : 10008,
     TokenError : 11000,
+    gameingError : 11001, //正在游戏中，不能转账
+
+    playerRecordError : { //账单数据错误
+      depositErr : 12000, //存点不正确
+      takeErr : 12001,   //取点不正确
+      billNotMatchErr : 12002, //账单不匹配
+      notSingleUser : 12003,  //不是同一个用户提交
+    }
 }
 
 const errorMessage = {
@@ -27,6 +35,11 @@ const errorMessage = {
   "11000" : "token错误",
   "10007" : "商家点数不足",
   "10008" : "玩家点数不足",
+  "11001" : "玩家正在游戏中，不能进行转账操作",
+  "12000" : "存点不正确",
+  "12001" : "取点不正确",
+  "12002" : "账单不匹配",
+  "notSingleUser" : "不是同一个用户提交"
 }
 
 
