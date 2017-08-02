@@ -271,7 +271,7 @@ export class Util {
                 return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
             }
             case "N": {
-                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
+                if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];
                 let [e, v] = this.parseNumber(value);
                 if (e) return [e, 0];
                 let error = false;

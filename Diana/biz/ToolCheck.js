@@ -3,11 +3,24 @@ export class ToolCheck {
     /**
      * 检查道具数据
      */
-    checkTool(inparam) {
+    check(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "toolName", type: "S", min: 1, max: 20 },
+            { name: "toolName", type: "S", min: 1, max: 10 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查状态变更入参
+     * @param {*} inparam 
+     */
+    checkStatus(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "toolName", type: "S", min: 1, max: 10 },
+            { name: "toolId", type: "N", min: 100000, max: 999999 },
+            { name: "status", type: "N", min: 0, max: 1 }]
+            , inparam)
         return [checkAttError, errorParams]
     }
 }
