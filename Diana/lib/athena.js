@@ -243,11 +243,26 @@ class Page {
 }
 
 export const RegEnum = {
+
     URL: /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/,
     IP: /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/,
-    NUMBER: /^[0-9]+$/,
+
+    SUFFIX: /^[a-zA-Z]\w{2,6}$/,
+    
+    COMPANYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$/,
+    COMPANYDESC: /^[\u4E00-\u9FA5A-Za-z0-9]{2,200}$/,
+    COMPANYCONTACT: /^[\u4E00-\u9FA5A-Za-z0-9]{2,16}$/,
+    COMPANYCONTACTWAY: /^[0-9]{2,20}$/,
+
+    USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    HOSTNAME: /^[\u4E00-\u9FA5A-Za-z]{5,16}$/,
+    
+    EMAIL: /^([a-zA-Z0-9_-]){1,16}@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/,
+
+    RATE: /^(\d{1,2}(\.\d{1,2})?|100(\.0{1,2})?)$/,
     PRICE: /^[0-9]+([.]{1}[0-9]{1,2})?$/,
-    EMAIL: /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+    
+    NUMBER: /^[0-9]+$/
 }
 
 export class Util {
