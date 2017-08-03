@@ -77,7 +77,35 @@ export class ToolModel extends BaseModel {
      * @param {*} inparams
      */
     async list(inparams) {
+        inparams = { toolName: null, toolStatus: 1 }
+        let ranges = Model.getInparamRanges(inparams)
+        let values = Model.getInparamValues(inparams)
+        // 组装条件
+        // let ranges = _.map(inparams, (v, i) => {
+        //     if (v === null) {
+        //         return null
+        //     }
+        //     if (i == 'toolName') {
+        //         return `contains(${i}, :${i})`
+        //     } else {
+        //         return `${i} = :${i}`
+        //     }
+        // })
+        // _.remove(ranges, (v) => v === null)
+        // ranges = _.join(ranges, ' AND ')
+        // 组装条件值
+        // const values = _.reduce(inparams, (result, v, i) => {
+        //     if (v !== null) {
+        //         result[`:${i}`] = v
+        //     }
+        //     return result
+        // }, {})
+        console.info(ranges)
+        console.info(values)
+        // 查询
         const [err, ret] = await this.scan({
+            // FilterExpression: ranges,
+            // ExpressionAttributeValues: values
         })
         if (err) {
             return [err, 0]

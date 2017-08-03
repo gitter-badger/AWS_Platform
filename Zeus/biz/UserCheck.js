@@ -38,7 +38,7 @@ export class UserCheck {
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "role", type: "N", min: 1, max: 100 },
-            { name: "limit", type: "N", min: 1, max: 10 },
+            { name: "limit", type: "NN", min: 1, max: 10 },
             { name: "hostContact", type: "S", min: 5, max: 40 },
 
             { name: "adminName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
