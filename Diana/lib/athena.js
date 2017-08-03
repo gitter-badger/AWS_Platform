@@ -303,7 +303,7 @@ export class Util {
             }
             case "REG": {
                 if (!value) return [new AError(CODES.INPARAM_ERROR), null];
-                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+                return !equal.test(value.toString()) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
             }
             case "NS": {
                 if (!value) {
@@ -331,7 +331,7 @@ export class Util {
                 if (!value) {
                     return [null, 0]
                 }
-                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+                return !equal.test(value.toString()) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
             }
             default: {
                 return [new AError(CODES.INPARAM_ERROR), null]
