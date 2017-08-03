@@ -24,27 +24,31 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
       Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
-  initData:
-    handler: api.initData
-    events:
-      -
-        http:
-          path: /initData
-          method: get
-          cors: true
-  jwtverify:
-    handler: api.jwtverify
-    integration: lambda
-  generateToken:
-    handler: api.generateToken
-    events:
-      -
-        http:
-          path: /generate_token
-          method: post
-          cors: true
+  # initData:
+  #   handler: api.initData
+  #   events:
+  #     -
+  #       http:
+  #         path: /initData
+  #         method: get
+  #         cors: true
+  # jwtverify:
+  #   handler: api.jwtverify
+  #   integration: lambda
+  # generateToken:
+  #   handler: api.generateToken
+  #   events:
+  #     -
+  #       http:
+  #         path: /generate_token
+  #         method: post
+  #         cors: true
   #统计开始
   overview: #统计总览
     handler: api_sta.overview
@@ -78,9 +82,19 @@ functions:
           path: /statistics/day/list
           method: get
           cors: true
+  # 触发器开始
+  userTrigger: #用户表触发器
+    handler: api_trigger.userTrigger
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - ZeusPlatformUser
+              - StreamArn
 resources:
   Resources:
-    ZeusPlatformUser:
+    ZeusPlatformUser: #用户表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformUser
@@ -110,7 +124,6 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
-
         GlobalSecondaryIndexes:
           -
             IndexName: RoleSuffixIndex
@@ -179,12 +192,13 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
 
-    DianaPlatformGame:
+    DianaPlatformGame: #游戏表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: DianaPlatformGame
@@ -248,12 +262,11 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    ZeusPlatformBill:
+    ZeusPlatformBill: #账单表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformBill
@@ -267,7 +280,6 @@ resources:
           -
             AttributeName: createdAt
             AttributeType: N
-
         KeySchema:
           -
             AttributeName: sn
@@ -275,7 +287,6 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
-
         GlobalSecondaryIndexes:
           -
             IndexName: UserIdIndex
@@ -319,7 +330,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ZeusPlatformMSN:
+
+    ZeusPlatformMSN: #线路号表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformMSN
@@ -341,7 +353,7 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    ZeusPlatformCode:
+    ZeusPlatformCode: #编码池表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformCode
@@ -352,7 +364,6 @@ resources:
           -
             AttributeName: code
             AttributeType: S
-
         KeySchema:
           -
             AttributeName: type
@@ -360,12 +371,11 @@ resources:
           -
             AttributeName: code
             KeyType: RANGE
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    ZeusPlatformCaptcha:
+    ZeusPlatformCaptcha: #验证码表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformCaptcha
@@ -376,7 +386,6 @@ resources:
           -
             AttributeName: usage
             AttributeType: S
-          
         KeySchema:
           -
             AttributeName: relKey
@@ -384,11 +393,11 @@ resources:
           -
             AttributeName: usage
             KeyType: RANGE
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ZeusPlatformLog:
+
+    ZeusPlatformLog: #日志表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformLog
@@ -405,7 +414,6 @@ resources:
           -
             AttributeName: createdAt
             AttributeType: N
-
         KeySchema:
           -
             AttributeName: sn
@@ -413,7 +421,6 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
-        
         GlobalSecondaryIndexes:
           -
             IndexName: LogRoleIndex
@@ -432,7 +439,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    DianaPlatformCompany:
+
+    DianaPlatformCompany: #游戏厂商表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: DianaPlatformCompany
@@ -443,7 +451,6 @@ resources:
           -
             AttributeName: companyId
             AttributeType: S
-
         KeySchema:
           -
             AttributeName: companyName
@@ -451,11 +458,11 @@ resources:
           -
             AttributeName: companyId
             KeyType: RANGE
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    DianaPlatformTool:
+
+    DianaPlatformTool: #工具表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: DianaPlatformTool
@@ -466,7 +473,6 @@ resources:
           -
             AttributeName: toolId
             AttributeType: S
-
         KeySchema:
           -
             AttributeName: toolName
@@ -474,7 +480,6 @@ resources:
           -
             AttributeName: toolId
             KeyType: RANGE
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

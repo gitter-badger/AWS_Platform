@@ -27,7 +27,8 @@ export class ToolModel extends BaseModel {
         this.item = {
             ...this.baseitem,
             toolName: Model.StringValue,
-            toolId: Model.StringValue
+            toolId: Model.StringValue,
+            order: Model.NumberValue
         }
     }
 
@@ -37,12 +38,13 @@ export class ToolModel extends BaseModel {
      */
     async addTool(inparam) {
         // Start:从编号池获取新编号
-        let [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
+        const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
         if (uucodeErr) { return [uucodeErr, 0] }
         // 数据类型处理
         inparam.toolStatus = ToolStatusEnum.Enable
         inparam.toolId = uucodeRet
         inparam.remark = inparam.remark || Model.StringValue
+        inparam.order = inparam.order || Model.NumberValue
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'toolName = :toolName',
@@ -56,18 +58,18 @@ export class ToolModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('道具已存在'), 0]
         }
-        // 保存
-        const item = {
+        const dataItem = {
             ...this.item,
             ...inparam
         }
-        const [putErr, putRet] = await this.putItem(item)
+        // 保存
+        const [putErr, putRet] = await this.putItem(dataItem)
         if (putErr) {
             return [putErr, 0]
         }
         // End:记录生成的编码
         this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: uucodeRet } })
-        return [0, item]
+        return [0, dataItem]
     }
 
     /**
@@ -80,7 +82,8 @@ export class ToolModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
-        return [0, ret.Items]
+        const sortResult = _.sortBy(ret.Items, ['order'])
+        return [0, sortResult]
     }
 
     /**
@@ -89,26 +92,38 @@ export class ToolModel extends BaseModel {
      * @param {道具ID} toolId 
      * @param {需要变更的状态} status 
      */
-    changeStatus(toolName, toolId, status) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                Key: {
-                    'toolName': toolName,
-                    'toolId': toolId
-                },
-                UpdateExpression: "SET toolStatus = :status",
-                ExpressionAttributeValues: {
-                    ':status': status
-                }
+    async changeStatus(toolName, toolId, status) {
+        const [err, ret] = await this.updateItem({
+            Key: {
+                'toolName': toolName,
+                'toolId': toolId
+            },
+            UpdateExpression: "SET toolStatus = :status",
+            ExpressionAttributeValues: {
+                ':status': status
             }
-            this.db$('update', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), 0])
-                })
         })
+        return [err, ret]
+    }
+
+    /**
+     * 更新道具
+     * @param {道具对象} inparam 
+     */
+    async updateTool(inparam) {
+        const [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
+        if (err) {
+            return [err, 0]
+        }
+        if (!ret) {
+            return [new BizErr.ItemNotExistErr(), 0]
+        }
+        ret.price = inparam.price
+        ret.num = inparam.num
+        ret.toolStatus = inparam.status
+        ret.updatedAt = Model.timeStamp()
+        ret.order = parseInt(inparam.order)
+        return await this.putItem(ret)
     }
 
     /**
@@ -116,26 +131,22 @@ export class ToolModel extends BaseModel {
      * @param {*} toolName
      * @param {*} toolId
      */
-    getOne(toolName, toolId) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                KeyConditionExpression: 'toolName = :toolName and toolId = :toolId',
-                ExpressionAttributeValues: {
-                    ':toolName': toolName,
-                    ':toolId': toolId
-                }
+    async getOne(toolName, toolId) {
+        const [err, ret] = await this.query({
+            KeyConditionExpression: 'toolName = :toolName and toolId = :toolId',
+            ExpressionAttributeValues: {
+                ':toolName': toolName,
+                ':toolId': toolId
             }
-            this.db$('query', params)
-                .then((res) => {
-                    if(res.Items.length > 0){
-                        res = res.Items[0]
-                    }
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
         })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, ret.Items[0]]
+        } else {
+            return [0, 0]
+        }
     }
 }
 

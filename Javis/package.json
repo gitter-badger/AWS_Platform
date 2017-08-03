@@ -26,6 +26,7 @@
     "bluebird": "^3.5.0",
     "jsonwebtoken": "^7.4.1",
     "lodash": "^4.17.4",
+    "password-generator": "^2.1.0",
     "rxjs": "^5.4.2",
     "safe-json-parse": "^4.0.0",
     "source-map-support": "^0.4.14",

@@ -129,6 +129,37 @@ const toolChangeStatus = async (e, c, cb) => {
   }
 }
 
+/**
+ * 道具更新
+ */
+const toolUpdate = async (e, c, cb) => {
+  // 数据输入，转换，校验
+  const errRes = { m: 'toolUpdate error' }
+  const res = { m: 'toolUpdate' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new ToolCheck().checkUpdate(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  const [err, ret] = await new ToolModel().updateTool(inparam)
+  if (err) {
+    return ResFail(cb, { ...errRes, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
+}
+
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -157,5 +188,6 @@ export {
   toolNew,                      // 创建道具
   toolList,                     // 道具列表
   toolOne,                      // 单个道具
+  toolUpdate,                   // 更新道具
   toolChangeStatus              // 道具状态变更
 }

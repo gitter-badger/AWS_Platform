@@ -11,6 +11,7 @@ export const Codes = {
   JSONParseError: '50006',
   NoSuffixError: '50007',
   CodeFullError: '50012',
+  ItemNotExistError: '50013',
 
   Busy: '44004',
   ParamError: '47003',
@@ -55,6 +56,9 @@ export const BizErr = {
   },
   ItemExistErr: (errMsg = '记录已存在') => {
     return { code: Codes.ItemDuplicate, msg: errMsg }
+  },
+  ItemNotExistErr: (errMsg = '记录不存在') => {
+    return { code: Codes.ItemNotExistError, msg: errMsg }
   },
   TokenErr: (errMsg = '身份令牌错误') => {
     return { code: Codes.TokenError, msg: errMsg }

@@ -111,52 +111,41 @@ export class GameModel extends BaseModel {
      * @param {游戏ID} gameId 
      * @param {需要变更的状态} status 
      */
-    changeStatus(gameType, gameId, status) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                Key: {
-                    'gameType': gameType,
-                    'gameId': gameId
-                },
-                UpdateExpression: "SET gameStatus = :status",
-                ExpressionAttributeValues: {
-                    ':status': parseInt(status)
-                }
+    async changeStatus(gameType, gameId, status) {
+        const [err, ret] = await this.updateItem({
+            ...this.params,
+            Key: {
+                'gameType': gameType,
+                'gameId': gameId
+            },
+            UpdateExpression: "SET gameStatus = :status",
+            ExpressionAttributeValues: {
+                ':status': parseInt(status)
             }
-            this.db$('update', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), 0])
-                })
         })
+        return [err, ret]
     }
     /**
      * 查询单个游戏
      * @param {*} gameType 
      * @param {*} gameId 
      */
-    getOne(gameType, gameId) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                KeyConditionExpression: 'gameType = :gameType and gameId = :gameId',
-                ExpressionAttributeValues: {
-                    ':gameType': gameType,
-                    ':gameId': gameId
-                }
+    async getOne(gameType, gameId) {
+        const [err, ret] = await this.query({
+            KeyConditionExpression: 'gameType = :gameType and gameId = :gameId',
+            ExpressionAttributeValues: {
+                ':gameType': gameType,
+                ':gameId': gameId
             }
-            this.db$('query', params)
-                .then((res) => {
-                    if (res.Items.length > 0) {
-                        res = res.Items[0]
-                    }
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
         })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, ret.Items[0]]
+        } else {
+            return [0, 0]
+        }
     }
 }
 

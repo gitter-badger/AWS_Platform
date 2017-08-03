@@ -15,14 +15,9 @@
         }
     },
     "body": {
-        "companyName": "111",
-        "companyDesc": "111",
-        "companyContact": "联系人一号",
-        "companyContactWay": "111",
-        "companyEmail": "sda@qq.com",
-        "companyRegion": "1",
-        "companyContract": "",
-        "license": "11",
-        "remark": "sadadsa"
+        "toolName": "测试道具1",
+        "toolId": "278779",
+        "price": 6.0,
+        "num":10
     }
 }

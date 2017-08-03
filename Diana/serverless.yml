@@ -1,14 +1,9 @@
 
-service: Diana # NOTE: update this with your service name
-
-# Use the serverless-webpack plugin to transpile ES6
+service: Diana
 plugins:
   - serverless-webpack
-
-# Enable auto-packing of external modules
 custom:
   webpackIncludeModules: true
-
 
 provider:
   name: aws
@@ -34,49 +29,12 @@ provider:
             - Ref: AWS::AccountId
             - ":table/*"
           
-
 functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
-
-  gameNew:
-    handler: api.gameNew
-    events:
-      -
-        http:
-          path: games
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  gameList:
-    handler: api.gameList
-    events:
-      -
-        http:
-          path: gameList
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  gameOne:
-    handler: api.gameOne
-    events:
-      -
-        http:
-          path: gameOne/{gameType}/{gameId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  gameChangeStatus: 
-    handler: api.gameChangeStatus
-    events:
-      -
-        http:
-          path: gameChangeStatus
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  billTransfer:
+  # ==================== 以下是账单和日志接口服务 ====================
+  billTransfer: # 转账
     handler: api.billTransfer
     events:
       -
@@ -85,7 +43,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  billOne:
+  billOne: # 单个账单
     handler: api.billOne
     events:
       -
@@ -94,7 +52,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  billList:
+  billList: # 账单列表
     handler: api.billList
     events:
       -
@@ -103,7 +61,7 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  logList: #日志列表，接口编号：
+  logList: #日志列表
     handler: api.logList
     events:
       -
@@ -112,8 +70,46 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  companyNew:
-    handler: api.companyNew
+  # ==================== 以下是游戏管理接口服务 ====================
+  gameNew: #创建游戏
+    handler: api_game.gameNew
+    events:
+      -
+        http:
+          path: games
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  gameList: #游戏列表
+    handler: api_game.gameList
+    events:
+      -
+        http:
+          path: gameList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  gameOne: #单个游戏
+    handler: api_game.gameOne
+    events:
+      -
+        http:
+          path: gameOne/{gameType}/{gameId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  gameChangeStatus: #变更游戏状态
+    handler: api_game.gameChangeStatus
+    events:
+      -
+        http:
+          path: gameChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是游戏厂商接口服务 ====================
+  companyNew: #创建游戏厂商
+    handler: api_company.companyNew
     events:
       -
         http:
@@ -121,8 +117,8 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  companyList:
-    handler: api.companyList
+  companyList: #游戏厂商列表
+    handler: api_company.companyList
     events:
       -
         http:
@@ -130,8 +126,8 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  companyOne:
-    handler: api.companyOne
+  companyOne: #单个厂商
+    handler: api_company.companyOne
     events:
       -
         http:
@@ -139,8 +135,8 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  companyChangeStatus:
-    handler: api.companyChangeStatus
+  companyChangeStatus: #变更厂商状态
+    handler: api_company.companyChangeStatus
     events:
       -
         http:
@@ -148,7 +144,8 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  toolNew:
+  # ==================== 以下是道具管理接口服务 ====================
+  toolNew: #创建道具
     handler: api_tool.toolNew
     events:
       -
@@ -157,7 +154,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  toolList:
+  toolList: #道具列表
     handler: api_tool.toolList
     events:
       -
@@ -166,7 +163,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  toolOne:
+  toolOne: #单个道具
     handler: api_tool.toolOne
     events:
       -
@@ -175,7 +172,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  toolChangeStatus:
+  toolChangeStatus: #变更道具状态
     handler: api_tool.toolChangeStatus
     events:
       -
@@ -184,6 +181,16 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  toolUpdate: #道具更新
+    handler: api_tool.toolUpdate
+    events:
+      -
+        http:
+          path: toolUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是帮助中心接口服务 ====================
   helpGenreList: 
     handler: api_server.helpGenreList
     events:
@@ -211,21 +218,3 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  # depositPoints:
-  #   handler: api.depositPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: deposit_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # withdrawPoints:
-  #   handler: api.withdrawPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: withdraw_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth

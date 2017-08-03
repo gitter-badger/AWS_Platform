@@ -56,16 +56,16 @@ export class CompanyModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('运营商已存在'), 0]
         }
-        // 保存
-        const item = {
+        const dataItem = {
             ...this.item,
             ...companyInfo
         }
-        const [putErr, putRet] = await this.putItem(item)
+        // 保存
+        const [putErr, putRet] = await this.putItem(dataItem)
         if (putErr) {
             return [putErr, 0]
         }
-        return [0, item]
+        return [0, dataItem]
     }
 
     /**
@@ -87,26 +87,18 @@ export class CompanyModel extends BaseModel {
      * @param {厂商ID} companyId 
      * @param {需要变更的状态} status 
      */
-    changeStatus(companyName, companyId, status) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                Key: {
-                    'companyName': companyName,
-                    'companyId': companyId
-                },
-                UpdateExpression: "SET companyStatus = :status",
-                ExpressionAttributeValues: {
-                    ':status': status
-                }
+    async changeStatus(companyName, companyId, status) {
+        const [err, ret] = this.updateItem({
+            Key: {
+                'companyName': companyName,
+                'companyId': companyId
+            },
+            UpdateExpression: "SET companyStatus = :status",
+            ExpressionAttributeValues: {
+                ':status': status
             }
-            this.db$('update', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), 0])
-                })
         })
+        return [err, ret]
     }
 
     /**
@@ -114,26 +106,22 @@ export class CompanyModel extends BaseModel {
      * @param {*} companyName
      * @param {*} companyId
      */
-    getOne(companyName, companyId) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                KeyConditionExpression: 'companyName = :companyName and companyId = :companyId',
-                ExpressionAttributeValues: {
-                    ':companyName': companyName,
-                    ':companyId': companyId
-                }
+    async getOne(companyName, companyId) {
+        const [err, ret] = await this.query({
+            KeyConditionExpression: 'companyName = :companyName and companyId = :companyId',
+            ExpressionAttributeValues: {
+                ':companyName': companyName,
+                ':companyId': companyId
             }
-            this.db$('query', params)
-                .then((res) => {
-                    if(res.Items.length > 0){
-                        res = res.Items[0]
-                    }
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
         })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, ret.Items[0]]
+        } else {
+            return [0, 0]
+        }
     }
 }
 

@@ -52,7 +52,7 @@ export const Tables = {
  * 基础Model
  */
 export const Model = {
-  StringValue: '0',
+  StringValue: 'NULL!',
   NumberValue: 0.0,
   PlatformAdminDefaultPoints: 100000000.00,
   DefaultParent: '01', // 平台
