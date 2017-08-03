@@ -37,7 +37,7 @@ export class ToolModel extends BaseModel {
      */
     async addTool(inparam) {
         // Start:从编号池获取新编号
-        let [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
+        const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
         if (uucodeErr) { return [uucodeErr, 0] }
         // 数据类型处理
         inparam.toolStatus = ToolStatusEnum.Enable
@@ -57,11 +57,10 @@ export class ToolModel extends BaseModel {
             return [BizErr.ItemExistErr('道具已存在'), 0]
         }
         // 保存
-        const item = {
+        const [putErr, putRet] = await this.putItem({
             ...this.item,
             ...inparam
-        }
-        const [putErr, putRet] = await this.putItem(item)
+        })
         if (putErr) {
             return [putErr, 0]
         }
@@ -90,8 +89,7 @@ export class ToolModel extends BaseModel {
      * @param {需要变更的状态} status 
      */
     async changeStatus(toolName, toolId, status) {
-        let [err, ret] = await this.updateItem({
-            ...this.params,
+        const [err, ret] = await this.updateItem({
             Key: {
                 'toolName': toolName,
                 'toolId': toolId
@@ -109,7 +107,7 @@ export class ToolModel extends BaseModel {
      * @param {道具对象} inparam 
      */
     async updateTool(inparam) {
-        let [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
+        const [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
         if (err) {
             return [err, 0]
         }
@@ -128,7 +126,7 @@ export class ToolModel extends BaseModel {
      * @param {*} toolId
      */
     async getOne(toolName, toolId) {
-        let [err, ret] = await this.query({
+        const [err, ret] = await this.query({
             KeyConditionExpression: 'toolName = :toolName and toolId = :toolId',
             ExpressionAttributeValues: {
                 ':toolName': toolName,

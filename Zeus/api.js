@@ -453,14 +453,6 @@ const jwtverify = async (e, c, cb) => {
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }
 
-// 随机数
-function randomNum(min, max) {
-  var range = max - min
-  var rand = Math.random()
-  var num = min + Math.round(rand * range)
-  return num
-}
-
 /**
   api export
 **/

@@ -71,29 +71,21 @@ export class UserModel extends BaseModel {
      * @param {用户ID} userId 
      * @param {需要变更的状态} status 
      */
-    changeStatus(role, userId, status) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                Key: {
-                    'role': role,
-                    'userId': userId
-                },
-                UpdateExpression: "SET #status = :status",
-                ExpressionAttributeNames: {
-                    '#status': 'status'
-                },
-                ExpressionAttributeValues: {
-                    ':status': status
-                }
+    async changeStatus(role, userId, status) {
+        const [err, ret] = await this.updateItem({
+            Key: {
+                'role': role,
+                'userId': userId
+            },
+            UpdateExpression: "SET #status = :status",
+            ExpressionAttributeNames: {
+                '#status': 'status'
+            },
+            ExpressionAttributeValues: {
+                ':status': status
             }
-            this.updateItem(params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), 0])
-                })
         })
+        return [err, ret]
     }
 
     /**
