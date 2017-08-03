@@ -128,6 +128,9 @@ export const BizErr = {
   BalanceErr: (errMsg = '余额不足') => {
     return { code: Codes.BalanceError, msg: errMsg }
   },
+  TcpErr: (errMsg = 'tcp connection error') => {
+    return { code: Codes.TcpError, msg: errMsg }
+  },
   CompanyNotExistError: (errMsg = "company not exist") => {
     return { code: Codes.CompanyNotExistError, msg: errMsg }
   },

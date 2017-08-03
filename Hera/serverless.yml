@@ -99,7 +99,15 @@ functions:
     events:
       - http:
           path: /player/forzen/{userName}
-          method: get
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  batchForzen:  #批量冻结/解冻玩家 1解冻,2,冻结
+    handler: managerApi.batchForzen
+    events:
+      - http:
+          path: /player/batch/forzen
+          method: post
           cors: true
           authorizer: tokenAuth
 resources:

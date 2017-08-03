@@ -35,7 +35,7 @@ export async function gamePlayerList(event, context, cb) {
     console.log(event);
     //json转换
     let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
-    if(parserErr) return callback(null, ReHandler.fail(parserErr));
+    if(parserErr) return cb(null, ReHandler.fail(parserErr));
     
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
@@ -75,6 +75,14 @@ export async function gamePlayerList(event, context, cb) {
  * @param {*} callback 
  */
 export async function gamePlayerInfo(event, context, cb) {
+    const [tokenErr, token] = await Model.currentToken(event);
+    if (tokenErr) {
+        return ResFail(cb, tokenErr)
+    }
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    if(e) {
+        return ResFail(cb, e)
+    }
     let userName = event.pathParameters.userName;
     let userModel = new UserModel({userName});
     let userBillModel = new UserBillModel();
@@ -82,17 +90,17 @@ export async function gamePlayerInfo(event, context, cb) {
     if(err){
         return ResFail(cb, billError)
     }
-    userInfo.merchantName = user.merchantName;
-    userInfo.msn = user.msn;
-    userInfo.updateAt = user.updateAt;
-    userInfo.amount = user.amount;
+    user.merchantName = user.merchantName;
+    user.msn = user.msn;
+    user.updateAt = user.updateAt;
+    user.amount = user.amount;
     //获取玩家的交易记录
     let [billError, bilList] = await userBillModel.list(userName);
     if(billError) {
         return ResFail(cb, billError)
     }
-    userInfo.list = bilList;
-    return ResOK(cb, userInfo);
+    user.list = bilList;
+    return ResOK(cb, user);
 }
 
 /**
@@ -102,14 +110,29 @@ export async function gamePlayerInfo(event, context, cb) {
  * @param {*} cb 
  */
 export async function gamePlayerForzen(event, context, cb){
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
     //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
   if(parserErr) {
       return ResFail(cb, parserErr);
   }
+   //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "state", type:"N"},
+  ], requestParams);
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return cb(null, ReHandler.fail(checkAttError));
+  } 
   let userName = event.pathParameters.userName;
   let state = +requestParams.state;
-
   var userModel = new UserModel();
   let [err] = await userModel.update({userName},{state})
   if(err) {
@@ -118,6 +141,50 @@ export async function gamePlayerForzen(event, context, cb){
   ResOK(cb, {state});
 }
 
+/**
+ * 批量冻结/解冻玩家
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+export async function batchForzen(event, context, cb){
+
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
+  //json转换
+  console.log(event.body);
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) {
+      return ResFail(cb, parserErr);
+  }
+   //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "state", type:"N"},
+      {name : "names", type:"J"},
+  ], requestParams);
+  
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return cb(null, ReHandler.fail(checkAttError));
+  } 
+  let names = requestParams.names;
+  let state = +requestParams.state;
+  for(let i = 0; i < names.length; i++){
+    let userName = names[i];
+    let userModel = new UserModel();
+    let [err] = await userModel.update({userName},{state})
+    if(err) {
+      return ResFail(cb, err);
+    }
+  }
+  ResOK(cb, {state});
+}
 // TOKEN验证
 export const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken
@@ -134,5 +201,4 @@ export const jwtverify = async (e, c, cb) => {
   }
 
   return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
-
 }
