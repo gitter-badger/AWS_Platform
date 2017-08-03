@@ -33,7 +33,8 @@ export class ToolCheck {
             { name: "toolName", type: "S", min: 1, max: 10 },
             { name: "toolId", type: "N", min: 100000, max: 999999 },
             { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
-            { name: "num", type: "N", min: 0, max: 9999 }]
+            { name: "num", type: "N", min: 0, max: 999999999 },
+            { name: "status", type: "N", min: 0, max: 2 }]
             , inparam)
         return [checkAttError, errorParams]
     }

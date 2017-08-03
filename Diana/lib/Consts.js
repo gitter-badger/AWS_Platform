@@ -22,7 +22,8 @@ export const CompanyStatusEnum = {
 }
 export const ToolStatusEnum = {
   Enable: 1,
-  Disable: 0
+  Disable: 0,
+  PROMOTOPN: 2
 }
 export const RoleCodeEnum = {
   'SuperAdmin': '0',
