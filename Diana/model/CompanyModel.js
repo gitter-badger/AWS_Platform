@@ -58,7 +58,7 @@ export class CompanyModel extends BaseModel {
         }
         const dataItem = {
             ...this.item,
-            ...inparam
+            ...companyInfo
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
