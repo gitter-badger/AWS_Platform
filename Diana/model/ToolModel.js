@@ -27,7 +27,8 @@ export class ToolModel extends BaseModel {
         this.item = {
             ...this.baseitem,
             toolName: Model.StringValue,
-            toolId: Model.StringValue
+            toolId: Model.StringValue,
+            order: Model.NumberValue
         }
     }
 
@@ -80,7 +81,8 @@ export class ToolModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
-        return [0, ret.Items]
+        const sortResult = _.sortBy(ret.Items, ['order'])
+        return [0, sortResult]
     }
 
     /**
@@ -119,6 +121,7 @@ export class ToolModel extends BaseModel {
         ret.num = inparam.num
         ret.toolStatus = inparam.status
         ret.updatedAt = Model.timeStamp()
+        ret.order = parseInt(inparam.order)
         return await this.putItem(ret)
     }
 
