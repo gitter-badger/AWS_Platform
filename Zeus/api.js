@@ -588,7 +588,7 @@ const updatePassword = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   //检查参数是否合法
-  let [checkAttError, errorParams] = new UserCheck().checkUser(inparam)
+  let [checkAttError, errorParams] = new UserCheck().checkPassword(inparam)
   if (checkAttError) {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
