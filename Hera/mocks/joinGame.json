@@ -1,0 +1,9 @@
+{
+    "body": "{\"userId\":\"944041\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"1002034\",  \"gamePlatform\":\"NA\", \"amount\":\"10\",  \"action\":\"1\"}",
+    "pathParameters" : {
+            "userName" : "day003"
+        },
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfZGF5MDA0Iiwic3VmZml4IjoiQ1kzOCIsInVzZXJJZCI6OTQ0MDQxLCJpYXQiOjE1MDE3NTY2MzN9.g6aTcxEayWE6yY2kvvtTngEI211GZm89rekG5BxJ6qI"
+    }
+}

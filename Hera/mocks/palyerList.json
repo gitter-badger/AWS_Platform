@@ -1,6 +1,7 @@
 {
-    "queryStringParameters": "{\"userName\":\"NA_lisichen\"}",
+    "pathParameters" : {"userName": "CY38_cmerchant316"},
+    "headers" : {},
     "requestContext" : {
-        "authorizer" : [0,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BX2xpc2ljaGVuIiwic3VmZml4IjoiTkEiLCJpYXQiOjE1MDEyMjE2Nzh9.qgPxD0wH5No8IEPdxYtSnFA4ONGfQ47iqd9PkZCAEuE"]
+        "authorizer" : [0,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkNZMzhfY21lcmNoYW50MzE2IiwicGFzc3dvcmQiOiJjaGVud2VuR0cxMjMiLCJtc24iOiI1MCIsInN1ZmZpeCI6IkNZMzgiLCJwYXJlbnQiOiI2ZGNkYjY3Zi1hZDg5LTQyYzYtYjhlMy1lNTYzZGU3MjhmMmEiLCJwYXJlbnROYW1lIjoiUGxhdGZvcm1fTkF0ZXN0MDAxIiwidXNlcklkIjoiN2QwN2VjZTEtMjgzZi00MzMzLWE2OWQtOTdlM2E3MGVkNzYzIiwicm9sZSI6IjEwMCIsImRpc3BsYXlOYW1lIjoiY2hlbiIsImFwaUtleSI6IjY2MTAxYjUxLWZmYWQtNDEzMy1hYjE1LTM3YjEyYmVhMWViZSIsImRpc3BsYXlJZCI6OTY3NjM4LCJ1cGRhdGVkQXQiOjE1MDE3NDI0MDIyNTEsImlhdCI6MTUwMTc0MjM3Mn0.V3BbNGb1A3Pb7eyxZxGXmqB2gTFWwT9xBMtP2hJa_HI"]
     }
 }

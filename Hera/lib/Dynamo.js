@@ -55,10 +55,16 @@ export const Model = {
   displayId: () => (new Date()).getTime() % 1000000 + 100000,
   timeStamp: () => (new Date()).getTime(),
   currentToken: async (e) =>{
+    e.headers = e.headers || {};
+    e.headers.Authorization = e.headers.Authorization;
     if (!e || !e.requestContext.authorizer) {
       return [BizErr.TokenErr(),0]
     }
-    return [0,e.requestContext.authorizer]
+    if(!e.headers.Authorization) {
+      return [0, e.requestContext.authorizer]
+    }else {
+      return [0,e.headers.Authorization.split(" ")]
+    }
   },
   token: (userInfo)=>{
     return JwtSign({

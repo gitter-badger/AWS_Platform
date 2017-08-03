@@ -26,7 +26,7 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
-  tokenAuth:
+  tokenVerify:
     handler: managerApi.jwtverify
     integration: lambda
   gamePlayerRegister: #玩家注册
@@ -71,11 +71,18 @@ functions:
           path: /game/player/balance
           method: get
           cors: true
+  joinGame:  #玩家进入游戏
+    handler: openApi.joinGame
+    events:
+      - http:
+          path: /game/player/join
+          method: post
+          cors: true
   playerRecord:  #获取玩家记录验证
     handler: openApi.playerRecordValidate
     events:
       - http:
-          path: /game/player/balance
+          path: /game/bill/verify
           method: get
           cors: true
   gamePlayerList:  #获取玩家列表
@@ -85,7 +92,7 @@ functions:
           path: /player/list
           method: get
           cors: true
-          authorizer: tokenAuth
+          authorizer: tokenVerify
   gamePlayerInfo:  #玩家详情页面
     handler: managerApi.gamePlayerInfo
     events:
@@ -93,7 +100,7 @@ functions:
           path: /player/bill/{userName}
           method: get
           cors: true
-          authorizer: tokenAuth
+          authorizer: tokenVerify
   gamePlayerForzen:  #冻结/解冻玩家 1解冻,2,冻结
     handler: managerApi.gamePlayerForzen
     events:
@@ -101,7 +108,7 @@ functions:
           path: /player/forzen/{userName}
           method: post
           cors: true
-          authorizer: tokenAuth
+          authorizer: tokenVerify
   batchForzen:  #批量冻结/解冻玩家 1解冻,2,冻结
     handler: managerApi.batchForzen
     events:
@@ -109,7 +116,7 @@ functions:
           path: /player/batch/forzen
           method: post
           cors: true
-          authorizer: tokenAuth
+          authorizer: tokenVerify
 resources:
   Resources:
     HeraGamePlayer:
@@ -189,3 +196,18 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+    HeraGameRecord:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGameRecord
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
