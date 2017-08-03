@@ -56,17 +56,18 @@ export class ToolModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('道具已存在'), 0]
         }
-        // 保存
-        const [putErr, putRet] = await this.putItem({
+        const dataItem = {
             ...this.item,
             ...inparam
-        })
+        }
+        // 保存
+        const [putErr, putRet] = await this.putItem(dataItem)
         if (putErr) {
             return [putErr, 0]
         }
         // End:记录生成的编码
         this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: uucodeRet } })
-        return [0, item]
+        return [0, dataItem]
     }
 
     /**

@@ -56,15 +56,16 @@ export class CompanyModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('运营商已存在'), 0]
         }
-        // 保存
-        const [putErr, putRet] = await this.putItem({
+        const dataItem = {
             ...this.item,
-            ...companyInfo
-        })
+            ...inparam
+        }
+        // 保存
+        const [putErr, putRet] = await this.putItem(dataItem)
         if (putErr) {
             return [putErr, 0]
         }
-        return [0, item]
+        return [0, dataItem]
     }
 
     /**
