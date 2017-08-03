@@ -117,7 +117,7 @@ export class ToolModel extends BaseModel {
         ret.price = inparam.price
         ret.num = inparam.num
         ret.toolStatus = inparam.status
-        ret.updateAt = Model.timeStamp()
+        ret.updatedAt = Model.timeStamp()
         return await this.putItem(ret)
     }
 
