@@ -38,6 +38,7 @@ functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
+  #==================== 以下是管理员接口 ====================
   eva: #创建第一个管理员，接口编号0
     handler: api.eva
     events:
@@ -134,51 +135,6 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  managerList: #线路商列表
-    handler: api.managerList
-    events:
-      -
-        http:
-          path: managers
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  managerOne: #获取线路商信息
-    handler: api.managerOne
-    events:
-      -
-        http:
-          path: managers/{id}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  merchantOne: #获取商户信息
-    handler: api.merchantOne
-    events:
-      -
-        http:
-          path: merchants/{id}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  managerUpdate: #更新线路商
-    handler: api.managerUpdate
-    events:
-      -
-        http:
-          path: managers/{id}
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  merchantList: #商户列表
-    handler: api.merchantList
-    events:
-      -
-        http:
-          path: merchants
-          method: get
-          cors: true
-          authorizer: tokenAuth
   childList: #下级列表
     handler: api.childList
     events:
@@ -186,15 +142,6 @@ functions:
         http:
           path: childList/{userId}/{childRole}
           method: get
-          cors: true
-          authorizer: tokenAuth
-  merchantUpdate: #更新商户信息
-    handler: api.merchantUpdate
-    events:
-      -
-        http:
-          path: merchants/{id}
-          method: post
           cors: true
           authorizer: tokenAuth
   randomPassword: #随机密码
@@ -214,8 +161,36 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  #==================== 以下是线路商接口 ====================
+  managerList: #线路商列表
+    handler: api_manager.managerList
+    events:
+      -
+        http:
+          path: managers
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  managerOne: #获取线路商信息
+    handler: api_manager.managerOne
+    events:
+      -
+        http:
+          path: managers/{id}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  managerUpdate: #更新线路商
+    handler: api_manager.managerUpdate
+    events:
+      -
+        http:
+          path: managers/{id}
+          method: post
+          cors: true
+          authorizer: tokenAuth
   avalibleManagers: #可用线路商列表
-    handler: api.avalibleManagers
+    handler: api_manager.avalibleManagers
     events:
       -
         http:
@@ -223,24 +198,37 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  checkMsn: #校验MSN
-    handler: api.checkMsn
+  #==================== 以下是商户接口 ====================
+  merchantList: #商户列表
+    handler: api_merchant.merchantList
     events:
       -
         http:
-          path: check_msn/{msn}
+          path: merchants
           method: get
           cors: true
-  captcha: #获取验证码，接口编号：
-    handler: api.captcha
+          authorizer: tokenAuth
+  merchantOne: #获取商户信息
+    handler: api_merchant.merchantOne
     events:
       -
         http:
-          path: captcha
+          path: merchants/{id}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  merchantUpdate: #更新商户信息
+    handler: api_merchant.merchantUpdate
+    events:
+      -
+        http:
+          path: merchants/{id}
           method: post
           cors: true
-  msnList: #获取线路号列表，接口编号：
-    handler: api.msnList
+          authorizer: tokenAuth
+  #==================== 以下是线路号接口 ====================
+  msnList: #获取线路号列表
+    handler: api_msn.msnList
     events:
       -
         http:
@@ -248,8 +236,16 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  checkMsn: #校验MSN
+    handler: api_msn.checkMsn
+    events:
+      -
+        http:
+          path: check_msn/{msn}
+          method: get
+          cors: true
   lockmsn: #锁定/解锁线路号，接口编号：
-    handler: api.lockmsn
+    handler: api_msn.lockmsn
     events:
       -
         http:
@@ -258,7 +254,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   msnRandom: #随机线路号，接口编号：
-    handler: api.msnRandom
+    handler: api_msn.msnRandom
     events:
       -
         http:
@@ -266,6 +262,15 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
+  captcha: #获取验证码，接口编号：
+    handler: api_msn.captcha
+    events:
+      -
+        http:
+          path: captcha
+          method: post
+          cors: true
+  #==================== 以下是第三方接口 ====================
   gameSign: #游戏管理后台登录sign
     handler: api_open.gameLoginSign
     events:
@@ -275,63 +280,3 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  # exquery:
-  #   handler: api.exquery
-  #   events:
-  #     -
-  #       http:
-  #         path: exquery
-  #         method: get
-  #         cors: true
-  # gameNew:
-  #   handler: api.gameNew
-  #   events:
-  #     -
-  #       http:
-  #         path: games
-  #         method: post
-  #         cors: true
-  # gameList:
-  #   handler: api.gameList
-  #   events:
-  #     -
-  #       http:
-  #         path: games/{gameType}
-  #         method: get
-  #         cors: true
-  # depositPoints:
-  #   handler: api.depositPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: deposit_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # withdrawPoints:
-  #   handler: api.withdrawPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: withdraw_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # billOne:
-  #   handler: api.billOne
-  #   events:
-  #     -
-  #       http:
-  #         path: bills/{userId}
-  #         method: get
-  #         cors: true
-  #         authorizer: tokenAuth
-  # billList:
-  #   handler: api.billList
-  #   events:
-  #     -
-  #       http:
-  #         path: waterfall/{userId}
-  #         method: get
-  #         cors: true
-  #         authorizer: tokenAuth

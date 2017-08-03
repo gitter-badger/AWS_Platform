@@ -23,4 +23,18 @@ export class ToolCheck {
             , inparam)
         return [checkAttError, errorParams]
     }
+
+    /**
+     * 检查更新
+     * @param {*} inparam 
+     */
+    checkUpdate(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "toolName", type: "S", min: 1, max: 10 },
+            { name: "toolId", type: "N", min: 100000, max: 999999 },
+            { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
+            { name: "num", type: "N", min: 0, max: 9999 }]
+            , inparam)
+        return [checkAttError, errorParams]
+    }
 }

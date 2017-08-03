@@ -16,7 +16,8 @@
     },
     "body": {
         "toolName": "测试道具1",
-        "toolId": "763843",
-        "status": 0
+        "toolId": "278779",
+        "price": 6.0,
+        "num":10
     }
 }
