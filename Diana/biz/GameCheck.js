@@ -1,9 +1,18 @@
+import {Codes,Model,RoleCodeEnum,GameTypeEnum,GameStatusEnum} from '../lib/all'
 const athena = require("../lib/athena")
 export class GameCheck {
     /**
      * 检查游戏数据
      */
     checkGame(inparam) {
+        // 数据类型处理
+        inparam.gameType = inparam.gameType.toString()
+        inparam.gameStatus = GameStatusEnum.Online
+        inparam.gameImg = inparam.gameImg || Model.StringValue
+        inparam.company = inparam.company || Model.StringValue
+        inparam.ip = inparam.ip || Model.StringValue
+        inparam.port = inparam.port || Model.StringValue
+
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "gameName", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYNAME },
             { name: "gameRecommend", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYDESC },
@@ -25,6 +34,9 @@ export class GameCheck {
      * @param {*} inparam 
      */
     checkStatus(inparam) {
+        // 数据类型处理
+        inparam.gameStatus = parsentInt(inparam.gameStatus)
+        
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "gameType", type: "N", min: 0, max: 2 },
             { name: "gameId", type: "S", min: 36, max: 36 },

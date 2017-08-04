@@ -37,13 +37,6 @@ export class GameModel extends BaseModel {
      * @param {*} gameInfo 
      */
     async addGame(gameInfo) {
-        // 数据类型处理
-        gameInfo.gameType = gameInfo.gameType.toString()
-        gameInfo.gameStatus = GameStatusEnum.Online;
-        gameInfo.gameImg = gameInfo.gameImg || Model.StringValue
-        gameInfo.company = gameInfo.company || Model.StringValue
-        gameInfo.ip = gameInfo.ip || Model.StringValue
-        gameInfo.port = gameInfo.port || Model.StringValue
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             IndexName: 'GameNameIndex',
