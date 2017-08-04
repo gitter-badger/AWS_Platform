@@ -3,9 +3,9 @@ let {RoleCodeEnum} = require("../lib/Consts");
 import {TABLE_NAMES} from "../config";
 import {Util} from "../lib/Util"
 
-const State = {
+export const State = {
     normal : 1,  //正常,
-    forzen : 2 //冻结
+    forzen : 0 //冻结
 }
 const SexEnum = {
     man : 1,

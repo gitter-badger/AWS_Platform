@@ -10,9 +10,9 @@ import {RoleCodeEnum} from "./lib/Consts"
 
 import {MerchantModel} from "./model/MerchantModel";
 
-import {UserModel, PaymentState} from "./model/UserModel";
+import {UserModel, PaymentState, State} from "./model/UserModel";
 
-import {UserBillModel} from "./model/UserBillModel";
+import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MSNModel} from "./model/MSNModel";
 
@@ -118,10 +118,9 @@ async function gamePlayerLogin(event, context, callback) {
   if(userExistError) return callback(null, ReHandler.fail(userExistError));
   if(!userInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   //账号已冻结
-  if(userInfo.state == 2) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
+  if(userInfo.state == State.forzen) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
   //验证密码
   let flag = user.vertifyPassword(userInfo.userPwd);
-  
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let loginToken = Util.createTokenJWT({userName,suffix:merchantInfo.suffix,userId:userInfo.userId});
   let [updateError] = await user.update({userName: userName},{ token: loginToken,updateAt:Date.now()});
@@ -205,32 +204,25 @@ async function gamePlayerBalance(event, context, callback) {
     } 
     let action = +requestParams.action;
     
-    let merchantAmount = -action * (+requestParams.amount);
 
     if(!Object.is(action, 1) && !Object.is(action, -1)){
       return callback(null, ReHandler.fail(new CHeraErr(CODES.DataError)));
     }
-    
-    
     //获取商家
     let [merError, merchantInfo] = await new MerchantModel().findById(+requestParams.buId);
+    
     if(merError) return callback(null, ReHandler.fail(merError));
     if(!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
     userName = `${merchantInfo.suffix}_${userName}`;
-    requestParams.userName = userName;
-
-    if(action == Action.recharge) {
-      requestParams.fromRole = RoleCodeEnum.Merchant;
-      requestParams.toRole = RoleCodeEnum.Player;
-      requestParams.fromUser = merchantInfo.username;
-      requestParams.toUser = userName;
-    }else {
-      requestParams.fromRole = RoleCodeEnum.Player;
-      requestParams.toRole = RoleCodeEnum.Merchant;
-      requestParams.fromUser = userName;
-      requestParams.toUser = merchantInfo.username;
+    let baseModel = {
+      fromRole : RoleCodeEnum.Player,
+      toRole : RoleCodeEnum.Merchant,
+      fromUser : userName,
+      toUser : merchantInfo.username,
+      amount : +requestParams.amount,
+      operator : userName,
+      remark : action > 0 ? "玩家从中心钱包转出" : "玩家转入中心钱包"
     }
-
     //检查玩家点数是否足够 如果是玩家提现才检查，充值不需要
     let userBillModel = new UserBillModel(requestParams);
     let [pError, palyerBalance] = await userBillModel.getBalance(); //获取玩家余额
@@ -238,7 +230,6 @@ async function gamePlayerBalance(event, context, callback) {
     if(action == -1) {
       if(palyerBalance < +requestParams.amount) return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
     }
-
     //获取用户信息
     let u = new UserModel();
     let [getUserError, user] = await u.get({userName});
@@ -248,20 +239,28 @@ async function gamePlayerBalance(event, context, callback) {
     if(gameing) {
       return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
     }
+    let merchantObj = {
+      username : merchantInfo.username,
+      userId : merchantInfo.userId,
+      action : -action,
+    };
+    Object.assign(merchantObj, baseModel)
     //商户点数变化
-    let merchantBillModel = new MerchantBillModel(requestParams);
-    merchantBillModel.action = -merchantBillModel.action;
-    merchantBillModel.amount = merchantAmount;
-    Object.assign(merchantBillModel,{
-      userId : merchantInfo.userId
-    })
+    let merchantBillModel = new MerchantBillModel(merchantObj);
     let [mError, amount] = await merchantBillModel.handlerPoint();
     if(mError) return callback(null, ReHandler.fail(mError));
+
     //保存玩家账单
-    userBillModel.userName = userName;
-    userBillModel.userId = user.userId;
-    userBillModel.originalAmount = palyerBalance;
-    console.log(userBillModel);
+    Object.assign(userBillModel, {
+       ...baseModel,
+       userName : userName,
+       userId : user.userId,
+       originalAmount : palyerBalance,
+       msn : merchantInfo.msn,
+       merchantName : merchantInfo.displayName,
+       type : action > 0 ? Type.recharge : Type.withdrawals
+    })
+
     let [saveError] = await userBillModel.save();
     if(saveError) return callback(null, ReHandler.fail(saveError));
     //查账
@@ -316,7 +315,7 @@ async function gamePlayerA3Login(event, context, callback) {
   if(userExistError) return callback(null, ReHandler.fail(userExistError));
   if(!userInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   //账号已冻结
-  if(userInfo.state == 2) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
+  if(userInfo.state == State.forzen) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
   //验证密码
   let flag = user.vertifyPassword(userInfo.userPwd);
   
@@ -333,12 +332,10 @@ async function gamePlayerA3Login(event, context, callback) {
     return callback(null, ReHandler.fail(updateError));
   }
   //修改游戏状态（不能进行转账操作）
-  /*
   let [upErr] = await user.update({userName:userName},{payState:PaymentState.forbid});
   if(upErr) {
     return callback(null, ReHandler.fail(upErr));
   }
-  */
   let callObj = {
     data : {
       token : loginToken,
@@ -368,6 +365,11 @@ async function getA3GamePlayerBalance(event, context, callback) {
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "userId", type:"N"}
   ], requestParams);
+
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return callback(null, ReHandler.fail(checkAttError));
+  } 
   let userId = +requestParams.userId;
   //验证token
   let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
@@ -409,15 +411,19 @@ async function playerRecordValidate(event, context, callback){
   }
   let userId = records[0].userId;
   let gameId = records[0].gameId;
+  if(+userInfo.userId != +userId) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
+  }
   let userRecordModel = new UserRecordModel({records});
   let [validErr, valid, settlementInfo] = userRecordModel.validateRecords(records);
   if(validErr) {
     return callback(null, ReHandler.fail(err));
   }
+  if(!valid) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.billNotMatchErr)));
+  }
   let {depositAmount, takeAmount, income} = settlementInfo;
-  let merAction = income > 0 ? Action.reflect : Action.recharge;  //如果用户收益为正数，表示商家亏了
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
-
   //获取用户数据
   let [uError, userModel] = await new UserModel().get({userId:+userId},[], "userIdIndex");
   if(uError) {
@@ -445,21 +451,13 @@ async function playerRecordValidate(event, context, callback){
     fromUser : userModel.userName,
     toUser : merchantModel.username,
     operator : userModel.userName,
-    gameId : gameId
-    
+    merchantName : merchantModel.displayName,
+    gameId : gameId,
+    msn : merchantModel.msn,
+    type : Type.gameSettlement,
+    remark : "玩家游戏结算"
   }
-  //商家点数变化
-  let merBillModel = new MerchantBillModel({
-    userId : merchantModel.userId,
-    username : merchantModel.username,
-    action : merAction,
-    amount : income
-  });
-  Object.assign(merBillModel, billBase);
-  let [mSaveErr] = await merBillModel.save();
-  if(mSaveErr) {
-    return callback(null, ReHandler.fail(mSaveErr));
-  }
+
 
   //玩家点数发生变化
   let userBillModel = new UserBillModel({
@@ -468,6 +466,12 @@ async function playerRecordValidate(event, context, callback){
     userName : userModel.userName,
     amount : income
   })
+  //查账
+  let [oriError, oriSumBalance] = await userBillModel.getBalance();
+  if(oriError) {
+    return callback(null, ReHandler.fail(oriError));
+  }
+  userBillModel.originalAmount = oriSumBalance;
   Object.assign(userBillModel, billBase);
   let [uSaveErr] = await userBillModel.save();
   if(uSaveErr) {
@@ -536,6 +540,8 @@ async function joinGame(event, context, callback){
   }));
 }
 
+
+
 export{
   gamePlayerRegister, //玩家注册
   gamePlayerLogin,    //玩家登陆
@@ -544,5 +550,5 @@ export{
   gamePlayerA3Login, //A3游戏登陆
   getA3GamePlayerBalance, //用户余额（A3）
   playerRecordValidate,  //玩家账单验证
-  joinGame  //进入游戏
+  joinGame //进入游戏
 }

@@ -5,10 +5,12 @@ import {RoleCodeEnum} from "../lib/Consts"
 
 import {CODES, CHeraErr} from "../lib/Codes";
 
+import {Model} from "../lib/Dynamo"
+
 
 
 export class MerchantBillModel extends athena.BaseModel {
-    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser, gameId} = {}) {
+    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser, gameId, remark} = {}) {
         super(TABLE_NAMES.PLATFORM_BILL);
         this.sn = Util.uuid();
         this.userId = userId;
@@ -19,10 +21,11 @@ export class MerchantBillModel extends athena.BaseModel {
         this.toRole = toRole;
         this.fromUser = fromUser;
         this.toUser = toUser;
-        this.operator = userName;
+        this.operator = operator;
         this.username = userName;
         this.createdAt = Date.now();
         this.updatedAt = Date.now();
+        this.remark = remark || Model.StringValue;
     }
     setAmount(amount) {
         if(this.action ==-1) {

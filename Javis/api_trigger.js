@@ -7,8 +7,11 @@ const userTrigger = async (e, c, cb) => {
     console.info(e)
     console.info('test context')
     console.info(c)
+    console.log("xiangxi");
+    console.log(JSON.stringify(e));
+    console.log(JSON.stringify(c));
     console.info('test dynamodb')
-    console.info(JSON.stringify(e.dynamodb))
+    console.info(JSON.stringify(e.dynamodb));
 }
 
 export {

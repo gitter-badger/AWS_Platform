@@ -91,7 +91,7 @@ export class BaseModel{
             filterExpression += `${key}=:${key} and `;
             expressionAttributeValues[`:${key}`] = conditions[key];
         }
-        let scanOpts = undefined;
+        let scanOpts = {};
         if(filterExpression.length!=0){
             filterExpression = filterExpression.substr(0, filterExpression.length-4);
             scanOpts = {
@@ -101,10 +101,12 @@ export class BaseModel{
         }
         return new Promise((reslove, reject) => {
             this.db$("scan", scanOpts).then((result) => {
+                console.log(result);
                 result = result || {};
                 result.Items = result.Items || [];
-                return reslove([null, result.Items]);
+                return reslove([null, result.Items || []]);
             }).catch((err) => {
+                console.log(111);
                 console.log(err);
                 return reslove([new AError(CODES.DB_ERROR, err.stack), []]);
             });
@@ -253,45 +255,79 @@ export class Util{
         }
     }
 
-    static checkProperty(value, type, min, max, equal){
-        if(!value) return [new AError(CODES.JSON_FORMAT_ERROR),null];
-        switch(type){
-            case "S" : {
+    static checkProperty(value, type, min, max, equal) {
+        switch (type) {
+            case "S": {
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
                 let strLength = value.length,
                     error = false;
-                if(min && strLength < min) error = true;
-                if(max && strLength > max) error = true;
-                if(equal) error = !Object.is(value, equal);
-                return error ? [new AError(CODES.JSON_FORMAT_ERROR),null] : [null,0];
+                if (min && strLength < min) error = true;
+                if (max && strLength > max) error = true;
+                if (equal) error = !Object.is(value, equal);
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
             }
-            case "N" : {
-                let [e, v] = this.parseNumber(value);   
-                if(e) return [e,0];
+            case "N": {
+                if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];
+                let [e, v] = this.parseNumber(value);
+                if (e) return [e, 0];
                 let error = false;
-                if(min && v < min) error = true;
-                if(max && v > max) error = true;
-                if(equal) error = !Object.is(v, +equal);
-                return error ? [new AError(CODES.JSON_FORMAT_ERROR),null] : [null,0];
+                if (min && v < min) error = true;
+                if (max && v > max) error = true;
+                if (equal) error = !Object.is(v, +equal);
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
             }
-            case "J" : {
+            case "J": {
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
                 return this.parseJSON(value);
             }
-            default :{
-                return [new AError(CODES.JSON_FORMAT_ERROR),null]
+            case "REG": {
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
+                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+            }
+            case "NS": {
+                if (!value) {
+                    return [null, 0]
+                }
+                let strLength = value.length, error = false
+                if (min && strLength < min) error = true
+                if (max && strLength > max) error = true
+                if (equal) error = !Object.is(value, equal)
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+            }
+            case "NN": {
+                if (!value) {
+                    return [null, 0]
+                }
+                let [e, v] = this.parseNumber(value);
+                if (e) return [e, 0];
+                let error = false;
+                if (min && v < min) error = true;
+                if (max && v > max) error = true;
+                if (equal) error = !Object.is(v, +equal);
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+            }
+            case "NREG": {
+                if (!value) {
+                    return [null, 0]
+                }
+                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+            }
+            default: {
+                return [new AError(CODES.INPARAM_ERROR), null]
             }
         }
     }
 
-    static checkProperties(properties, body){
+    static checkProperties(properties, body) {
         let errorArray = [];
-        for(let i = 0; i < properties.length; i++){
-            let {name, type, min, max, equal} = properties[i];
+        for (let i = 0; i < properties.length; i++) {
+            let { name, type, min, max, equal } = properties[i];
             let value = body[name]
             let [checkErr] = this.checkProperty(value, type, min, max, equal);
-            if(checkErr) errorArray.push(name);
+            if (checkErr) errorArray.push(name);
         }
-        return Object.is(errorArray.length, 0) ? [null, errorArray] : 
-            [new AError(CODES.JSON_FORMAT_ERROR),errorArray]
+        return Object.is(errorArray.length, 0) ? [null, errorArray] :
+            [new AError(CODES.INPARAM_ERROR), errorArray]
     }
 
     static parseNumber(v){

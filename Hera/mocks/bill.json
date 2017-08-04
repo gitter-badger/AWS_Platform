@@ -1,13 +1,13 @@
 
 {
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfZGF5MDA0Iiwic3VmZml4IjoiQ1kzOCIsInVzZXJJZCI6OTQ0MDQxLCJpYXQiOjE1MDE3NTQzMDh9.NpZgGy8VByiTZd8seexdzIHt71tSF6PgTHRi0eWyFtY"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfY2hlbndlbiIsInN1ZmZpeCI6IkNZMzgiLCJ1c2VySWQiOjM5NzY4NSwiaWF0IjoxNTAxODM1NzMwfQ.mpMyrjOSXHnIOoEL3f_Bd8n6GRNOWGQ_85ha8nyjqvU"
     },
     "body":{
     "list" : [
         {
             "amount" : -1,
-            "userId" : "944041",
+            "userId" : "397685",
             "id":335369526361194500,
             "gameId" : 30000,
             "time":1499999926000,
@@ -15,7 +15,7 @@
         },
         {
             "amount" : -1,
-            "userId" : "944041",
+            "userId" : "397685",
             "id":335369526361194500,
             "gameId" : 30000,
             "time":1499999926000,
@@ -23,7 +23,7 @@
         },
         {
             "amount" : -5,
-            "userId" : "944041",
+            "userId" : "397685",
             "id":335369526361194500,
             "gameId" : 30000,
             "time":1499999926000,
@@ -31,7 +31,7 @@
         },
         {
             "amount" : 100,
-            "userId" : "944041",
+            "userId" : "397685",
             "id":335369526361194501,
             "gameId" : 30000,
             "time":1499999926000,
@@ -39,7 +39,7 @@
         },
         {
             "amount" : -98,
-            "userId" : "944041",
+            "userId" : "397685",
             "id":335369526361194501,
             "gameId" : 30000,
             "time":1499999926000,
