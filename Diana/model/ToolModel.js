@@ -147,7 +147,7 @@ export class ToolModel extends BaseModel {
         ret.num = inparam.num
         ret.toolStatus = inparam.status
         ret.updatedAt = Model.timeStamp()
-        ret.order = parseInt(inparam.order)
+        ret.order = inparam.order
         return await this.putItem(ret)
     }
 

@@ -31,6 +31,7 @@ export class ToolCheck {
             , inparam)
 
         // 数据类型处理
+        inparam.toolId = parseInt(inparam.toolId)
         inparam.status = parseInt(inparam.status)
 
         return [checkAttError, errorParams]
@@ -49,6 +50,14 @@ export class ToolCheck {
             { name: "order", type: "N", min: 0, max: 999999999 },
             { name: "status", type: "N", min: 0, max: 2 }]
             , inparam)
+        
+        // 数据类型处理
+        inparam.toolId = inparam.toolId.toString()
+        inparam.status = parseInt(inparam.status)
+        inparam.order = parseInt(inparam.order)
+        inparam.num = parseInt(inparam.num)
+        inparam.price = parseFloat(inparam.price)
+
         return [checkAttError, errorParams]
     }
 }
