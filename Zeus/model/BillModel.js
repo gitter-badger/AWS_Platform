@@ -109,8 +109,8 @@ export class BillModel extends BaseModel {
             return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
         }
         // 数据类型处理
-        fromInparam.role = fromInparam.role.toString()
-        billInfo.toRole = billInfo.toRole.toString()
+        // fromInparam.role = fromInparam.role.toString()
+        // billInfo.toRole = billInfo.toRole.toString()
         // 存储账单流水
         const Bill = {
             ...Model.baseModel(),

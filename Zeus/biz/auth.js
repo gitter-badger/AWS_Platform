@@ -103,39 +103,42 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [queryParentErr, 0]
   }
   // 初始点数
-  const depositPoints = parseFloat(CheckUser.points)
-  const User = {
-    ...CheckUser,
-    username: `${CheckUser.suffix}_${CheckUser.username}`,
-    parentName: parentUser.username,
-    parentSuffix: parentUser.suffix,
-    points: 0.0
+  const initPoints = CheckUser.points
+  // 检查余额
+  const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
+  if (queryBalanceErr) {
+    return [queryBalanceErr, 0]
   }
+  if (initPoints > balance) {
+    return [BizErr.BalanceErr(), 0]
+  }
+
   //推送给游戏服务器(A3)
   // let pushModel = new PushModel(User);
   // let [pushErr, data] = await pushModel.push();
   // if(pushErr) {
   //   return [pushErr, 0]
   // }
+
   // 保存创建用户
+  const User = {
+    ...CheckUser,
+    username: `${CheckUser.suffix}_${CheckUser.username}`,
+    parentName: parentUser.username,
+    parentSuffix: parentUser.suffix,
+    points: Model.NumberValue
+  }
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
-  // 检查余额
-  const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
-  if (queryBalanceErr) {
-    return [queryBalanceErr, 0]
-  }
-  if (depositPoints > balance) {
-    return [BizErr.BalanceErr(), 0]
-  }
+
   // 开始转账
   parentUser.operatorToken = token
   const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
-    amount: depositPoints,
+    amount: initPoints,
     operator: token.username,
     remark: '初始点数'
   })

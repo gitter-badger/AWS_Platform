@@ -20,6 +20,10 @@ export class UserCheck {
 
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
+
+        // 数据类型处理
+        inparam.role = inparam.role.toString()
+
         return [checkAttError, errorParams]
     }
     /**
@@ -55,6 +59,15 @@ export class UserCheck {
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
+
+            // 数据类型处理
+            inparam.rate = inparam.rate.toString()
+            inparam.points = parseFloat(inparam.points)
+            inparam.role = inparam.role.toString()
+            if(inparam.limit){
+                inparam.limit = inparam.limit.toString()
+            }
+
         return [checkAttError, errorParams]
     }
 
@@ -68,6 +81,11 @@ export class UserCheck {
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
+        
+        // 数据类型处理
+        inparam.role = inparam.role.toString()
+        inparam.status = parseInt(inparam.status)
+
         return [checkAttError, errorParams]
     }
 

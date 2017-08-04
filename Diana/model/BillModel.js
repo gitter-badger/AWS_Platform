@@ -158,10 +158,6 @@ export class BillModel extends BaseModel {
         if (fromInparam.username == billInfo.toUser) {
             return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
         }
-        // 数据类型处理
-        fromInparam.role = fromInparam.role.toString()
-        billInfo.toRole = billInfo.toRole.toString()
-        billInfo.remark = billInfo.remark || Model.StringValue
         
         // 存储账单流水
         const Bill = {
