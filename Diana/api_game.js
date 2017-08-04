@@ -121,7 +121,7 @@ const gameChangeStatus = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   //检查参数是否合法
-  let [checkAttError, errorParams] = new GameCheck().checkGame(inparam)
+  let [checkAttError, errorParams] = new GameCheck().checkStatus(inparam)
   if (checkAttError) {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
