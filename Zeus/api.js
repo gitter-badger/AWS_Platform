@@ -137,6 +137,12 @@ const userAuth = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new UserCheck().checkLogin(userLoginInfo)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
   // 用户登录
   const [loginUserErr, loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
   // 登录日志
