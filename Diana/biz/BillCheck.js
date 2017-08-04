@@ -15,7 +15,7 @@ export class BillCheck {
         // 数据类型处理
         inparam.amount = parseFloat(inparam.amount)
         inparam.toRole = inparam.toRole.toString()
-        inparam.remark = billInfo.remark || Model.StringValue
+        inparam.remark = inparam.remark || Model.StringValue
 
         return [checkAttError, errorParams]
     }
