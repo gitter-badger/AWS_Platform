@@ -45,6 +45,9 @@ export class UserModel extends athena.BaseModel {
     cryptoPassword(){
         this.userPwd = Util.sha256(this.userPwd);
     }
+    updateGameState(userName, state){
+        return this.update({userName}, {payState: state})
+    }
     async save(len, num){
         len = len || 6;
         num = num || -1;

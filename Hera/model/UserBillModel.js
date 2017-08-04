@@ -8,7 +8,7 @@ import {CODES, CHeraErr} from "../lib/Codes";
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser} = {}) {
+    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, gameId} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
         this.userId = +userId
@@ -25,6 +25,7 @@ export class UserBillModel extends athena.BaseModel {
         this.createAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
+        this.gameId = gameId || -1;  //-1表示中心钱包的
         if(this.action == Action.reflect) this.amount = -this.amount;
         this.type = this.action == Action.recharge ? Type.recharge : Type.withdrawals
     }
@@ -39,14 +40,19 @@ export class UserBillModel extends athena.BaseModel {
         });
         return [null, sumMount];
     }
-    async list(userName){
+    async list(userName, gameId){
         let scanParams = {
             TableName : this.tableName,
-            FilterExpression : "userName=:userName",
+            FilterExpression : "userName=:userName ",
             ExpressionAttributeValues : {
                 ":userName" : userName
             }
         }
+        if(gameId) {
+            scanParams.FilterExpression +="and gameId=:gameId";
+            scanParams.ExpressionAttributeValues[":gameId"] = gameId;
+        }
+        
         return new Promise((reslove, reject) => {
             this.db$("scan", scanParams).then((result)=>{
                 return reslove([null, result.Items]);

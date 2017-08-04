@@ -20,6 +20,7 @@ export const CODES = {
       takeErr : 12001,   //取点不正确
       billNotMatchErr : 12002, //账单不匹配
       notSingleUser : 12003,  //不是同一个用户提交
+      notHaveRecord : 12004,  //没有记录
     }
 }
 
@@ -39,7 +40,8 @@ const errorMessage = {
   "12000" : "存点不正确",
   "12001" : "取点不正确",
   "12002" : "账单不匹配",
-  "notSingleUser" : "不是同一个用户提交"
+  "notSingleUser" : "不是同一个用户提交",
+  "12004" : "记录不存在"
 }
 
 

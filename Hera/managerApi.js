@@ -36,7 +36,6 @@ export async function gamePlayerList(event, context, cb) {
     //json转换
     let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
     if(parserErr) return cb(null, ReHandler.fail(parserErr));
-    
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
         return ResFail(cb, tokenErr)
@@ -45,26 +44,27 @@ export async function gamePlayerList(event, context, cb) {
     if(e) {
         return ResFail(cb, e)
     }
-
     let role = tokenInfo.role;
-    let displayId = tokenInfo.displayId;
+    let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
     let err, userList;
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
         [err, userList] = await userModel.scan(requestParams);
     }else if(role == RoleCodeEnum.Merchant) { //如果是商家
-        Object.assign(requestParams, {buId:displayId})
+        requestParams = requestParams || {};
+        requestParams.buId = displayId;
         [err, userList] = await userModel.scan(requestParams);
-        userList.forEach(function(element) {
-            delete element.userPwd
-        }, this);
     }else {
         return ResOK(cb, { list: [] })
     }
     if (err) {
         return ResFail(cb, err)
     }
+    userList = userList || [];
+    userList.forEach(function(element) {
+            delete element.userPwd
+        }, this);
     return ResOK(cb, {list: userList});
 }
 
@@ -75,6 +75,7 @@ export async function gamePlayerList(event, context, cb) {
  * @param {*} callback 
  */
 export async function gamePlayerInfo(event, context, cb) {
+
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
         return ResFail(cb, tokenErr)
@@ -83,19 +84,28 @@ export async function gamePlayerInfo(event, context, cb) {
     if(e) {
         return ResFail(cb, e)
     }
+
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
+    if(parserErr) {
+        return ResFail(cb, parserErr);
+    }
     let userName = event.pathParameters.userName;
+    let gameId = requestParams.gameId;
     let userModel = new UserModel({userName});
     let userBillModel = new UserBillModel();
     let [err, user] = await userModel.get({userName});
     if(err){
         return ResFail(cb, billError)
     }
+    if(!user) {
+        return ResFail(cb, new CHeraErr(CODES.userNotExist));
+    }
     user.merchantName = user.merchantName;
     user.msn = user.msn;
-    user.updateAt = user.updateAt;
+    user.updateAt = user.updatedAt;
     user.amount = user.amount;
     //获取玩家的交易记录
-    let [billError, bilList] = await userBillModel.list(userName);
+    let [billError, bilList] = await userBillModel.list(userName, gameId);
     if(billError) {
         return ResFail(cb, billError)
     }
@@ -193,12 +203,10 @@ export const jwtverify = async (e, c, cb) => {
     return c.fail('Unauthorized: wrong token type')
   }
   // verify it and return the policy statements
-  const [err,
-    userInfo] = await JwtVerify(token[1]);
+  const [err, userInfo] = await JwtVerify(token[1]);
   if (err || !userInfo) {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
-
   return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }

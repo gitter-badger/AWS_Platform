@@ -8,22 +8,30 @@ import {CODES, CHeraErr} from "../lib/Codes";
 
 
 export class MerchantBillModel extends athena.BaseModel {
-    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser} = {}) {
+    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser, gameId} = {}) {
         super(TABLE_NAMES.PLATFORM_BILL);
         this.sn = Util.uuid();
         this.userId = userId;
         this.action = +action;
-        this.amount = (this.action == -1 ? -amount : +amount).toFixed(2);
+        this.gameId = gameId;
+        this.setAmount(amount);
         this.fromRole = fromRole;
         this.toRole = toRole;
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.operator = userName;
-        this.userName = userName;
+        this.username = userName;
         this.createdAt = Date.now();
         this.updatedAt = Date.now();
     }
-
+    setAmount(amount) {
+        if(this.action ==-1) {
+            if(amount > 0)  this.amount = -amount;
+        }
+        if(this.action == 1){
+            if(amount < 0) this.amount = -amount;
+        }
+    }
     async getBlance(){
         let [err, records] = await this.get({userId: this.userId}, [], "UserIdIndexSec", true);
         if(err) return [err, 0];
