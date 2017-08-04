@@ -11,6 +11,7 @@ export class GameCheck {
             { name: "gameType", type: "N", min: 0, max: 2 },
             { name: "ip", type: "REG", min: null, max: null, equal: athena.RegEnum.IP },
             { name: "port", type: "N", min: 1, max: 65535 },
+            { name: "kindId", type: "N", min: 10000, max: 99999 },
 
             { name: "gameImg", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL }
         ], inparam)
@@ -22,6 +23,7 @@ export class GameCheck {
         inparam.company = inparam.company || Model.StringValue
         inparam.ip = inparam.ip || Model.StringValue
         inparam.port = inparam.port || Model.StringValue
+        inparam.kindId = inparam.kindId.toString()
 
         return [checkAttError, errorParams]
 
