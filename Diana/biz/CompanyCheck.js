@@ -1,3 +1,4 @@
+import {Codes,Model,RoleCodeEnum,CompanyStatusEnum} from '../lib/all'
 const athena = require("../lib/athena")
 export class CompanyCheck {
     /**
@@ -16,6 +17,14 @@ export class CompanyCheck {
             { name: "license", type: "NS", min: 1, max: 20 },
             { name: "remark", type: "NS", min: 2, max: 200 }
         ], inparam)
+
+        // 数据类型处理
+        inparam.companyStatus = CompanyStatusEnum.Enable
+        inparam.companyDesc = inparam.companyDesc || Model.StringValue
+        inparam.companyContract = inparam.companyContract || Model.StringValue
+        inparam.license = inparam.license || Model.StringValue
+        inparam.remark = inparam.remark || Model.StringValue
+
         return [checkAttError, errorParams]
     }
 
@@ -29,6 +38,10 @@ export class CompanyCheck {
             { name: "companyId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
+        
+        // 数据类型处理
+        inparam.status = parseInt(inparam.status)
+        
         return [checkAttError, errorParams]
     }
 }

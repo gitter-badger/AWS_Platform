@@ -113,7 +113,7 @@ export class GameModel extends BaseModel {
             },
             UpdateExpression: "SET gameStatus = :status",
             ExpressionAttributeValues: {
-                ':status': parseInt(status)
+                ':status': status
             }
         })
         return [err, ret]
