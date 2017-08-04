@@ -15,6 +15,7 @@ export class ToolCheck {
         inparam.toolStatus = ToolStatusEnum.Enable
         inparam.remark = inparam.remark || Model.StringValue
         inparam.order = inparam.order || Model.NumberValue
+        inparam.img = inparam.img || Model.StringValue
 
         return [checkAttError, errorParams]
     }
