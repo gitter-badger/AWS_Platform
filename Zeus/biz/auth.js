@@ -154,7 +154,6 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
  * @param {*} userLoginInfo 用户登录信息
  */
 export const LoginUser = async (userLoginInfo = {}) => {
-  console.info(userLoginInfo)
   // 检查验证码
   const [checkErr, checkRet] = await new CaptchaModel().checkCaptcha(userLoginInfo)
   if (checkErr) {
@@ -268,15 +267,12 @@ export const UserGrabToken = async (userInfo = {}) => {
 // ==================== 以下为内部方法 ====================
 
 // 查询用户上级
-const queryParent = async (token, userId) => {
-  var id = 0, role = -1
-  if (!userId || Model.DefaultParent == userId) {
+const queryParent = async (token, parent) => {
+  var id = 0
+  if (!parent || Model.DefaultParent == parent) {
     id = token.userId
-    role = token.role
   } else {
-    id = userId
-    // 能够有子节点的只能是管理员或者线路商
-    role = RoleCodeEnum['Manager']
+    id = parent
   }
   const [err, user] = await new UserModel().queryUserById(id)
   if (err) {
