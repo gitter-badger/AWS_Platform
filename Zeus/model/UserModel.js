@@ -163,7 +163,7 @@ export class UserModel extends BaseModel {
             if (err) {
                 return [err, 0]
             }
-            else if (childs.length < parseInt(user.limit)) {
+            else if (childs.length < user.limit) {
                 userArr.push(user)
             }
         }

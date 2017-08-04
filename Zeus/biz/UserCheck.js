@@ -65,8 +65,26 @@ export class UserCheck {
             inparam.points = parseFloat(inparam.points)
             inparam.role = inparam.role.toString()
             if(inparam.limit){
-                inparam.limit = inparam.limit.toString()
+                inparam.limit = parseInt(inparam.limit)
             }
+
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查登录
+     * @param {*} inparam 
+     */
+    checkLogin(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
+            { name: "password", type: "S", min: 6, max: 16 },
+            { name: "role", type: "N", min: 1, max: 100 }
+        ], inparam)
+
+        // 数据类型处理
+        inparam.role = inparam.role.toString()
+        inparam.captcha = parseInt(inparam.captcha)
 
         return [checkAttError, errorParams]
     }

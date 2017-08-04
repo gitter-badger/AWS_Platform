@@ -34,8 +34,6 @@ export class CaptchaModel extends BaseModel {
      * @param {*} userLoginInfo 登录信息
      */
     async checkCaptcha(userLoginInfo) {
-        // 数据类型转换
-        userLoginInfo.captcha = parseInt(userLoginInfo.captcha)
         // 数据校验
         if (!userLoginInfo.captcha) {
             return [BizErr.CaptchaErr(), 0]
