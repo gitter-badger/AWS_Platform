@@ -38,7 +38,7 @@ async function playerBuyProp(event, context, callback){
       {name : "toolId", type:"S"},
       {name : "num", type:"N"},
       {name : "amount", type:"N"},
-      {name : "gameId", type:"S"}
+      {name : "kindId", type:"S"}
   ], requestParams);
 
   if(checkAttError){
@@ -95,9 +95,10 @@ async function playerBuyProp(event, context, callback){
     fromRole : userModel.role,
     fromUser : userModel.userName,
     merchantName : merchantModel.displayName,
+    msn : merchantModel.msn,
     operator : userModel.userName,
     amount : actualAmount,
-    gameId : requestParams.gameId,
+    kindId : requestParams.kindId,
     tool : toolInfo,
     num : num,
     type : Type.buyTool,
