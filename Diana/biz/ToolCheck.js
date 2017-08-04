@@ -1,3 +1,4 @@
+import { Codes, Model, RoleCodeEnum, ToolStatusEnum } from '../lib/all'
 const athena = require("../lib/athena")
 export class ToolCheck {
     /**
@@ -9,6 +10,12 @@ export class ToolCheck {
             { name: "remark", type: "NS", min: 1, max: 200 },
             { name: "order", type: "NN", min: 1, max: 999999999 }
         ], inparam)
+
+        // 数据类型处理
+        inparam.toolStatus = ToolStatusEnum.Enable
+        inparam.remark = inparam.remark || Model.StringValue
+        inparam.order = inparam.order || Model.NumberValue
+
         return [checkAttError, errorParams]
     }
 
@@ -22,6 +29,10 @@ export class ToolCheck {
             { name: "toolId", type: "N", min: 100000, max: 999999 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
+
+        // 数据类型处理
+        inparam.status = parseInt(inparam.status)
+
         return [checkAttError, errorParams]
     }
 
