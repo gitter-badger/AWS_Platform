@@ -103,6 +103,7 @@ const gameOne = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   let [err, ret] = await new GameModel().getOne(gameParams.gameType, gameParams.gameId)
+  ret.gameType = GameTypeEnum[ret.gameType].name
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   }
