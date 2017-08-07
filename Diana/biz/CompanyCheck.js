@@ -18,6 +18,10 @@ export class CompanyCheck {
             { name: "remark", type: "NS", min: 2, max: 200 }
         ], inparam)
 
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.companyStatus = CompanyStatusEnum.Enable
         inparam.companyDesc = inparam.companyDesc || Model.StringValue
@@ -38,6 +42,10 @@ export class CompanyCheck {
             { name: "companyId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
+
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
         
         // 数据类型处理
         inparam.status = parseInt(inparam.status)

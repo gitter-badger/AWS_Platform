@@ -10,6 +10,10 @@ export class LogCheck {
             { name: "pageSize", type: "N", min: 1, max: 99999 }
         ], inparam)
 
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.role = inparam.role.toString()
         inparam.pageSize = parseInt(inparam.pageSize)

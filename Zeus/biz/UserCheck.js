@@ -22,6 +22,10 @@ export class UserCheck {
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.role = inparam.role.toString()
 
@@ -61,6 +65,10 @@ export class UserCheck {
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.rate = inparam.rate.toString()
         inparam.points = parseFloat(inparam.points)
@@ -86,6 +94,10 @@ export class UserCheck {
             { name: "role", type: "N", min: 1, max: 100 }
         ], inparam)
 
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.role = inparam.role.toString()
         inparam.captcha = parseInt(inparam.captcha)
@@ -103,6 +115,10 @@ export class UserCheck {
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
+
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
 
         // 数据类型处理
         inparam.role = inparam.role.toString()

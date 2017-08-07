@@ -16,6 +16,10 @@ export class GameCheck {
             { name: "gameImg", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL }
         ], inparam)
 
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.gameType = inparam.gameType.toString()
         inparam.gameStatus = GameStatusEnum.Online
@@ -43,6 +47,10 @@ export class GameCheck {
             { name: "status", type: "N", min: 0, max: 4 }]
             , inparam)
         
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.status = parseInt(inparam.status)
 

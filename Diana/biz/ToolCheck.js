@@ -11,6 +11,10 @@ export class ToolCheck {
             { name: "order", type: "NN", min: 1, max: 999999999 }
         ], inparam)
 
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
         // 数据类型处理
         inparam.toolStatus = ToolStatusEnum.Enable
         inparam.remark = inparam.remark || Model.StringValue
@@ -30,6 +34,10 @@ export class ToolCheck {
             { name: "toolId", type: "N", min: 100000, max: 999999 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
+        
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
 
         // 数据类型处理
         inparam.toolId = parseInt(inparam.toolId)
@@ -51,6 +59,10 @@ export class ToolCheck {
             { name: "order", type: "N", min: 0, max: 999999999 },
             { name: "status", type: "N", min: 0, max: 2 }]
             , inparam)
+        
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
         
         // 数据类型处理
         inparam.toolId = inparam.toolId.toString()
