@@ -266,7 +266,7 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
           -
-            IndexName: kindIdIndex
+            IndexName: KindIdIndex
             KeySchema:
               -
                 AttributeName: kindId
