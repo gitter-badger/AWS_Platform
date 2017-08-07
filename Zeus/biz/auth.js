@@ -103,39 +103,34 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [queryParentErr, 0]
   }
   // 初始点数
-  const depositPoints = parseFloat(CheckUser.points)
-  const User = {
-    ...CheckUser,
-    username: `${CheckUser.suffix}_${CheckUser.username}`,
-    parentName: parentUser.username,
-    parentSuffix: parentUser.suffix,
-    points: 0.0
-  }
-  //推送给游戏服务器(A3)
-  let pushModel = new PushModel(User);
-  let [pushErr, data] = await pushModel.push();
-  // if(pushErr) {
-  //   return [pushErr, 0]
-  // }
-  // 保存创建用户
-  const [saveUserErr, saveUserRet] = await saveUser(User)
-  if (saveUserErr) {
-    return [saveUserErr, 0]
-  }
+  const initPoints = CheckUser.points
   // 检查余额
   const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
-  if (depositPoints > balance) {
+  if (initPoints > balance) {
     return [BizErr.BalanceErr(), 0]
   }
+  // 保存创建用户
+  const User = {
+    ...CheckUser,
+    username: `${CheckUser.suffix}_${CheckUser.username}`,
+    parentName: parentUser.username,
+    parentSuffix: parentUser.suffix,
+    points: Model.NumberValue
+  }
+  const [saveUserErr, saveUserRet] = await saveUser(User)
+  if (saveUserErr) {
+    return [saveUserErr, 0]
+  }
+
   // 开始转账
   parentUser.operatorToken = token
   const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
-    amount: depositPoints,
+    amount: initPoints,
     operator: token.username,
     remark: '初始点数'
   })
@@ -151,7 +146,6 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
  * @param {*} userLoginInfo 用户登录信息
  */
 export const LoginUser = async (userLoginInfo = {}) => {
-  console.info(userLoginInfo)
   // 检查验证码
   const [checkErr, checkRet] = await new CaptchaModel().checkCaptcha(userLoginInfo)
   if (checkErr) {
@@ -265,15 +259,12 @@ export const UserGrabToken = async (userInfo = {}) => {
 // ==================== 以下为内部方法 ====================
 
 // 查询用户上级
-const queryParent = async (token, userId) => {
-  var id = 0, role = -1
-  if (!userId || Model.DefaultParent == userId) {
+const queryParent = async (token, parent) => {
+  var id = 0
+  if (!parent || Model.DefaultParent == parent) {
     id = token.userId
-    role = token.role
   } else {
-    id = userId
-    // 能够有子节点的只能是管理员或者线路商
-    role = RoleCodeEnum['Manager']
+    id = parent
   }
   const [err, user] = await new UserModel().queryUserById(id)
   if (err) {

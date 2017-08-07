@@ -1,0 +1,139 @@
+{
+    "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX2NoZW5leSIsInBhc3N3b3JkIjoiMTIzNDU2Iiwic3VmZml4IjoiUGxhdGZvcm0iLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJTdXBlckFkbWluIiwidXNlcklkIjoiNjAyOGVlYzYtOTZlYy00OTJkLWEzNmItZmQ4ZDY5ODFiNzZmIiwicm9sZSI6IjEiLCJkaXNwbGF5TmFtZSI6IuW5s-WPsOeuoeeQhuWRmCIsImlhdCI6MTUwMDk3Mzg5OX0.2TQMNV3yBDYoBKaUtU0bwTNuAPeaGGAovZ8JN-DZ5pE"
+    },
+    "requestContext": {
+        "authorizer": {
+            "username": "Platform_cheney",
+            "parent": "00",
+            "role": "1",
+            "userId": "eb827426-695c-4df1-8205-ba2e14153b49",
+            "principalId": "eb827426-695c-4df1-8205-ba2e14153b49"
+        },
+        "identity": {
+            "sourceIp": "127.0.0.1"
+        }
+    },
+    "body": {
+        "lastIP": "47.88.158.157",
+        "isforever": true,
+        "limit": 3,
+        "hostName": "这是负责人",
+        "gmUsername": "NULL!",
+        "status": 1,
+        "contractPeriod": 0,
+        "adminName": "这是管理员明儿",
+        "enabledAt": 1501755759470,
+        "displayName": "Admin123啊",
+        "password": "F5Au5Ty9fy_N?v",
+        "loginAt": 1501763306239,
+        "suffix": "AA1",
+        "userId": "1abd4f0d-578d-4cfe-963a-cfac0711ba4e",
+        "displayId": 648407,
+        "gmPassword": "NULL!",
+        "parentName": "Platform_Yongtest001",
+        "hostContact": "这是联系方式啊",
+        "rate": "100",
+        "adminContact": "管理员联系方式没关系",
+        "passhash": "$2a$10$zW2TSAoCGBepRwWSTmbW4.d9.GEVE7qvc2TL6KKZr0IT9gyUwmrsq",
+        "createdAt": 1501755759879,
+        "gender": 1,
+        "children": 0,
+        "remark": "这是个一个备注信息",
+        "managerName": "NULL!",
+        "managerEmail": "1@qq.com",
+        "parentSuffix": "Platform",
+        "role": "10",
+        "points": 0,
+        "updatedAt": 1501763306239,
+        "adminEmail": "1@qq.com",
+        "parent": "01",
+        "username": "AA1_admin123@啊",
+        "gameList": [
+            {
+                "gameId": "9aa5507b-4691-4a4a-87a3-6dfe21e2dfd0",
+                "createdAt": 1501754870342,
+                "gameType": "2",
+                "gameRecommend": "这是创建的第三个游戏",
+                "gameName": "GameSara",
+                "port": "5",
+                "gameStatus": 1,
+                "ip": "789.164.464.4",
+                "gameImg": "NULL!",
+                "company": {
+                    "companyDesc": "这是一个运营商C",
+                    "companyName": "运营商C",
+                    "companyStatus": 1,
+                    "remark": "这是一个C的游戏运营商",
+                    "companyContract": "NULL!",
+                    "createdAt": 1501754466357,
+                    "license": "NULL!",
+                    "companyId": "dc03c5e9-8293-4418-a031-627eff75b5d5",
+                    "companyRegion": "3",
+                    "companyContactWay": "10004455",
+                    "companyEmail": "1@qq.com",
+                    "companyKey": "2da88f4f-6ed0-48f1-b93b-a9541194014b",
+                    "companyContact": "运营商C",
+                    "updatedAt": 1501754466357
+                },
+                "updatedAt": 1501754870342
+            },
+            {
+                "gameId": "6b57a186-7e7e-42d6-940b-2910903318b8",
+                "createdAt": 1501754838892,
+                "gameType": "1",
+                "gameRecommend": "这是创建的第二个游戏",
+                "gameName": "GameShare2",
+                "port": "1",
+                "gameStatus": 1,
+                "ip": "188.44.122.1",
+                "gameImg": "NULL!",
+                "company": {
+                    "companyDesc": "这是一个B运营商",
+                    "companyName": "运营商B",
+                    "companyStatus": 1,
+                    "remark": "这是一个B类型的运营商",
+                    "companyContract": "NULL!",
+                    "createdAt": 1501754429398,
+                    "license": "NULL!",
+                    "companyId": "5048e54d-1401-47f9-99e2-e011cd9d7981",
+                    "companyRegion": "5",
+                    "companyContactWay": "146545454565",
+                    "companyEmail": "1@qq.com",
+                    "companyKey": "f58973b4-76bf-4d28-9466-d2a97a974bb4",
+                    "companyContact": "运营商B",
+                    "updatedAt": 1501754429398
+                },
+                "updatedAt": 1501754838892
+            },
+            {
+                "gameId": "5bab0438-9463-4256-afe0-61d18b5d515c",
+                "createdAt": 1501754797942,
+                "gameType": "0",
+                "gameRecommend": "这是第一个创建的游戏",
+                "gameName": "GameClick01",
+                "port": "1",
+                "gameStatus": 1,
+                "ip": "182.164.133.1",
+                "gameImg": "NULL!",
+                "company": {
+                    "companyDesc": "这是一个A的运营商",
+                    "companyName": "运营商A",
+                    "companyStatus": 1,
+                    "remark": "这是一个A类游戏运营商",
+                    "companyContract": "NULL!",
+                    "createdAt": 1501753315836,
+                    "license": "NULL!",
+                    "companyId": "e9f84b49-4c40-4247-9d10-b593c318e8fd",
+                    "companyRegion": "4",
+                    "companyContactWay": "1004545456465",
+                    "companyEmail": "1@qq.com",
+                    "companyKey": "52167931-d731-4a3a-98d0-2eaf85e9bc9a",
+                    "companyContact": "联系人A",
+                    "updatedAt": 1501753315836
+                },
+                "updatedAt": 1501754797942
+            }
+        ]
+    }
+}

@@ -45,7 +45,6 @@ export class BillModel extends BaseModel {
         if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
             return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
         }
-        const initPoints = parseFloat(user.points)
         const [queryErr, bills] = await this.query({
             IndexName: 'UserIdIndex',
             KeyConditionExpression: 'userId = :userId',
@@ -59,11 +58,11 @@ export class BillModel extends BaseModel {
         // 直接在内存里面做列表了. 如果需要进行缓存,以后实现
         const waterfall = _.map(bills.Items, (item, index) => {
             let balance = _.reduce(_.slice(bills.Items, 0, index + 1), (sum, item) => {
-                return sum + parseFloat(item.amount)
-            }, 0.0) + initPoints
+                return sum + item.amount
+            }, 0.0) + user.points
             return {
                 ...bills.Items[index],
-                oldBalance: balance - parseFloat(bills.Items[index].amount),
+                oldBalance: balance - bills.Items[index].amount,
                 balance: balance
             }
         })
@@ -87,7 +86,7 @@ export class BillModel extends BaseModel {
             return [0, user]
         }
         if (!(user.userId == token.userId || user.parent == token.userId)) {
-            return [BizErr.TokenErr('current token user  cant operate this user'), 0]
+            return [BizErr.TokenErr('current token user cant operate this user'), 0]
         }
         return [0, user]
     }
@@ -97,10 +96,6 @@ export class BillModel extends BaseModel {
      * @param {*} user 
      */
     async checkUserBalance(user) {
-        if (user.points == undefined || user.points == null) {
-            return [BizErr.ParamErr('User dont have base points'), 0]
-        }
-        const baseBalance = parseFloat(user.points)
         const [queryErr, bills] = await this.query({
             IndexName: 'UserIdIndex',
             KeyConditionExpression: 'userId = :userId',
@@ -112,10 +107,10 @@ export class BillModel extends BaseModel {
             return [queryErr, 0]
         }
         const sums = _.reduce(bills.Items, (sum, bill) => {
-            return sum + parseFloat(bill.amount)
+            return sum + bill.amount
         }, 0.0)
 
-        return [0, baseBalance + sums]
+        return [0, user.points + sums]
     }
 
     /**
@@ -158,11 +153,7 @@ export class BillModel extends BaseModel {
         if (fromInparam.username == billInfo.toUser) {
             return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
         }
-        // 数据类型处理
-        fromInparam.role = fromInparam.role.toString()
-        billInfo.toRole = billInfo.toRole.toString()
-        billInfo.remark = billInfo.remark || Model.StringValue
-        
+
         // 存储账单流水
         const Bill = {
             ...Model.baseModel(),

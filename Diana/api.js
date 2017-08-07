@@ -19,6 +19,7 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 import { UserModel } from './model/UserModel'
 
+import { LogCheck } from './biz/LogCheck'
 import { BillCheck } from './biz/BillCheck'
 
 const ResOK = (callback, res) => callback(null, Success(res))
@@ -139,11 +140,11 @@ const logList = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
-  // 参数校验
-  if (!inparam.pageSize || !inparam.role) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
-  } else {
-    inparam.pageSize = parseInt(inparam.pageSize)
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new LogCheck().checkPage(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 获取令牌，只有管理员有权限
   const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])

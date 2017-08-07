@@ -11,6 +11,16 @@ export class BillCheck {
             { name: "amount", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
+
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.amount = parseFloat(inparam.amount)
+        inparam.toRole = inparam.toRole.toString()
+        inparam.remark = inparam.remark || Model.StringValue
+
         return [checkAttError, errorParams]
     }
 }

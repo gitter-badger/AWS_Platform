@@ -1,3 +1,4 @@
+import { Codes, Model, RoleCodeEnum } from '../lib/all'
 const athena = require("../lib/athena")
 export class UserCheck {
     /**
@@ -20,6 +21,14 @@ export class UserCheck {
 
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
+
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.role = inparam.role.toString()
+
         return [checkAttError, errorParams]
     }
     /**
@@ -38,9 +47,9 @@ export class UserCheck {
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "role", type: "N", min: 1, max: 100 },
-            { name: "limit", type: "N", min: 1, max: 10 },
             { name: "hostContact", type: "S", min: 5, max: 40 },
 
+             { name: "limit", type: "NN", min: 1, max: 10 },
             { name: "adminName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
             { name: "adminContact", type: "NS", min: 1, max: 40 },
@@ -55,6 +64,44 @@ export class UserCheck {
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
+
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.rate = inparam.rate.toString()
+        inparam.points = parseFloat(inparam.points)
+        inparam.role = inparam.role.toString()
+        if (inparam.limit) {
+            inparam.limit = parseInt(inparam.limit)
+        }
+        if (!inparam.parent) {
+            inparam.parent = Model.DefaultParent
+        }
+
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查登录
+     * @param {*} inparam 
+     */
+    checkLogin(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
+            { name: "password", type: "S", min: 6, max: 16 },
+            { name: "role", type: "N", min: 1, max: 100 }
+        ], inparam)
+
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.role = inparam.role.toString()
+        inparam.captcha = parseInt(inparam.captcha)
+
         return [checkAttError, errorParams]
     }
 
@@ -68,6 +115,15 @@ export class UserCheck {
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
+
+        if(checkAttError){
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.role = inparam.role.toString()
+        inparam.status = parseInt(inparam.status)
+
         return [checkAttError, errorParams]
     }
 

@@ -21,6 +21,7 @@
     "port": "8080",
     "ip": "127.0.0.1",
     "gameRecommend": "推荐信息",
+    "kindId":"20000",
     "gameImg": "http://test.com"
   }
 }

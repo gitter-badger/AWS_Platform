@@ -37,15 +37,8 @@ export class GameModel extends BaseModel {
      * @param {*} gameInfo 
      */
     async addGame(gameInfo) {
-        // 数据类型处理
-        gameInfo.gameType = gameInfo.gameType.toString()
-        gameInfo.gameStatus = GameStatusEnum.Online;
-        gameInfo.gameImg = gameInfo.gameImg || Model.StringValue
-        gameInfo.company = gameInfo.company || Model.StringValue
-        gameInfo.ip = gameInfo.ip || Model.StringValue
-        gameInfo.port = gameInfo.port || Model.StringValue
         // 判断是否重复
-        const [existErr, exist] = await this.isExist({
+        let [existErr, exist] = await this.isExist({
             IndexName: 'GameNameIndex',
             KeyConditionExpression: 'gameType = :gameType and gameName = :gameName',
             ExpressionAttributeValues: {
@@ -58,6 +51,20 @@ export class GameModel extends BaseModel {
         }
         if (exist) {
             return [BizErr.ItemExistErr(), 0]
+        }
+        // 判断kindId是否重复
+        [existErr, exist] = await this.isExist({
+            IndexName: 'KindIdIndex',
+            KeyConditionExpression: 'kindId = :kindId',
+            ExpressionAttributeValues: {
+                ':kindId': gameInfo.kindId,
+            }
+        })
+        if (existErr) {
+            return [existErr, 0]
+        }
+        if (exist) {
+            return [BizErr.ItemExistErr('KindId已存在'), 0]
         }
         // 保存
         const item = {
@@ -120,7 +127,7 @@ export class GameModel extends BaseModel {
             },
             UpdateExpression: "SET gameStatus = :status",
             ExpressionAttributeValues: {
-                ':status': parseInt(status)
+                ':status': status
             }
         })
         return [err, ret]

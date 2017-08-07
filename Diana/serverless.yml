@@ -107,6 +107,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  gameType: #游戏类别
+    handler: api_game.gameType
+    events:
+      -
+        http:
+          path: gameType
+          method: get
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是游戏厂商接口服务 ====================
   companyNew: #创建游戏厂商
     handler: api_company.companyNew

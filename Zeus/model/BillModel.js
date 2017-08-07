@@ -37,10 +37,6 @@ export class BillModel extends BaseModel {
      * @param {*} user 
      */
     async checkUserBalance(user) {
-        if (user.points == undefined || user.points == null) {
-            return [BizErr.ParamErr('User dont have base points'), 0]
-        }
-        const baseBalance = parseFloat(user.points)
         const [queryErr, bills] = await this.query({
             IndexName: 'UserIdIndex',
             KeyConditionExpression: 'userId = :userId',
@@ -52,11 +48,11 @@ export class BillModel extends BaseModel {
             return [queryErr, 0]
         }
         const sums = _.reduce(bills.Items, (sum, bill) => {
-            return sum + parseFloat(bill.amount)
+            return sum + bill.amount
         }, 0.0)
         let lastBill = bills.Items[bills.Items.length - 1]
         lastBill = lastBill || {}
-        lastBill.lastBalance = baseBalance + sums
+        lastBill.lastBalance = user.points + sums
         return [0, lastBill]
     }
 
@@ -109,8 +105,8 @@ export class BillModel extends BaseModel {
             return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
         }
         // 数据类型处理
-        fromInparam.role = fromInparam.role.toString()
-        billInfo.toRole = billInfo.toRole.toString()
+        // fromInparam.role = fromInparam.role.toString()
+        // billInfo.toRole = billInfo.toRole.toString()
         // 存储账单流水
         const Bill = {
             ...Model.baseModel(),

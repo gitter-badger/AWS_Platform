@@ -2,6 +2,7 @@ import AWS from 'aws-sdk'
 import { Stream$ } from './Rx5'
 import { BizErr } from './Codes'
 import { JwtVerify, JwtSign } from './Response'
+import _ from 'lodash'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
 const generatePassword = require('password-generator')
@@ -158,5 +159,25 @@ export const Model = {
       ...info,
       lastIP: sourceIP
     }
+  },
+  getInparamRanges(inparams) {
+    let ranges = _.map(inparams, (v, i) => {
+      if (v === null) {
+        return null
+      }
+      return `${i} = :${i}`
+    })
+    _.remove(ranges, (v) => v === null)
+    ranges = _.join(ranges, ' AND ')
+    return ranges
+  },
+  getInparamValues(inparams) {
+    const values = _.reduce(inparams, (result, v, i) => {
+      if (v !== null) {
+        result[`:${i}`] = v
+      }
+      return result
+    }, {})
+    return values
   }
 }
