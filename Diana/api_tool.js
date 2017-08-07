@@ -122,6 +122,12 @@ const toolChangeStatus = async (e, c, cb) => {
   }
   // 业务操作
   const [err, ret] = await new ToolModel().changeStatus(inparam.toolName, inparam.toolId, inparam.status)
+
+  // 操作日志记录
+  inparam.operateAction = '道具状态变更'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
+
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {
@@ -153,6 +159,12 @@ const toolUpdate = async (e, c, cb) => {
   }
   // 业务操作
   const [err, ret] = await new ToolModel().updateTool(inparam)
+
+  // 操作日志记录
+  inparam.operateAction = '道具更新'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
+
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {

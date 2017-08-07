@@ -133,6 +133,12 @@ const gameChangeStatus = async (e, c, cb) => {
   }
   // 业务操作
   const [err, ret] = await new GameModel().changeStatus(inparam.gameType, inparam.gameId, inparam.status)
+
+  // 操作日志记录
+  inparam.operateAction = '游戏状态变更'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
+
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   } else {
