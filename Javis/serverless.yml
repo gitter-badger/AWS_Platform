@@ -210,6 +210,9 @@ resources:
             AttributeName: gameId
             AttributeType: S
           -
+            AttributeName: kindId
+            AttributeType: S
+          -
             AttributeName: gameName
             AttributeType: S
           -
@@ -256,6 +259,17 @@ resources:
             KeySchema:
               -
                 AttributeName: gameId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: kindIdIndex
+            KeySchema:
+              -
+                AttributeName: kindId
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

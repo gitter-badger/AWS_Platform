@@ -140,6 +140,18 @@ const gameChangeStatus = async (e, c, cb) => {
   }
 }
 
+/**
+ * 游戏类别
+ */
+const gameType = async (e, c, cb) => {
+  const res = { m: 'gameType' }
+  let gameTypeArr = []
+  for (let item in GameTypeEnum) {
+    gameTypeArr.push(GameTypeEnum[item])
+  }
+  return ResOK(cb, { ...res, payload: gameTypeArr })
+}
+
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -169,5 +181,6 @@ export {
   gameNew,                      // 新建游戏
   gameList,                     // 游戏列表
   gameChangeStatus,             // 游戏状态变更
-  gameOne                       // 单个游戏
+  gameOne,                      // 单个游戏
+  gameType                      // 游戏类型
 }

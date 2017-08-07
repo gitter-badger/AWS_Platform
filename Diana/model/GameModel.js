@@ -38,7 +38,7 @@ export class GameModel extends BaseModel {
      */
     async addGame(gameInfo) {
         // 判断是否重复
-        const [existErr, exist] = await this.isExist({
+        let [existErr, exist] = await this.isExist({
             IndexName: 'GameNameIndex',
             KeyConditionExpression: 'gameType = :gameType and gameName = :gameName',
             ExpressionAttributeValues: {
@@ -51,6 +51,20 @@ export class GameModel extends BaseModel {
         }
         if (exist) {
             return [BizErr.ItemExistErr(), 0]
+        }
+        // 判断kindId是否重复
+        [existErr, exist] = await this.isExist({
+            IndexName: 'KindIdIndex',
+            KeyConditionExpression: 'kindId = :kindId',
+            ExpressionAttributeValues: {
+                ':kindId': gameInfo.kindId,
+            }
+        })
+        if (existErr) {
+            return [existErr, 0]
+        }
+        if (exist) {
+            return [BizErr.ItemExistErr('KindId已存在'), 0]
         }
         // 保存
         const item = {
