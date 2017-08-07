@@ -322,7 +322,7 @@ async function gamePlayerA3Login(event, context, callback) {
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let suffix = userInfo.userName.split("_")[0];
   let loginToken = Util.createTokenJWT({userName : userInfo.userName, suffix:suffix, userId:+userInfo.userId});
-  let [updateError] = await user.update({userName: userInfo.userName},{ token: loginToken,updateAt:Date.now()});
+  let [updateError] = await user.update({userName: userInfo.userName},{updateAt:Date.now()});
   if(updateError) return callback(null, ReHandler.fail(updateError));
 
   //获取余额
@@ -452,7 +452,7 @@ async function playerRecordValidate(event, context, callback){
     toUser : merchantModel.username,
     operator : userModel.userName,
     merchantName : merchantModel.displayName,
-    gameId : gameId,
+    kindId : gameId,
     msn : merchantModel.msn,
     type : Type.gameSettlement,
     remark : "玩家游戏结算"

@@ -109,10 +109,6 @@ export async function gamePlayerInfo(event, context, cb) {
     if(!user) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
     }
-    user.merchantName = user.merchantName;
-    user.msn = user.msn;
-    user.updateAt = user.updatedAt;
-    user.amount = user.amount;
     //获取玩家的交易记录
     let [billError, bilList] = await userBillModel.list(userName, gameId);
     if(billError) {
