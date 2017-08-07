@@ -10,7 +10,7 @@ import {Model} from "./lib/Dynamo"
 
 import {MerchantModel} from "./model/MerchantModel";
 
-import {UserModel} from "./model/UserModel";
+import {UserModel, State} from "./model/UserModel";
 
 import {UserBillModel} from "./model/UserBillModel";
 
@@ -65,7 +65,8 @@ export async function gamePlayerList(event, context, cb) {
     userList.forEach(function(element) {
             delete element.userPwd
         }, this);
-    return ResOK(cb, {list: userList});
+    
+    ResOK(cb, {list: userList});
 }
 
 /**
@@ -89,7 +90,15 @@ export async function gamePlayerInfo(event, context, cb) {
     if(parserErr) {
         return ResFail(cb, parserErr);
     }
-    let userName = event.pathParameters.userName;
+     //检查参数是否合法
+    let [checkAttError, errorParams] = athena.Util.checkProperties([
+        {name : "userName", type:"S"},
+    ], requestParams);
+    if(checkAttError){
+        Object.assign(checkAttError, {params: errorParams});
+        return cb(null, ReHandler.fail(checkAttError));
+    } 
+    let userName = requestParams.userName;
     let gameId = requestParams.gameId;
     let userModel = new UserModel({userName});
     let userBillModel = new UserBillModel();
@@ -110,6 +119,7 @@ export async function gamePlayerInfo(event, context, cb) {
         return ResFail(cb, billError)
     }
     user.list = bilList;
+    delete user.token;
     return ResOK(cb, user);
 }
 
@@ -120,6 +130,7 @@ export async function gamePlayerInfo(event, context, cb) {
  * @param {*} cb 
  */
 export async function gamePlayerForzen(event, context, cb){
+    console.log(event);
   const [tokenErr, token] = await Model.currentToken(event);
   if (tokenErr) {
     return ResFail(cb, tokenErr)
@@ -136,13 +147,19 @@ export async function gamePlayerForzen(event, context, cb){
    //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "state", type:"N"},
+      {name : "userName", type:"S"},
   ], requestParams);
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
     return cb(null, ReHandler.fail(checkAttError));
   } 
-  let userName = event.pathParameters.userName;
+  let userName = requestParams.userName;
   let state = +requestParams.state;
+  if(state != State.forzen && state != State.normal) {
+      let stateError = new CHeraErr(CODES.DataError);
+      Object.assign(checkAttError, {params: ["state"]});
+    return cb(null, ReHandler.fail(checkAttError));
+  }
   var userModel = new UserModel();
   let [err] = await userModel.update({userName},{state})
   if(err) {

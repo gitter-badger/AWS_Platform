@@ -21,7 +21,9 @@ export const CODES = {
       billNotMatchErr : 12002, //账单不匹配
       notSingleUser : 12003,  //不是同一个用户提交
       notHaveRecord : 12004,  //没有记录
-    }
+    },
+    toolNotExist : 13000,  //道具不存在
+    amountError : 13001,   //金额不正确
 }
 
 const errorMessage = {
@@ -41,7 +43,9 @@ const errorMessage = {
   "12001" : "取点不正确",
   "12002" : "账单不匹配",
   "notSingleUser" : "不是同一个用户提交",
-  "12004" : "记录不存在"
+  "12004" : "记录不存在",
+  "13000" : "道具不存在",
+  "13001" : "金额不正确"
 }
 
 

@@ -1,9 +1,9 @@
 {
-    "body": "{\"userName\":\"day004\",\"userPwd\":\"zhangsan\", \"apiKey\":\"66101b51-ffad-4133-ab15-37b12bea1ebe\", \"buId\":\"770046\",  \"gamePlatform\":\"NA\", \"amount\":\"10\",  \"action\":\"1\"}",
+    "body": "{\"userName\":\"chenwen\",\"userPwd\":\"chenwen\", \"apiKey\":\"66101b51-ffad-4133-ab15-37b12bea1ebe\", \"buId\":\"662736\",  \"gamePlatform\":\"NA\", \"amount\":\"2\",  \"action\":\"1\"}",
     "pathParameters" : {
-            "userName" : "day004"
+            "userName" : "chenwen"
         },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfZGF5MDA0Iiwic3VmZml4IjoiQ1kzOCIsInVzZXJJZCI6OTQ0MDQxLCJpYXQiOjE1MDE3NTY3MTl9.t0x9taLfunbES_fIfDmh2KJ3r4tCz1ULTLuG1j2znGQ"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfY2hlbndlbiIsInN1ZmZpeCI6IkNZMzgiLCJ1c2VySWQiOjM5NzY4NSwiaWF0IjoxNTAxODM1NzMwfQ.mpMyrjOSXHnIOoEL3f_Bd8n6GRNOWGQ_85ha8nyjqvU"
     }
 }

@@ -78,12 +78,26 @@ functions:
           path: /game/player/join
           method: post
           cors: true
+  toolList:  #道具列表
+    handler: openApi_tool.toolList
+    events:
+      - http:
+          path: /game/tool/list
+          method: get
+          cors: true
+  buy:  #购买道具
+    handler: openApi_tool.playerBuyProp
+    events:
+      - http:
+          path: /game/tool/buy
+          method: post
+          cors: true
   playerRecord:  #获取玩家记录验证
     handler: openApi.playerRecordValidate
     events:
       - http:
           path: /game/bill/verify
-          method: get
+          method: post
           cors: true
   gamePlayerList:  #获取玩家列表
     handler: managerApi.gamePlayerList
@@ -97,7 +111,7 @@ functions:
     handler: managerApi.gamePlayerInfo
     events:
       - http:
-          path: /player/bill/{userName}
+          path: /player/bill/info
           method: get
           cors: true
           authorizer: tokenVerify
@@ -105,7 +119,7 @@ functions:
     handler: managerApi.gamePlayerForzen
     events:
       - http:
-          path: /player/forzen/{userName}
+          path: /player/forzen
           method: post
           cors: true
           authorizer: tokenVerify

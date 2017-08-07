@@ -480,6 +480,19 @@ resources:
           -
             AttributeName: toolId
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: toolIdIndex
+            KeySchema:
+              -
+                AttributeName: toolId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        

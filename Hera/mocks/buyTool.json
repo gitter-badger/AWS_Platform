@@ -1,0 +1,6 @@
+{
+    "body": "{\"userId\":\"397685\",\"toolId\":\"478543\", \"num\":\"1\",  \"amount\":\"20\", \"gameId\":\"10\",  \"action\":\"1\"}",
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfY2hlbndlbiIsInN1ZmZpeCI6IkNZMzgiLCJ1c2VySWQiOjM5NzY4NSwiaWF0IjoxNTAxODM1NzMwfQ.mpMyrjOSXHnIOoEL3f_Bd8n6GRNOWGQ_85ha8nyjqvU"
+    }
+}
