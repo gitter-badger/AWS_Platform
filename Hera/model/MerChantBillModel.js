@@ -29,10 +29,19 @@ export class MerchantBillModel extends athena.BaseModel {
     }
     setAmount(amount) {
         if(this.action ==-1) {
-            if(amount > 0)  this.amount = -amount;
+            if(amount > 0) {
+                 this.amount = -amount;
+            }else{
+                this.amount = amount
+            }
+            
         }
         if(this.action == 1){
-            if(amount < 0) this.amount = -amount;
+            if(amount < 0){
+                 this.amount = -amount;
+            }else {
+                this.amount = amount;
+            }
         }
     }
     async getBlance(){

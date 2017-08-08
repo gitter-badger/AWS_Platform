@@ -15,16 +15,16 @@
     }
   },
   "body": {
-      "username": "cmerchant372",
-      "displayName" : "chen29",
-      "msn":"81",
-      "suffix":"CY81",
+      "username": "cmerchant1",
+      "displayName" : "merchant1",
+      "msn":"1",
+      "suffix":"CY1",
       "password": "chenwenGG123",
       "role": "100",
       "adminName": "cheneymerg",
       "merchantName": "cheneymmerca",
       
-      "parent": "1915ebeb-290c-48cc-af48-e90bdecf11d9",
+      "parent": "fce1c8d7-c0cc-4eb3-aee1-b30050f34fb3",
       "hostName":"负责人一号",
       "hostContact":"18780004427",
       "rate":"90",

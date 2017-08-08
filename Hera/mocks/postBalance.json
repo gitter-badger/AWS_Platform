@@ -1,9 +1,9 @@
 {
-    "body": "{\"userName\":\"chenwen\",\"userPwd\":\"chenwen\", \"apiKey\":\"66101b51-ffad-4133-ab15-37b12bea1ebe\", \"buId\":\"662736\",  \"gamePlatform\":\"NA\", \"amount\":\"2\",  \"action\":\"1\"}",
+    "body": "{ \"amount\":\"200000\",  \"action\":\"1\", \"buId\":\"493280\", \"buId\":\"493280\"}",
     "pathParameters" : {
-            "userName" : "chenwen"
+            "userName" : "test001"
         },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfY2hlbndlbiIsInN1ZmZpeCI6IkNZMzgiLCJ1c2VySWQiOjM5NzY4NSwiaWF0IjoxNTAxODM1NzMwfQ.mpMyrjOSXHnIOoEL3f_Bd8n6GRNOWGQ_85ha8nyjqvU"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMV90ZXN0MDAxIiwic3VmZml4IjoiQ1kxIiwidXNlcklkIjoxMDMzNDQsImlhdCI6MTUwMjE2OTM0M30.RF-yhj0AfrGlV0sL0Hv4qG8izNW6HB5xHd36d7j1-9o"
     }
 }

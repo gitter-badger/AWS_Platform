@@ -214,6 +214,7 @@ async function gamePlayerBalance(event, context, callback) {
     if(merError) return callback(null, ReHandler.fail(merError));
     if(!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
     userName = `${merchantInfo.suffix}_${userName}`;
+    requestParams.userName = userName;
     let baseModel = {
       fromRole : RoleCodeEnum.Player,
       toRole : RoleCodeEnum.Merchant,
@@ -226,9 +227,11 @@ async function gamePlayerBalance(event, context, callback) {
     //检查玩家点数是否足够 如果是玩家提现才检查，充值不需要
     let userBillModel = new UserBillModel(requestParams);
     let [pError, palyerBalance] = await userBillModel.getBalance(); //获取玩家余额
-    if(pError) return callback(null, ReHandler.fail(action)); 
+    if(pError) return callback(null, ReHandler.fail(pError)); 
     if(action == -1) {
-      if(palyerBalance < +requestParams.amount) return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
+      if(palyerBalance < +requestParams.amount){
+         return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
+      }
     }
     //获取用户信息
     let u = new UserModel();
@@ -240,6 +243,7 @@ async function gamePlayerBalance(event, context, callback) {
       return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
     }
     let merchantObj = {
+      ...baseModel,
       username : merchantInfo.username,
       userId : merchantInfo.userId,
       action : -action,
@@ -260,13 +264,14 @@ async function gamePlayerBalance(event, context, callback) {
        merchantName : merchantInfo.displayName,
        type : action > 0 ? Type.recharge : Type.withdrawals
     })
-
+    userBillModel.setAmount(userBillModel.amount);
     let [saveError] = await userBillModel.save();
     if(saveError) return callback(null, ReHandler.fail(saveError));
     //查账
     let [getError, userSumAmount] = await userBillModel.getBalance();
     if(getError) return callback(null, ReHandler.fail(getError));
-
+    console.log("palyer");
+    console.log(userBillModel);
     //更新余额
     let [updateError] = await u.update({userName},{balance : userSumAmount});
     if(updateError) return callback(null, ReHandler.fail(updateError));
