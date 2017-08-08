@@ -79,19 +79,19 @@ const gameList = async (e, c, cb) => {
   }
   let [err, ret] = [1, 1]
   // 普通游戏列表
-  if (!gameParams.parent || gameParams.parent == RoleCodeEnum['PlatformAdmin'] || gameParams.parent == '01') {
-    [err, ret] = await new GameModel().listGames(gameParams)
-  }
+  // if (!gameParams.parent || gameParams.parent == RoleCodeEnum['PlatformAdmin'] || gameParams.parent == '01') {
+  [err, ret] = await new GameModel().listGames(gameParams)
+  // }
   // 上级用户拥有的游戏列表
-  else {
-    [err, ret] = await new UserModel().queryUserById(gameParams.parent)
-  }
+  // else {
+  // [err, ret] = await new UserModel().queryUserById(gameParams.parent)
+  // }
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   }
-  if (gameParams.parent) {
-    ret = ret.gameList
-  }
+  // if (gameParams.parent) {
+  //   ret = ret.gameList
+  // }
   return ResOK(cb, { ...res, payload: ret })
 }
 
@@ -155,11 +155,21 @@ const gameChangeStatus = async (e, c, cb) => {
  */
 const gameType = async (e, c, cb) => {
   const res = { m: 'gameType' }
-  let gameTypeArr = []
-  for (let item in GameTypeEnum) {
-    gameTypeArr.push(GameTypeEnum[item])
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
   }
-  return ResOK(cb, { ...res, payload: gameTypeArr })
+  // 全部游戏类别
+  if (!inparam.parent || inparam.parent == RoleCodeEnum['PlatformAdmin'] || inparam.parent == '01') {
+    let gameTypeArr = []
+    for (let item in GameTypeEnum) {
+      gameTypeArr.push(GameTypeEnum[item])
+    }
+    return ResOK(cb, { ...res, payload: gameTypeArr })
+  }
+  // 上级游戏类别
+  const [err, ret] = await new UserModel().queryUserById(inparam.parent)
+  return ResOK(cb, { ...res, payload: ret.gameList })
 }
 
 // ==================== 以下为内部方法 ====================
