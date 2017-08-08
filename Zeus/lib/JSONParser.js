@@ -17,11 +17,8 @@ export const JSONParser = (data) => {
   for (let i in ret) {
     if (typeof (ret[i]) == 'string') {
       ret[i] = ret[i].trim()
-      if (ret[i] == 'NULL!') {
+      if (ret[i] == 'NULL!' || ret[i] == '') {
         ret[i] = null
-      }
-      if (ret[i] == '') {
-        return [BizErr.JSONParseErr('不允许空值传入'), 0]
       }
     }
   }
