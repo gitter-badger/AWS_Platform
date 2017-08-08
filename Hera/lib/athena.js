@@ -350,11 +350,13 @@ class AError{
 }
 
 const CODES = {
-    JSON_FORMAT_ERROR : 10000,
-    DB_ERROR : 500
+    JSON_FORMAT_ERROR: 10000,
+    INPARAM_ERROR: 10001,
+    DB_ERROR: 500
 }
 
 const EMSG = {
-    "10000" : "数据错误",
-    "500" : "服务器错误"
+    "10000": "数据错误",
+    "10001": "入参数据不合法",
+    "500": "服务器错误"
 }

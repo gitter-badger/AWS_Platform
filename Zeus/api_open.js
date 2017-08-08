@@ -5,6 +5,7 @@ import {
   Success,
   Fail,
   Codes,
+  Model,
   BizErr
 } from './lib/all'
 
@@ -17,16 +18,26 @@ const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, 
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 async function gameLoginSign(event, context, callback){
+
+  const [tokenErr, token] = await Model.currentToken(event)
+  if (tokenErr) {
+    return ResFail(callback, { ...errRes, err: tokenErr }, tokenErr.code)
+  }
     //json转换
   event = event || {};
   let [parserErr, requestParams] = Util.parseJSON(event.body);
-  if(parserErr) return callback(null, ResErr(parserErr));
+  if(parserErr) return callback(null, ResFail(callback, parserErr));
+  
   //检查参数是否合法
   let [checkAttError, errorParams] = Util.checkProperties([
-      {name : "id", type:"S", min:6, max :12},
       {name : "timestamp", type:"S", min:1},
       {name : "gameId", type:"S", min:1}
-  ], requestParams);
+  ], requestParams); 
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return callback(null, ResFail(callback, checkAttError));
+  } 
+  requestParams.id = token.userId;
   //找到游戏厂商的gameKey
   let gameModel = new GameModel();
   let [error, company] = await gameModel.getCompanyById(requestParams.gameId);
@@ -37,8 +48,10 @@ async function gameLoginSign(event, context, callback){
       return ResFail(callback, BizErr.CompanyNotExistError());
   }
   let gameKey = company.companyKey;
+
+  console.log(requestParams);
   let sign = getSign(gameKey, ["id","timestamp"], requestParams);
-  ResOK(callback, {sign:sign});
+  ResOK(callback, {sign:sign, id: token.userId});
 }
 
 function getSign(secret, args, msg){

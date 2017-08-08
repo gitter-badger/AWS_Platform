@@ -28,7 +28,7 @@ export class PushModel{
     }
     setGameList(gameList){
         gameList = gameList || [];
-        let list = gameList.map((game) => game.gameId);
+        let list = gameList.map((game) => game.code);
         return list;
     }
 }

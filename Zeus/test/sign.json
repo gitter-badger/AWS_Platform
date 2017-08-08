@@ -1,7 +1,19 @@
 
-{"body": {
-    "id" : "plat000001",
-    "timestamp" : 15045747845,
-    "gameId" : "123"
-}
+{
+    "body": {
+        "timestamp" : 15045747845,
+        "gameId" : "7becc5e2-fdb4-4b4f-96f1-ffc04c9f8d83"
+    },
+    "requestContext": {
+        "authorizer": {
+        "username": "Platform_cheney",
+        "parent": "00",
+        "role": "1",
+        "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
+        "principalId": "de1fb483-5307-4ff9-8009-9a04cffee142"
+        },
+        "identity": {
+        "sourceIp": "127.0.0.1"
+        }
+  }
 }

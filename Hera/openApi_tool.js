@@ -30,6 +30,7 @@ const gamePlatform = "NA"
  */
 async function playerBuyProp(event, context, callback){
   //json转换
+  console.log(event);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
@@ -40,7 +41,6 @@ async function playerBuyProp(event, context, callback){
       {name : "amount", type:"N"},
       {name : "kindId", type:"S"}
   ], requestParams);
-
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, ReHandler.fail(checkAttError));
@@ -116,13 +116,13 @@ async function playerBuyProp(event, context, callback){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
   }
 
-
   //查账
   let [oriError, oriSumBalance] = await userBillModel.getBalance();
   if(oriError) {
     return callback(null, ReHandler.fail(oriError));
   }
   userBillModel.originalAmount = oriSumBalance;
+  //保存账单
   let [uSaveErr] = await userBillModel.save();
 
   if(uSaveErr) {
@@ -150,28 +150,17 @@ async function playerBuyProp(event, context, callback){
  * @param {*} callback 
  */
 async function toolList(event, context, callback) {
-
+  console.log(event);
     //json转换
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
-  //检查参数是否合法
-  let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userId", type:"N"}
-  ], requestParams);
-  if(checkAttError){
-    Object.assign(checkAttError, {params: errorParams});
-    return callback(null, ReHandler.fail(checkAttError));
-  } 
-  let userId = +requestParams.userId;
-
   //验证token
   let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
-  if(err ||  !userInfo || !Object.is(userId, userInfo.userId)){
+  if(err ||  !userInfo ){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
   let toolModel = new ToolModel();
   let [toolErr, toolList] = await toolModel.scan();
-
   if(toolErr) {
       return callback(null, ReHandler.fail(toolErr));
   }

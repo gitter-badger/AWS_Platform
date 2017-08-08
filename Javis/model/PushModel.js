@@ -25,17 +25,14 @@ export class PushModel{
         const proId = 9;  //协议
         return pushUserInfo(this, host, port, proId);
     }
-    static pushUserBalance (obj){
-        const port = 20003;
-        const proId = 9;  //协议
-        return pushUserInfo(obj, host, port, proId);
-    }
     setGameList(gameList){
         gameList = gameList || [];
         let list = gameList.map((game) => game.gameId);
         return list;
     }
-    pushUserBalance() {
-
+    pushUserBalance(obj) {
+        const port = 20003;
+        const proId = 9;  //协议
+        return pushUserInfo(obj, host, port, proId);
     }
 }

@@ -1,14 +1,15 @@
-import { Success, Fail, Codes, Tables, JwtVerify, JSONParser } from './lib/all'
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+// import { Success, Fail, Codes, Tables, JwtVerify, JSONParser } from './lib/all'
 
-import {PlatformUserModel} from "./model/PlatformUserModel"
+// import {PlatformUserModel} from "./model/PlatformUserModel"
 
-import {PushModel} from "./model/PushModel"
+// import {PushModel} from "./model/PushModel"
 
-import {UserModel} from "./model/UserModel"
 
-import {UserBillModel} from "./model/UserBillModel"
+// import {UserModel} from "./model/UserModel"
+
+// import {UserBillModel} from "./model/UserBillModel"
+
+// import {MSNModel} from "./model/MSNModel"
 
 import {TcpUtil} from "./lib/TcpUtil"
 
@@ -18,49 +19,65 @@ const userTrigger = async (e, c, cb) => {
     console.info(e.Records[0].dynamodb);
    
     let record = e.Records[0].dynamodb.Keys;
+    console.info(record.userId);
     let userId = record.userId.S;
-    let userModel = new PlatformUserModel();
-    let [error, userInfo] = await userModel.get({userId}, [], "UserIdIndex");
-    if(error) {
-        return console.log(error);
-    }
-    if(!userInfo) return;
-    
-    let pushModel = new PushModel({
-        username : userInfo.username,
-        id :userInfo.userId,
-        role : userInfo.role,
-        headPic : "",
-        parentId : userInfo.parent,
-        msn : userInfo.msn,
-        gameList : userInfo.gameList || [],
-        nickName : userInfo.displayName || ""
-    })
-    let [er] = await pushModel.pushMerchant();
-    if(er) {
-        console.log("推送商户发生错误");
-        console.error(er);
-    }else {
-        console.log("推送商户成功");
-    }
+    console.info(userId);
+    // let userModel = new PlatformUserModel();
+    // let [error, userInfo] = await userModel.get({userId}, [], "UserIdIndex");
+    // if(error) {
+    //     return console.info(error);
+    // }
+    // if(!userInfo) return;
+    // let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
+
+    // if(!msnInfo) return;
+    // let pushModel = new PushModel({
+    //     username : userInfo.username,
+    //     userId :userInfo.userId,
+    //     role : userInfo.role,
+    //     headPic : "",
+    //     parent : userInfo.parent,
+    //     msn : msnInfo.msn,
+    //     gameList : userInfo.gameList || [],
+    //     displayName : userInfo.displayName || ""
+    // })
+    // let [er] = await pushModel.pushMerchant();
+    // if(er) {
+    //     console.info("推送商户发生错误");
+    //     console.info(er);
+    // }else {
+    //     console.info("推送商户成功");
+    // }
 }
 
 const playerBalanceTrigger = async(e, c , cb) =>{
-    let record = e.Records[0].dynamodb.keys;
-    let userId = +record.userId.N;
-    let gameId = record.kindId;
-    let userBillModel = new UserBillModel();
-    let [error, balance] = userBillModel.getBalanceByUid(userId);
-    balance = balance || 0;
-    if(gameId == -1) {
-        let pushModel = newPushModel({
-            userId : userId,
-            balance : balance
-        })
-        pushModel.pushUserBalance();
-    }
+    // let record = e.Records[0].dynamodb.keys;
+    // let userId = +record.userId.N;
+    // let gameId = record.kindId;
+    // let userBillModel = new UserBillModel();
+    // let [error, balance] = userBillModel.getBalanceByUid(userId);
+    // balance = balance || 0;
+    // if(gameId == -1) {
+    //     let pushModel = new PushModel({
+    //         userId : userId,
+    //         balance : balance
+    //     })
+    //     pushModel.pushUserBalance();
+    // }
     
 }
+
+// class DBUtil{
+//     static findPlatfromUserByUid(uid){
+
+//     }
+//     static findPlayerByUid(uid){
+
+//     }
+//     static findMsnByUid(uid) {
+
+//     }
+// }
 
 export {
     userTrigger,                     // 用户表触发器

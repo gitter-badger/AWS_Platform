@@ -1,9 +1,9 @@
 var net = require('net');
 
-import {
-  BizErr,
-  Codes
-} from './all'
+// import {
+//   BizErr,
+//   Codes
+// } from './all'
 
 export const pushUserInfo =  (body, host, port, proId) => {
     let client = new net.Socket();
@@ -18,7 +18,7 @@ export const pushUserInfo =  (body, host, port, proId) => {
             console.log(data);
             // console.log(data.readUInt32LE(0,4).toString(10));
             // console.log(data.readUInt32LE(4,8).toString(10));
-            // let code = +data.readUInt32LE(8,12).toString(10);
+            let code = +data.readUInt32LE(8,12).toString(10);
             // 完全关闭连接
             client.destroy();
             console.log("code");

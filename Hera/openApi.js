@@ -283,6 +283,7 @@ async function gamePlayerBalance(event, context, callback) {
  * @param {*} callback 
  */
 async function gamePlayerA3Login(event, context, callback) {
+  console.log(event);
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
 
@@ -390,6 +391,7 @@ async function getA3GamePlayerBalance(event, context, callback) {
  * @param {*} callback 
  */
 async function playerRecordValidate(event, context, callback){
+  console.log(event);
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
@@ -407,9 +409,7 @@ async function playerRecordValidate(event, context, callback){
   }
   let userId = records[0].userId;
   let gameId = records[0].gameId;
-  if(+userInfo.userId != +userId) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
-  }
+ 
   let userRecordModel = new UserRecordModel({records});
   let [validErr, valid, settlementInfo] = userRecordModel.validateRecords(records);
   if(validErr) {
@@ -526,7 +526,7 @@ async function joinGame(event, context, callback){
   }
   //判断是否正在游戏中
   let game = userModel.isGames(userObj);
-  if(gameing) {
+  if(game) {
       return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
   }
   //修改游戏状态（不能进行转账操作）

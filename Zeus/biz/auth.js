@@ -112,6 +112,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (initPoints > balance) {
     return [BizErr.BalanceErr(), 0]
   }
+   
   // 保存创建用户
   const User = {
     ...CheckUser,
@@ -120,6 +121,12 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     parentSuffix: parentUser.suffix,
     points: Model.NumberValue
   }
+  //推送给游戏服务器(A3)
+  let pushModel = new PushModel(User);
+  let [pushErr, data] = await pushModel.push();
+  // if(pushErr) {
+  //   return [pushErr, 0]
+  // }
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]

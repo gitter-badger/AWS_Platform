@@ -20,6 +20,7 @@ export const pushUserInfo =  (body, host, port, proId) => {
             let code = +data.readUInt32LE(8,12).toString(10);
             // 完全关闭连接
             client.destroy();
+            console.log("code:"+ code);
             if(code != Codes.OK) {
                 reslove([BizErr.PushMerchantError(), {code:code}]);
             }else {

@@ -15,23 +15,24 @@
     }
   },
   "body": {
-      "username": "cmerchant355",
+      "username": "cmerchant369",
+      "displayName" : "chen25",
+      "msn":"78",
+      "suffix":"CY78",
       "password": "chenwenGG123",
       "role": "100",
-      "adminName": "cheneymerc",
-      "merchantName": "cheneymmerc",
-      "displayName" : "chen1",
+      "adminName": "cheneymerg",
+      "merchantName": "cheneymmerca",
+      
       "parent": "1915ebeb-290c-48cc-af48-e90bdecf11d9",
       "hostName":"负责人一号",
       "hostContact":"18780004427",
-      "msn":"93",
       "rate":"90",
-      "suffix":"CY63",
       "points":"1000",
       "limit":"5",
       "gameList" : [
         {
-          "gameId" : 30000
+          "code" : 30000
         }
       ]
   }

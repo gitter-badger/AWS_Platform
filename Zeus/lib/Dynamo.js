@@ -25,7 +25,7 @@ export const Store$ = async (action, params) => {
 // table names
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformBill = 'ZeusPlatformBill'
-const ZeusPlatformGame = 'ZeusPlatformGame'
+const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'

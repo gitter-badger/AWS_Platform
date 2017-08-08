@@ -32,7 +32,7 @@ provider:
             - Ref: AWS::Region
             - ":"
             - Ref: AWS::AccountId
-            - ":table/Zeus*"
+            - ":table/*"
 
 functions:
   tokenAuth:
