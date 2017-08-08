@@ -402,12 +402,34 @@ async function playerRecordValidate(event, context, callback){
   if(err ||  !userInfo){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
+  let userId = userInfo.userId;
+  console.log("userId:"+ userId);
+  //获取用户数据
+  let [uError, userModel] = await new UserModel().get({userId:+userId},[], "userIdIndex");
+  if(uError) {
+    return callback(null, ReHandler.fail(uError));
+  }
+  if(!userModel) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+  }
 
   let records = requestParams.list || [];
-  if(records.length == 0) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.notHaveRecord)));
+  if(records.length == 0) { //如果记录为null
+    //解除玩家状态
+    let [gameError] = await new UserModel().updateGameState(userModel.userName, PaymentState.allow);
+    if(gameError) {
+      return callback(null, ReHandler.fail(gameError));
+    }
+    //获取玩家余额
+    let [playerErr, b] = await new UserBillModel().getBalanceByUid(userId);
+    if(playerErr) {
+      return callback(null, ReHandler.fail(playerErr));
+    }
+    return callback(null, ReHandler.success({
+      data :{balance : userSumAmount}
+    }));
   }
-  let userId = records[0].userId;
+
   let gameId = records[0].gameId;
  
   let userRecordModel = new UserRecordModel({records});
@@ -420,14 +442,7 @@ async function playerRecordValidate(event, context, callback){
   }
   let income = settlementInfo;
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
-  //获取用户数据
-  let [uError, userModel] = await new UserModel().get({userId:+userId},[], "userIdIndex");
-  if(uError) {
-    return callback(null, ReHandler.fail(uError));
-  }
-  if(!userModel) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
-  }
+  
   let merchantId = userModel.buId;
   let [meError, merchantModel] = await new MerchantModel().findById(merchantId);
   if(meError) {

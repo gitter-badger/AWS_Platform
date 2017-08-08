@@ -1,9 +1,9 @@
 var net = require('net');
 
-// import {
-//   BizErr,
-//   Codes
-// } from './all'
+import {
+  BizErr,
+  Codes
+} from './all'
 
 export const pushUserInfo =  (body, host, port, proId) => {
     let client = new net.Socket();
