@@ -1,91 +1,94 @@
-let  athena  = require("../lib/athena");
-let {RoleCodeEnum} = require("../lib/Consts");
-import {TABLE_NAMES} from "../config";
+import {
+    Tables,
+    Store$,
+    Codes,
+    BizErr,
+    Trim,
+    Empty,
+    Model,
+    Keys,
+    Pick,
+    Omit,
+    StatusEnum,
+    RoleCodeEnum,
+    RoleModels
+} from '../lib/all'
 
-export const State = {
-    normal : 1,  //正常,
-    forzen : 0 //冻结
-}
-const SexEnum = {
-    man : 1,
-    woman : 2
-}
-export const PaymentState = {  //是否可以进行转账操作
-    allow :1 ,//允许
-    forbid : 2 //禁止（正在游戏中不能转账）
-}
-export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState} = {}) {
-        super(TABLE_NAMES.TABLE_USER);
-        this.userName = userName;
-        this.userPwd = userPwd;
-        this.buId = +buId;
-        this.role = RoleCodeEnum.Player;
-        this.state = state || State.normal;
-        this.updateAt = Date.now();
-        this.createAt = Date.now();
-        this.merchantName = merchantName;
-        this.balance = 0;
-        this.msn = msn;
-        this.payState = paymentState || PaymentState.allow;
+import { BaseModel } from './BaseModel'
+
+export class UserModel extends BaseModel {
+    constructor() {
+        super()
+        // 设置表名
+        this.params = {
+            TableName: Tables.ZeusPlatformUser,
+        }
+        // 设置对象属性
+        this.item = {
+            ...this.baseitem,
+            role: Model.StringValue,
+            userId: Model.StringValue
+        }
     }
-
+    /**
+     * 根据用户ID查询
+     * @param {*} userId 用户ID 
+     */
+    async queryUserById(userId) {
+        const [err, ret] = await this.query({
+            IndexName: 'UserIdIndex',
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeValues: {
+                ':userId': userId
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length - 1 != 0) {
+            return [BizErr.UserNotFoundErr(), 0]
+        }
+        return [0, ret.Items[0]]
+    }
 
     /**
-     * 判断用户是否存在
-     * @param {*} userName 
+     * 根据角色和带前缀的用户名查询唯一用户
+     * @param {*} role 
+     * @param {*} username 
      */
-    isExist(userName) {
-        return super.isExist({userName});
-    }
-    isGames(user) {
-        return user.payState == PaymentState.forbid;
-    }
-    updateGameState(userName, state){
-        return this.update({userName}, {payState: state})
-    }
-    async save(len, num){
-        len = len || 6;
-        num = num || -1;
-        this.userId = Util.userId(len);
-        let [err, userInfo] = await this.get({userId:this.userId},[], "userIdIndex");
-        num ++;
-        if(err) return [err, 0];
-        if(userInfo) { //重新找
-            if(num%2 ==0) {
-                num = 0;
-                len ++;
+    async getUserByName(role, username) {
+        const [queryErr, queryRet] = await this.query({
+            IndexName: 'RoleUsernameIndex',
+            KeyConditionExpression: '#role = :role and #username = :username',
+            ExpressionAttributeNames: {
+                '#username': 'username',
+                '#role': 'role'
+            },
+            ExpressionAttributeValues: {
+                ':username': username,
+                ':role': role
             }
-            return this.save(len, num);
-        }else {
-            return super.save();
-        }
-    }
-    list(buId){
-        let scanParams = {
-            TableName : this.tableName,
-            ReturnValues : ["userId", "userName","buId","updateAt","merchantName","balance", "msn","state"]
-        }
-        let FilterExpression = "";
-        let ExpressionAttributeValues;
-        if(buId){
-            FilterExpression = "buId = :buId";
-            ExpressionAttributeValues = {
-                ":buId" : buId
-            }
-            Object.assign(scanParams,{FilterExpression, ExpressionAttributeValues});
-        }
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanParams).then((result)=>{
-                return reslove([null, result.Items]);
-            }).catch((error) => {
-                return reslove([error, 0]);
-            })
         })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const User = queryRet.Items[0]
+        if (!User) {
+            return [BizErr.UserNotFoundErr(), 0]
+        }
+        return [0, User]
     }
-    vertifyPassword(password){
-        this.userPwd = Util.sha256(this.userPwd);
-        return Object.is(password, this.userPwd);
-    }
-    
+
+    // const params = {
+    //     ...this.params,
+    //     Key: {
+    //         'role': '100',
+    //         'userId': '25f76130-e04b-4b9f-9a20-1836a75fe419'
+    //     },
+    //     UpdateExpression: "SET contractPeriod = :contractPeriod",
+    //     ExpressionAttributeValues: {
+    //         ':contractPeriod': [new Date().getTime() - 10000000, new Date().getTime() + 10000000]
+    //     }
+    // }
+    // await this.db$('update', params)
 }
