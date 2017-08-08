@@ -30,14 +30,15 @@ async function gameLoginSign(event, context, callback){
   
   //检查参数是否合法
   let [checkAttError, errorParams] = Util.checkProperties([
-      {name : "timestamp", type:"S", min:1},
       {name : "gameId", type:"S", min:1}
   ], requestParams); 
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, ResFail(callback, checkAttError));
   } 
+  let timestamp = Date.now();
   requestParams.id = token.userId;
+  requestParams.timestamp = timestamp;
   //找到游戏厂商的gameKey
   let gameModel = new GameModel();
   let [error, company] = await gameModel.getCompanyById(requestParams.gameId);
@@ -51,7 +52,7 @@ async function gameLoginSign(event, context, callback){
 
   console.log(requestParams);
   let sign = getSign(gameKey, ["id","timestamp"], requestParams);
-  ResOK(callback, {sign:sign, id: token.userId});
+  ResOK(callback, {data:{sign:sign, id: token.userId, timestamp}});
 }
 
 function getSign(secret, args, msg){
