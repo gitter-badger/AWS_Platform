@@ -243,7 +243,7 @@ class Page {
 }
 
 export const RegEnum = {
-    SUFFIX: /^[a-zA-Z]\w{2,6}$/,
+    SUFFIX: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}$/,
 
     DISPLAYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{4,10}$/,
     USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,

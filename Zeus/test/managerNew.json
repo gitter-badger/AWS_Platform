@@ -4,11 +4,11 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_cheney",
+      "username": "Platform_NAtest",
       "parent": "00",
       "role": "1",
-      "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
-      "principalId": "de1fb483-5307-4ff9-8009-9a04cffee142"
+      "userId": "fce1c8d7-c0cc-4eb3-aee1-b30050f34fb3",
+      "principalId": "fce1c8d7-c0cc-4eb3-aee1-b30050f34fb3"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
@@ -16,27 +16,27 @@
   },
   "body": {
     "role": "10",
-    "suffix": "SKT",
-    "displayName": "SKT001",
-    "rate": "12.3",
-    "managerEmail": "SKT@SKT.com",
+    "suffix": "A1",
+    "displayName": "Admin12",
+    "rate": "100",
+    "managerEmail": "test@qq.com",
     "parent": "",
-    "remark": "SKT直属商户",
-    "hostName": "SKTasd",
-    "hostContact": "13888888888",
+    "remark": "",
+    "hostName": "这是负责人",
+    "hostContact": "这是联系方式",
     "contractPeriod": 0,
     "isforever": true,
-    "points": "120000",
+    "points": "1000000",
     "limit": "10",
     "gameList": [
       "棋牌游戏",
       "电子游戏",
       "真人视讯"
     ],
-    "username": "SKTaaa123",
-    "password": "fJrS7SSK?u_T",
-    "adminName": "asdasdas",
-    "adminEmail": "asdasda@fasa.fasf",
-    "adminContact": "13000000000"
+    "username": "Admin12啊",
+    "password": "_EtRSs?X3ZUJ",
+    "adminName": "真实姓名嘛",
+    "adminEmail": "test@qq.com",
+    "adminContact": "这是联系方式"
   }
 }

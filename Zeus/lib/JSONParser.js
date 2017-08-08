@@ -17,7 +17,7 @@ export const JSONParser = (data) => {
   for (let i in ret) {
     if (typeof (ret[i]) == 'string') {
       ret[i] = ret[i].trim()
-      if (ret[i] == 'NULL!') {
+      if (ret[i] == 'NULL!' || ret[i] == '') {
         ret[i] = null
       }
     }

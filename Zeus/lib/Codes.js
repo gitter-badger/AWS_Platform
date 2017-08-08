@@ -26,6 +26,7 @@ export const Codes = {
   UnAuth: '44002',
   ParamMiss: '44001',
   TokenError: '44000',
+  RoleTokenError: '44013',
   UsernameTooLong: '40015',
   UsernameTooShort: '40016',
   PasswordError: '40017',
@@ -97,6 +98,9 @@ export const BizErr = {
   },
   TokenErr: (errMsg = '身份令牌错误') => {
     return { code: Codes.TokenError, msg: errMsg }
+  },
+  RoleTokenErr: (errMsg = '角色身份错误') => {
+    return { code: Codes.RoleTokenError, msg: errMsg }
   },
   MsnExistErr: (errMsg = '线路号已存在') => {
     return { code: Codes.MsnExistError, msg: errMsg }

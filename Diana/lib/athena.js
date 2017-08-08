@@ -247,7 +247,7 @@ export const RegEnum = {
     URL: /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/,
     IP: /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/,
 
-    SUFFIX: /^[a-zA-Z]\w{2,6}$/,
+    SUFFIX: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}$/,
 
     COMPANYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$/,
     COMPANYDESC: /^[\u4E00-\u9FA5A-Za-z0-9]{2,200}$/,

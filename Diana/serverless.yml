@@ -113,7 +113,7 @@ functions:
       -
         http:
           path: gameType
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是游戏厂商接口服务 ====================
