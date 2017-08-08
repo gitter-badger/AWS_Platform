@@ -18,7 +18,7 @@ const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformRole = 'ZeusPlatformRole'
 const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
-const ZeusPlatformGame = 'ZeusPlatformGame'
+const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 
 export const Tables = {
@@ -55,7 +55,6 @@ export const Model = {
     if(!e.headers.Authorization) {
       return [0, e.requestContext.authorizer]
     }else {
-      console.log("111111111111111111111111");
       return [0,e.headers.Authorization.split(" ")]
     }
   },

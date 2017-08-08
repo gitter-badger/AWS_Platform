@@ -10,7 +10,7 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark} = {}) {
+    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
         this.userId = +userId
@@ -33,6 +33,8 @@ export class UserBillModel extends athena.BaseModel {
         this.type = type;
         this.remark = remark || Model.StringValue;
         this.setAmount(amount);
+        this.typeName = typeName;
+        this.gameType = gameType;
     }
     setAmount(amount){
         if(this.action ==-1) {

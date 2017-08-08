@@ -1,6 +1,5 @@
 let {RoleCodeEnum} = require("../lib/Consts");
 
-import { pushUserInfo } from "../lib/TcpUtil"
 
 import {BaseModel} from "../lib/athena"
 
@@ -9,10 +8,6 @@ import {
 } from '../lib/all'
 
 
-const State = {
-    normal : 1,  //正常,
-    forzen : 2 //冻结
-}
 
 export class GameModel extends BaseModel{
     constructor({gameId} = {}) {
@@ -47,6 +42,10 @@ export class GameModel extends BaseModel{
         }
         let company = game.company;
         return [null, company];
+    }
+    async findByKindId(kindId){
+        let [gameErr, game] = await this.get({kindId}, [], "KindIdIndex");
+        return [gameErr, game]
     }
     async findSingleByType(gameType){
         console.log("gameType: "+gameType);

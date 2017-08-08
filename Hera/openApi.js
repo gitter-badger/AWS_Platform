@@ -16,6 +16,8 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MSNModel} from "./model/MSNModel";
 
+import {GameModel} from "./model/GameModel";
+
 import {MerchantBillModel,Action} from "./model/MerchantBillModel";
 
 import {UserRecordModel} from "./model/UserRecordModel";
@@ -222,7 +224,9 @@ async function gamePlayerBalance(event, context, callback) {
       toUser : merchantInfo.username,
       amount : +requestParams.amount,
       operator : userName,
-      remark : action > 0 ? "玩家从中心钱包转出" : "玩家转入中心钱包"
+      remark : " ",
+      gameType : -1,
+      typeName : action > 0 ? "中心钱包转入" : "中心钱包转出"
     }
     //检查玩家点数是否足够 如果是玩家提现才检查，充值不需要
     let userBillModel = new UserBillModel(requestParams);
@@ -435,8 +439,16 @@ async function playerRecordValidate(event, context, callback){
     }));
   }
 
-  let gameId = records[0].gameId;
- 
+  let gameId = records[0].gameId+"" || "30000";
+
+  let [gError, gameInfo] = await new GameModel({gameId}).findByKindId(gameId);
+  if(gError) {
+    return callback(null, ReHandler.fail(gError));
+  }
+  if(!gameInfo) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
+  }
+  let typeName = gameInfo.gameName;
   let userRecordModel = new UserRecordModel({records});
   let [validErr, valid, settlementInfo] = userRecordModel.validateRecords(records);
   if(validErr) {
@@ -469,12 +481,13 @@ async function playerRecordValidate(event, context, callback){
     operator : userModel.userName,
     merchantName : merchantModel.displayName,
     kindId : gameId,
+    gameType : gameInfo.gameType,
     msn : merchantModel.msn,
     type : Type.gameSettlement,
-    remark : "玩家游戏结算"
+    typeName : typeName,
+    remark : "游戏结算"
   }
-
-
+  
   //玩家点数发生变化
   let userBillModel = new UserBillModel({
     userId : +userModel.userId,

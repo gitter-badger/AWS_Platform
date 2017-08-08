@@ -17,8 +17,8 @@ import {TcpUtil} from "./lib/TcpUtil"
 
 
 const userTrigger = async (e, c, cb) => {
-    // console.info(e.Records)
-    // console.info(e.Records[0].dynamodb)
+    console.info(e.Records)
+    console.info(e.Records[0].dynamodb)
     let record = e.Records[0].dynamodb.Keys;
     console.info(record.userId);
     let userId = record.userId.S;
@@ -28,15 +28,14 @@ const userTrigger = async (e, c, cb) => {
     if(error) {
         return console.info(error);
     }
+    console.log("22222222222222");
     if(!userInfo){
         console.info("没有找到用户信息")
         return;
     }
+    console.log("333333333333");
     let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
-    if(!msnInfo){
-        console.info("没有找到线路商信息");
-        return;
-    }
+    msnInfo = msnInfo || {msn:"-1"};
     let pushModel = new PushModel({
         username : userInfo.username,
         userId :userInfo.userId,

@@ -24,6 +24,7 @@ export const CODES = {
     },
     toolNotExist : 13000,  //道具不存在
     amountError : 13001,   //金额不正确
+    gameNotExist : 13002,  //游戏不存在
 }
 
 const errorMessage = {
@@ -45,7 +46,8 @@ const errorMessage = {
   "notSingleUser" : "不是同一个用户提交",
   "12004" : "记录不存在",
   "13000" : "道具不存在",
-  "13001" : "金额不正确"
+  "13001" : "金额不正确",
+  "13002" : "游戏不存在"
 }
 
 

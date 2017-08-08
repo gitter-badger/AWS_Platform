@@ -1,9 +1,9 @@
 {
-    "body": "{ \"amount\":\"200000\",  \"action\":\"1\", \"buId\":\"493280\", \"buId\":\"493280\"}",
+    "body": "{ \"amount\":\"20000\",  \"action\":\"1\", \"buId\":\"708642\"}",
     "pathParameters" : {
-            "userName" : "test001"
+            "userName" : "day003"
         },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMV90ZXN0MDAxIiwic3VmZml4IjoiQ1kxIiwidXNlcklkIjoxMDMzNDQsImlhdCI6MTUwMjE2OTM0M30.RF-yhj0AfrGlV0sL0Hv4qG8izNW6HB5xHd36d7j1-9o"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZX2RheTAwMyIsInN1ZmZpeCI6IkNZIiwidXNlcklkIjo2ODEyNzksImlhdCI6MTUwMjE4Njk1N30.nq95xxzx7OXv4k1IxDW5m8SLdnStMYoCOryeLjM8kZE"
     }
 }

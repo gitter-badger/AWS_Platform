@@ -1,14 +1,14 @@
 
 {
     "body": {
-        "gameId" : "3d38630f-f3d5-4b98-8312-b5694596ae8c"
+        "gameType" : "10000"
     },
     "requestContext": {
         "authorizer": {
         "username": "Platform_cheney",
         "parent": "00",
-        "role": "1",
-        "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
+        "role": "100",
+        "userId": "552102dd-5ac7-46a4-b8bc-39b9e68a25a9",
         "principalId": "de1fb483-5307-4ff9-8009-9a04cffee142"
         },
         "identity": {

@@ -157,6 +157,10 @@ export async function gamePlayerForzen(event, context, cb){
     return cb(null, ReHandler.fail(checkAttError));
   }
   var userModel = new UserModel();
+  let [getUserRrror, us] = await userModel.get({userName});
+  if(getUserRrror || !us) {
+    return ResOK(cb, {state});
+  }
   let [err] = await userModel.update({userName},{state})
   if(err) {
       return ResFail(cb, err);
@@ -186,7 +190,7 @@ export async function batchForzen(event, context, cb){
   if(parserErr) {
       return ResFail(cb, parserErr);
   }
-   //检查参数是否合法
+  //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "state", type:"N"},
       {name : "names", type:"J"},
@@ -201,6 +205,8 @@ export async function batchForzen(event, context, cb){
   for(let i = 0; i < names.length; i++){
     let userName = names[i];
     let userModel = new UserModel();
+    let [getUserRrror, us] = await userModel.get({userName});
+    if(getUserRrror || !us) continue;
     let [err] = await userModel.update({userName},{state})
     if(err) {
       return ResFail(cb, err);
