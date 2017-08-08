@@ -20,6 +20,9 @@ export const JSONParser = (data) => {
       if (ret[i] == 'NULL!') {
         ret[i] = null
       }
+      if (ret[i] == '') {
+        return [BizErr.JSONParseErr('不允许空值传入'), 0]
+      }
     }
   }
   return [0, ret]
