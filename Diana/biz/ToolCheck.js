@@ -40,7 +40,7 @@ export class ToolCheck {
         }
 
         // 数据类型处理
-        inparam.toolId = parseInt(inparam.toolId)
+        inparam.toolId = inparam.toolId.toString()
         inparam.status = parseInt(inparam.status)
 
         return [checkAttError, errorParams]

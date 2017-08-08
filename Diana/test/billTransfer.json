@@ -15,10 +15,10 @@
         }
     },
     "body": {
-        "fromUserId": "de1fb483-5307-4ff9-8009-9a04cffee142",
-        "toRole": "100",
-        "toUser": "CY63_cmerchant355",
-        "amount": "500.00",
-        "remark": "测试"
+        "fromUserId": "f1e6f996-0b74-4a2c-a240-853b59074da3",
+        "toRole": "10",
+        "toUser": "Platform_TGXtest002",
+        "amount": "1111",
+        "remark": ""
     }
 }

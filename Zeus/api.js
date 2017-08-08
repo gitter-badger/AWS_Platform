@@ -470,13 +470,14 @@ export {
   adminList,                    // 管理员列表
   adminCenter,                  // 管理员个人中心
   userNew,                      // 创建新用户
-  userGrabToken,                // 使用apiKey登录获取用户信息
   userChangeStatus,             // 变更用户状态
   childList,                    // 下级用户列表
+  
   checkUserExist,               // 检查用户是否被占用
   checkSuffixExist,             // 检查前缀是否被占用
   checkNickExist,               // 检查昵称是否被占用
 
+  userGrabToken,                // 使用apiKey登录获取用户信息
   updatePassword,               // 更新密码
   randomPassword                // 随机密码
 }

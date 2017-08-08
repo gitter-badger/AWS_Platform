@@ -83,9 +83,18 @@ export class GameModel extends BaseModel {
      * @param {*} pathParams 
      */
     async listGames(pathParams) {
+        // 如果类型参数为空，默认查询所有类型
+        if (!pathParams.gameType) {
+            pathParams.gameType = ''
+            for (let item in GameTypeEnum) {
+                pathParams.gameType += (item + ',')
+            }
+        }
+        pathParams.gameType = pathParams.gameType.substr(0, pathParams.gameType.length - 1)
+        // 分割类型
         const inputTypes = pathParams.gameType.split(',')
         const gameTypes = _.filter(inputTypes, (type) => {
-            return !!GameTypeEnum[type]
+            return !!GameTypeEnum[type].code
         })
         if (gameTypes.length === 0) {
             return [BizErr.ParamErr('game type is missing'), 0]
@@ -94,12 +103,12 @@ export class GameModel extends BaseModel {
         let ranges = _.map(gameTypes, (t, index) => {
             return `gameType = :t${index}`
         }).join(' OR ')
-        ranges += ' AND gameStatus <> :gameStatus'
+        // ranges += ' AND gameStatus <> :gameStatus'
         const values = _.reduce(gameTypes, (result, t, index) => {
             result[`:t${index}`] = t
             return result
         }, {})
-        values[':gameStatus'] = 0
+        // values[':gameStatus'] = 0
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,

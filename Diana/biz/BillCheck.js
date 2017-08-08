@@ -1,3 +1,4 @@
+import { Model } from '../lib/all'
 const athena = require("../lib/athena")
 export class BillCheck {
     /**
@@ -12,7 +13,7 @@ export class BillCheck {
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             return [checkAttError, errorParams]
         }
 

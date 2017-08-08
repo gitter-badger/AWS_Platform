@@ -8,7 +8,7 @@ export class GameCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "gameName", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYNAME },
             { name: "gameRecommend", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYDESC },
-            { name: "gameType", type: "N", min: 0, max: 2 },
+            { name: "gameType", type: "N", min: 10000, max: 90000 },
             { name: "ip", type: "REG", min: null, max: null, equal: athena.RegEnum.IP },
             { name: "port", type: "N", min: 1, max: 65535 },
             { name: "kindId", type: "N", min: 10000, max: 99999 },
