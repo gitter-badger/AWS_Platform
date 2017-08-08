@@ -4,24 +4,65 @@ const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, 
 
 import {PlatformUserModel} from "./model/PlatformUserModel"
 
+import {PushModel} from "./model/PushModel"
+
+import {UserModel} from "./model/UserModel"
+
+import {UserBillModel} from "./model/UserBillModel"
+
+import {TcpUtil} from "./lib/TcpUtil"
+
+
 const userTrigger = async (e, c, cb) => {
     console.info(e.Records);
     console.info(e.Records[0].dynamodb);
-    // console.info('test event')
-    // console.info(e)
-    // console.info('test context')
-    // console.info(c)
-    // console.log("xiangxi");
-    // console.log(JSON.stringify(e));
-    // console.log(JSON.stringify(c));
-    // console.info('test dynamodb')
-    // console.info(JSON.stringify(e.dynamodb));
-    let record = e.Records[0].dynamodb.keys;
+   
+    let record = e.Records[0].dynamodb.Keys;
     let userId = record.userId.S;
     let userModel = new PlatformUserModel();
-    let [error, userInfo] = userModel.get({userId});
+    let [error, userInfo] = await userModel.get({userId}, [], "UserIdIndex");
+    if(error) {
+        return console.log(error);
+    }
+    if(!userInfo) return;
+    
+    let pushModel = new PushModel({
+        username : userInfo.username,
+        id :userInfo.userId,
+        role : userInfo.role,
+        headPic : "",
+        parentId : userInfo.parent,
+        msn : userInfo.msn,
+        gameList : userInfo.gameList || [],
+        nickName : userInfo.displayName || ""
+    })
+    let [er] = await pushModel.pushMerchant();
+    if(er) {
+        console.log("推送商户发生错误");
+        console.error(er);
+    }else {
+        console.log("推送商户成功");
+    }
+}
+
+const playerBalanceTrigger = async(e, c , cb) =>{
+    let record = e.Records[0].dynamodb.keys;
+    let userId = +record.userId.N;
+    let gameId = record.kindId;
+    let userBillModel = new UserBillModel();
+    let [error, balance] = userBillModel.getBalanceByUid(userId);
+    balance = balance || 0;
+    if(gameId == -1) {
+        let pushModel = newPushModel({
+            userId : userId,
+            balance : balance
+        })
+        pushModel.pushUserBalance();
+    }
+    
 }
 
 export {
-    userTrigger                    // 用户表触发器
+    userTrigger,                     // 用户表触发器
+    playerBalanceTrigger
 }

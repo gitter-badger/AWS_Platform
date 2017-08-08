@@ -331,11 +331,7 @@ async function gamePlayerA3Login(event, context, callback) {
   if(bError) {
     return callback(null, ReHandler.fail(updateError));
   }
-  //修改游戏状态（不能进行转账操作）
-  let [upErr] = await user.update({userName:userName},{payState:PaymentState.forbid});
-  if(upErr) {
-    return callback(null, ReHandler.fail(upErr));
-  }
+  
   let callObj = {
     data : {
       token : loginToken,
@@ -422,7 +418,7 @@ async function playerRecordValidate(event, context, callback){
   if(!valid) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.billNotMatchErr)));
   }
-  let {depositAmount, takeAmount, income} = settlementInfo;
+  let income = settlementInfo;
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
   //获取用户数据
   let [uError, userModel] = await new UserModel().get({userId:+userId},[], "userIdIndex");
@@ -518,6 +514,7 @@ async function joinGame(event, context, callback){
   if(err ||  !userInfo || !Object.is(userId, userInfo.userId)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
+
   //更改状态
   let userModel = new UserModel();
   let [usergetError, userObj] = await userModel.get({userId},[], "userIdIndex");
@@ -527,7 +524,12 @@ async function joinGame(event, context, callback){
   if(!userObj) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
-
+  //判断是否正在游戏中
+  let game = userModel.isGames(userObj);
+  if(gameing) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
+  }
+  //修改游戏状态（不能进行转账操作）
   let [updateError] = await userModel.updateGameState(userObj.userName, PaymentState.forbid);
   if(updateError) {
     return callback(null, ReHandler.fail(updateError));

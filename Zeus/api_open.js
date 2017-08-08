@@ -36,7 +36,7 @@ async function gameLoginSign(event, context, callback){
   if(!company) {
       return ResFail(callback, BizErr.CompanyNotExistError());
   }
-  let gameKey = company.gameKey;
+  let gameKey = company.companyKey;
   let sign = getSign(gameKey, ["id","timestamp"], requestParams);
   ResOK(callback, {sign:sign});
 }
