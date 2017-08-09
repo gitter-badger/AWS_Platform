@@ -146,10 +146,14 @@ const logList = async (e, c, cb) => {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
-  // 获取令牌，只有管理员有权限
-  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  // 获取身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
+  }
+  //只能是管理员或线路商
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Manager']) {
+    return [BizErr.TokenErr('must admin/manager token'), 0]
   }
   // 业务操作
   let [err, ret] = await new LogModel().logPage(inparam)

@@ -213,5 +213,6 @@ export {
     packageList,                     // 道具包列表
     packageOne,                      // 单个道具包
     packageUpdate,                   // 更新道具包
-    packageChangeStatus              // 道具包状态变更
+    packageChangeStatus,             // 道具包状态变更
+    packageDelete                    // 道具包删除
 }
