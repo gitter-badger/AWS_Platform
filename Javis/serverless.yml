@@ -98,6 +98,15 @@ functions:
             Fn::GetAtt:
               - ZeusPlatformUser
               - StreamArn
+  palyerBillTrigger: #玩家账单表触发器
+      handler: api_trigger.playerBalanceTrigger
+      events:
+        - stream:
+            type: dynamodb
+            arn:
+              Fn::GetAtt:
+                - HeraGamePlayerBill
+                - StreamArn
 resources:
   Resources:
     ZeusPlatformUser: #用户表

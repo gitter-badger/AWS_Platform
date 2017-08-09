@@ -28,12 +28,10 @@ const userTrigger = async (e, c, cb) => {
     if(error) {
         return console.info(error);
     }
-    console.log("22222222222222");
     if(!userInfo){
         console.info("没有找到用户信息")
         return;
     }
-    console.log("333333333333");
     let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
     msnInfo = msnInfo || {msn:"-1"};
     let pushModel = new PushModel({

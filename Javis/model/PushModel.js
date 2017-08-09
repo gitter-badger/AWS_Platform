@@ -32,7 +32,7 @@ export class PushModel{
         return list;
     }
     pushUserBalance(obj) {
-        const port = 20003;
+        const port = 20002;
         const proId = 9;  //协议
         return pushUserInfo(obj, host, port, proId);
     }

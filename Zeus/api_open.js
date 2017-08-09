@@ -17,7 +17,7 @@ import crypto from "crypto";
 
 import {httpRequest}  from "./lib/HttpsUtil";
 
-const ResOK = (callback, res) => callback(null, Success(res))
+const ResOK = (callback, res, code) => callback(null, Success(res, code))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
@@ -26,6 +26,11 @@ async function gameLoginSign(event, context, callback){
   const [tokenErr, token] = await Model.currentToken(event)
   if (tokenErr) {
     return ResFail(callback, { ...errRes, err: tokenErr }, tokenErr.code)
+  }
+//   console.log("1111111111");
+//   console.log(token);
+  if(!token) {
+      return ResFail(callback, BizErr.TokenErr());
   }
     //json转换
   event = event || {};
@@ -40,6 +45,8 @@ async function gameLoginSign(event, context, callback){
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, ResFail(callback, checkAttError));
   } 
+//   console.log("token");
+//   console.log(token);
   let timestamp = Date.now();
   requestParams.id = token.userId;
   requestParams.timestamp = timestamp;
@@ -61,7 +68,7 @@ async function gameLoginSign(event, context, callback){
   if(httpError) {
       return ResFail(callback, httpError);
   }
-  ResOK(callback, {data:data});
+  ResOK(callback, data, data.code);
 }
 
 function getSign(secret, args, msg){

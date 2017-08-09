@@ -1,6 +1,7 @@
 import https from 'https'
 import http from "http"
 import url from 'url'
+import fs from "fs"
 
 import {
   BizErr,
@@ -64,8 +65,7 @@ export function httpRequest(addr, post_data){
             let str = "";
             res.on("data", (chunk) => str += chunk);
             res.on("end", () => {
-                console.log("请求结束");
-                console.log(str);
+                str = str.trim();
                 reslove(Util.parseJSON(str));
             })
         });
