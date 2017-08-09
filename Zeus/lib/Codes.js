@@ -46,8 +46,8 @@ export const Codes = {
   MerchantPeriodEndErr: '60004',
   TcpError: '60004',
   CompanyNotExistError: "60005",
-  PushMerchantError: "60006"
-
+  PushMerchantError: "60006",
+  HttpsError: '60007',
 }
 
 export const BizErr = {
@@ -134,6 +134,9 @@ export const BizErr = {
   },
   TcpErr: (errMsg = 'tcp connection error') => {
     return { code: Codes.TcpError, msg: errMsg }
+  },
+  HttpsErr: (errMsg = '请求游戏服务器后台失败') => {
+    return { code: Codes.HttpsError, msg: errMsg }
   },
   CompanyNotExistError: (errMsg = "company not exist") => {
     return { code: Codes.CompanyNotExistError, msg: errMsg }

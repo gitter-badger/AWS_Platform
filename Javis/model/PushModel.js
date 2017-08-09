@@ -23,11 +23,12 @@ export class PushModel{
     pushMerchant(){
         const port = 20003;
         const proId = 9;  //协议
+        console.info(this);
         return pushUserInfo(this, host, port, proId);
     }
     setGameList(gameList){
         gameList = gameList || [];
-        let list = gameList.map((game) => game.gameId);
+        let list = gameList.map((game) => game.code);
         return list;
     }
     pushUserBalance(obj) {

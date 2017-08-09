@@ -6,19 +6,23 @@ import {
   Fail,
   Codes,
   Model,
-  BizErr
+  BizErr,
 } from './lib/all'
+
+import {GameTypeEnum} from "./lib/Consts"
 
 import {GameModel} from "./model/GameModel"
 
 import crypto from "crypto";
+
+import {httpRequest}  from "./lib/HttpsUtil";
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 async function gameLoginSign(event, context, callback){
-
+  console.log(event);
   const [tokenErr, token] = await Model.currentToken(event)
   if (tokenErr) {
     return ResFail(callback, { ...errRes, err: tokenErr }, tokenErr.code)
@@ -51,9 +55,13 @@ async function gameLoginSign(event, context, callback){
   let company = game.company || {};
   
   let gameKey = company.companyKey;
-
   let sign = getSign(gameKey, ["id","timestamp"], requestParams);
-  ResOK(callback, {data:{sign:sign, id: token.userId, timestamp}});
+  let [httpError, data] = await httpRequest((GameTypeEnum[requestParams.gameType] || {}).url,
+         {sign:sign, id: token.userId, timestamp});
+  if(httpError) {
+      return ResFail(callback, httpError);
+  }
+  ResOK(callback, {data:data});
 }
 
 function getSign(secret, args, msg){

@@ -22,6 +22,12 @@ export const RoleCodeEnum = {
   'Agent': '1000',
   'Player': '10000'
 }
+export const GameTypeEnum = {
+  '10000': { code: '10000', name: '棋牌游戏', url: 'http://root.rottagame.com/admin/api/checkLoginAccess' },
+  '40000': { code: '40000', name: '电子游戏', url: 'http://test.com' },
+  '30000': { code: '30000', name: '真人视讯', url: 'http://146.88.71.30:8011/player/login' }
+}
+
 export const BillMo = function () {
   return {
     sn: Model.uuid(),

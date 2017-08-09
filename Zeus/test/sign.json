@@ -1,15 +1,15 @@
 
 {
     "body": {
-        "gameType" : "10000"
+        "gameType" : "30000"
     },
     "requestContext": {
         "authorizer": {
         "username": "Platform_cheney",
         "parent": "00",
         "role": "100",
-        "userId": "552102dd-5ac7-46a4-b8bc-39b9e68a25a9",
-        "principalId": "de1fb483-5307-4ff9-8009-9a04cffee142"
+        "userId": "8c4b4c93-e0b0-4272-9262-7fb38e7400ed",
+        "principalId": "8c4b4c93-e0b0-4272-9262-7fb38e7400ed"
         },
         "identity": {
         "sourceIp": "127.0.0.1"
