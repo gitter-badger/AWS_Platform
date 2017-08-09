@@ -18,7 +18,6 @@ import {TcpUtil} from "./lib/TcpUtil"
 
 const userTrigger = async (e, c, cb) => {
     console.info(e.Records)
-    console.info(e.Records[0].dynamodb)
     let record = e.Records[0].dynamodb.Keys;
     console.info(record.userId);
     let userId = record.userId.S;
