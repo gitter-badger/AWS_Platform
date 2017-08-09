@@ -30,8 +30,13 @@ const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 /**
  * 七牛云TOKEN
  */
-const upToken = (e, c, cb) => {
+const upToken = async (e, c, cb) => {
   const res = { m: 'upToken' }
+  // 身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
   const mac = new qiniu.auth.digest.Mac(QINIU_ACCESS_KEY, QINIU_SECRET_KEY)
   const options = { scope: QINIU_BUCKET }
   const putPolicy = new qiniu.rs.PutPolicy(options)
