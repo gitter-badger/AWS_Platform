@@ -143,6 +143,23 @@ export class PackageModel extends BaseModel {
             return [0, 0]
         }
     }
+
+    /**
+     * 删除道具包
+     * @param {*} inparam
+     */
+    async delete(inparam) {
+        const [err, ret] = await this.deleteItem({
+            Key: {
+                'packageName': inparam.packageName,
+                'packageId': inparam.packageId
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
+    }
 }
 
 

@@ -52,7 +52,7 @@ functions:
       -
         http:
           path: /upToken
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   #统计开始

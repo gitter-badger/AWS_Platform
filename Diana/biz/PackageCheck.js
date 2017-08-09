@@ -66,4 +66,24 @@ export class PackageCheck {
 
         return [checkAttError, errorParams]
     }
+
+    /**
+     * 检查删除
+     * @param {*} inparam 
+     */
+    checkDelete(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "packageName", type: "S", min: 1, max: 10 },
+            { name: "packageId", type: "N", min: 100000, max: 999999 }]
+            , inparam)
+
+        if (checkAttError) {
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.packageId = inparam.packageId.toString()
+
+        return [checkAttError, errorParams]
+    }
 }
