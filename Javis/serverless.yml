@@ -570,36 +570,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    HeraGamePlayer:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGamePlayer
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: userId
-            AttributeType: N
-        KeySchema:
-          -
-            AttributeName: userName
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          -
-            IndexName: userIdIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
     HeraGamePlayerBill:
       Type: AWS::DynamoDB::Table
       Properties:
