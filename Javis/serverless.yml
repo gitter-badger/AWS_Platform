@@ -1,15 +1,9 @@
 
-service: Javis # NOTE: update this with your service name
-
-# Use the serverless-webpack plugin to transpile ES6
+service: Javis
 plugins:
   - serverless-webpack
-
-# Enable auto-packing of external modules
 custom:
   webpackIncludeModules: true
-
-
 provider:
   name: aws
   runtime: nodejs6.10
@@ -49,6 +43,18 @@ functions:
   #         path: /generate_token
   #         method: post
   #         cors: true
+  tokenAuth: #TOKEN验证
+    handler: api.jwtverify
+    integration: lambda
+  upToken: #七牛云上传TOKEN
+    handler: api_qiniu.upToken
+    events:
+      -
+        http:
+          path: /upToken
+          method: get
+          cors: true
+          authorizer: tokenAuth
   #统计开始
   overview: #统计总览
     handler: api_sta.overview
@@ -488,7 +494,7 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    DianaPlatformTool: #工具表
+    DianaPlatformTool: #道具表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: DianaPlatformTool
@@ -521,4 +527,72 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
+    DianaPlatformPackage: #道具包表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: DianaPlatformPackage
+        AttributeDefinitions:
+          -
+            AttributeName: packageName
+            AttributeType: S
+          -
+            AttributeName: packageId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: packageName
+            KeyType: HASH
+          -
+            AttributeName: packageId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: packageIdIndex
+            KeySchema:
+              -
+                AttributeName: packageId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    # DianaPlatformSeat: #席位表
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: DianaPlatformSeat
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: seatName
+    #         AttributeType: S
+    #       -
+    #         AttributeName: seatId
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: seatName
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: seatId
+    #         KeyType: RANGE
+    #     GlobalSecondaryIndexes:
+    #       -
+    #         IndexName: seatIdIndex
+    #         KeySchema:
+    #           -
+    #             AttributeName: seatId
+    #             KeyType: HASH
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: 1
+    #           WriteCapacityUnits: 1
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
         

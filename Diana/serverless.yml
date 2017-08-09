@@ -199,6 +199,52 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  # ==================== 以下是道具包管理接口服务 ====================
+  packageNew: #创建道具包
+    handler: api_package.packageNew
+    events:
+      -
+        http:
+          path: packageNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageList: #道具包列表
+    handler: api_package.packageList
+    events:
+      -
+        http:
+          path: packageList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageOne: #单个道具包
+    handler: api_package.packageOne
+    events:
+      -
+        http:
+          path: packageOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageChangeStatus: #变更道具包状态
+    handler: api_package.packageChangeStatus
+    events:
+      -
+        http:
+          path: packageChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageUpdate: #道具包更新
+    handler: api_package.packageUpdate
+    events:
+      -
+        http:
+          path: packageUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是帮助中心接口服务 ====================
   helpGenreList: 
     handler: api_server.helpGenreList

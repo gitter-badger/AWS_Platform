@@ -35,6 +35,7 @@ export const Codes = {
   DuplicateUser: '21001',
   UserNotFound: '22011',
   UserLocked: '22012',
+  UserIPError: '22013',
 
   InsufficientBalance: '10002',
   TransferError: '10003',
@@ -74,6 +75,9 @@ export const BizErr = {
   },
   UserLockedErr: (errMsg = '用户已锁定') => {
     return { code: Codes.UserLocked, msg: errMsg }
+  },
+  UserIPErr: (errMsg = '登录IP未在白名单范围内') => {
+    return { code: Codes.UserIPError, msg: errMsg }
   },
   PasswordErr: (errMsg = '密码错误') => {
     return { code: Codes.PasswordError, msg: errMsg }

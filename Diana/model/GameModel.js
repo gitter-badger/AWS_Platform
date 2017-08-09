@@ -89,8 +89,8 @@ export class GameModel extends BaseModel {
             for (let item in GameTypeEnum) {
                 pathParams.gameType += (item + ',')
             }
+            pathParams.gameType = pathParams.gameType.substr(0, pathParams.gameType.length - 1)
         }
-        pathParams.gameType = pathParams.gameType.substr(0, pathParams.gameType.length - 1)
         // 分割类型
         const inputTypes = pathParams.gameType.split(',')
         const gameTypes = _.filter(inputTypes, (type) => {

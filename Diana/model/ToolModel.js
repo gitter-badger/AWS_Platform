@@ -17,7 +17,7 @@ import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
 export class ToolModel extends BaseModel {
-    constructor(uucode) {
+    constructor() {
         super()
         // 设置表名
         this.params = {
