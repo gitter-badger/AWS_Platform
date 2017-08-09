@@ -25,6 +25,11 @@ export const ToolStatusEnum = {
   Disable: 0,
   PROMOTOPN: 2
 }
+export const PackageStatusEnum = {
+  Enable: 1,
+  Disable: 0,
+  PROMOTOPN: 2
+}
 export const RoleCodeEnum = {
   'SuperAdmin': '0',
   'PlatformAdmin': '1',
