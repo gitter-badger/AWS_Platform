@@ -108,7 +108,7 @@ const merchantUpdate = async (e, c, cb) => {
   }
   // 获取更新属性和新密码HASH
   const Merchant = {
-    ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Manager']])
+    ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Merchant']])
   }
   Merchant.passhash = Model.hashGen(Merchant.password)
   // 业务操作
