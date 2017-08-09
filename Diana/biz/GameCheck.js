@@ -42,7 +42,7 @@ export class GameCheck {
      */
     checkStatus(inparam) {    
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "gameType", type: "N", min: 0, max: 2 },
+            { name: "gameType", type: "N", min: 10000, max: 90000 },
             { name: "gameId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 4 }]
             , inparam)

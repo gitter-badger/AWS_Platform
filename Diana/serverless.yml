@@ -33,43 +33,6 @@ functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
-  # ==================== 以下是账单和日志接口服务 ====================
-  billTransfer: # 转账
-    handler: api.billTransfer
-    events:
-      -
-        http:
-          path: billTransfer
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  billOne: # 单个账单
-    handler: api.billOne
-    events:
-      -
-        http:
-          path: bills/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  billList: # 账单列表
-    handler: api.billList
-    events:
-      -
-        http:
-          path: waterfall/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  logList: #日志列表
-    handler: api.logList
-    events:
-      -
-        http:
-          path: logList
-          method: post
-          cors: true
-          authorizer: tokenAuth
   # ==================== 以下是游戏管理接口服务 ====================
   gameNew: #创建游戏
     handler: api_game.gameNew
@@ -245,31 +208,77 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  # ==================== 以下是帮助中心接口服务 ====================
-  helpGenreList: 
-    handler: api_server.helpGenreList
+  packageDelete: #道具包删除
+    handler: api_package.packageDelete
     events:
       -
         http:
-          path: /help/genres
+          path: packageDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是账单和日志接口服务 ====================
+  billTransfer: # 转账
+    handler: api.billTransfer
+    events:
+      -
+        http:
+          path: billTransfer
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  billOne: # 单个账单
+    handler: api.billOne
+    events:
+      -
+        http:
+          path: bills/{userId}
           method: get
           cors: true
           authorizer: tokenAuth
-  helpCreateGenre: 
-    handler: api_server.createHelpGenre
+  billList: # 账单列表
+    handler: api.billList
     events:
       -
         http:
-          path: /help/genre/create
-          method: post
+          path: waterfall/{userId}
+          method: get
           cors: true
           authorizer: tokenAuth
-  createHelp: 
-    handler: api_server.createHelp
+  logList: #日志列表
+    handler: api.logList
     events:
       -
         http:
-          path: /help/create
+          path: logList
           method: post
           cors: true
           authorizer: tokenAuth
+  # ==================== 以下是帮助中心接口服务 ====================
+  # helpGenreList: 
+  #   handler: api_server.helpGenreList
+  #   events:
+  #     -
+  #       http:
+  #         path: /help/genres
+  #         method: get
+  #         cors: true
+  #         authorizer: tokenAuth
+  # helpCreateGenre: 
+  #   handler: api_server.createHelpGenre
+  #   events:
+  #     -
+  #       http:
+  #         path: /help/genre/create
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # createHelp: 
+  #   handler: api_server.createHelp
+  #   events:
+  #     -
+  #       http:
+  #         path: /help/create
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth

@@ -1,0 +1,100 @@
+
+service: Hulk
+plugins:
+  - serverless-webpack
+custom:
+  webpackIncludeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  iamRoleStatements:
+      -
+        Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:Scan
+        Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
+          
+functions:
+  tokenAuth:
+    handler: api.jwtverify
+    integration: lambda
+  # ==================== 以下是账单和日志接口服务 ====================
+  billTransfer: # 转账
+    handler: api.billTransfer
+    events:
+      -
+        http:
+          path: billTransfer
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  billOne: # 单个账单
+    handler: api.billOne
+    events:
+      -
+        http:
+          path: bills/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  billList: # 账单列表
+    handler: api.billList
+    events:
+      -
+        http:
+          path: waterfall/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  logList: #日志列表
+    handler: api.logList
+    events:
+      -
+        http:
+          path: logList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是帮助中心接口服务 ====================
+  helpGenreList: 
+    handler: api_help.helpGenreList
+    events:
+      -
+        http:
+          path: /help/genres
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  helpCreateGenre: 
+    handler: api_help.createHelpGenre
+    events:
+      -
+        http:
+          path: /help/genre/create
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  createHelp: 
+    handler: api_help.createHelp
+    events:
+      -
+        http:
+          path: /help/create
+          method: post
+          cors: true
+          authorizer: tokenAuth
