@@ -174,29 +174,10 @@ const toolUpdate = async (e, c, cb) => {
 
 // ==================== 以下为内部方法 ====================
 
-// TOKEN验证
-const jwtverify = async (e, c, cb) => {
-  // get the token from event.authorizationToken
-  const token = e.authorizationToken.split(' ')
-  if (token[0] !== 'Bearer') {
-    return c.fail('Unauthorized: wrong token type')
-  }
-  // verify it and return the policy statements
-  const [err, userInfo] = await JwtVerify(token[1])
-  if (err || !userInfo) {
-    console.log(JSON.stringify(err), JSON.stringify(userInfo));
-    return c.fail('Unauthorized')
-  }
-  console.info(userInfo)
-  return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
-}
-
 /**
   api export
 **/
 export {
-  jwtverify,                    // 用于进行token验证的方法
-
   toolNew,                      // 创建道具
   toolList,                     // 道具列表
   toolOne,                      // 单个道具
