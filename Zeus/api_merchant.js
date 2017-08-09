@@ -91,7 +91,7 @@ const merchantUpdate = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
   }
   //检查参数是否合法
-  let [checkAttError, errorParams] = new UserCheck().checkUser(merchantInfo)
+  let [checkAttError, errorParams] = new UserCheck().checkUserUpdate(merchantInfo)
   if (checkAttError) {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)

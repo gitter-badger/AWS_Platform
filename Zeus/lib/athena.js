@@ -247,6 +247,7 @@ export const RegEnum = {
 
     DISPLAYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{4,10}$/,
     USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    USERNAME_UPDATE: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}_[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
     PASSWORD: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
     HOSTNAME: /^[\u4E00-\u9FA5A-Za-z]{5,16}$/,
 

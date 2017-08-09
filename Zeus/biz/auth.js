@@ -190,6 +190,36 @@ export const LoginUser = async (userLoginInfo = {}) => {
   if (User.status == StatusEnum.Disable) {
     return [BizErr.UserLockedErr(), 0]
   }
+  // 如果是商户，检查白名单
+  let whiteFlag = false
+  if (roleCode == RoleCodeEnum.Merchant) {
+    // 白名单为空，默认放行
+    if (!User.loginWhiteList) {
+      whiteFlag = true
+    }
+    // 白名单不为空，则校验
+    else {
+      let whiteList = User.loginWhiteList
+      let whiteArr = whiteList.split(';')
+      for (let white of whiteArr) {
+        if (white == '0.0.0.0') {
+          whiteFlag = true
+          break
+        }
+        if (white == User.lastIP) {
+          whiteFlag = true
+          break
+        }
+      }
+    }
+  }
+  // 非商户，不检查白名单
+  else {
+    whiteFlag = true
+  }
+  if (!whiteFlag) {
+    return [BizErr.UserIPErr('IP不合法：' + User.lastIP), 0]
+  }
   // 更新用户信息
   User.lastIP = UserLoginInfo.lastIP
   const [saveUserErr, saveUserRet] = await saveUser(User)
