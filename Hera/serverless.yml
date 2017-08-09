@@ -24,10 +24,6 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-        - dynamodb:DescribeStream
-        - dynamodb:GetRecords
-        - dynamodb:GetShardIterator
-        - dynamodb:ListStreams
       Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
   tokenVerify:
@@ -137,85 +133,6 @@ functions:
           authorizer: tokenVerify
 resources:
   Resources:
-    HeraGamePlayer:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGamePlayer
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: userId
-            AttributeType: N
-        KeySchema:
-          -
-            AttributeName: userName
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          -
-            IndexName: userIdIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-    HeraGamePlayerBill:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGamePlayerBill
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: userId
-            AttributeType: N
-          -
-            AttributeName: createAt
-            AttributeType: N
-        KeySchema:
-          -
-            AttributeName: userName
-            KeyType: HASH
-          -
-            AttributeName: createAt
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        StreamSpecification:
-          StreamViewType: NEW_AND_OLD_IMAGES
-        GlobalSecondaryIndexes:
-          -
-            IndexName: userNameIndex
-            KeySchema:
-              -
-                AttributeName: userName
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-          -
-            IndexName: userIdIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
     HeraGameRecord:
       Type: AWS::DynamoDB::Table
       Properties:
