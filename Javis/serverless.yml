@@ -516,37 +516,40 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    # DianaPlatformPackage: #道具包表
-    #   Type: AWS::DynamoDB::Table
-    #   Properties:
-    #     TableName: DianaPlatformPackage
-    #     AttributeDefinitions:
-    #       -
-    #         AttributeName: packageName
-    #         AttributeType: S
-    #       -
-    #         AttributeName: packageId
-    #         AttributeType: S
-    #     KeySchema:
-    #       -
-    #         AttributeName: packageName
-    #         KeyType: HASH
-    #       -
-    #         AttributeName: packageId
-    #         KeyType: RANGE
-    #     GlobalSecondaryIndexes:
-    #       -
-    #         IndexName: packageIdIndex
-    #         KeySchema:
-    #           -
-    #             AttributeName: packageId
-    #             KeyType: HASH
-    #         Projection:
-    #           ProjectionType: ALL
-    #         ProvisionedThroughput:
-    #           ReadCapacityUnits: 1
-    #           WriteCapacityUnits: 1
-              
+    DianaPlatformPackage: #道具包表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: DianaPlatformPackage
+        AttributeDefinitions:
+          -
+            AttributeName: packageName
+            AttributeType: S
+          -
+            AttributeName: packageId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: packageName
+            KeyType: HASH
+          -
+            AttributeName: packageId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: packageIdIndex
+            KeySchema:
+              -
+                AttributeName: packageId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
     # DianaPlatformSeat: #席位表
     #   Type: AWS::DynamoDB::Table
     #   Properties:
