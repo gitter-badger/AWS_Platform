@@ -85,7 +85,7 @@ export class SeatCheck {
      */
     checkDelete(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "packageId", type: "S", min: 36, max: 36 }]
+            { name: "seatId", type: "S", min: 36, max: 36 }]
             , inparam)
 
         if (checkAttError) {
