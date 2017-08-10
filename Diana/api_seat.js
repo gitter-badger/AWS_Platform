@@ -59,7 +59,7 @@ const seatNew = async (e, c, cb) => {
 }
 
 /**
- * 席位列表
+ * 列表
  */
 const seatList = async (e, c, cb) => {
     // 入参转换
@@ -78,7 +78,7 @@ const seatList = async (e, c, cb) => {
 }
 
 /**
- * 单个席位
+ * 单个
  */
 const seatOne = async (e, c, cb) => {
     const res = { m: 'seatOne' }
@@ -94,7 +94,7 @@ const seatOne = async (e, c, cb) => {
 }
 
 /**
- * 席位状态变更
+ * 状态变更
  */
 const seatChangeStatus = async (e, c, cb) => {
     // 数据输入，转换，校验
@@ -104,7 +104,7 @@ const seatChangeStatus = async (e, c, cb) => {
         return ResErr(cb, jsonParseErr)
     }
     //检查参数是否合法
-    let [checkAttError, errorParams] = new seatCheck().checkStatus(inparam)
+    let [checkAttError, errorParams] = new SeatCheck().checkStatus(inparam)
     if (checkAttError) {
         Object.assign(checkAttError, { params: errorParams })
         return ResErr(cb, checkAttError)
@@ -176,7 +176,7 @@ const seatDelete = async (e, c, cb) => {
         return ResErr(cb, jsonParseErr)
     }
     //检查参数是否合法
-    let [checkAttError, errorParams] = new seatCheck().checkDelete(inparam)
+    let [checkAttError, errorParams] = new SeatCheck().checkDelete(inparam)
     if (checkAttError) {
         Object.assign(checkAttError, { params: errorParams })
         return ResErr(cb, checkAttError)
