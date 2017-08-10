@@ -42,8 +42,8 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
   if (!queryUserRet) {
     return [BizErr.UserExistErr(), 0]
   }
-  // 保存用户
-  const User = { ...CheckUser, username: `${CheckUser.suffix}_${CheckUser.username}` }
+  // 保存用户，处理用户名前缀
+  const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}` }
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
@@ -112,10 +112,11 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (initPoints > balance) {
     return [BizErr.BalanceErr(), 0]
   }
-   
-  // 保存创建用户
+
+  // 保存用户，处理用户名前缀
   const User = {
     ...CheckUser,
+    uname: `${CheckUser.username}`,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
     parentName: parentUser.username,
     parentSuffix: parentUser.suffix,
