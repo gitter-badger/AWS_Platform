@@ -34,7 +34,35 @@ export const pushUserInfo =  (body, host, port, proId) => {
         })
     })
 }
-
+export const pushUserBalance = (userId, host, port, proId) => {
+    let client = new net.Socket();
+    let buffer = buildPayload(proId, userId);
+    return new Promise((reslove, reject) => {
+        console.log("请求连接");
+        console.log(port, host, proId);
+        client.connect(port, host, function() {
+            client.write(buffer);
+        });
+        client.on('data', function(data) {
+            console.log(data);
+            // console.log(data.readUInt32LE(0,4).toString(10));
+            // console.log(data.readUInt32LE(4,8).toString(10));
+            let code = +data.readUInt32LE(8,12).toString(10);
+            // 完全关闭连接
+            client.destroy();
+            console.log("code");
+            console.log(code);
+            if(code != Codes.OK) {
+                reslove([{code:code}, 0]);
+            }else {
+                reslove([null, 0]);
+            }
+        });
+        client.on("error", function(err){
+            reslove([BizErr.TcpErr(), 0]);
+        })
+    })
+}
 
 var buildPayload = function (protocalId, data) {
 	var dataBuffer = Buffer.from(data, 'utf8')

@@ -43,6 +43,20 @@ functions:
           path: /player
           method: post
           cors: true
+  updatePassword:     #玩家修改密码
+    handler: openApi.updatePassword
+    events:
+      - http:
+          path: /{userName}/password
+          method: post
+          cors: true
+  updateInfo:     #玩家修改基本信息
+    handler: openApi.updateUserInfo
+    events:
+      - http:
+          path: /game/player/info
+          method: post
+          cors: true
   A3Login:     #玩家A3游戏登陆
     handler: openApi.gamePlayerA3Login
     events:

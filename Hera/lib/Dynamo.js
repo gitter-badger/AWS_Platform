@@ -33,6 +33,7 @@ export const Tables = {
 
 
 export const Model = {
+  StringValue: 'NULL!',
   USERNAME_LIMIT: [6,16], // 用户名长度限制
   PASSWORD_PATTERN: [3,16],
   StringValue: 'NULL!',

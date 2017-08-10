@@ -31,19 +31,16 @@ export class UserRecordModel extends athena.BaseModel {
      * @param {*} remark  备注 
      * @param {*} execUser 操作人
      */
-    constructor({ userId,  depositAmount,takeAmount, income, records, state,remark} = {}) {
+    constructor({ userId,  depositAmount,checkOutBalance, income, records, state,remark} = {}) {
         super(TABLE_NAMES.TABLE_PALYER_RECORD);
         this.id = Util.uuid();
         this.userId = userId;
         this.createAt = Date.now();
-        this.depositAmount = depositAmount; //转入金额
-        this.takeAmount = takeAmount;     //转出金额
-        this.income = income;    //收益
+        this.depositAmount = depositAmount || 0; //转入金额
+        this.checkOutBalance = checkOutBalance || 0;     //转出金额
+        this.income = income || 0;    //收益
         this.records = records;
         this.state = SettlementState.fail;
-        // this.list = list;
-        // this.userId = userId;
-        // this.time = time;
         // this.amount = amount; //转入，正数   转出，负数
         // this.preBalance = preBalance;
         // this.type = type;
@@ -77,12 +74,9 @@ export class UserRecordModel extends athena.BaseModel {
 
         //检查所有的数据是否为同一用户
         let singlieUser = this.isSingleUser();
-        let userId = this.records[0].userId
-        this.userId = userId;
-        this.gameId = this.records[0].gameId;
         if(!singlieUser) {
             this.remark = "数据非同一用户"
-            return [new CHeraErr(playerRecordError.takeErr), false, 0]
+            return [new CHeraErr(playerRecordError.takeErr), 0]
         }
         // let depositAmount = +(+depositRecord.amount).toFixed(2) //存入多少金额
         // let takeAmount = +(+takeRecord.amount).toFixed(2);   //取出多少金额
@@ -94,9 +88,9 @@ export class UserRecordModel extends athena.BaseModel {
         // this.takeAmount = takeAmount;
         this.income = income;
         this.state = SettlementState.success;
-        return [0, true, income]
+        return [0, income]
 
-
+        
         //转入+消费+返奖+转出 =0
         if(takeAmount + depositAmount+income == 0) { //如果相等，视为账单合法
             this.state = SettlementState.success;

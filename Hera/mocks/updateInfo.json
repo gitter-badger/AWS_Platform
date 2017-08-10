@@ -1,0 +1,12 @@
+
+{
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfdGVzdDAwMSIsInN1ZmZpeCI6IkNaU1kiLCJ1c2VySWQiOjk4NTg2NiwiaWF0IjoxNTAyMzM1ODY0fQ.sa5vv6HAQAgLSUNsvnxIygNW4OivplF5JHT11WUcinE"
+    },
+    "body":{
+        "userId" : "123456",
+        "nickname" : "小不点",
+        "gameId" : "30001",
+        "headPic" :"https://baidu.com"
+    }
+}

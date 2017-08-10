@@ -54,21 +54,20 @@ const userTrigger = async (e, c, cb) => {
 }
 
 const playerBalanceTrigger = async(e, c , cb) =>{
-    let record = e.Records[0].dynamodb.keys;
+    console.log(e);
+    let record = e.Records[0].dynamodb.Keys;
+    console.log(record);
     let userId = +record.userId.N;
-    let userBillModel = new UserBillModel();
-    let [error, balance] = userBillModel.getBalanceByUid(userId);
-    console.log("玩家余额:" +balance);
-    balance = balance || 0;
-    if(gameId == -1) {
-        let pushModel = new PushModel({
-            userId : userId,
-            balance : balance
-        })
-        pushModel.pushUserBalance();
+    console.log("userId: "+ userId);
+    let pushModel = new PushModel();
+    let [er] = await pushModel.pushUserBalance(userId);
+    if(er) {
+        console.info("玩家余额变更推送失败");
+        console.info(er);
+    }else {
+        console.info("玩家余额变更推送成功");
     }
 }
-
 
 export {
     userTrigger,                     // 用户表触发器
