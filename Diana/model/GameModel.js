@@ -163,6 +163,23 @@ export class GameModel extends BaseModel {
             return [0, 0]
         }
     }
+
+    /**
+     * 查询游戏的厂商对应的游戏
+     * @param {*} inparam 
+     */
+    async getByCompanyId(inparam) {
+        const [err, ret] = await this.scan({
+            FilterExpression: 'company.companyId = :companyId',
+            ExpressionAttributeValues: {
+                ':companyId': inparam.companyId,
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
+    }
 }
 
 

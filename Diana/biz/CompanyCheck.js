@@ -13,8 +13,8 @@ export class CompanyCheck {
             { name: "companyRegion", type: "S", min: 1, max: 20 },
 
             { name: "companyDesc", type: "NREG", min: null, max: null, equal: athena.RegEnum.COMPANYDESC },
-            { name: "companyContract", type: "NS", min: 1, max: 50 },
-            { name: "license", type: "NS", min: 1, max: 20 },
+            { name: "companyContract", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL},
+            { name: "license", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL},
             { name: "remark", type: "NS", min: 2, max: 200 }
         ], inparam)
 
