@@ -56,15 +56,25 @@ export class SeatCheck {
     checkUpdate(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "seatId", type: "S", min: 36, max: 36 },
-            { name: "status", type: "N", min: 0, max: 2 }]
-            , inparam)
+            { name: "seatType", type: "N", min: 1, max: 2 },
+            { name: "order", type: "N", min: 1, max: 99999 },
+            { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
+            { name: "sum", type: "N", min: 1, max: 100000000 },
+            { name: "seatStatus", type: "N", min: 1, max: 2 },
+            { name: "remark", type: "NS", min: 1, max: 200 }
+        ], inparam)
 
         if (checkAttError) {
             return [checkAttError, errorParams]
         }
 
         // 数据类型处理
-        inparam.status = parseInt(inparam.status)
+        inparam.seatStatus = parseInt(inparam.seatStatus)
+        inparam.order = parseInt(inparam.order)
+        inparam.sum = parseInt(inparam.sum)
+        inparam.price = parseFloat(inparam.price)
+        inparam.seatType = inparam.seatType.toString()
+        inparam.remark = inparam.remark || Model.StringValue
 
         return [checkAttError, errorParams]
     }

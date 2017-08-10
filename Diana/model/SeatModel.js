@@ -94,6 +94,12 @@ export class SeatModel extends BaseModel {
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
+        ret.order = inparam.order
+        ret.price = inparam.price
+        ret.remark = inparam.remark
+        ret.seatStatus = inparam.seatStatus
+        ret.seatType = inparam.seatType
+        ret.sum = ret.sum
         ret.updatedAt = Model.timeStamp()
         return await this.putItem(ret)
     }
