@@ -22,13 +22,15 @@ export const CompanyStatusEnum = {
 }
 export const ToolStatusEnum = {
   Enable: 1,
-  Disable: 0,
-  PROMOTOPN: 2
+  Disable: 0
 }
 export const PackageStatusEnum = {
   Enable: 1,
-  Disable: 0,
-  PROMOTOPN: 2
+  Disable: 0
+}
+export const SeatStatusEnum = {
+  Enable: 1,
+  Disable: 0
 }
 export const RoleCodeEnum = {
   'SuperAdmin': '0',
@@ -42,6 +44,10 @@ export const GameTypeEnum = {
   '10000': { code: '10000', name: '棋牌游戏', url: 'http://192.168.3.131/webadmin/public/admin/api/checkLoginAccess' },
   '40000': { code: '40000', name: '电子游戏', url: 'http://test.com' },
   '30000': { code: '30000', name: '真人视讯', url: 'http://146.88.71.30:8011/player/login' }
+}
+export const SeatTypeEnum = {
+  '1': '钻石展位',
+  '2': '道具展位'
 }
 export const BillMo = function () {
   return {

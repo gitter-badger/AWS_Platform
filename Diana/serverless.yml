@@ -217,68 +217,58 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  # ==================== 以下是账单和日志接口服务 ====================
-  # billTransfer: # 转账
-  #   handler: api.billTransfer
-  #   events:
-  #     -
-  #       http:
-  #         path: billTransfer
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # billOne: # 单个账单
-  #   handler: api.billOne
-  #   events:
-  #     -
-  #       http:
-  #         path: bills/{userId}
-  #         method: get
-  #         cors: true
-  #         authorizer: tokenAuth
-  # billList: # 账单列表
-  #   handler: api.billList
-  #   events:
-  #     -
-  #       http:
-  #         path: waterfall/{userId}
-  #         method: get
-  #         cors: true
-  #         authorizer: tokenAuth
-  # logList: #日志列表
-  #   handler: api.logList
-  #   events:
-  #     -
-  #       http:
-  #         path: logList
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # ==================== 以下是帮助中心接口服务 ====================
-  # helpGenreList: 
-  #   handler: api_server.helpGenreList
-  #   events:
-  #     -
-  #       http:
-  #         path: /help/genres
-  #         method: get
-  #         cors: true
-  #         authorizer: tokenAuth
-  # helpCreateGenre: 
-  #   handler: api_server.createHelpGenre
-  #   events:
-  #     -
-  #       http:
-  #         path: /help/genre/create
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # createHelp: 
-  #   handler: api_server.createHelp
-  #   events:
-  #     -
-  #       http:
-  #         path: /help/create
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
+  # ==================== 以下是席位管理接口服务 ====================
+  seatNew: #创建席位
+    handler: api_seat.seatNew
+    events:
+      -
+        http:
+          path: seatNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatList: #席位列表
+    handler: api_seat.seatList
+    events:
+      -
+        http:
+          path: seatList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatOne: #单个席位
+    handler: api_seat.seatOne
+    events:
+      -
+        http:
+          path: seatOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatChangeStatus: #变更席位状态
+    handler: api_seat.seatChangeStatus
+    events:
+      -
+        http:
+          path: seatChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatUpdate: #席位更新
+    handler: api_seat.seatUpdate
+    events:
+      -
+        http:
+          path: seatUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatDelete: #席位删除
+    handler: api_seat.seatDelete
+    events:
+      -
+        http:
+          path: seatDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
