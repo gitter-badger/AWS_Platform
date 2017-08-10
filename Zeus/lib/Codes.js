@@ -92,10 +92,10 @@ export const BizErr = {
     return { code: Codes.NoSuffixError, msg: errMsg }
   },
   MerchantPeriodEndErr: (errMsg = '帐号已过期') => {
-    return { code: Codes.MerchantPeriodErr, msg: errMsg }
+    return { code: Codes.MerchantPeriodEndErr, msg: errMsg }
   },
   MerchantPeriodStartErr: (errMsg = '帐号尚未生效') => {
-    return { code: Codes.MerchantPeriodErr, msg: errMsg }
+    return { code: Codes.MerchantPeriodStartErr, msg: errMsg }
   },
   ItemExistErr: (errMsg = '记录已存在') => {
     return { code: Codes.ItemDuplicate, msg: errMsg }
