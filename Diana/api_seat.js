@@ -118,7 +118,7 @@ const seatChangeStatus = async (e, c, cb) => {
     const [err, ret] = await new SeatModel().changeStatus(inparam)
 
     // 操作日志记录
-    inparam.operateAction = '席位状态变更'
+    inparam.operateAction = '展位状态变更'
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
 
@@ -154,7 +154,7 @@ const seatUpdate = async (e, c, cb) => {
     const [err, ret] = await new SeatModel().update(inparam)
 
     // 操作日志记录
-    inparam.operateAction = '席位更新'
+    inparam.operateAction = '展位更新'
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
 
@@ -190,7 +190,7 @@ const seatDelete = async (e, c, cb) => {
     const [err, ret] = await new SeatModel().delete(inparam)
 
     // 操作日志记录
-    inparam.operateAction = '席位删除'
+    inparam.operateAction = '展位删除'
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
 
