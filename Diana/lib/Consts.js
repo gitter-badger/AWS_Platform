@@ -1,14 +1,17 @@
 import { Model } from './Dynamo'
 
+// 性别枚举
 export const GenderEnum = {
   Male: 1,
   Female: 0,
   Trans: 2
 }
+// 普通状态枚举
 export const StatusEnum = {
   Enable: 1,
   Disable: 0
 }
+// 游戏状态枚举
 export const GameStatusEnum = {
   Online: 1,
   Offline: 2,
@@ -16,22 +19,28 @@ export const GameStatusEnum = {
   Error: 4,
   Delete: 0
 }
+// 游戏厂商状态枚举
 export const CompanyStatusEnum = {
   Enable: 1,
   Disable: 0
 }
+// 道具状态枚举
 export const ToolStatusEnum = {
   Enable: 1,
   Disable: 0
 }
+// 道具包状态枚举
 export const PackageStatusEnum = {
   Enable: 1,
   Disable: 0
 }
+// 展位状态枚举
 export const SeatStatusEnum = {
   Enable: 1,
-  Disable: 0
+  Disable: 0,
+  Promotion: 2
 }
+// 角色编码枚举
 export const RoleCodeEnum = {
   'SuperAdmin': '0',
   'PlatformAdmin': '1',
@@ -40,15 +49,18 @@ export const RoleCodeEnum = {
   'Agent': '1000',
   'Player': '10000'
 }
+// 游戏类型枚举
 export const GameTypeEnum = {
   '10000': { code: '10000', name: '棋牌游戏', url: 'http://192.168.3.131/webadmin/public/admin/api/checkLoginAccess' },
   '40000': { code: '40000', name: '电子游戏', url: 'http://test.com' },
   '30000': { code: '30000', name: '真人视讯', url: 'http://146.88.71.30:8011/player/login' }
 }
+// 展位类型枚举
 export const SeatTypeEnum = {
   '1': '钻石展位',
   '2': '道具展位'
 }
+// 账单属性
 export const BillMo = function () {
   return {
     sn: Model.uuid(),
@@ -62,7 +74,7 @@ export const BillMo = function () {
     remark: Model.StringValue
   }
 }
-
+// 用户角色基类
 const UserRole = function () {
   return {
     userId: Model.uuid(),
@@ -73,6 +85,7 @@ const UserRole = function () {
     role: Model.StringValue
   }
 }
+// 平台用户角色属性
 const PlatformBaseBizRole = function () {
   return {
     ...UserRole(),
@@ -93,81 +106,7 @@ const PlatformBaseBizRole = function () {
     loginAt: Model.timeStamp()
   }
 }
-export const RoleEditProps = {
-  '0': [],
-  '1': [],
-  '10': [
-    'hostName',
-    'hostContact',
-    'rate',
-    'limit',
-    'gameList',
-    'managerEmail',
-    'remark',
-    'adminName',
-    'adminEmail',
-    'adminContact',
-    'contractPeriod'
-  ],
-  '100': [
-    'hostName',
-    'hostContact',
-    'rate',
-    'limit',
-    'gameList',
-    'managerEmail',
-    'loginWhiteList',
-    'frontURL',
-    'remark',
-    'adminName',
-    'adminEmail',
-    'adminContact',
-    'contractPeriod'
-  ],
-  '1000': [],
-  '10000': []
-
-}
-export const RoleDisplay = {
-  '0': [],
-  '1': [
-    'username',
-    'password',
-    'suffix',
-    'parent',
-    'parentName',
-    'userId',
-    'role',
-    'displayName'
-  ],
-  '10': [
-    'username',
-    'password',
-    'suffix',
-    'parent',
-    'parentName',
-    'userId',
-    'role',
-    'displayName',
-    'updatedAt',
-    'displayId'
-  ],
-  '100': [
-    'username',
-    'password',
-    'msn',
-    'suffix',
-    'parent',
-    'parentName',
-    'userId',
-    'role',
-    'displayName',
-    'apiKey',
-    'displayId',
-    'updatedAt'
-  ]
-}
-
+// 用户角色属性
 export const RoleModels = {
   '0': function () {
     return {
@@ -237,4 +176,79 @@ export const RoleModels = {
   '10000': function () {
     return {}
   }
+}
+// 用户修改属性
+export const RoleEditProps = {
+  '0': [],
+  '1': [],
+  '10': [
+    'hostName',
+    'hostContact',
+    'rate',
+    'limit',
+    'gameList',
+    'managerEmail',
+    'remark',
+    'adminName',
+    'adminEmail',
+    'adminContact',
+    'contractPeriod'
+  ],
+  '100': [
+    'hostName',
+    'hostContact',
+    'rate',
+    'limit',
+    'gameList',
+    'managerEmail',
+    'loginWhiteList',
+    'frontURL',
+    'remark',
+    'adminName',
+    'adminEmail',
+    'adminContact',
+    'contractPeriod'
+  ],
+  '1000': [],
+  '10000': []
+}
+// 用户展示属性
+export const RoleDisplay = {
+  '0': [],
+  '1': [
+    'username',
+    'password',
+    'suffix',
+    'parent',
+    'parentName',
+    'userId',
+    'role',
+    'displayName'
+  ],
+  '10': [
+    'username',
+    'password',
+    'suffix',
+    'parent',
+    'parentName',
+    'userId',
+    'role',
+    'displayName',
+    'updatedAt',
+    'displayId'
+  ],
+  '100': [
+    'username',
+    'password',
+    'msn',
+    'suffix',
+    'parent',
+    'parentName',
+    'userId',
+    'role',
+    'displayName',
+    'apiKey',
+    'displayId',
+    'updatedAt'
+  ]
 }

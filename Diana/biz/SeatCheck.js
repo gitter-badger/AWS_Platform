@@ -1,4 +1,4 @@
-import { Model, PackageStatusEnum } from '../lib/all'
+import { Model, SeatStatusEnum, SeatTypeEnum } from '../lib/all'
 const athena = require("../lib/athena")
 export class SeatCheck {
     /**
@@ -9,8 +9,8 @@ export class SeatCheck {
             { name: "seatType", type: "N", min: 1, max: 2 },
             { name: "order", type: "N", min: 1, max: 99999 },
             { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
-            { name: "sum", type: "N", min: 1, max: 99999 },
-            { name: "seatStatus", type: "N", min: 0, max: 2 },
+            { name: "sum", type: "N", min: 1, max: 100000000 },
+            { name: "seatStatus", type: "N", min: 1, max: 2 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
@@ -20,10 +20,10 @@ export class SeatCheck {
 
         // 数据类型处理
         inparam.seatStatus = parseInt(inparam.seatStatus)
-        inparam.seatType = inparam.seatType.toString()
         inparam.order = parseInt(inparam.order)
         inparam.sum = parseInt(inparam.sum)
         inparam.price = parseFloat(inparam.price)
+        inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue
 
         return [checkAttError, errorParams]

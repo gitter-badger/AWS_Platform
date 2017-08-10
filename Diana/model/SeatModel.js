@@ -45,6 +45,7 @@ export class SeatModel extends BaseModel {
         if (putErr) {
             return [putErr, 0]
         }
+        return [0, dataItem]
     }
 
     /**
