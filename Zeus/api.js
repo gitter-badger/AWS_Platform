@@ -201,8 +201,20 @@ const userChangeStatus = async (e, c, cb) => {
   if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Manager']) {
     return [BizErr.TokenErr('must admin/manager token'), 0]
   }
-  // 更新用户状态
-  const [err, ret] = await new UserModel().changeStatus(inparam.role, inparam.userId, inparam.status)
+  // 查询用户
+  let [userErr, user] = await new UserModel().queryUserById(inparam.userId)
+  if (userErr) {
+    return [userErr, 0]
+  }
+  // 更新用户
+  user.status = inparam.status
+  if (inparam.contractPeriod == 0) {
+    user.contractPeriod = 0
+  } else if (inparam.contractPeriod) {
+    user.contractPeriod = inparam.contractPeriod
+  }
+  const [err, ret] = await new UserModel().userUpdate(user)
+
   // 操作日志记录
   inparam.operateAction = '变更用户状态'
   inparam.operateToken = token
@@ -476,7 +488,7 @@ export {
   userNew,                      // 创建新用户
   userChangeStatus,             // 变更用户状态
   childList,                    // 下级用户列表
-  
+
   checkUserExist,               // 检查用户是否被占用
   checkSuffixExist,             // 检查前缀是否被占用
   checkNickExist,               // 检查昵称是否被占用

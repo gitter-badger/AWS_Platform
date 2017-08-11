@@ -23,6 +23,8 @@ export class CompanyCheck {
         }
 
         // 数据类型处理
+        inparam.companyRegion = inparam.companyRegion.toString()
+
         inparam.companyStatus = CompanyStatusEnum.Enable
         inparam.companyDesc = inparam.companyDesc || Model.StringValue
         inparam.companyContract = inparam.companyContract || Model.StringValue

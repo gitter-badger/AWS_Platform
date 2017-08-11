@@ -46,6 +46,7 @@ const UserRole = function () {
   return {
     userId: Model.uuid(),
     username: Model.StringValue,
+    uname: Model.StringValue,
     password: Model.StringValue,
     passhash: Model.StringValue,
     parent: Model.StringValue,

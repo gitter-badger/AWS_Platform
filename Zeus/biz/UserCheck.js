@@ -164,7 +164,6 @@ export class UserCheck {
      */
     checkStatus(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "role", type: "N", min: 1, max: 100 },
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
@@ -174,7 +173,6 @@ export class UserCheck {
         }
 
         // 数据类型处理
-        inparam.role = inparam.role.toString()
         inparam.status = parseInt(inparam.status)
 
         return [checkAttError, errorParams]

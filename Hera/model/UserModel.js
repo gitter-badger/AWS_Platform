@@ -17,7 +17,7 @@ export const PaymentState = {  //是否可以进行转账操作
     forbid : 2 //禁止（正在游戏中不能转账）
 }
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic, sex} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic} = {}) {
         super(TABLE_NAMES.TABLE_USER);
         this.userName = userName;
         this.userPwd = userPwd;
