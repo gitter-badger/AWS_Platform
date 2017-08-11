@@ -20,6 +20,11 @@ export class GameCheck {
             return [checkAttError, errorParams]
         }
 
+        // 检查子对象
+        if (!inparam.company || !inparam.company.companyName || !inparam.company.companyId) {
+            return [{ "code": -1, "msg": "游戏厂商数据不合法", "params": ["company"] }, 'company']
+        }
+
         // 数据类型处理
         inparam.gameType = inparam.gameType.toString()
         inparam.kindId = inparam.kindId.toString()
@@ -28,11 +33,12 @@ export class GameCheck {
         inparam.gameImg = inparam.gameImg || Model.StringValue
         inparam.company = inparam.company || Model.StringValue
 
-        return [checkAttError, errorParams]
+        // 精细检查
+        if (!GameTypeEnum[inparam.gameType]) {
+            return [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+        }
 
-        // if (!_.isNumber(kindId)) {
-        //     return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
-        // }
+        return [checkAttError, errorParams]
     }
 
     /**
@@ -52,6 +58,11 @@ export class GameCheck {
 
         // 数据类型处理
         inparam.status = parseInt(inparam.status)
+
+        // 精细检查
+        if (!GameTypeEnum[inparam.gameType]) {
+            return [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+        }
 
         return [checkAttError, errorParams]
     }

@@ -119,6 +119,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     uname: `${CheckUser.username}`,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
     parentName: parentUser.username,
+    parentDisplayName: parentUser.displayName,
     parentSuffix: parentUser.suffix,
     points: Model.NumberValue
   }
