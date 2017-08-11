@@ -117,6 +117,11 @@ export class PackageModel extends BaseModel {
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
+        ret.icon = inparam.icon
+        ret.duration = inparam.duration
+        ret.remark = inparam.remark
+        ret.packageStatus = inparam.packageStatus
+        ret.content = inparam.content
         ret.updatedAt = Model.timeStamp()
         return await this.putItem(ret)
     }
