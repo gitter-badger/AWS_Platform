@@ -1,0 +1,12 @@
+{
+    "body": {
+        "companyName": "测试企业",
+        "companyDesc": "这是一个测试企业",
+        "companyContactWay": "18780004427",
+        "companyEmail": "18780004427@qiye.com",
+        "companyRegion": "欧洲",
+        "companyContract": "合同",
+        "license": "执照",
+        "remark": "类型，分成比"
+    }
+}
