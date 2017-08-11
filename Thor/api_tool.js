@@ -5,11 +5,8 @@ import {
   JSONParser,
   Model,
   Tables,
-  StatusEnum,
   ToolStatusEnum,
-  GenderEnum,
   RoleCodeEnum,
-  RoleEditProps,
   Trim,
   Pick,
   JwtVerify,
@@ -218,5 +215,6 @@ export {
   toolList,                     // 道具列表
   toolOne,                      // 单个道具
   toolUpdate,                   // 更新道具
-  toolChangeStatus              // 道具状态变更
+  toolChangeStatus,             // 道具状态变更
+  toolDelete                    // 道具删除
 }

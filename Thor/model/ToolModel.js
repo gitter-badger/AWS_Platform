@@ -173,6 +173,23 @@ export class ToolModel extends BaseModel {
             return [0, 0]
         }
     }
+
+    /**
+     * 删除
+     * @param {*} inparam
+     */
+    async delete(inparam) {
+        const [err, ret] = await this.deleteItem({
+            Key: {
+                'toolName':inparam.toolName,
+                'toolId': inparam.toolId
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
+    }
 }
 
 

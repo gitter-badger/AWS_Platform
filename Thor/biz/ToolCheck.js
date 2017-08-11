@@ -83,6 +83,7 @@ export class ToolCheck {
      */
     checkDelete(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "toolName", type: "S", min: 1, max: 20 },
             { name: "toolId", type: "N", min: 100000, max: 999999 }]
             , inparam)
 
