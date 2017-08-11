@@ -90,7 +90,8 @@ export const RoleEditProps = {
     'adminEmail',
     'adminContact',
     'contractPeriod',
-    'password'
+    'password',
+    'isforever'
   ],
   '100': [
     'hostName',
@@ -106,7 +107,8 @@ export const RoleEditProps = {
     'adminEmail',
     'adminContact',
     'contractPeriod',
-    'password'
+    'password',
+    'isforever'
   ],
   '1000': [],
   '10000': []
