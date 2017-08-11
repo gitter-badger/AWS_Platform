@@ -135,6 +135,7 @@ export class ToolModel extends BaseModel {
      * @param {道具对象} inparam 
      */
     async updateTool(inparam) {
+        // 更新
         const [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
         if (err) {
             return [err, 0]
@@ -142,9 +143,10 @@ export class ToolModel extends BaseModel {
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
-        ret.price = inparam.price
-        ret.num = inparam.num
-        ret.toolStatus = inparam.status
+        ret.icon = inparam.icon
+        ret.desc = inparam.desc
+        ret.remark = inparam.remark
+        ret.toolStatus = inparam.toolStatus
         ret.updatedAt = Model.timeStamp()
         return await this.putItem(ret)
     }

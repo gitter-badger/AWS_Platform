@@ -162,6 +162,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  toolDelete: #道具删除
+    handler: api_tool.toolDelete
+    events:
+      -
+        http:
+          path: toolDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是道具包管理接口服务 ====================
   packageNew: #创建道具包
     handler: api_package.packageNew
