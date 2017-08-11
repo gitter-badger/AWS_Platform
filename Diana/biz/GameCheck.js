@@ -39,10 +39,6 @@ export class GameCheck {
         }
 
         return [checkAttError, errorParams]
-
-        // if (!_.isNumber(kindId)) {
-        //     return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
-        // }
     }
 
     /**
@@ -62,6 +58,11 @@ export class GameCheck {
 
         // 数据类型处理
         inparam.status = parseInt(inparam.status)
+
+        // 精细检查
+        if (!GameTypeEnum[inparam.gameType]) {
+            return [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+        }
 
         return [checkAttError, errorParams]
     }
