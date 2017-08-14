@@ -15,6 +15,7 @@ import {
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
+import { SeatModel } from './SeatModel'
 
 export class PackageModel extends BaseModel {
     constructor() {
@@ -54,11 +55,17 @@ export class PackageModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('道具包已存在'), 0]
         }
+        // 获取所有添加的道具id，组合字符串以便查询
+        let contentIds = ''
+        for (let tool of inparam.content) {
+            contentIds += (tool.toolId + ',')
+        }
+        inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
+        // 保存
         const dataItem = {
             ...this.item,
             ...inparam
         }
-        // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
         if (putErr) {
             return [putErr, 0]
@@ -86,47 +93,6 @@ export class PackageModel extends BaseModel {
     }
 
     /**
-     * 更新道具包状态
-     * @param {道具包名称} packageName 
-     * @param {道具包ID} packageId 
-     * @param {需要变更的状态} status 
-     */
-    async changeStatus(packageName, packageId, status) {
-        const [err, ret] = await this.updateItem({
-            Key: {
-                'packageName': packageName,
-                'packageId': packageId
-            },
-            UpdateExpression: "SET packageStatus = :status",
-            ExpressionAttributeValues: {
-                ':status': status
-            }
-        })
-        return [err, ret]
-    }
-
-    /**
-     * 更新道具包
-     * @param {道具包对象} inparam 
-     */
-    async update(inparam) {
-        const [err, ret] = await this.getOne(inparam.packageName, inparam.packageId)
-        if (err) {
-            return [err, 0]
-        }
-        if (!ret) {
-            return [new BizErr.ItemNotExistErr(), 0]
-        }
-        ret.icon = inparam.icon
-        ret.duration = inparam.duration
-        ret.remark = inparam.remark
-        ret.packageStatus = inparam.packageStatus
-        ret.content = inparam.content
-        ret.updatedAt = Model.timeStamp()
-        return await this.putItem(ret)
-    }
-
-    /**
      * 查询单个道具包
      * @param {*} packageName
      * @param {*} packageId
@@ -150,11 +116,76 @@ export class PackageModel extends BaseModel {
     }
 
     /**
+     * 更新道具包状态
+     * @param {} inparam 
+     */
+    async changeStatus(inparam) {
+        // 检查是否可以变更
+        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        if (ret) {
+            return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
+        }
+        // 变更
+        [err, ret] = await this.updateItem({
+            Key: {
+                'packageName': inparam.packageName,
+                'packageId': inparam.packageId
+            },
+            UpdateExpression: "SET packageStatus = :status",
+            ExpressionAttributeValues: {
+                ':status': inparam.status
+            }
+        })
+        return [err, ret]
+    }
+
+    /**
+     * 更新道具包
+     * @param {道具包对象} inparam 
+     */
+    async update(inparam) {
+        // 检查是否可以变更
+        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        if (ret) {
+            return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
+        }
+        // 变更
+        [err, ret] = await this.getOne(inparam.packageName, inparam.packageId)
+        if (err) {
+            return [err, 0]
+        }
+        if (!ret) {
+            return [new BizErr.ItemNotExistErr(), 0]
+        }
+        ret.icon = inparam.icon
+        ret.duration = inparam.duration
+        ret.remark = inparam.remark
+        ret.packageStatus = inparam.packageStatus
+        ret.content = inparam.content
+        ret.updatedAt = Model.timeStamp()
+
+        // 获取所有添加的道具id，组合字符串以便查询
+        let contentIds = ''
+        for (let tool of inparam.content) {
+            contentIds += (tool.toolId + ',')
+        }
+        ret.contentIds = contentIds.substr(0, contentIds.length - 1)
+
+        return await this.putItem(ret)
+    }
+
+    /**
      * 删除道具包
      * @param {*} inparam
      */
     async delete(inparam) {
-        const [err, ret] = await this.deleteItem({
+        // 检查是否可以删除
+        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        if (ret) {
+            return [BizErr.ItemUsed('礼包在展位中，不可删除'), 0]
+        }
+        // 删除
+        [err, ret] = await this.deleteItem({
             Key: {
                 'packageName': inparam.packageName,
                 'packageId': inparam.packageId

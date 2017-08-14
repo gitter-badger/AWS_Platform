@@ -9,6 +9,8 @@ export class MsnCheck {
             { name: "msn", type: "N", min: 1, max: 999 },
             { name: "status", type: "N", min: 0, max: 2 }]
             , inparam)
+        inparam.msn = parseInt(inparam.msn).toString()
+        inparam.status = parseInt(inparam.status)
         return [checkAttError, errorParams]
     }
 }

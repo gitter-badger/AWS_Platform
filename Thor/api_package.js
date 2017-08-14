@@ -117,7 +117,7 @@ const packageChangeStatus = async (e, c, cb) => {
         return ResErr(cb, tokenErr)
     }
     // 业务操作
-    const [err, ret] = await new PackageModel().changeStatus(inparam.packageName, inparam.packageId, inparam.status)
+    const [err, ret] = await new PackageModel().changeStatus(inparam)
 
     // 操作日志记录
     inparam.operateAction = '道具状态变更'

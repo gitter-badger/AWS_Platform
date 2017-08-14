@@ -18,6 +18,13 @@ export class SeatCheck {
             return [checkAttError, errorParams]
         }
 
+        if(!inparam.content || inparam.content.length < 1){
+            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+        }
+        if( (!inparam.content.toolId && !inparam.content.packageId) ){
+            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+        }
+
         // 数据类型处理
         inparam.seatStatus = parseInt(inparam.seatStatus)
         inparam.order = parseInt(inparam.order)
@@ -25,7 +32,6 @@ export class SeatCheck {
         inparam.price = parseFloat(inparam.price)
         inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue
-
         return [checkAttError, errorParams]
     }
 
@@ -66,6 +72,13 @@ export class SeatCheck {
 
         if (checkAttError) {
             return [checkAttError, errorParams]
+        }
+
+        if(!inparam.content || inparam.content.length < 1){
+            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+        }
+        if( (!inparam.content.toolId && !inparam.content.packageId) ){
+            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
 
         // 数据类型处理

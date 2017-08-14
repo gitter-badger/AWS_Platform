@@ -118,7 +118,7 @@ const toolChangeStatus = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [err, ret] = await new ToolModel().changeStatus(inparam.toolName, inparam.toolId, inparam.status)
+  const [err, ret] = await new ToolModel().changeStatus(inparam)
 
   // 操作日志记录
   inparam.operateAction = '道具状态变更'

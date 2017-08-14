@@ -36,11 +36,21 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam 
      */
     async add(inparam) {
+        // 获取所有添加的道具/礼包id，组合字符串以便查询
+        let contentIds = ''
+        for (let item in inparam.content) {
+            if (inparam.content['toolId']) {
+                contentIds += ('tool_' + inparam.content['toolId'] + ',')
+            } else {
+                contentIds += ('package_' + inparam.content['packageId'] + ',')
+            }
+        }
+        inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
+        // 保存
         const dataItem = {
             ...this.item,
             ...inparam
         }
-        // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
         if (putErr) {
             return [putErr, 0]
@@ -87,6 +97,7 @@ export class SeatModel extends BaseModel {
      * @param {席位对象} inparam 
      */
     async update(inparam) {
+        // 更新
         const [err, ret] = await this.getOne(inparam)
         if (err) {
             return [err, 0]
@@ -99,8 +110,21 @@ export class SeatModel extends BaseModel {
         ret.remark = inparam.remark
         ret.seatStatus = inparam.seatStatus
         ret.seatType = inparam.seatType
-        ret.sum = ret.sum
+        ret.sum = inparam.sum
+        ret.content = inparam.content
         ret.updatedAt = Model.timeStamp()
+
+        // 获取所有添加的道具/礼包id，组合字符串以便查询
+        let contentIds = ''
+        for (let item in inparam.content) {
+            if (inparam.content['toolId']) {
+                contentIds += ('tool_' + inparam.content['toolId'] + ',')
+            } else {
+                contentIds += ('package_' + inparam.content['packageId'] + ',')
+            }
+        }
+        inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
+
         return await this.putItem(ret)
     }
 
