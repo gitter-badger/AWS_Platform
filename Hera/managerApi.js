@@ -22,7 +22,12 @@ import {RoleCodeEnum} from "./lib/Consts";
 
 
 const ResOK = (callback, res) => callback(null, ReHandler.success(res))
-const ResFail = (callback, res) => callback(null, ReHandler.fail(res))
+const ResFail = (callback, res) => {
+    let errObj = {};
+    errObj.err = res;
+    errObj.code = res.code;
+    callback(null, ReHandler.fail(errObj))
+}
 
 
 /**
@@ -153,8 +158,8 @@ export async function gamePlayerForzen(event, context, cb){
   let state = +requestParams.state;
   if(state != State.forzen && state != State.normal) {
       let stateError = new CHeraErr(CODES.DataError);
-      Object.assign(checkAttError, {params: ["state"]});
-    return cb(null, ReHandler.fail(checkAttError));
+      Object.assign(stateError, {params: ["state"]});
+      return ResFail(cb, stateError);
   }
   var userModel = new UserModel();
   let [getUserRrror, us] = await userModel.get({userName});
@@ -214,6 +219,8 @@ export async function batchForzen(event, context, cb){
   }
   ResOK(cb, {state});
 }
+
+
 // TOKEN验证
 export const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken

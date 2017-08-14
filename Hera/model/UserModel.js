@@ -1,5 +1,6 @@
 let  athena  = require("../lib/athena");
 let {RoleCodeEnum} = require("../lib/Consts");
+import {Model} from "../lib/Dynamo"
 import {TABLE_NAMES} from "../config";
 import {Util} from "../lib/Util"
 
@@ -16,7 +17,7 @@ export const PaymentState = {  //是否可以进行转账操作
     forbid : 2 //禁止（正在游戏中不能转账）
 }
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic} = {}) {
         super(TABLE_NAMES.TABLE_USER);
         this.userName = userName;
         this.userPwd = userPwd;
@@ -28,6 +29,9 @@ export class UserModel extends athena.BaseModel {
         this.merchantName = merchantName;
         this.balance = 0;
         this.msn = msn;
+        this.sex = sex || 0;
+        this.nickname = nickname || Model.StringValue;
+        this.headPic = headPic || Model.StringValue;
         this.payState = paymentState || PaymentState.allow;
     }
 

@@ -28,6 +28,7 @@ export const Store$ = async (action, params) => {
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
+const HeraGamePlayer = 'HeraGamePlayer'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'
 const ZeusPlatformCode = 'ZeusPlatformCode'
@@ -43,6 +44,7 @@ export const Tables = {
   ZeusPlatformCaptcha,
   ZeusPlatformLog,
   ZeusPlatformCode,
+  HeraGamePlayer,
 
   DianaPlatformGame,
   DianaPlatformCompany,

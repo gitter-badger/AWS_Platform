@@ -9,7 +9,7 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({}) {
+    constructor({}={}) {
         super(TABLE_NAMES.BILL_USER);
     }
     setAmount(amount){
