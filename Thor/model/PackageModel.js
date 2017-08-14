@@ -15,6 +15,7 @@ import {
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
+import { SeatModel } from './SeatModel'
 
 export class PackageModel extends BaseModel {
     constructor() {
@@ -92,20 +93,47 @@ export class PackageModel extends BaseModel {
     }
 
     /**
-     * 更新道具包状态
-     * @param {道具包名称} packageName 
-     * @param {道具包ID} packageId 
-     * @param {需要变更的状态} status 
+     * 查询单个道具包
+     * @param {*} packageName
+     * @param {*} packageId
      */
-    async changeStatus(packageName, packageId, status) {
+    async getOne(packageName, packageId) {
+        const [err, ret] = await this.query({
+            KeyConditionExpression: 'packageName = :packageName and packageId = :packageId',
+            ExpressionAttributeValues: {
+                ':packageName': packageName,
+                ':packageId': packageId
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, ret.Items[0]]
+        } else {
+            return [0, 0]
+        }
+    }
+
+    /**
+     * 更新道具包状态
+     * @param {} inparam 
+     */
+    async changeStatus(inparam) {
+        // 检查是否可以变更
+        [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        if (ret) {
+            return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
+        }
+        // 变更
         const [err, ret] = await this.updateItem({
             Key: {
-                'packageName': packageName,
-                'packageId': packageId
+                'packageName': inparam.packageName,
+                'packageId': inparam.packageId
             },
             UpdateExpression: "SET packageStatus = :status",
             ExpressionAttributeValues: {
-                ':status': status
+                ':status': inparam.status
             }
         })
         return [err, ret]
@@ -116,6 +144,12 @@ export class PackageModel extends BaseModel {
      * @param {道具包对象} inparam 
      */
     async update(inparam) {
+        // 检查是否可以变更
+        [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        if (ret) {
+            return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
+        }
+        // 变更
         const [err, ret] = await this.getOne(inparam.packageName, inparam.packageId)
         if (err) {
             return [err, 0]
@@ -141,33 +175,16 @@ export class PackageModel extends BaseModel {
     }
 
     /**
-     * 查询单个道具包
-     * @param {*} packageName
-     * @param {*} packageId
-     */
-    async getOne(packageName, packageId) {
-        const [err, ret] = await this.query({
-            KeyConditionExpression: 'packageName = :packageName and packageId = :packageId',
-            ExpressionAttributeValues: {
-                ':packageName': packageName,
-                ':packageId': packageId
-            }
-        })
-        if (err) {
-            return [err, 0]
-        }
-        if (ret.Items.length > 0) {
-            return [0, ret.Items[0]]
-        } else {
-            return [0, 0]
-        }
-    }
-
-    /**
      * 删除道具包
      * @param {*} inparam
      */
     async delete(inparam) {
+        // 检查是否可以删除
+        [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        if (ret) {
+            return [BizErr.ItemUsed('礼包在展位中，不可删除'), 0]
+        }
+        // 删除
         const [err, ret] = await this.deleteItem({
             Key: {
                 'packageName': inparam.packageName,

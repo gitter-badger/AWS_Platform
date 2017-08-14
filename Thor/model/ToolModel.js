@@ -71,14 +71,14 @@ export class ToolModel extends BaseModel {
 
     /**
      * 道具列表
-     * @param {*} inparams
+     * @param {*} inparam
      */
-    async list(inparams) {
-        inparams = { toolName: null, toolStatus: 1 }
-        let ranges = Model.getInparamRanges(inparams)
-        let values = Model.getInparamValues(inparams)
+    async list(inparam) {
+        inparam = { toolName: null, toolStatus: 1 }
+        let ranges = Model.getInparamRanges(inparam)
+        let values = Model.getInparamValues(inparam)
         // 组装条件
-        // let ranges = _.map(inparams, (v, i) => {
+        // let ranges = _.map(inparam, (v, i) => {
         //     if (v === null) {
         //         return null
         //     }
@@ -91,7 +91,7 @@ export class ToolModel extends BaseModel {
         // _.remove(ranges, (v) => v === null)
         // ranges = _.join(ranges, ' AND ')
         // 组装条件值
-        // const values = _.reduce(inparams, (result, v, i) => {
+        // const values = _.reduce(inparam, (result, v, i) => {
         //     if (v !== null) {
         //         result[`:${i}`] = v
         //     }
@@ -109,47 +109,6 @@ export class ToolModel extends BaseModel {
         }
         const sortResult = _.sortBy(ret.Items, ['createdAt'])
         return [0, sortResult]
-    }
-
-    /**
-     * 更新道具状态
-     * @param {道具} toolName 
-     * @param {道具ID} toolId 
-     * @param {需要变更的状态} status 
-     */
-    async changeStatus(toolName, toolId, status) {
-        const [err, ret] = await this.updateItem({
-            Key: {
-                'toolName': toolName,
-                'toolId': toolId
-            },
-            UpdateExpression: "SET toolStatus = :status",
-            ExpressionAttributeValues: {
-                ':status': status
-            }
-        })
-        return [err, ret]
-    }
-
-    /**
-     * 更新道具
-     * @param {道具对象} inparam 
-     */
-    async updateTool(inparam) {
-        // 更新
-        const [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
-        if (err) {
-            return [err, 0]
-        }
-        if (!ret) {
-            return [new BizErr.ItemNotExistErr(), 0]
-        }
-        ret.icon = inparam.icon
-        ret.desc = inparam.desc
-        ret.remark = inparam.remark
-        ret.toolStatus = inparam.toolStatus
-        ret.updatedAt = Model.timeStamp()
-        return await this.putItem(ret)
     }
 
     /**
@@ -175,18 +134,78 @@ export class ToolModel extends BaseModel {
     }
 
     /**
+     * 更新道具状态
+     * @param {} inparam 
+     */
+    async changeStatus(inparam) {
+        // 检查是否可以变更状态
+        let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
+        if (ret) {
+            return [BizErr.ItemUsed('道具在礼包中，不可变更'), 0]
+        }
+        [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
+        if (ret) {
+            return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
+        }
+        // 变更状态
+        const [err, ret] = await this.updateItem({
+            Key: {
+                'toolName': inparam.toolName,
+                'toolId': inparam.toolId
+            },
+            UpdateExpression: "SET toolStatus = :status",
+            ExpressionAttributeValues: {
+                ':status': inparam.status
+            }
+        })
+        return [err, ret]
+    }
+
+    /**
+     * 更新道具
+     * @param {道具对象} inparam 
+     */
+    async updateTool(inparam) {
+        // 检查是否可以更新
+        let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
+        if (ret) {
+            return [BizErr.ItemUsed('道具在礼包中，不可变更'), 0]
+        }
+        [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
+        if (ret) {
+            return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
+        }
+        // 更新
+        const [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
+        if (err) {
+            return [err, 0]
+        }
+        if (!ret) {
+            return [new BizErr.ItemNotExistErr(), 0]
+        }
+        ret.icon = inparam.icon
+        ret.desc = inparam.desc
+        ret.remark = inparam.remark
+        ret.toolStatus = inparam.toolStatus
+        ret.updatedAt = Model.timeStamp()
+        return await this.putItem(ret)
+    }
+
+    /**
      * 删除
      * @param {*} inparam
      */
     async delete(inparam) {
+        // 检查是否可以删除
         let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
         if (ret) {
             return [BizErr.ItemUsed('道具在礼包中，不可删除'), 0]
         }
-        [err, ret] = await new SeatModel().findIdsContains(inparam.toolId)
+        [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
         if (ret) {
             return [BizErr.ItemUsed('道具在展位中，不可删除'), 0]
         }
+        // 删除
         [err, ret] = await this.deleteItem({
             Key: {
                 'toolName': inparam.toolName,
