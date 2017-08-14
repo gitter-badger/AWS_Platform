@@ -69,3 +69,10 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  info :  #公告信息
+    handler: openApi.info
+    events:
+      - http:
+          path: /notice/info
+          method: post
+          cors: true
