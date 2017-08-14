@@ -60,6 +60,11 @@ export const SeatTypeEnum = {
   '1': '钻石展位',
   '2': '道具展位'
 }
+// 展位内容类型枚举
+export const SeatContentTypeEnum = {
+  'tool': '道具',
+  'package': '礼包'
+}
 // 账单属性
 export const BillMo = function () {
   return {

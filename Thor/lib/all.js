@@ -21,6 +21,7 @@ export {
   RoleCodeEnum,
   GameTypeEnum,
   SeatTypeEnum,
+  SeatContentTypeEnum,
   GameStatusEnum,
   CompanyStatusEnum,
   ToolStatusEnum,

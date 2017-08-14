@@ -198,3 +198,12 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  seatType: #展位列表
+    handler: api_seat.seatType
+    events:
+      -
+        http:
+          path: seatType
+          method: get
+          cors: true
+          authorizer: tokenAuth
