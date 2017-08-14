@@ -1,6 +1,6 @@
 let {RoleCodeEnum} = require("../lib/Consts");
 
-import { pushUserInfo, pushUserBalance } from "../lib/TcpUtil"
+import { pushUserInfo, pushUserBalance, pushId } from "../lib/TcpUtil"
 
 
 const State = {
@@ -35,6 +35,7 @@ export class PushModel{
         const proId = 8;  //协议
         return pushUserBalance(userId+"", host, port, proId);
     }
+    //公告推送
     pushGameNotice(noid) {
         const proId = 1;  //协议
         return pushId(noid, host, port, proId);

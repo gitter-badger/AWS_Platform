@@ -87,13 +87,13 @@ const playerBalanceTrigger = async(e, c , cb) =>{
  * @param {*} c 
  * @param {*} cb 
  */
-const gameNoticeTrigger = async(e, c, cb) => {
+const gameNotice = async(e, c, cb) => {
     console.log(e);
     let record = e.Records[0].dynamodb.Keys;
     console.log(record);
     let noid = record.noid.S;
     let pushModel = new PushModel();
-    let [er] = await pushModel.pushGameNotice(userId);
+    let [er] = await pushModel.pushGameNotice(noid);
     if(er) {
         console.info("广播推送失败");
         console.info(er);
@@ -105,5 +105,5 @@ const gameNoticeTrigger = async(e, c, cb) => {
 export {
     userTrigger,                     // 用户表触发器
     playerBalanceTrigger,
-    gameNoticeTrigger
+    gameNotice
 }

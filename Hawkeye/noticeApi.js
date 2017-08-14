@@ -57,7 +57,7 @@ const add = async(e, c, cb) => {
   if(saveErr) {
     return errorHandle(cb, saveErr);
   }
-  cb(null, ReHandler.success(noticeModel.setProperties()));
+  cb(null, ReHandler.success({data:noticeModel.setProperties()}));
 }
 
 /**
@@ -112,7 +112,7 @@ const update = async(e, c, cb) => {
   if(updateErr) {
     return errorHandle(cb, updateErr);
   }
-  cb(null, ReHandler.success(noticeModel.setProperties()));
+  cb(null, ReHandler.success({data:noticeModel.setProperties()}));
 }
 
 /**
