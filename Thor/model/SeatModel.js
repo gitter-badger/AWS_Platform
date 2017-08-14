@@ -33,6 +33,7 @@ export class SeatModel extends BaseModel {
             }
         }
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
+        inparam.contentType = contentType
         // 保存
         const dataItem = {
             ...this.item,
