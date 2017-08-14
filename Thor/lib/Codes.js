@@ -12,6 +12,7 @@ export const Codes = {
   NoSuffixError: '50007',
   CodeFullError: '50012',
   ItemNotExistError: '50013',
+  ItemUsed: '50014',
 
   Busy: '44004',
   ParamError: '47003',
@@ -59,6 +60,9 @@ export const BizErr = {
   },
   ItemNotExistErr: (errMsg = '记录不存在') => {
     return { code: Codes.ItemNotExistError, msg: errMsg }
+  },
+  ItemUsed: (errMsg = '占用中') => {
+    return { code: Codes.ItemUsed, msg: errMsg }
   },
   TokenErr: (errMsg = '身份令牌错误') => {
     return { code: Codes.TokenError, msg: errMsg }

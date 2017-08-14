@@ -199,4 +199,25 @@ export class BaseModel {
         })
     }
 
+    /**
+     * 通过contentIds模糊查询
+     * @param {*} id
+     */
+    async findIdsContains(id) {
+        const [err, ret] = await this.query({
+            KeyConditionExpression: 'contains(contentIds,:id)',
+            ExpressionAttributeValues: {
+                ':id': id
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, ret.Items]
+        } else {
+            return [0, 0]
+        }
+    }
+
 }

@@ -15,6 +15,8 @@ import {
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
+import { PackageModel } from './PackageModel'
+import { SeatModel } from './SeatModel'
 
 export class ToolModel extends BaseModel {
     constructor() {
@@ -40,7 +42,6 @@ export class ToolModel extends BaseModel {
         const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
         if (uucodeErr) { return [uucodeErr, 0] }
         inparam.toolId = uucodeRet
-
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'toolName = :toolName',
@@ -153,15 +154,14 @@ export class ToolModel extends BaseModel {
 
     /**
      * 查询单个道具
-     * @param {*} toolName
-     * @param {*} toolId
+     * @param {*} inparam
      */
-    async getOne(toolName, toolId) {
+    async getOne(inparam) {
         const [err, ret] = await this.query({
             KeyConditionExpression: 'toolName = :toolName and toolId = :toolId',
             ExpressionAttributeValues: {
-                ':toolName': toolName,
-                ':toolId': toolId
+                ':toolName': inparam.toolName,
+                ':toolId': inparam.toolId
             }
         })
         if (err) {
@@ -179,9 +179,17 @@ export class ToolModel extends BaseModel {
      * @param {*} inparam
      */
     async delete(inparam) {
-        const [err, ret] = await this.deleteItem({
+        let [err, ret] = new PackageModel().findIdsContains(inparam.toolId)
+        if (ret) {
+            return [BizErr.ItemUsed('道具在礼包中，不可删除'), 0]
+        }
+        [err, ret] = new SeatModel().findIdsContains(inparam.toolId)
+        if (ret) {
+            return [BizErr.ItemUsed('道具在展位中，不可删除'), 0]
+        }
+        [err, ret] = await this.deleteItem({
             Key: {
-                'toolName':inparam.toolName,
+                'toolName': inparam.toolName,
                 'toolId': inparam.toolId
             }
         })

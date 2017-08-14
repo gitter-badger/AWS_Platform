@@ -54,11 +54,18 @@ export class PackageModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('道具包已存在'), 0]
         }
+        // 获取所有添加的道具id，组合字符串以便查询
+        let contentIds = ''
+        for (let tool in inparam.content) {
+            contentIds += (tool.id + ',')
+        }
+        contentIds.substr(0, contentIds.length - 1)
+        inparam.contentIds = contentIds
+        // 保存
         const dataItem = {
             ...this.item,
             ...inparam
         }
-        // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
         if (putErr) {
             return [putErr, 0]

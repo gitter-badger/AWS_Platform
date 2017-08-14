@@ -18,6 +18,10 @@ export class SeatCheck {
             return [checkAttError, errorParams]
         }
 
+        if(!inparam.content || inparam.content.length < 1){
+            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+        }
+
         // 数据类型处理
         inparam.seatStatus = parseInt(inparam.seatStatus)
         inparam.order = parseInt(inparam.order)
