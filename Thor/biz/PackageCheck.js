@@ -69,6 +69,9 @@ export class PackageCheck {
         if (checkAttError) {
             return [checkAttError, errorParams]
         }
+        if(!inparam.content || inparam.content.length < 1 || !inparam.content[0].toolId || !inparam.content[0].toolName){
+            return [{ "code": -1, "msg": "道具内容数据不合法", "params": ["content"] }, 'content']
+        }
 
         // 数据类型处理
         inparam.packageStatus = parseInt(inparam.packageStatus)

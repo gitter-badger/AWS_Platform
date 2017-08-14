@@ -129,6 +129,14 @@ export class PackageModel extends BaseModel {
         ret.packageStatus = inparam.packageStatus
         ret.content = inparam.content
         ret.updatedAt = Model.timeStamp()
+
+        // 获取所有添加的道具id，组合字符串以便查询
+        let contentIds = ''
+        for (let tool of inparam.content) {
+            contentIds += (tool.toolId + ',')
+        }
+        ret.contentIds = contentIds.substr(0, contentIds.length - 1)
+
         return await this.putItem(ret)
     }
 
