@@ -121,12 +121,12 @@ export class PackageModel extends BaseModel {
      */
     async changeStatus(inparam) {
         // 检查是否可以变更
-        [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
         if (ret) {
             return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
         }
         // 变更
-        const [err, ret] = await this.updateItem({
+        [err, ret] = await this.updateItem({
             Key: {
                 'packageName': inparam.packageName,
                 'packageId': inparam.packageId
@@ -145,12 +145,12 @@ export class PackageModel extends BaseModel {
      */
     async update(inparam) {
         // 检查是否可以变更
-        [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
         if (ret) {
             return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
         }
         // 变更
-        const [err, ret] = await this.getOne(inparam.packageName, inparam.packageId)
+        [err, ret] = await this.getOne(inparam.packageName, inparam.packageId)
         if (err) {
             return [err, 0]
         }
@@ -180,12 +180,12 @@ export class PackageModel extends BaseModel {
      */
     async delete(inparam) {
         // 检查是否可以删除
-        [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
         if (ret) {
             return [BizErr.ItemUsed('礼包在展位中，不可删除'), 0]
         }
         // 删除
-        const [err, ret] = await this.deleteItem({
+        [err, ret] = await this.deleteItem({
             Key: {
                 'packageName': inparam.packageName,
                 'packageId': inparam.packageId
