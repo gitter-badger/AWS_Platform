@@ -201,6 +201,20 @@ const seatDelete = async (e, c, cb) => {
     }
 }
 
+/**
+ * 展位类别
+ */
+const seatType = async (e, c, cb) => {
+    const res = { m: 'seatType' }
+    let seatTypeArr = []
+    for (let code in SeatTypeEnum) {
+        seatTypeArr.push({ 'code': code, 'name': SeatTypeEnum[code] })
+    }
+    // 全部展位类别
+    return ResOK(cb, { ...res, payload: seatTypeArr })
+
+}
+
 // ==================== 以下为内部方法 ====================
 
 /**
@@ -212,5 +226,6 @@ export {
     seatOne,                         // 单个席位
     seatUpdate,                      // 更新席位
     seatChangeStatus,                // 席位状态变更
-    seatDelete                       // 席位删除
+    seatDelete,                      // 席位删除
+    seatType                         // 展位列表
 }

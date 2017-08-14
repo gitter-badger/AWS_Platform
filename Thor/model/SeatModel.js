@@ -1,19 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels,
-    SeatStatusEnum,
-    SeatTypeEnum
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, SeatStatusEnum, SeatTypeEnum, SeatContentTypeEnum } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
@@ -36,6 +21,7 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam 
      */
     async add(inparam) {
+        let contentType = SeatContentTypeEnum['tool']
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
         for (let item in inparam.content) {
@@ -43,6 +29,7 @@ export class SeatModel extends BaseModel {
                 contentIds += ('tool_' + inparam.content['toolId'] + ',')
             } else {
                 contentIds += ('package_' + inparam.content['packageId'] + ',')
+                contentType = SeatContentTypeEnum['package']
             }
         }
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
@@ -65,14 +52,37 @@ export class SeatModel extends BaseModel {
     async list(inparam) {
         // 查询
         const [err, ret] = await this.scan({
-            // FilterExpression: ranges,
-            // ExpressionAttributeValues: values
+            KeyConditionExpression: '#seatType = :seatType',
+            ExpressionAttributeValues: {
+                ':seatType': inparam.seatType,
+            }
         })
         if (err) {
             return [err, 0]
         }
         const sortResult = _.sortBy(ret.Items, ['order'])
         return [0, sortResult]
+    }
+
+    /**
+     * 查询单个席位
+     * @param {*} inparam
+     */
+    async getOne(inparam) {
+        const [err, ret] = await this.query({
+            KeyConditionExpression: 'seatId = :seatId',
+            ExpressionAttributeValues: {
+                ':seatId': inparam.seatId
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, ret.Items[0]]
+        } else {
+            return [0, 0]
+        }
     }
 
     /**
@@ -126,27 +136,6 @@ export class SeatModel extends BaseModel {
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
 
         return await this.putItem(ret)
-    }
-
-    /**
-     * 查询单个席位
-     * @param {*} inparam
-     */
-    async getOne(inparam) {
-        const [err, ret] = await this.query({
-            KeyConditionExpression: 'seatId = :seatId',
-            ExpressionAttributeValues: {
-                ':seatId': inparam.seatId
-            }
-        })
-        if (err) {
-            return [err, 0]
-        }
-        if (ret.Items.length > 0) {
-            return [0, ret.Items[0]]
-        } else {
-            return [0, 0]
-        }
     }
 
     /**

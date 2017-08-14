@@ -579,6 +579,12 @@ resources:
           -
             AttributeName: seatId
             AttributeType: S
+          # -
+          #   AttributeName: seatType
+          #   AttributeType: S
+          # -
+          #   AttributeName: order
+          #   AttributeType: N
         KeySchema:
           -
             AttributeName: seatId
@@ -586,6 +592,21 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        # GlobalSecondaryIndexes:
+        #   -
+        #     IndexName: SeatTypeIndex
+        #     KeySchema:
+        #       -
+        #         AttributeName: seatType
+        #         KeyType: HASH
+        #       -
+        #         AttributeName: order
+        #         KeyType: RANGE
+        #     Projection:
+        #       ProjectionType: ALL
+        #     ProvisionedThroughput:
+        #       ReadCapacityUnits: 1
+        #       WriteCapacityUnits: 1
 
     HeraGamePlayerBill: #玩家账单表
       Type: AWS::DynamoDB::Table
