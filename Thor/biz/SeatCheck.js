@@ -18,10 +18,10 @@ export class SeatCheck {
             return [checkAttError, errorParams]
         }
 
-        if(!inparam.content || inparam.content.length < 1){
+        if (!inparam.content || inparam.content.length < 1) {
             return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
-        if( (!inparam.content.toolId && !inparam.content.packageId) ){
+        if ((!inparam.content.toolId && !inparam.content.packageId)) {
             return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
 
@@ -32,6 +32,24 @@ export class SeatCheck {
         inparam.price = parseFloat(inparam.price)
         inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查查询
+     * @param {*} inparam 
+     */
+    checkQuery(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "seatType", type: "N", min: 1, max: 2 }]
+            , inparam)
+
+        if (checkAttError) {
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.seatType = inparam.seatType.toString()
         return [checkAttError, errorParams]
     }
 
@@ -74,10 +92,10 @@ export class SeatCheck {
             return [checkAttError, errorParams]
         }
 
-        if(!inparam.content || inparam.content.length < 1){
+        if (!inparam.content || inparam.content.length < 1) {
             return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
-        if( (!inparam.content.toolId && !inparam.content.packageId) ){
+        if ((!inparam.content.toolId && !inparam.content.packageId)) {
             return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
 

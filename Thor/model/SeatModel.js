@@ -51,9 +51,9 @@ export class SeatModel extends BaseModel {
      */
     async list(inparam) {
         // 查询
-        const [err, ret] = await this.query({
+        const [err, ret] = await this.scan({
             IndexName: 'SeatTypeIndex',
-            KeyConditionExpression: 'seatType = :seatType',
+            FilterExpression: 'seatType = :seatType',
             ExpressionAttributeValues: {
                 ':seatType': inparam.seatType,
             }
@@ -61,8 +61,7 @@ export class SeatModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
-        const sortResult = _.sortBy(ret.Items, ['order'])
-        return [0, sortResult]
+        return [0, ret.Items]
     }
 
     /**
