@@ -1,6 +1,8 @@
-import athena from "./lib/athena";
+let athena = require("./lib/athena");
 
 import {CODES, CHeraErr} from "./lib/Codes";
+
+import {Util} from "./lib/Util"
 
 import {ReHandler, JwtVerify} from "./lib/Response";
 
@@ -8,9 +10,9 @@ import {Model} from "./lib/Dynamo";
 
 import {NoticeModel} from "./model/NoticeModel"
 
-import {GameModel} from "./model/GameModel"
+import {MerchantModel} from "./model/MerchantModel"
 
-import {RoleCodeEnum} from "./lib/Consts"
+import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
 /**
  * 添加公告
@@ -23,7 +25,7 @@ const add = async(e, c, cb) => {
   if(beforeErr) {
     return errorHandle(cb, beforeErr);
   }
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -33,28 +35,29 @@ const add = async(e, c, cb) => {
       {name : "endTime", type:"N"},
       {name : "splitTime", type:"N"},
       {name : "kindId", type:"S"},
+      {name : "displayId", type:"S"},
   ], requestParams);
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
   //根据kindId找到游戏
-  let gameModel = new GameModel();
-  let [gameErr, gameInfo] = await gameModel.findByKindId(requestParams.kindId);
-  if(gameErr) {
-    return errorHandle(cb, gameErr);
-  }
-  if(!gameInfo) {
-    return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
+  if(requestParams.kindId == -1) {
+    requestParams.gameName = "广场";
+  }else {
+    let gameInfo = GameTypeEnum[requestParams.kindId]
+    if(!gameInfo) {
+      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
+    }
+    requestParams.gameName = gameInfo.name;
   }
   requestParams.userId = userInfo.userId;
-  requestParams.gemeName = gameInfo.gameName;
   let noticeModel = new NoticeModel(requestParams);
   let [saveErr] = await noticeModel.save();
   if(saveErr) {
     return errorHandle(cb, saveErr);
   }
-  cb(null, ReHandler.success(noticeModel));
+  cb(null, ReHandler.success(noticeModel.setProperties()));
 }
 
 /**
@@ -68,7 +71,7 @@ const update = async(e, c, cb) => {
   if(beforeErr) {
     return errorHandle(cb, beforeErr);
   }
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -78,6 +81,7 @@ const update = async(e, c, cb) => {
     {name : "startTime", type:"N"},
     {name : "endTime", type:"N"},
     {name : "splitTime", type:"N"},
+    {name : "displayId", type:"S"},
     {name : "kindId", type:"S"},
   ], requestParams);
   if(checkAttError){
@@ -92,12 +96,23 @@ const update = async(e, c, cb) => {
   if(!noticeInfo) {
     return errorHandle(cb, new CHeraErr(CODES.noticeNotExist));
   }
+  //根据kindId找到游戏
+  if(requestParams.kindId == -1) {
+    requestParams.gameName = "广场";
+  }else {
+    let gameInfo = GameTypeEnum[requestParams.kindId]
+    if(!gameInfo) {
+      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
+    }
+    requestParams.gameName = gameInfo.name;
+  }
   let noticeModel = new NoticeModel(requestParams);
+  delete noticeModel.noid;
   let [updateErr] = await noticeModel.update({noid:requestParams.noid});
   if(updateErr) {
     return errorHandle(cb, updateErr);
   }
-  cb(null, ReHandler.success(noticeModel));
+  cb(null, ReHandler.success(noticeModel.setProperties()));
 }
 
 /**
@@ -111,9 +126,9 @@ const list = async(e, c, cb) => {
   if(beforeErr) {
     return errorHandle(cb, beforeErr);
   }
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if(parserErr) return errorHandle(cb, parserErr);
-  let [scanErr, list] = new NoticeModel().scan({});
+  let [scanErr, list] = await new NoticeModel().scan({});
   if(scanErr) {
     return errorHandle(cb, scanErr);
   } 
@@ -121,24 +136,31 @@ const list = async(e, c, cb) => {
 }
 
 /**
- * 游戏列表
+ * 商家列表
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
  */
-const gameList = async(e, c, cb) => {
+const merchantList = async(e, c, cb) => {
   let [beforeErr, userInfo] = await validateToken(e);
   if(beforeErr) {
     return errorHandle(cb, beforeErr);
   }
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if(parserErr) return errorHandle(cb, parserErr);
-  let gameModel = new GameModel();
-  let [gameErr, gameList] = await gameModel.scan({});
-  if(gameErr) {
-    return errorHandle(cb, gameErr);
+  let merchantModel = new MerchantModel();
+  let [merchantErr, merchantList] = await merchantModel.all();
+  if(merchantErr) {
+    return errorHandle(cb, merchantErr);
   }
-  cb(null, ReHandler.success({list:gameList}));
+  merchantList = merchantList || [];
+  let returnList = merchantList.map((item) => {
+    return {
+      displayId : item.displayId,
+      displayName : item.displayName
+    }
+  })
+  cb(null, ReHandler.success({list:returnList}));
 }
 
 /**
@@ -152,7 +174,7 @@ const remove = async(e, c, cb) => {
   if(beforeErr) {
     return errorHandle(cb, beforeErr);
   }
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
     {name : "noid", type:"S"}
@@ -183,13 +205,13 @@ const remove = async(e, c, cb) => {
  */
 const validateToken = async(e) => {
     //json转换
-    const [tokenErr, token] = await Model.currentToken(event);
+    const [tokenErr, token] = await Model.currentToken(e);
     if (tokenErr) {
         return [tokenErr, null];
     }
-    const [e, tokenInfo] = await JwtVerify(token[1])
-    if(e) {
-        return [e, nuyll];
+    const [te, tokenInfo] = await JwtVerify(token[1])
+    if(te) {
+        return [te, nuyll];
     }
     let role = tokenInfo.role;
     let userId = tokenInfo.userId;
@@ -213,7 +235,7 @@ const errorHandle = (cb, error) =>{
 export{
     add,
     update,
-    gameList,
+    merchantList,
     remove,
     list
 }

@@ -34,6 +34,9 @@ export const pushUserInfo =  (body, host, port, proId) => {
         })
     })
 }
+export const pushId = (id, host, port, proId) => {
+    return pushUserBalance(id, host, port, proId);
+}
 export const pushUserBalance = (userId, host, port, proId) => {
     let client = new net.Socket();
     let buffer = buildPayload(proId, userId);

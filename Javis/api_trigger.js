@@ -81,8 +81,29 @@ const playerBalanceTrigger = async(e, c , cb) =>{
         console.info("玩家余额变更推送成功");
     }
 }
+/**
+ * 游戏广播推送
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const gameNoticeTrigger = async(e, c, cb) => {
+    console.log(e);
+    let record = e.Records[0].dynamodb.Keys;
+    console.log(record);
+    let noid = record.noid.S;
+    let pushModel = new PushModel();
+    let [er] = await pushModel.pushGameNotice(userId);
+    if(er) {
+        console.info("广播推送失败");
+        console.info(er);
+    }else {
+        console.info("广播推送成功");
+    }
+}
 
 export {
     userTrigger,                     // 用户表触发器
-    playerBalanceTrigger
+    playerBalanceTrigger,
+    gameNoticeTrigger
 }

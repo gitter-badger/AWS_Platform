@@ -17,7 +17,9 @@ export class BaseModel{
         let item = {};
         for(let key in this){
             if(!Object.is(key, "dbClient") && !Object.is(key, "tableName")){
-                item[key] = this[key];
+                if(this[key] || this[key] ==0){
+                    item[key] = this[key];
+                }
             }
         }
         return item;
@@ -116,9 +118,11 @@ export class BaseModel{
     }
     async scan(conditions){
         let filterExpression = "";
+        let expressionAttributeNames = {};
         let expressionAttributeValues = {};
         for(let key in conditions){
-            filterExpression += `${key}=:${key} and `;
+            filterExpression += `#${key}=:${key} and `;
+            expressionAttributeNames[`#${key}`] = `${key}`;
             expressionAttributeValues[`:${key}`] = conditions[key];
         }
         let scanOpts = {};
@@ -126,6 +130,7 @@ export class BaseModel{
             filterExpression = filterExpression.substr(0, filterExpression.length-4);
             scanOpts = {
                 FilterExpression : filterExpression,
+                ExpressionAttributeNames : expressionAttributeNames,
                 ExpressionAttributeValues:expressionAttributeValues
             }
         }

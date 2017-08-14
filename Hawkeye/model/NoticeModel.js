@@ -7,8 +7,8 @@ import {Util} from "../lib/Util";
 
 
 export class NoticeModel extends athena.BaseModel {
-    constructor({userId, content, showTime, kindId,startTime, endTime, split, gameName} = {}) {
-        super(Tables.HawkeyeNotice);
+    constructor({userId, content, showTime, kindId,startTime, endTime, splitTime, gameName, displayId} = {}) {
+        super(Tables.HawkeyeGameNotice);
         this.userId = userId;    //创建者
         this.noid = Util.uuid();
         this.content = content;
@@ -20,5 +20,6 @@ export class NoticeModel extends athena.BaseModel {
         this.startTime = +startTime; //开始时间
         this.endTime = +endTime;     //结束时间
         this.splitTime = +splitTime;  //播放间隔（单位秒）
+        this.displayId = displayId;  //商家ID，如果是全部，为-1
     }
 }

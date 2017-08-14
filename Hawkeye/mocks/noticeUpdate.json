@@ -1,0 +1,12 @@
+{
+    "body" : {
+        "noid" : "8a3379d1-d9c4-4656-9190-6ca9476c6f20",
+        "content" : "这是更改后的公告",
+        "displayId" : "752609",
+        "kindId" : "-1",
+        "showTime" : 60,
+        "startTime" : 1,
+        "endTime" :3600000,
+        "splitTime" : 36
+    }
+}

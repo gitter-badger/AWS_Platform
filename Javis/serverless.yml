@@ -107,6 +107,15 @@ functions:
               Fn::GetAtt:
                 - HeraGamePlayerBill
                 - StreamArn
+  gameNotice: #游戏公告触发器
+      handler: api_trigger.gameNotice
+      events:
+        - stream:
+            type: dynamodb
+            arn:
+              Fn::GetAtt:
+                - HawkeyeGameNotice
+                - StreamArn
 resources:
   Resources:
     ZeusPlatformUser: #用户表
@@ -636,4 +645,20 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-        
+    HawkeyeGameNotice:  #游戏通知表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyeGameNotice
+        AttributeDefinitions:
+          -
+            AttributeName: noid
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: noid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
