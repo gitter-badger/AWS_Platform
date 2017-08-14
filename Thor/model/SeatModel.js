@@ -51,8 +51,9 @@ export class SeatModel extends BaseModel {
      */
     async list(inparam) {
         // 查询
-        const [err, ret] = await this.scan({
-            KeyConditionExpression: '#seatType = :seatType',
+        const [err, ret] = await this.query({
+            IndexName: 'SeatTypeIndex',
+            KeyConditionExpression: 'seatType = :seatType',
             ExpressionAttributeValues: {
                 ':seatType': inparam.seatType,
             }
