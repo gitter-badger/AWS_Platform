@@ -56,11 +56,10 @@ export class PackageModel extends BaseModel {
         }
         // 获取所有添加的道具id，组合字符串以便查询
         let contentIds = ''
-        for (let tool in inparam.content) {
+        for (let tool of inparam.content) {
             contentIds += (tool.toolId + ',')
         }
-        contentIds.substr(0, contentIds.length - 1)
-        inparam.contentIds = contentIds
+        inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
         // 保存
         const dataItem = {
             ...this.item,

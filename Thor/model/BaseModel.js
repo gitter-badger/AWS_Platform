@@ -204,8 +204,8 @@ export class BaseModel {
      * @param {*} id
      */
     async findIdsContains(id) {
-        const [err, ret] = await this.query({
-            KeyConditionExpression: 'contains(contentIds,:id)',
+        const [err, ret] = await this.scan({
+            FilterExpression: 'contains(contentIds,:id)',
             ExpressionAttributeValues: {
                 ':id': id
             }

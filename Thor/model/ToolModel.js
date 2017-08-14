@@ -179,11 +179,11 @@ export class ToolModel extends BaseModel {
      * @param {*} inparam
      */
     async delete(inparam) {
-        let [err, ret] = new PackageModel().findIdsContains(inparam.toolId)
+        let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
         if (ret) {
             return [BizErr.ItemUsed('道具在礼包中，不可删除'), 0]
         }
-        [err, ret] = new SeatModel().findIdsContains(inparam.toolId)
+        [err, ret] = await new SeatModel().findIdsContains(inparam.toolId)
         if (ret) {
             return [BizErr.ItemUsed('道具在展位中，不可删除'), 0]
         }
