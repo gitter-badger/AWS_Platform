@@ -1,18 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels,
-    ToolStatusEnum
-} from '../lib/all'
+import {Tables,Codes,BizErr,Trim,Empty,Model,Keys,Pick,Omit,RoleCodeEnum,RoleModels,ToolStatusEnum} from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 import { PackageModel } from './PackageModel'
@@ -148,7 +134,7 @@ export class ToolModel extends BaseModel {
             return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
         }
         // 变更状态
-        const [err, ret] = await this.updateItem({
+        [err, ret] = await this.updateItem({
             Key: {
                 'toolName': inparam.toolName,
                 'toolId': inparam.toolId
@@ -176,7 +162,7 @@ export class ToolModel extends BaseModel {
             return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
         }
         // 更新
-        const [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
+        [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
         if (err) {
             return [err, 0]
         }

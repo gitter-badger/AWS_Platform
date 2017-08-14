@@ -32,7 +32,6 @@ export class SeatCheck {
         inparam.price = parseFloat(inparam.price)
         inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue
-
         return [checkAttError, errorParams]
     }
 

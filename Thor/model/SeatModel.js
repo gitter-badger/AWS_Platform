@@ -38,11 +38,11 @@ export class SeatModel extends BaseModel {
     async add(inparam) {
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
-        for (let item of inparam.content) {
-            if (item.toolId) {
-                contentIds += ('tool_' + item.toolId + ',')
+        for (let item in inparam.content) {
+            if (inparam.content['toolId']) {
+                contentIds += ('tool_' + inparam.content['toolId'] + ',')
             } else {
-                contentIds += ('package_' + item.packageId + ',')
+                contentIds += ('package_' + inparam.content['packageId'] + ',')
             }
         }
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
@@ -116,14 +116,14 @@ export class SeatModel extends BaseModel {
 
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
-        for (let item of inparam.content) {
-            if (item.toolId) {
-                contentIds += ('tool_' + item.toolId + ',')
+        for (let item in inparam.content) {
+            if (inparam.content['toolId']) {
+                contentIds += ('tool_' + inparam.content['toolId'] + ',')
             } else {
-                contentIds += ('package_' + item.packageId + ',')
+                contentIds += ('package_' + inparam.content['packageId'] + ',')
             }
         }
-        ret.contentIds = contentIds.substr(0, contentIds.length - 1)
+        inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
 
         return await this.putItem(ret)
     }
