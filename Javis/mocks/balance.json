@@ -10,7 +10,7 @@
             "Keys" : 
                 {
                     "userId": { "N": "631944" },
-                    "kindId": { "S": "11111" } 
+                    "userName": { "S": "CN_test02" } 
                 }
         }
     }

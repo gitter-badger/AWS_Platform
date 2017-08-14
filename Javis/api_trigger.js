@@ -13,6 +13,8 @@ import {MSNModel} from "./model/MSNModel"
 
 import {UserBillModel} from "./model/UserBillModel"
 
+import {PlayerModel} from "./model/PlayerModel"
+
 import {TcpUtil} from "./lib/TcpUtil"
 
 
@@ -57,8 +59,19 @@ const playerBalanceTrigger = async(e, c , cb) =>{
     console.log(e);
     let record = e.Records[0].dynamodb.Keys;
     console.log(record);
-    let userId = +record.userId.N;
-    console.log("userId: "+ userId);
+    let userName = record.userName.S;
+    console.log("userName: "+ userName);
+    let playerModel = new PlayerModel();
+    let [playErr, playerInfo] = await playerModel.get({userName});
+    if(playErr) {
+        console.log(playErr);
+        return;
+    }
+    if(!playerInfo) {
+        return;
+    }
+    console.log(playerInfo);
+    let userId = playerInfo.userId;
     let pushModel = new PushModel();
     let [er] = await pushModel.pushUserBalance(userId);
     if(er) {

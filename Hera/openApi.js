@@ -353,7 +353,7 @@ async function gamePlayerA3Login(event, context, callback) {
       userId : userInfo.userId,
       nickname : userInfo.nickname,
       headPic : userInfo.headPic,
-      sex : userInfo.sex
+      sex : userInfo.sex || 0
     }
   }
   callback(null, ReHandler.success(callObj));
@@ -367,6 +367,7 @@ async function gamePlayerA3Login(event, context, callback) {
  * @param callback
  */
 async function getA3GamePlayerBalance(event, context, callback) {
+  console.log(event);
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters);
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
@@ -641,7 +642,9 @@ async function updateUserInfo(event, context, callback) {
   let obj = {};
   for(let key in requestParams) {
     if(Object.is(key, "nickname") || Object.is(key, "headPic") || Object.is(key, "sex")) {
-      obj[key] = requestParams[key];
+      if(requestParams[key]) {
+          obj[key] = requestParams[key];
+      }
     }
   }
   if(obj.sex != 1 && obj.sex!=2) delete obj.sex;

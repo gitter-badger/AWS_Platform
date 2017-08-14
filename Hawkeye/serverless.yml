@@ -1,0 +1,56 @@
+
+service: Hawkeye # NOTE: update this with your service name
+
+# Use the serverless-webpack plugin to transpile ES6
+plugins:
+  - serverless-webpack
+
+# Enable auto-packing of external modules
+custom:
+  webpackIncludeModules: true
+
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
+functions:
+  tokenVerify:
+    handler: noticeApi.jwtverify
+    integration: lambda
+  add:  #添加公告
+    handler: noticeApi.add
+    events:
+      - http:
+          path: /player/list
+          method: get
+          cors: true
+          authorizer: tokenVerify
+resources:
+  Resources:
+    HawkeyeNotice:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyeNotice
+        AttributeDefinitions:
+          -
+            AttributeName: noid
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: noid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
