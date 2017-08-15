@@ -92,7 +92,8 @@ export class ToolCheck {
         }
 
         // 数据类型处理
-
+        inparam.toolId = inparam.toolId.toString()
+        
         return [checkAttError, errorParams]
     }
 }

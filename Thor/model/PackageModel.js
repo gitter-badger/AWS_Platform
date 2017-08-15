@@ -194,6 +194,10 @@ export class PackageModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
+
+        // End:删除生成的编码
+        this.db$('delete', { TableName: Tables.ZeusPlatformCode, Item: { type: 'package', code: inparam.packageId } })
+        
         return [0, ret]
     }
 }

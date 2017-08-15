@@ -1,4 +1,4 @@
-import {Tables,Codes,BizErr,Trim,Empty,Model,Keys,Pick,Omit,RoleCodeEnum,RoleModels,ToolStatusEnum} from '../lib/all'
+import { Tables, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels, ToolStatusEnum } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 import { PackageModel } from './PackageModel'
@@ -202,6 +202,10 @@ export class ToolModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
+
+        // End:删除生成的编码
+        this.db$('delete', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: inparam.toolId } })
+
         return [0, ret]
     }
 }
