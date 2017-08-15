@@ -71,6 +71,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
+
   // 检查用户是否已经存在
   const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
@@ -102,6 +103,20 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (queryParentErr) {
     return [queryParentErr, 0]
   }
+
+  // 如果是线路商创建商户，检查可用余额
+  // if (parentUser.role === RoleCodeEnum['Manager'] && CheckUser.role === RoleCodeEnum['Merchant']) {
+  //   // 查询已用商户已用数量
+  //   let merchantUsedCount = 0
+  //   const [err, ret] = await new UserModel().listChildUsers(parentUser, RoleCodeEnum['Merchant'])
+  //   if (ret && ret.length > 0) {
+  //     merchantUsedCount = ret.length
+  //   }
+  //   if (merchantUsedCount >= parentUser.limit) {
+  //     return [BizErr.InparamErr('商户可用名额不足'), 0]
+  //   }
+  // }
+
   // 初始点数
   const initPoints = CheckUser.points
   // 检查余额
