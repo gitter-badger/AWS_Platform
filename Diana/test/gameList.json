@@ -15,6 +15,7 @@
     }
   },
   "body": {
-    "gameType": "10000"
+    "gameType": null,
+    "keyword":"战锤"
   }
 }

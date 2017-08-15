@@ -80,35 +80,37 @@ export class GameModel extends BaseModel {
 
     /**
      * 游戏列表
-     * @param {*} pathParams 
+     * @param {*} inparam 
      */
-    async listGames(pathParams) {
-        // 如果类型参数为空，默认查询所有类型
-        if (!pathParams.gameType) {
-            pathParams.gameType = ''
-            for (let item in GameTypeEnum) {
-                pathParams.gameType += (item + ',')
-            }
-            pathParams.gameType = pathParams.gameType.substr(0, pathParams.gameType.length - 1)
-        }
+    async listGames(inparam) {
         // 分割类型
-        const inputTypes = pathParams.gameType.split(',')
+        const inputTypes = inparam.gameType.split(',')
         const gameTypes = _.filter(inputTypes, (type) => {
             return !!GameTypeEnum[type].code
         })
         if (gameTypes.length === 0) {
             return [BizErr.ParamErr('game type is missing'), 0]
         }
-        // 组装条件
+
+        // 1、组装条件
         let ranges = _.map(gameTypes, (t, index) => {
             return `gameType = :t${index}`
         }).join(' OR ')
+        ranges = '(' + ranges + ')'
+        // 添加查询条件
+        inparam.keyword ? ranges += ' AND contains(gameName,:gameName)' : 0
         // ranges += ' AND gameStatus <> :gameStatus'
+
+        // 2、组装条件值
         const values = _.reduce(gameTypes, (result, t, index) => {
             result[`:t${index}`] = t
             return result
         }, {})
+        // 添加查询条件值
+        inparam.keyword ? values[':gameName'] = inparam.keyword : 0
         // values[':gameStatus'] = 0
+
+        // 3、开始查询
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,
