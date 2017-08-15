@@ -63,7 +63,7 @@ export class LogModel extends BaseModel {
             if (loginUserErr.code == Codes.MerchantPeriodStartErr) {
                 detail = '帐号尚未生效'
             }
-            if (loginUserErr.code == Codes.IPBlock) {
+            if (loginUserErr.code == Codes.UserIPError) {
                 detail = 'IP不合法'
             }
             if (loginUserErr.code == Codes.MerchantPeriodEndErr) {
