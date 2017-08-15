@@ -40,4 +40,9 @@ export class PushModel{
         const proId = 1;  //协议
         return pushId(noid, host, port, proId);
     }
+    //公告推送
+    pushGameEamil(emid) {
+        const proId = 2;  //协议
+        return pushId(emid, host, port, proId);
+    }
 }

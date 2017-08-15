@@ -36,6 +36,7 @@ const userTrigger = async (e, c, cb) => {
     }
     let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
     msnInfo = msnInfo || {msn:"-1"};
+    msnInfo.msn = msnInfo.msn || "-1";
     let pushModel = new PushModel({
         username : userInfo.username,
         userId :userInfo.userId,
@@ -101,9 +102,29 @@ const gameNotice = async(e, c, cb) => {
         console.info("广播推送成功");
     }
 }
-
+/**
+ * 游戏邮件推送
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const gameEmail = async(e, c, cb) => {
+    console.log(e);
+    let record = e.Records[0].dynamodb.Keys;
+    console.log(record);
+    let emid = record.emid.S;
+    let pushModel = new PushModel();
+    let [er] = await pushModel.pushGameNotice(emid);
+    if(er) {
+        console.info("广播推送失败");
+        console.info(er);
+    }else {
+        console.info("广播推送成功");
+    }
+}
 export {
     userTrigger,                     // 用户表触发器
     playerBalanceTrigger,
-    gameNotice
+    gameNotice,
+    gameEmail
 }

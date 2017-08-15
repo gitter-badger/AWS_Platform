@@ -35,29 +35,42 @@ const add = async(e, c, cb) => {
       {name : "endTime", type:"N"},
       {name : "splitTime", type:"N"},
       {name : "kindId", type:"S"},
-      {name : "displayId", type:"S"},
+      {name : "msn", type:"N"},
+      {name : "frequency", type:"N"},
   ], requestParams);
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
-  //根据kindId找到游戏
-  if(requestParams.kindId == -1) {
-    requestParams.gameName = "广场";
-  }else {
-    let gameInfo = GameTypeEnum[requestParams.kindId]
-    if(!gameInfo) {
-      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
-    }
-    requestParams.gameName = gameInfo.name;
+  let [gameInfoErr, gameName] = getGameName(requestParams);
+  if(gameInfoErr) {
+    return errorHandle(cb, gameInfoErr);
   }
   requestParams.userId = userInfo.userId;
+  requestParams.gameName = gameName;
   let noticeModel = new NoticeModel(requestParams);
   let [saveErr] = await noticeModel.save();
   if(saveErr) {
     return errorHandle(cb, saveErr);
   }
   cb(null, ReHandler.success({data:noticeModel.setProperties()}));
+}
+
+function getGameName(requestParams){
+  //根据kindId找到游戏
+  let gameName = '';
+  if(requestParams.kindId == 0) {
+    gameName = "广场";
+  }else if(requestParams.kindId == -1) {
+    gameName = "所有游戏";
+  }else{
+    let gameInfo = GameTypeEnum[requestParams.kindId]
+    gameName = gameInfo.name;
+    if(!gameInfo) {
+      return [new CHeraErr(CODES.gameNotExist), gameName]
+    }
+  }
+  return [null, gameName];
 }
 
 /**
@@ -81,8 +94,9 @@ const update = async(e, c, cb) => {
     {name : "startTime", type:"N"},
     {name : "endTime", type:"N"},
     {name : "splitTime", type:"N"},
-    {name : "displayId", type:"S"},
+    {name : "msn", type:"N"},
     {name : "kindId", type:"S"},
+    {name : "frequency", type:"N"},
   ], requestParams);
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
@@ -97,15 +111,11 @@ const update = async(e, c, cb) => {
     return errorHandle(cb, new CHeraErr(CODES.noticeNotExist));
   }
   //根据kindId找到游戏
-  if(requestParams.kindId == -1) {
-    requestParams.gameName = "广场";
-  }else {
-    let gameInfo = GameTypeEnum[requestParams.kindId]
-    if(!gameInfo) {
-      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
-    }
-    requestParams.gameName = gameInfo.name;
+  let [gameInfoErr, gameName] = getGameName(requestParams);
+  if(gameInfoErr) {
+    return errorHandle(cb, gameInfoErr);
   }
+  requestParams.gameName = gameName;
   let noticeModel = new NoticeModel(requestParams);
   delete noticeModel.noid;
   let [updateErr] = await noticeModel.update({noid:requestParams.noid});
@@ -156,10 +166,14 @@ const merchantList = async(e, c, cb) => {
   merchantList = merchantList || [];
   let returnList = merchantList.map((item) => {
     return {
-      displayId : item.displayId,
+      msn : item.msn,
       displayName : item.displayName
     }
   })
+  returnList.unshift({
+    msn : -1,
+    displayName : "所有"
+  });
   cb(null, ReHandler.success({list:returnList}));
 }
 

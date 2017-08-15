@@ -28,6 +28,10 @@ export const CODES = {
 
     noticeNotExist : 13100, //公告不存在
     notAuth : 13101,  //没有权限
+    toolNotExist : 13102, //道具不存在
+    toolMoreThan : 13103,  //道具超过12个
+    emailNotExist : 13104, //邮件不存在
+    emailUpdateError:13105,  //邮件已经发送，不能修改
 }
 
 const errorMessage = {
@@ -52,7 +56,11 @@ const errorMessage = {
   "13001" : "金额不正确",
   "13002" : "游戏不存在",
   "13100" : "公告不存在",
-  "13101" : "没有权限"
+  "13101" : "没有权限",
+  "13102" : "道具不存在",
+  "13103" : "道具超过12个",
+  "13104" : "邮件不存在",
+  "13105" : "邮件已经发送，不能修改"
 }
 
 

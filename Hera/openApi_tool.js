@@ -16,6 +16,10 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantModel} from "./model/MerchantModel";
 
+import {ToolSeatModel} from "./model/ToolSeatModel";
+
+import {UserDiamondBillModel} from "./model/UserDiamondBillModel";
+
 import {Util} from "./lib/Util"
 
 
@@ -23,7 +27,7 @@ const gamePlatform = "NA"
 
 
 /**
- * 玩家购买道具
+ * 玩家购买钻石
  * @param {*} event 
  * @param {*} context 
  * @param {*} callback 
@@ -36,7 +40,6 @@ async function playerBuyProp(event, context, callback){
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "userId", type:"N"},
-      {name : "toolId", type:"S"},
       {name : "num", type:"N"},
       {name : "amount", type:"N"},
       {name : "kindId", type:"S"}
@@ -51,12 +54,15 @@ async function playerBuyProp(event, context, callback){
   if(err ||  !userInfo || !Object.is(userId, userInfo.userId)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
+  //变量
   let num = +requestParams.num;
   let amount = + requestParams.amount;
-  let toolId = requestParams.toolId;
+  let kindId = requestParams.kindId;
+  let userId = requestParams.userId;
+
   //获取道具
-  let toolModel = new ToolModel();
-  let [toolErr, toolInfo] = await toolModel.get({toolId},[], "toolIdIndex");
+  let toolSeatModel = new ToolSeatModel();
+  let [toolErr, toolInfo] = await toolSeatModel.getDiamonds();
   if(toolErr) {
       return callback(null, ReHandler.fail(toolErr));
   }
@@ -65,10 +71,14 @@ async function playerBuyProp(event, context, callback){
       return callback(null, ReHandler.fail(new CHeraErr(CODES.toolNotExist)));
   }
   let price = toolInfo.price || 0;
-  let actualAmount = (price*num).toFixed(2);
-  if(actualAmount != amount) {
+  
+  //实际消耗的金额
+  let actualDiamonds = (price*num).toFixed(2);
+  if(actualDiamonds != amount) {
       return callback(null, ReHandler.fail(new CHeraErr(CODES.amountError)));
   }
+  //用户得到的钻石数量
+  let diamonds = (toolInfo.num * price* num).toFixed(2);
   //获取用户信息
   let [userError, userModel] = await new UserModel().get({userId},[], "userIdIndex");
   if(userError) {
@@ -124,22 +134,35 @@ async function playerBuyProp(event, context, callback){
   userBillModel.originalAmount = oriSumBalance;
   //保存账单
   let [uSaveErr] = await userBillModel.save();
-
   if(uSaveErr) {
     return callback(null, ReHandler.fail(uSaveErr));
   }
 
+  //用户钻石发生变化
+  let userDiamondBillModel = new UserDiamondBillModel({
+    userId : userId,
+    action :1,
+    userName : userModel.userName,
+    msn : merchantModel.msn,
+    diamonds : diamonds,
+    toolId : 1,
+    kindId : kindId
+  })
+  //获取用户钻石
+  let [diamondsError, userDiamonds] = await userDiamondBillModel.getBalance();
+  if(diamondsError) {
+    return callback(null, ReHandler.fail(diamondsError));
+  }
+  userDiamondBillModel.originalDiamonds = userDiamonds;
   //更新余额
   let u = new UserModel(); 
   let [updatebError] = await u.update({userName:userModel.userName},{balance : oriSumBalance-amount});
   if(updatebError) return callback(null, ReHandler.fail(updatebError));
-  //解除玩家状态
-  let [gameError] = await u.updateGameState(userModel.userName, PaymentState.allow);
-  if(gameError) {
-    return callback(null, ReHandler.fail(gameError));
-  }
+
+  //写入钻石账单
+  let [saveDiamondError] = await userDiamondBillModel.save();
   callback(null, ReHandler.success({
-      data :{balance : oriSumBalance-amount}
+      data :{balance : oriSumBalance-amount, diamonds: originalDiamonds+diamonds}
   }));
 }
 

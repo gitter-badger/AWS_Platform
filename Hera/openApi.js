@@ -125,7 +125,7 @@ async function gamePlayerLogin(event, context, callback) {
   let flag = user.vertifyPassword(userInfo.userPwd);
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let loginToken = Util.createTokenJWT({userName,suffix:merchantInfo.suffix,userId:userInfo.userId});
-  let [updateError] = await user.update({userName: userName},{ token: loginToken,updateAt:Date.now()});
+  let [updateError] = await user.update({userName: userName},{ updateAt:Date.now()});
   if(updateError) return callback(null, ReHandler.fail(updateError));
   callback(null, ReHandler.success({
       data:{token : loginToken, msn:merchantInfo.msn}
