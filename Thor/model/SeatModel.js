@@ -24,13 +24,11 @@ export class SeatModel extends BaseModel {
         let contentType = SeatContentTypeEnum['tool']
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
-        for (let item in inparam.content) {
-            if (inparam.content['toolId']) {
-                contentIds += ('tool_' + inparam.content['toolId'] + ',')
-            } else {
-                contentIds += ('package_' + inparam.content['packageId'] + ',')
-                contentType = SeatContentTypeEnum['package']
-            }
+        if (inparam.content['toolId']) {
+            contentIds += ('tool_' + inparam.content['toolId'] + ',')
+        } else {
+            contentIds += ('package_' + inparam.content['packageId'] + ',')
+            contentType = SeatContentTypeEnum['package']
         }
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
         inparam.contentType = contentType
@@ -127,14 +125,12 @@ export class SeatModel extends BaseModel {
 
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
-        for (let item in inparam.content) {
-            if (inparam.content['toolId']) {
-                contentIds += ('tool_' + inparam.content['toolId'] + ',')
-            } else {
-                contentIds += ('package_' + inparam.content['packageId'] + ',')
-            }
+        if (inparam.content['toolId']) {
+            contentIds += ('tool_' + inparam.content['toolId'] + ',')
+        } else {
+            contentIds += ('package_' + inparam.content['packageId'] + ',')
         }
-        inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
+        ret.contentIds = contentIds.substr(0, contentIds.length - 1)
 
         return await this.putItem(ret)
     }
