@@ -204,7 +204,7 @@ export class ToolModel extends BaseModel {
         }
 
         // End:删除生成的编码
-        this.db$('delete', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: inparam.toolId } })
+        this.db$('delete', { TableName: Tables.ZeusPlatformCode, Key: { type: 'tool', code: inparam.toolId } })
 
         return [0, ret]
     }
