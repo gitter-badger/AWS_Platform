@@ -11,6 +11,7 @@ export class SeatCheck {
             { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "sum", type: "N", min: 1, max: 100000000 },
             { name: "seatStatus", type: "N", min: 1, max: 2 },
+            { name: "contentType", type: "N", min: 1, max: 2 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
@@ -29,6 +30,7 @@ export class SeatCheck {
         inparam.seatStatus = parseInt(inparam.seatStatus)
         inparam.order = parseInt(inparam.order)
         inparam.sum = parseInt(inparam.sum)
+        inparam.contentType = parseInt(inparam.contentType)
         inparam.price = parseFloat(inparam.price)
         inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue
@@ -85,6 +87,7 @@ export class SeatCheck {
             { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "sum", type: "N", min: 1, max: 100000000 },
             { name: "seatStatus", type: "N", min: 1, max: 2 },
+            { name: "contentType", type: "N", min: 1, max: 2 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
@@ -103,6 +106,7 @@ export class SeatCheck {
         inparam.seatStatus = parseInt(inparam.seatStatus)
         inparam.order = parseInt(inparam.order)
         inparam.sum = parseInt(inparam.sum)
+        inparam.contentType = parseInt(inparam.contentType)
         inparam.price = parseFloat(inparam.price)
         inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue

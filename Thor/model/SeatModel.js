@@ -1,4 +1,4 @@
-import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, SeatStatusEnum, SeatTypeEnum, SeatContentTypeEnum } from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, SeatStatusEnum, SeatTypeEnum } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
@@ -21,17 +21,14 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam 
      */
     async add(inparam) {
-        let contentType = SeatContentTypeEnum['tool']
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
         if (inparam.content['toolId']) {
             contentIds += ('tool_' + inparam.content['toolId'] + ',')
         } else {
             contentIds += ('package_' + inparam.content['packageId'] + ',')
-            contentType = SeatContentTypeEnum['package']
         }
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
-        inparam.contentType = contentType
         // 保存
         const dataItem = {
             ...this.item,
