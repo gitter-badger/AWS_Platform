@@ -39,8 +39,12 @@ export class UserCheck {
         if (passwordLevel(inparam.password) < 3) {
             return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
+        // 代理默认前缀
+        if (inparam.role == RoleCodeEnum['Agent']) {
+            inparam.suffix = 'Agent'
+        }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "role", type: "N", min: 1, max: 100 },
+            { name: "role", type: "N", min: 1, max: 1000 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
@@ -102,7 +106,7 @@ export class UserCheck {
             return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "role", type: "N", min: 1, max: 100 },
+            { name: "role", type: "N", min: 1, max: 1000 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME_UPDATE },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
@@ -125,7 +129,7 @@ export class UserCheck {
 
             // 代理
             { name: "agentEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            
+
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
@@ -155,7 +159,7 @@ export class UserCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "role", type: "N", min: 1, max: 100 }
+            { name: "role", type: "N", min: 1, max: 1000 }
         ], inparam)
 
         if (checkAttError) {
