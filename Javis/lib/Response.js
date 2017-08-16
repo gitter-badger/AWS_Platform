@@ -25,6 +25,20 @@ export const Fail = (body, code = Codes.Error, headers = {}) => {
   return responseTemplate(500, body, code, headers)
 }
 
+export class ReHandler{
+  static success(body = {}, headers = {}){
+    Object.assign(body, {
+      code : 0,
+      msg : "success"
+    })
+    return responseTemplate(200, body, headers)
+  }
+  static fail(failBody, headers = {}, opts = {}){
+    Object.assign(failBody, opts);
+    return responseTemplate(500, failBody,  headers)
+  }
+}
+
 export const JwtVerify = async (data) => {
   try {
     const decoded = await jwtVerify(data,TOKEN_SECRET)

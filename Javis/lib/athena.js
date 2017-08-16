@@ -285,7 +285,7 @@ export class Util {
                 if (min && strLength < min) error = true;
                 if (max && strLength > max) error = true;
                 if (equal) error = !Object.is(value, equal);
-                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, value];
             }
             case "N": {
                 if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];
@@ -295,15 +295,15 @@ export class Util {
                 if (min && v < min) error = true;
                 if (max && v > max) error = true;
                 if (equal) error = !Object.is(v, +equal);
-                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, +value];
             }
             case "J": {
                 if (!value) return [new AError(CODES.INPARAM_ERROR), null];
                 return this.parseJSON(value);
             }
             case "REG": {
-                if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];
-                return !equal.test(value.toString()) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
+                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
             }
             case "NS": {
                 if (!value) {
@@ -331,7 +331,7 @@ export class Util {
                 if (!value) {
                     return [null, 0]
                 }
-                return !equal.test(value.toString()) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
             }
             default: {
                 return [new AError(CODES.INPARAM_ERROR), null]
@@ -340,12 +340,16 @@ export class Util {
     }
 
     static checkProperties(properties, body) {
-        let errorArray = [];
+        let errorArray = []
         for (let i = 0; i < properties.length; i++) {
             let { name, type, min, max, equal } = properties[i];
             let value = body[name]
-            let [checkErr] = this.checkProperty(value, type, min, max, equal);
-            if (checkErr) errorArray.push(name);
+            let [checkErr,parseValue] = this.checkProperty(value, type, min, max, equal);
+            if (checkErr) {
+                errorArray.push(name);
+            }else {
+                body[name] = parseValue;
+            }
         }
         return Object.is(errorArray.length, 0) ? [null, errorArray] :
             [new AError(CODES.INPARAM_ERROR), errorArray]

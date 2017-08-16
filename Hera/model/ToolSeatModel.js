@@ -5,7 +5,7 @@ import {Util} from "../lib/Util";
 
 export class ToolSeatModel extends athena.BaseModel {
     constructor({num, price, toolId, name} = {}) {
-        super(TABLE_NAMES.GAME_TOOL);
+        super(TABLE_NAMES.TOOL_SEAT);
         this.num = num;
         this.price = price;
         this.toolId = toolId;

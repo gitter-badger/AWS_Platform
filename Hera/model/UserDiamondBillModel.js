@@ -10,8 +10,9 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserDiamondBillModel extends athena.BaseModel {
-    constructor({userId, action, userName, msn, originalDiamonds, toolId, kindId} = {}) {
+    constructor({seatId, userId, action, userName, msn, originalDiamonds,diamonds, toolId, kindId} = {}) {
         super(TABLE_NAMES.BILL_DIAMOND_USER);
+        this.seatId = seatId;
         this.billId = Util.uuid();
         this.userId = +userId
         this.action = +action;
@@ -32,12 +33,12 @@ export class UserDiamondBillModel extends athena.BaseModel {
         }
     }
     async getBalance(){
-        let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], "userNameIndex", true);
+        let [err, records] = await this.get({userName:this.userName},["userName","diamonds"], "UserNameIndex", true);
         if(err) return [err, 0];
         records = records || [];
         let sumMount = 0;
         records.forEach(function(element) {
-            sumMount += element.diamonds;
+            sumMount += +element.diamonds;
         });
         return [null, sumMount];
     }

@@ -22,6 +22,8 @@ import {MerchantBillModel,Action} from "./model/MerchantBillModel";
 
 import {UserRecordModel} from "./model/UserRecordModel";
 
+import {UserDiamondBillModel} from "./model/UserDiamondBillModel";
+
 import {Util} from "./lib/Util"
 
 
@@ -334,18 +336,22 @@ async function gamePlayerA3Login(event, context, callback) {
   let loginToken = Util.createTokenJWT({userName : userInfo.userName, suffix:suffix, userId:+userInfo.userId});
   let [updateError] = await user.update({userName: userInfo.userName},{updateAt:Date.now()});
   if(updateError) return callback(null, ReHandler.fail(updateError));
-
   //获取余额
   let userBill = new UserBillModel(userInfo);
   let [bError, balance] = await userBill.getBalance();
   if(bError) {
     return callback(null, ReHandler.fail(updateError));
   }
-  
+  //获取玩家钻石
+  let [diamondErr, diamonds] = await new UserDiamondBillModel({userName}).getBalance();
+  if(diamondErr) {
+    return callback(null, ReHandler.fail(diamondErr));
+  }
   let callObj = {
     data : {
       token : loginToken,
       balance : balance,
+      diamonds : diamonds,
       msn : userInfo.msn,
       createAt : userInfo.createAt,
       updateAt : userInfo.updateAt,
@@ -386,14 +392,19 @@ async function getA3GamePlayerBalance(event, context, callback) {
   if(err ||  !userInfo || !Object.is(+userId, +userInfo.userId)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
-  
+  let userName = userInfo.userName;
   let userBill = new UserBillModel(userInfo);
   console.log(typeof +userId);
 
   let [bError, balance] = await userBill.getBalance();
   if(bError) return callback(null, ReHandler.fail(bError));
+  //获取玩家钻石
+  let [diamondErr, diamonds] = await new UserDiamondBillModel({userName}).getBalance();
+  if(diamondErr) {
+    return callback(null, ReHandler.fail(diamondErr));
+  }
   callback(null, ReHandler.success({
-      data :{balance : balance}
+      data :{balance : balance, diamonds}
   }));
 }
 

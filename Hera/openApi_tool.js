@@ -5,7 +5,7 @@ import {CODES, CHeraErr} from "./lib/Codes";
 
 import {ReHandler} from "./lib/Response";
 
-import {RoleCodeEnum} from "./lib/Consts"
+import {RoleCodeEnum,SeatTypeEnum, SeatContentEnum, ToolIdEnum} from "./lib/Consts"
 
 
 import {ToolModel} from "./model/ToolModel";
@@ -16,23 +16,20 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantModel} from "./model/MerchantModel";
 
+import {PackageModel} from "./model/PackageModel";
+
 import {ToolSeatModel} from "./model/ToolSeatModel";
 
 import {UserDiamondBillModel} from "./model/UserDiamondBillModel";
+
+import {ToolPackageModel} from "./model/ToolPackageModel";
 
 import {Util} from "./lib/Util"
 
 
 const gamePlatform = "NA"
 
-
-/**
- * 玩家购买钻石
- * @param {*} event 
- * @param {*} context 
- * @param {*} callback 
- */
-async function playerBuyProp(event, context, callback){
+async function playerBufBefore(event) {
   //json转换
   console.log(event);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
@@ -42,43 +39,138 @@ async function playerBuyProp(event, context, callback){
       {name : "userId", type:"N"},
       {name : "num", type:"N"},
       {name : "amount", type:"N"},
+      {name : "seatId", type:"S"},
       {name : "kindId", type:"S"}
   ], requestParams);
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
-    return callback(null, ReHandler.fail(checkAttError));
+    return [checkAttError,null]
   } 
-  let userId = +requestParams.userId;
+  //变量
+  let {userId, num, amount, seatId, kindId} = requestParams;
+
   //验证token
   let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
   if(err ||  !userInfo || !Object.is(userId, userInfo.userId)){
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
+    return [new CHeraErr(CODES.TokenError), null];
   }
-  //变量
-  let num = +requestParams.num;
-  let amount = + requestParams.amount;
-  let kindId = requestParams.kindId;
-  let userId = requestParams.userId;
-
-  //获取道具
+  
+  //获取展位
   let toolSeatModel = new ToolSeatModel();
-  let [toolErr, toolInfo] = await toolSeatModel.getDiamonds();
+  let [toolErr, seatInfo] = await toolSeatModel.get({seatId});
+  console.log("abc:");
+  console.log(seatInfo);
   if(toolErr) {
-      return callback(null, ReHandler.fail(toolErr));
+    return [toolErr, null];
   }
-  //道具不存在
-  if(!toolInfo) {
-      return callback(null, ReHandler.fail(new CHeraErr(CODES.toolNotExist)));
+  //展位不存在
+  if(!seatInfo) {
+    return [new CHeraErr(CODES.seatNotExist), null];
   }
-  let price = toolInfo.price || 0;
+  //展位价格
+  let price = seatInfo.price || 0;
   
   //实际消耗的金额
-  let actualDiamonds = (price*num).toFixed(2);
-  if(actualDiamonds != amount) {
-      return callback(null, ReHandler.fail(new CHeraErr(CODES.amountError)));
+  let actualAmount = +(price*num).toFixed(2);
+  console.log(actualAmount);
+  console.log(amount);
+  //如果实际消耗的金额和前端传入的金额不匹配，视为无效
+  if(actualAmount != amount) {
+    return [new CHeraErr(CODES.amountError), null];
   }
+
+  //展位内容的类型
+  let seatType = seatInfo.contentType;
+  //如果展位是道具包
+  let toolContent;
+  if(seatType == SeatContentEnum.package) {
+    //道具包里面的道具内容
+    console.log("包");
+    toolContent = (seatInfo.content || {}).content || [];
+  }else {
+    console.log("daoju");
+    toolContent = [seatInfo.content];
+  }
+  toolContent.actualAmount = actualAmount;
+  return [null, toolContent, requestParams, userInfo, actualAmount, seatInfo.sum, seatInfo]
+}
+
+/**
+ * 玩家购买道具
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function playerBuyProp(event, context, callback) {
+  let [beforeErr, toolContent, requestParams, userInfo, actualAmount, propNumber, seatInfo] = await playerBufBefore(event);
+  if(beforeErr) {
+    return callback(null, ReHandler.fail(beforeErr));
+  }
+  if(seatInfo.seatType != SeatTypeEnum.tool) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.notDiamonds)));
+  }
+ 
+  let {userId, userName} = userInfo;
+  //获取用户信息
+  let [userErr, userModel] = await new UserModel().get({userName});
+  if(userErr) {
+    return callback(null, ReHandler.fail(new CHeraErr(userErr)));
+  }
+  if(!userModel) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+  }
+  //获取玩家钻石
+  let [diamondErr, diamonds] = await new UserDiamondBillModel({userName}).getBalance();
+  if(diamondErr) {
+    return callback(null, ReHandler.fail(diamondErr));
+  }
+  //钻石不足
+  if(actualAmount > diamonds) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.DiamondsIns)));
+  }
+  //用户钻石发生变化
+  let userDiamondBillModel = new UserDiamondBillModel({
+    seatId : requestParams.seatId,
+    userId : userId,
+    action :-1,
+    msn : userModel.msn,
+    userName : userName,
+    diamonds : -actualAmount,
+    toolId : 1,
+    kindId : requestParams.kindId
+  })
+
+  userDiamondBillModel.originalDiamonds = diamonds;
+  let [saveErr] = await userDiamondBillModel.save();
+  callback(null, ReHandler.success({
+      data :{diamonds: diamonds-actualAmount}
+  }));
+}
+
+/**
+ * 玩家购买钻石
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function playerBuyDiamonds(event, context, callback){
+  let [beforeErr, toolContent, requestParams, userInfo, actualAmount, seatNumber, seatInfo] = await playerBufBefore(event);
+  if(beforeErr) {
+    return callback(null, ReHandler.fail(beforeErr));
+  }
+  if(seatInfo.seatType != SeatTypeEnum.diamonds) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.notDiamonds)));
+  }
+  let packageSumDiamond = 0; //包里面的总数量
+  for(let i = 0; i < toolContent.length; i++) {
+    let info = toolContent[i];
+    packageSumDiamond += +(info.toolNum || 1);
+  }
+  let {userId, userName} = userInfo;
   //用户得到的钻石数量
-  let diamonds = (toolInfo.num * price* num).toFixed(2);
+  let diamonds = +(seatNumber * (+packageSumDiamond)).toFixed(2);
+  console.log("用户得到的钻石数量");
+  console.log(diamonds);
   //获取用户信息
   let [userError, userModel] = await new UserModel().get({userId},[], "userIdIndex");
   if(userError) {
@@ -109,11 +201,11 @@ async function playerBuyProp(event, context, callback){
     operator : userModel.userName,
     amount : actualAmount,
     kindId : requestParams.kindId,
-    tool : toolInfo,
-    num : num,
+    tool : toolContent,
+    seatInfo : seatInfo,
     type : Type.buyTool,
-    toolName : toolInfo.toolName,
-    remark : `购买${toolInfo.toolName}`
+    toolName : toolContent.prop,
+    remark : `购买${seatInfo.prop}`
   })
 
   let [bErr, balance] = await userBillModel.getBalanceByUid(userId);
@@ -122,7 +214,7 @@ async function playerBuyProp(event, context, callback){
       return callback(null, ReHandler.fail(new CHeraErr(bErr)));
   }
   //用户余额不足
-  if(amount > balance) {
+  if(actualAmount > balance) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
   }
 
@@ -144,9 +236,9 @@ async function playerBuyProp(event, context, callback){
     action :1,
     userName : userModel.userName,
     msn : merchantModel.msn,
-    diamonds : diamonds,
+    diamonds : +diamonds,
     toolId : 1,
-    kindId : kindId
+    kindId : requestParams.kindId
   })
   //获取用户钻石
   let [diamondsError, userDiamonds] = await userDiamondBillModel.getBalance();
@@ -156,13 +248,12 @@ async function playerBuyProp(event, context, callback){
   userDiamondBillModel.originalDiamonds = userDiamonds;
   //更新余额
   let u = new UserModel(); 
-  let [updatebError] = await u.update({userName:userModel.userName},{balance : oriSumBalance-amount});
+  let [updatebError] = await u.update({userName:userModel.userName},{balance : oriSumBalance-actualAmount});
   if(updatebError) return callback(null, ReHandler.fail(updatebError));
-
   //写入钻石账单
   let [saveDiamondError] = await userDiamondBillModel.save();
   callback(null, ReHandler.success({
-      data :{balance : oriSumBalance-amount, diamonds: originalDiamonds+diamonds}
+      data :{balance : oriSumBalance-actualAmount, diamonds: userDiamonds+diamonds}
   }));
 }
 
@@ -177,26 +268,73 @@ async function toolList(event, context, callback) {
     //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
-  //验证token
-  let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
-  if(err ||  !userInfo ){
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
-  }
+
   let toolModel = new ToolModel();
   let [toolErr, toolList] = await toolModel.scan();
   if(toolErr) {
       return callback(null, ReHandler.fail(toolErr));
   }
   let returnArr = [];
+  console.log(toolList);
   toolList.forEach(function(element) {
-      let {toolId, price, url , toolName, num, order, img, toolStatus} = element;
-      returnArr.push({toolId, price, url, num, toolName, order, img, toolStatus});
+      let {toolId,  toolName,  order, icon, toolStatus, desc} = element;
+      returnArr.push({toolId,  toolName,  order, icon, toolStatus, desc});
   }, this);
   returnArr.sort((a, b) =>  b.order - a.order)
   callback(null, ReHandler.success({list : returnArr}));
 }
 
+/**
+ * 展位列表
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function seatList(event, context, callback) {
+  //json转换
+  console.log(event);
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
+  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+  //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "type", type:"S"},
+  ], requestParams);
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return callback(null, ReHandler.fail(checkAttError));
+  }
+  let {type} = requestParams
+  let seatModel = new ToolSeatModel();
+  let [scanErr, list] = await seatModel.scan({seatType:type});
+  console.log(list[0].content);
+  if(scanErr) {
+    return callback(null, ReHandler.fail(scanErr));
+  }
+  list.sort((a, b) =>  b.order - a.order);
+  
+  callback(null, ReHandler.success({list}));
+}
+
+/**
+ * 道具包列表
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function packageList(event, context, callback) {
+  let packageModel = new PackageModel();
+  let [scanErr, list] = await seatModel.scan();
+  if(scanErr) {
+    return callback(null, ReHandler.fail(scanErr));
+  }
+  list.sort((a, b) =>  b.order - a.order);
+  callback(null, ReHandler.success({list}));
+}
+
 export{
   playerBuyProp,  //购买道具
+  playerBuyDiamonds, //购买钻石
   toolList,  //道具列表
+  seatList,  //展位列表
+  packageList, //道具包列表
 }
