@@ -70,6 +70,34 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  # ==================== 以下是代理接口服务 ====================
+  agentList: # 代理列表
+    handler: api_agent.agentList
+    events:
+      -
+        http:
+          path: agentList
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  agentOne: # 单个代理
+    handler: api_agent.agentOne
+    events:
+      -
+        http:
+          path: agentOne/{id}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  agentUpdate: # 代理更新
+    handler: api_agent.agentUpdate
+    events:
+      -
+        http:
+          path: agentUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是帮助中心接口服务 ====================
   helpGenreList: 
     handler: api_help.helpGenreList

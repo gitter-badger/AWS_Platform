@@ -14,7 +14,6 @@ import {
   RoleCodeEnum,
   RoleEditProps
 } from './lib/all'
-import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { LogModel } from './model/LogModel'
