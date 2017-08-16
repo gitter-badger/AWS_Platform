@@ -339,7 +339,7 @@ const getRole = async (code) => {
 const saveUser = async (userInfo) => {
   // 线路商或商户，从编码池获取新编码
   let [uucodeErr, uucodeRet] = [0, 0]
-  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role) {
+  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role || RoleCodeEnum['Agent'] == userInfo.role) {
     [uucodeErr, uucodeRet] = await Model.uucode('displayId', 6)
     if (uucodeErr) {
       return [uucodeErr, 0]
