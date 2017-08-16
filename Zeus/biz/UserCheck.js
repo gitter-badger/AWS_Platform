@@ -23,7 +23,7 @@ export class UserCheck {
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             return [checkAttError, errorParams]
         }
 
@@ -66,9 +66,18 @@ export class UserCheck {
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             return [checkAttError, errorParams]
         }
+
+        // 线路号处理
+        if (inparam.role == RoleCodeEnum['Merchant']) {
+            if (!inparam.msn) {
+                return [{ "code": -1, "msg": "入参商户线路号不存在", "params": ["msn"] }, 'msn']
+            }
+            inparam.msn = parseInt(inparam.msn).toString()
+        }
+
 
         // 数据类型处理
         inparam.rate = inparam.rate.toString()
@@ -118,7 +127,7 @@ export class UserCheck {
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             return [checkAttError, errorParams]
         }
 
@@ -147,7 +156,7 @@ export class UserCheck {
             { name: "role", type: "N", min: 1, max: 100 }
         ], inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             return [checkAttError, errorParams]
         }
 
@@ -168,7 +177,7 @@ export class UserCheck {
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             return [checkAttError, errorParams]
         }
 
