@@ -38,12 +38,12 @@ const agentOne = async (e, c, cb) => {
         return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
     }
     // 业务操作
-    const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Merchant'])
+    const [err, ret] = await new UserModel().getUser(params.id, RoleCodeEnum['Agent'])
     // 结果返回
-    if (merchantErr) {
-        return ResFail(cb, { ...res, err: merchantErr }, merchantErr.code)
+    if (err) {
+        return ResFail(cb, { ...res, err: err }, err.code)
     }
-    return ResOK(cb, { ...res, payload: merchant })
+    return ResOK(cb, { ...res, payload: ret })
 }
 
 /**
@@ -64,7 +64,7 @@ const agentList = async (e, c, cb) => {
     }
     // 查询每个用户余额
     for (let user of ret) {
-        let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+        let [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
         user.balance = lastBill.lastBalance
         user.lastBill = lastBill
     }
@@ -81,12 +81,12 @@ const agentUpdate = async (e, c, cb) => {
     if (paramsErr || !params.id) {
         return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
     }
-    const [jsonParseErr, merchantInfo] = JSONParser(e && e.body)
+    const [jsonParseErr, inparam] = JSONParser(e && e.body)
     if (jsonParseErr) {
         return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
     }
     //检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkUserUpdate(merchantInfo)
+    let [checkAttError, errorParams] = new UserCheck().checkUserUpdate(inparam)
     if (checkAttError) {
         Object.assign(checkAttError, { params: errorParams })
         return ResErr(cb, checkAttError)
@@ -97,17 +97,17 @@ const agentUpdate = async (e, c, cb) => {
         return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
     }
     // 业务操作
-    const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Agent'])
-    if (merchantErr) {
-        return ResFail(cb, { ...res, err: merchantErr }, merchantErr.code)
+    const [err, ret] = await new UserModel().getUser(params.id, RoleCodeEnum['Agent'])
+    if (err) {
+        return ResFail(cb, { ...res, err: err }, err.code)
     }
     // 获取更新属性和新密码HASH
-    const Merchant = {
-        ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Agent']])
+    const Agent = {
+        ...ret, ...Pick(inparam, RoleEditProps[RoleCodeEnum['Agent']])
     }
-    Merchant.passhash = Model.hashGen(Merchant.password)
+    Agent.passhash = Model.hashGen(Agent.password)
     // 业务操作
-    const [updateErr, updateRet] = await new UserModel().userUpdate(Merchant)
+    const [updateErr, updateRet] = await new UserModel().userUpdate(Agent)
     // 操作日志记录
     params.operateAction = '更新代理信息'
     params.operateToken = token
