@@ -12,7 +12,7 @@
     },
     "identity": {
       "sourceIp": "127.0.0.1"
-    }
+    }``
   },
   "body": {
       "username": "cmerchant1",
@@ -22,7 +22,6 @@
       "password": "chenwenGG123",
       "role": "100",
       "adminName": "cheneymerg",
-      "merchantName": "cheneymmerca",
       
       "parent": "fce1c8d7-c0cc-4eb3-aee1-b30050f34fb3",
       "hostName":"负责人一号",

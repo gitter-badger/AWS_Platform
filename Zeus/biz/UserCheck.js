@@ -9,16 +9,16 @@ export class UserCheck {
             return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "role", type: "N", min: 1, max: 1 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "role", type: "N", min: 1, max: 1 },
             { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "adminContact", type: "S", min: 1, max: 40 },
             { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
             { name: "displayName", type: "NREG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
-            { name: "hostName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "hostContact", type: "NS", min: 5, max: 40 },
+            // { name: "hostName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // { name: "hostContact", type: "NS", min: 5, max: 40 },
 
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
@@ -40,28 +40,29 @@ export class UserCheck {
             return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "role", type: "N", min: 1, max: 100 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
-            { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
-            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
-            { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "role", type: "N", min: 1, max: 100 },
+            { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
+            { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
+            { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
             { name: "hostContact", type: "S", min: 5, max: 40 },
+            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // 帐号管理员
+            { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            { name: "adminContact", type: "S", min: 1, max: 40 },
 
-            { name: "limit", type: "NN", min: 1, max: 10 },
-            { name: "adminName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "adminContact", type: "NS", min: 1, max: 40 },
-
-            { name: "managerName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // 线路商
             { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "managerContact", type: "NS", min: 5, max: 40 },
+            { name: "limit", type: "NN", min: 1, max: 10 },
 
-            { name: "merchantName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "merchantContact", type: "NS", min: 5, max: 40 },
+
+            // 代理
+            { name: "agentEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
@@ -94,36 +95,37 @@ export class UserCheck {
     }
 
     /**
-     * 检查普通用户
+     * 检查普通用户更新
      */
     checkUserUpdate(inparam) {
         if (passwordLevel(inparam.password) < 3) {
             return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "role", type: "N", min: 1, max: 100 },
+            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME_UPDATE },
+            { name: "password", type: "S", min: 6, max: 16 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
             { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            { name: "hostContact", type: "S", min: 5, max: 40 },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
-            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME_UPDATE },
-            { name: "password", type: "S", min: 6, max: 16 },
-            { name: "role", type: "N", min: 1, max: 100 },
-            { name: "hostContact", type: "S", min: 5, max: 40 },
+            // 帐号管理员
+            { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            { name: "adminContact", type: "S", min: 1, max: 40 },
 
-            { name: "limit", type: "NN", min: 1, max: 10 },
-            { name: "adminName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "adminEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "adminContact", type: "NS", min: 1, max: 40 },
-
-            { name: "managerName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // 线路商
             { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "managerContact", type: "NS", min: 5, max: 40 },
+            { name: "limit", type: "NN", min: 1, max: 10 },
 
-            { name: "merchantName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "merchantContact", type: "NS", min: 5, max: 40 },
 
+            // 代理
+            { name: "agentEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
