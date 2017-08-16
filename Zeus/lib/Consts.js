@@ -132,7 +132,7 @@ export const RoleModels = {
       apiKey: Model.uuid(),                 // APIKEY
       merchantEmail: Model.StringValue,     // 商户邮箱
       frontURL: Model.StringValue,          // 商户站点
-      loginWhiteList: []                    // 登录白名单
+      loginWhiteList: '0.0.0.0'             // 登录白名单
     }
   },
   '1000': function () {
@@ -141,7 +141,7 @@ export const RoleModels = {
       suffix: 'AGENT',                      // 前缀
       apiKey: Model.uuid(),                 // APIKEY
       agentEmail: Model.StringValue,        // 代理邮箱
-      loginWhiteList: []                    // 登录白名单
+      loginWhiteList: '0.0.0.0'             // 登录白名单
     }
   },
   '10000': function () {
