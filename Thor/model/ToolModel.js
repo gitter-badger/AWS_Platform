@@ -24,10 +24,6 @@ export class ToolModel extends BaseModel {
      * @param {*} inparam 
      */
     async addTool(inparam) {
-        // Start:从编号池获取新编号
-        const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
-        if (uucodeErr) { return [uucodeErr, 0] }
-        inparam.toolId = uucodeRet
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'toolName = :toolName',
@@ -41,6 +37,16 @@ export class ToolModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('道具已存在'), 0]
         }
+
+        // Start:从编号池获取新编号
+        if (inparam.toolName == '钻石') {
+            inparam.toolId = '100000'
+        } else {
+            const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
+            if (uucodeErr) { return [uucodeErr, 0] }
+            inparam.toolId = uucodeRet
+        }
+
         const dataItem = {
             ...this.item,
             ...inparam
@@ -51,7 +57,7 @@ export class ToolModel extends BaseModel {
             return [putErr, 0]
         }
         // End:记录生成的编码
-        this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: uucodeRet } })
+        this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: inparam.toolId } })
         return [0, dataItem]
     }
 
