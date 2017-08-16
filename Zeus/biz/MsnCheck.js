@@ -1,5 +1,12 @@
 const athena = require("../lib/athena")
 export class MsnCheck {
+    check(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "msn", type: "N", min: 1, max: 999 }]
+            , inparam)
+        inparam.msn = parseInt(inparam.msn).toString()
+        return [checkAttError, errorParams]
+    }
     /**
      * 检查线路号锁定/解锁入参
      * @param {*} inparam s

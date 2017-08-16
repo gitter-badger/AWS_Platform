@@ -73,6 +73,12 @@ const checkMsn = async (e, c, cb) => {
   if (paramErr) {
     return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
   }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new MsnCheck().check(params)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
   // 业务操作
   const [checkErr, checkRet] = await new MsnModel().checkMSN(params)
   if (checkErr) {
