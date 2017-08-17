@@ -151,7 +151,9 @@ export const RoleModels = {
       ...PlatformBaseBizRole(),
       // suffix: 'AGENT',                     // 前缀
       // apiKey: Model.uuid(),                // APIKEY
-      agentEmail: Model.StringValue           // 代理邮箱
+      agentEmail: Model.StringValue,          // 代理邮箱
+      vedioMix: Model.NumberValue,            // 电子游戏洗码比
+      liveMix: Model.NumberValue              // 真人视讯洗码比
       // loginWhiteList: '0.0.0.0'            // 登录白名单
     }
   },
@@ -202,15 +204,15 @@ export const RoleEditProps = {
     'hostContact',
     'password',
     'rate',
-    'gameList',
-    'loginWhiteList',
     'agentEmail',
     'adminName',
     'adminEmail',
     'adminContact',
     'contractPeriod',
+    'isforever',
     'remark',
-    'isforever'
+    'vedioMix',
+    'liveMix'
   ],
   '10000': []
 }
@@ -266,7 +268,12 @@ export const RoleDisplay = {
     'displayName',
     'apiKey',
     'displayId',
-    'updatedAt'
+    'updatedAt',
+    'contractPeriod',
+    'isforever',
+    'remark',
+    'vedioMix',
+    'liveMix'
   ]
 }
 

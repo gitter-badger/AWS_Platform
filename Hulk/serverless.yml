@@ -89,6 +89,14 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  agentLogin: # 代理登录
+    handler: api_agent.agentLogin
+    events:
+      -
+        http:
+          path: agentLogin
+          method: post
+          cors: true
   agentList: # 代理列表
     handler: api_agent.agentList
     events:

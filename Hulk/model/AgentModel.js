@@ -15,6 +15,7 @@ import {
     RoleModels
 } from '../lib/all'
 import _ from 'lodash'
+import { CaptchaModel } from '../model/CaptchaModel'
 import { BaseModel } from './BaseModel'
 import { UserModel } from '../model/UserModel'
 import { BillModel } from '../model/BillModel'
@@ -134,6 +135,61 @@ export class AgentModel extends BaseModel {
             orderId = '-1'
         }
         return [0, { ...saveUserRet, orderId: orderId }]
+    }
+
+    /**
+     * 代理登录
+     * @param {*} userLoginInfo 用户登录信息
+     */
+    async login(userLoginInfo = {}) {
+        // 检查验证码
+        const [checkErr, checkRet] = await new CaptchaModel().checkCaptcha(userLoginInfo)
+        if (checkErr) {
+            return [checkErr, 0]
+        }
+        // 获取代理角色模型
+        const Role = RoleModels[userInfo.role]()
+        // 组装用户登录信息
+        const UserLoginInfo = Pick({
+            ...Role,
+            ...userLoginInfo
+        }, Keys(Role))
+        const username = UserLoginInfo.username
+        const suffix = UserLoginInfo.suffix
+        // 查询用户信息
+        const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(roleCode, suffix, username)
+        if (queryUserErr) {
+            return [queryUserErr, 0]
+        }
+        if (queryUserRet.Items.length === 0) {
+            return [BizErr.UserNotFoundErr(), 0]
+        }
+        if (queryUserRet.Items.length > 1) {
+            return [BizErr.DBErr(), 0]
+        }
+        const User = queryUserRet.Items[0]
+        // 校验用户密码
+        const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
+        if (!valid) {
+            return [BizErr.PasswordErr(), User]
+        }
+        // 检查非管理员的有效期
+        const [periodErr, periodRet] = await new UserModel().checkContractPeriod(User)
+        if (periodErr) {
+            return [periodErr, User]
+        }
+        // 检查用户是否被锁定
+        if (User.status == StatusEnum.Disable) {
+            return [BizErr.UserLockedErr(), User]
+        }
+        // 更新用户信息
+        User.lastIP = UserLoginInfo.lastIP
+        const [saveUserErr, saveUserRet] = await saveUser(User)
+        if (saveUserErr) {
+            return [saveUserErr, User]
+        }
+        // 返回用户身份令牌
+        return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
     }
 }
 
