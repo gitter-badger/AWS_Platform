@@ -99,27 +99,27 @@ const agentNew = async (e, c, cb) => {
  * 代理登录
  */
 const agentLogin = async (e, c, cb) => {
-  const res = { m: 'agentLogin' }
-  // 输入参数转换与校验
-  const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResErr(cb, jsonParseErr)
-  }
-  //检查参数是否合法
-  let [checkAttError, errorParams] = new AgentCheck().checkLogin(userLoginInfo)
-  if (checkAttError) {
-    Object.assign(checkAttError, { params: errorParams })
-    return ResErr(cb, checkAttError)
-  }
-  // 用户登录
-  const [loginUserErr, loginUserRet] = await new AgentModel().login(Model.addSourceIP(e, userLoginInfo))
-  // 登录日志
-  new LogModel().addLogin(Model.addSourceIP(e, userLoginInfo), loginUserErr, Model.addSourceIP(e, loginUserRet))
-  // 结果返回
-  if (loginUserErr) {
-    return ResFail(cb, { ...res, err: loginUserErr }, loginUserErr.code)
-  }
-  return ResOK(cb, { ...res, payload: loginUserRet })
+    const res = { m: 'agentLogin' }
+    // 输入参数转换与校验
+    const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
+    if (jsonParseErr) {
+        return ResErr(cb, jsonParseErr)
+    }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = new AgentCheck().checkLogin(userLoginInfo)
+    if (checkAttError) {
+        Object.assign(checkAttError, { params: errorParams })
+        return ResErr(cb, checkAttError)
+    }
+    // 用户登录
+    const [loginUserErr, loginUserRet] = await new AgentModel().login(Model.addSourceIP(e, userLoginInfo))
+    // 登录日志
+    new LogModel().addLogin(Model.addSourceIP(e, userLoginInfo), loginUserErr, Model.addSourceIP(e, loginUserRet))
+    // 结果返回
+    if (loginUserErr) {
+        return ResFail(cb, { ...res, err: loginUserErr }, loginUserErr.code)
+    }
+    return ResOK(cb, { ...res, payload: loginUserRet })
 }
 
 /**
@@ -233,9 +233,10 @@ const availableAgents = async (e, c, cb) => {
 // ==================== 以下为内部方法 ====================
 
 /**
-  api export
-**/
+ * api export
+ */
 export {
+    agentLogin,                // 代理登录
     agentAdminNew,             // 代理管理员注册
     agentNew,                  // 代理注册
     agentList,                 // 代理列表

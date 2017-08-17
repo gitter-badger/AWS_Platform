@@ -16,22 +16,9 @@
     },
     "body": {
         "role": "1000",
-        "suffix": "AA2",
-        "username": "testagent2",
+        "suffix": "Agent",
+        "username": "NAagent",
         "password": "Ab123456",
-        "parent": "c929d95a-24e9-45d0-b6ef-eb8afb06876a",
-        "displayName": "测试代理2",
-        "hostName": "负责人一号",
-        "hostContact": "18780004427",
-        "agentEmail": "1@1.com",
-        "rate": "90.11",
-        "points": "1000",
-        "vedioMix": 10.50,
-        "liveMix": 20.50,
-        "contractPeriod": 0,
-        "isforever": true,
-        "adminName": "负责管理员一号",
-        "adminContact": "18780004427",
-        "adminEmail": "1@1.com"
+        "captcha": "9386"
     }
 }

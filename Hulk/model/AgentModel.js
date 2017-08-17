@@ -148,7 +148,7 @@ export class AgentModel extends BaseModel {
             return [checkErr, 0]
         }
         // 获取代理角色模型
-        const Role = RoleModels[userInfo.role]()
+        const Role = RoleModels[userLoginInfo.role]()
         // 组装用户登录信息
         const UserLoginInfo = Pick({
             ...Role,
@@ -157,7 +157,7 @@ export class AgentModel extends BaseModel {
         const username = UserLoginInfo.username
         const suffix = UserLoginInfo.suffix
         // 查询用户信息
-        const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(roleCode, suffix, username)
+        const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(userLoginInfo.role, suffix, username)
         if (queryUserErr) {
             return [queryUserErr, 0]
         }

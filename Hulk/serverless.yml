@@ -121,7 +121,7 @@ functions:
       -
         http:
           path: availableAgents
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   agentUpdate: # 代理更新
