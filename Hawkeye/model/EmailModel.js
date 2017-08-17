@@ -14,15 +14,14 @@ const EmailState = {
 
 
 export class EmailModel extends athena.BaseModel {
-    constructor({userId, content, kindId, gameName, state, msn, sendTime,title,sendUser} = {}) {
+    constructor({userId, content,  state, msn, sendTime,title,sendUser,nickname} = {}) {
         super(Tables.HawkeyeGameEmail);
         this.userId = userId;    //创建者
         this.title = title;
+        this.nickname = nickname || Model.StringValue;
         this.emid = Util.uuid();
         this.content = content;
         this.createdAt = Date.now();
-        this.kindId = kindId;   //游戏ID，如果是广场为0 -1所有游戏;
-        this.gameName = gameName;   //游戏名
         this.msn = msn;  //线路号
         this.sendTime = +sendTime;
         this.sendUser = sendUser || Model.StringValue;

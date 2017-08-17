@@ -5,13 +5,19 @@
     "body" : {
         "content" : "这是一条邮件的内容",
         "title" : "新手福利",
-        "kindId" : "-1",
-        "msn" : 2,
-        "showTime" : 60,
-        "sendTime" : 120,
+        "nickname" : "abcdeff",
+        "sendTime" : 150125254124,
         "tools" : [
-            {"number":1,"toolId" : "835163"},
-            {"number" : 2, "toolId" : "581703"}
+            {
+                "sum" : 1,
+                "contentType" :1,
+                "content" : {}
+            },
+            {
+                "sum" : 1,
+                "contentType" :1,
+                "content" : {}
+            }
         ]
     }
 }

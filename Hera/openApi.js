@@ -29,6 +29,21 @@ import {Util} from "./lib/Util"
 
 const gamePlatform = "NA"
 
+function validateIp(event, merchant) {
+  let loginWhiteStr = merchant.loginWhiteList;
+  let whiteList = loginWhiteStr.split(",");
+  whiteList.forEach(function(element) {
+    element.trim();
+  }, this);
+  console.log("event.headers.identity");
+  console.log(event.requestContext.identity);
+  console.log(whiteList);
+  let sourceIp = event.requestContext.identity.sourceIp;
+  let whiteIp = whiteList.find((ip) => ip == sourceIp);
+  if(whiteIp) return true;
+  return false;
+}
+
 /**
  * 玩家注册
  * @param {*} event 
@@ -62,6 +77,11 @@ async function gamePlayerRegister(event, context, callback) {
   if(!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   } 
+  //验证白名单
+  let white = validateIp(event, merchantInfo);
+  if(!white) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  }
   Object.assign(requestParams, {
     msn : merchantInfo.msn,
     merchantName : merchantInfo.displayName,
@@ -116,6 +136,11 @@ async function gamePlayerLogin(event, context, callback) {
   if(!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   } 
+  //验证白名单
+  let white = validateIp(event, merchantInfo);
+  if(!white) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  }
   userName = `${merchantInfo.suffix}_${userName}`;
   let user = new UserModel(requestParams);
   let [userExistError, userInfo] = await user.get({userName});
@@ -168,6 +193,11 @@ async function getGamePlayerBalance(event, context, callback) {
   if(!merchantInfo){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   } 
+  //验证白名单
+  let white = validateIp(event, merchantInfo);
+  if(!white) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  }
   userName = `${merchantInfo.suffix}_${userName}`;
   let userBill = new UserBillModel({userName});
   let [bError, balance] = await userBill.getBalance();
@@ -217,6 +247,11 @@ async function gamePlayerBalance(event, context, callback) {
     
     if(merError) return callback(null, ReHandler.fail(merError));
     if(!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
+    //验证白名单
+    let white = validateIp(event, merchantInfo);
+    if(!white) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+    }
     userName = `${merchantInfo.suffix}_${userName}`;
     requestParams.userName = userName;
     let baseModel = {

@@ -17,22 +17,24 @@ export const PaymentState = {  //是否可以进行转账操作
     forbid : 2 //禁止（正在游戏中不能转账）
 }
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic,remark} = {}) {
         super(TABLE_NAMES.TABLE_USER);
         this.userName = userName;
         this.userPwd = userPwd;
-        this.buId = +buId;
+        this.buId = buId ? +buId : -1;
         this.role = RoleCodeEnum.Player;
         this.state = state || State.normal;
         this.updateAt = Date.now();
         this.createAt = Date.now();
-        this.merchantName = merchantName;
+        this.merchantName = merchantName || Model.StringValue;
         this.balance = 0;
         this.msn = msn;
         this.sex = sex || 0;
+        this.remark = remark || Model.StringValue;
         this.nickname = nickname || Model.StringValue;
         this.headPic = headPic || Model.StringValue;
         this.payState = paymentState || PaymentState.allow;
+        this.password = userPwd || Model.StringValue;
     }
 
 
@@ -42,6 +44,26 @@ export class UserModel extends athena.BaseModel {
      */
     isExist(userName) {
         return super.isExist({userName});
+    }
+    findByBuIds(buIds) {
+        let filterExpression = "",
+            expressionAttributeValues = {};
+        for(var i =0; i < uids.length; i++){
+            filterExpression += `buId=:buId${i} or `;
+            expressionAttributeValues[`:buId${i}`] = buIds[i];
+        }
+        filterExpression = filterExpression.substring(0, filterExpression.length -3);
+        return new Promise((reslove, reject) => {
+            this.db$("scan", {
+                TableName : this.tableName,
+                FilterExpression : filterExpression,
+                ExpressionAttributeValues : expressionAttributeValues
+            }).then((result) => {
+                reslove([null, result.Items]);
+            }).catch((err) => {
+                reslove([err, 0]);
+            })
+        })
     }
     isGames(user) {
         return user.payState == PaymentState.forbid;
@@ -56,7 +78,7 @@ export class UserModel extends athena.BaseModel {
         len = len || 6;
         num = num || -1;
         this.userId = Util.userId(len);
-        let [err, userInfo] = await this.get({userId:this.userId},[], "userIdIndex");
+        let [err, userInfo] = await this.get({userId:this.userId}, [], "userIdIndex");
         num ++;
         if(err) return [err, 0];
         if(userInfo) { //重新找

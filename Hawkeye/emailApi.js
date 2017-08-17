@@ -34,17 +34,29 @@ const add = async(e, c, cb) => {
       {name : "title", type:"S"},
       {name : "content", type:"S"},
       {name : "tools", type:"J"},
-      {name : "sendTime", type:"N"},
-      {name : "kindId", type:"S"},
-      {name : "msn", type:"N"}
+      {name : "sendTime", type:"N"}
   ], requestParams);
   
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
+  //线路好与nickname只能选择其一
+  if(!requestParams.nickname && !requestParams.msn) {
+    return errorHandle(cb, new CHeraErr(CODES.DataError));
+  }
+  if(requestParams.nickname && requestParams.msn) {
+    return errorHandle(cb, new CHeraErr(CODES.DataError));
+  }
   //变量
   let {tools, kindId} = requestParams;
+  //检查tools格式是否正确
+  for(let i = 0; i < tools.length; i++) {
+    let tool = tools[i];
+    if(!tool.sum || !tool.contentType) { //如果缺少数量,以及是礼包还是道具字段
+      return errorHandle(cb, new CHeraErr(CODES.DataError));
+    }
+  }
   requestParams.userId = userInfo.userId;
   requestParams.sendUser = userInfo.displayName;
   //检查道具数量
@@ -52,39 +64,38 @@ const add = async(e, c, cb) => {
     return errorHandle(cb, new CHeraErr(CODES.toolMoreThan));
   }
   
-  //根据kindId找到游戏
-  if(requestParams.kindId == -1) {
-    requestParams.gameName = "全部";
-  }else {
-    let gameInfo = GameTypeEnum[kindId]
-    if(!gameInfo) {
-      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
-    }
-    requestParams.gameName = gameInfo.name;
-  }
+ 
   //找道具
-  let toolModel = new ToolModel();
-  for(let i = 0; i < tools.length; i++) {
-    if(!tools[i].toolId) {
-      let cError = new CHeraErr(CODES.DataError);
-      Object.assign(cError,{params:["tools"]});
-      return errorHandle(cb, cError);
-    }
-  }
-  let toolIds = tools.map((item) => item.toolId);
-  let [toolListError, toolList] = await toolModel.findByIds(toolIds);
-  //如果道具数量不相等，道具ID有误，返回错误
-  if(toolList.length != toolIds.length) {
-    return errorHandle(cb, new CHeraErr(CODES.toolNotExist));
-  }
-  //填充邮件道具实体
+  // let toolModel = new ToolModel();
+  // for(let i = 0; i < tools.length; i++) {
+  //   if(!tools[i].toolId) {
+  //     let cError = new CHeraErr(CODES.DataError);
+  //     Object.assign(cError,{params:["tools"]});
+  //     return errorHandle(cb, cError);
+  //   }
+  // }
+  // let toolIds = tools.map((item) => item.toolId);
+  // let [toolListError, toolList] = await toolModel.findByIds(toolIds);
+  // //如果道具数量不相等，道具ID有误，返回错误
+  // if(toolList.length != toolIds.length) {
+  //   return errorHandle(cb, new CHeraErr(CODES.toolNotExist));
+  // }
+  // //填充邮件道具实体
   let emailModel = new EmailModel(requestParams);
-  emailModel.setTools(toolList, tools);
   let [saveErr] = await emailModel.save();
   if(saveErr) {
     return errorHandle(cb, saveErr);
   }
   cb(null, ReHandler.success({data:emailModel.setProperties()}));
+}
+
+/**
+ * 接收邮件
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const acceptMail = async(e, c, cb) => {
 }
 
 /**

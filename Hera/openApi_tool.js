@@ -16,6 +16,8 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantModel} from "./model/MerchantModel";
 
+import {GameModel} from "./model/GameModel";
+
 import {PackageModel} from "./model/PackageModel";
 
 import {ToolSeatModel} from "./model/ToolSeatModel";
@@ -187,7 +189,18 @@ async function playerBuyDiamonds(event, context, callback){
   if(!merchantModel) {
       return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
-
+  //获取游戏
+  let gameType = -1;
+  if(requestParams.kindId!= -1) {
+    let [gameError, gameModel] = new GameModel().findByKindId(requestParams.kindId);
+    if(gameError) {
+      return callback(null, ReHandler.fail(new CHeraErr(gameError)));
+    }
+    if(!gameModel) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
+    }
+    gameType = gameModel.gameType;
+  }
   //获取玩家余额
   let userBillModel = new UserBillModel({
     userId : +userId,
@@ -201,6 +214,7 @@ async function playerBuyDiamonds(event, context, callback){
     operator : userModel.userName,
     amount : actualAmount,
     kindId : requestParams.kindId,
+    gameType : gameType,
     tool : toolContent,
     seatInfo : seatInfo,
     type : Type.buyTool,
