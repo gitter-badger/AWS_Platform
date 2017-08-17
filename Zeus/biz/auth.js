@@ -52,7 +52,6 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
 }
 
 /**
- * 接口编号：2
  * 专门用于创建商户/建站商
  * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息

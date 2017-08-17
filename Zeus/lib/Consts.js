@@ -138,10 +138,10 @@ export const RoleModels = {
   '1000': function () {
     return {// 代理
       ...PlatformBaseBizRole(),
-      suffix: 'AGENT',                      // 前缀
-      apiKey: Model.uuid(),                 // APIKEY
+      // suffix: 'AGENT',                      // 前缀
+      // apiKey: Model.uuid(),                 // APIKEY
       agentEmail: Model.StringValue,        // 代理邮箱
-      loginWhiteList: '0.0.0.0'             // 登录白名单
+      // loginWhiteList: '0.0.0.0'             // 登录白名单
     }
   },
   '10000': function () {

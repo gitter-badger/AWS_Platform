@@ -138,13 +138,40 @@ export class BillModel extends BaseModel {
     }
 
     /**
+     * 查询用户出账金额
+     * @param {*} user 
+     */
+    async checkUserOut(user) {
+        const [queryErr, bills] = await this.query({
+            IndexName: 'ActionIndex',
+            KeyConditionExpression: 'userId = :userId AND #action = :action',
+            ExpressionAttributeNames: {
+                '#action': 'action',
+            },
+            ExpressionAttributeValues: {
+                ':userId': user.userId,
+                ':action': -1
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const sums = _.reduce(bills.Items, (sum, bill) => {
+            return sum + bill.amount
+        }, 0.0)
+
+        return [0, user.points + sums * -1]
+    }
+
+    /**
      * 返回某个账户下的余额
      * @param {*} token 
      * @param {*} user 
      */
     async checkBalance(token, user) {
         // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
-        // 当前登录用户只能查询自己的balance
+        // 当前登录用户只能查询自己的余额
+        // 上级可以查询下级余额
         if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
             return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
         }

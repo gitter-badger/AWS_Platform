@@ -122,8 +122,7 @@ const userNew = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
 
-  return ResOK(cb, { ...res, payload: resgisterUserRet });
-
+  return ResOK(cb, { ...res, payload: resgisterUserRet })
 }
 
 /**

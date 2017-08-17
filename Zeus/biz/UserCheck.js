@@ -83,7 +83,6 @@ export class UserCheck {
             inparam.msn = parseInt(inparam.msn).toString()
         }
 
-
         // 数据类型处理
         inparam.rate = inparam.rate.toString()
         inparam.points = parseFloat(inparam.points)

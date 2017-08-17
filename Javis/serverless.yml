@@ -316,6 +316,9 @@ resources:
             AttributeName: userId
             AttributeType: S
           -
+            AttributeName: action
+            AttributeType: N
+          -
             AttributeName: createdAt
             AttributeType: N
         KeySchema:
@@ -359,6 +362,20 @@ resources:
                 KeyType: HASH
               -
                 AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: ActionIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+              -
+                AttributeName: action
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
