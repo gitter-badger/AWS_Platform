@@ -31,8 +31,8 @@ const add = async(e, c, cb) => {
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "title", type:"S"},
-      {name : "content", type:"S"},
+      {name : "title", type:"S", min:1, max:20},
+      {name : "content", type:"S", min:1, max:200},
       {name : "tools", type:"J"},
       {name : "sendTime", type:"N"}
   ], requestParams);
@@ -41,13 +41,7 @@ const add = async(e, c, cb) => {
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
-  //线路好与nickname只能选择其一
-  if(!requestParams.nickname && !requestParams.msn) {
-    return errorHandle(cb, new CHeraErr(CODES.DataError));
-  }
-  if(requestParams.nickname && requestParams.msn) {
-    return errorHandle(cb, new CHeraErr(CODES.DataError));
-  }
+    
   //变量
   let {tools, kindId} = requestParams;
   //检查tools格式是否正确

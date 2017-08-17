@@ -32,9 +32,11 @@ export class MerchantModel extends athena.BaseModel {
      * @param {*} intoArray 
      */
     async agentChildListByUids(uids, intoArray = []) {
-        let [parentsError, userList] = await this.findByParents(uids);
+        let [parentsError, userList] = await this.findByParents(uids);  
         if(parentsError) return [parentsError, null];
-        if(userList.length) {
+        console.log("111122222222");
+        console.log(userList);
+        if(userList.length == 0) {
             return [null, intoArray];
         }else {
             uids = [];
@@ -42,7 +44,7 @@ export class MerchantModel extends athena.BaseModel {
                 intoArray.push(item);
                 uids.push(item.userId);
             })
-            return agentChildListByUids(uids, intoArray);
+            return this.agentChildListByUids(uids, intoArray);
         }
     }
 
@@ -58,12 +60,11 @@ export class MerchantModel extends athena.BaseModel {
             this.db$("scan", {
                 TableName : this.tableName,
                 FilterExpression : filterExpression,
-                ExpressionAttributeValues : expressionAttributeValues,
-                Select : "userId, parent, displayId"
+                ExpressionAttributeValues : expressionAttributeValues
             }).then((result) => {
                 reslove([null, result.Items]);
             }).catch((err) => {
-                reslove([err, 0]);
+                reslove([err, []]);
             })
         })
     }

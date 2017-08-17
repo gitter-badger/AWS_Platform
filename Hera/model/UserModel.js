@@ -48,7 +48,7 @@ export class UserModel extends athena.BaseModel {
     findByBuIds(buIds) {
         let filterExpression = "",
             expressionAttributeValues = {};
-        for(var i =0; i < uids.length; i++){
+        for(var i =0; i < buIds.length; i++){
             filterExpression += `buId=:buId${i} or `;
             expressionAttributeValues[`:buId${i}`] = buIds[i];
         }

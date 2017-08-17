@@ -29,25 +29,19 @@ const add = async(e, c, cb) => {
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "content", type:"S"},
+      {name : "content", type:"S", min:1, max:200},
       {name : "showTime", type:"N"},
       {name : "startTime", type:"N"},
       {name : "endTime", type:"N"},
       {name : "splitTime", type:"N"},
-      {name : "kindId", type:"S"},
-      {name : "msn", type:"N"},
-      {name : "frequency", type:"N"},
+      {name : "count", type:"N"},
   ], requestParams);
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
-  let [gameInfoErr, gameName] = getGameName(requestParams);
-  if(gameInfoErr) {
-    return errorHandle(cb, gameInfoErr);
-  }
+ 
   requestParams.userId = userInfo.userId;
-  requestParams.gameName = gameName;
   let noticeModel = new NoticeModel(requestParams);
   let [saveErr] = await noticeModel.save();
   if(saveErr) {

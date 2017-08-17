@@ -29,8 +29,6 @@ const ResFail = (callback, res) => {
     callback(null, ReHandler.fail(errObj))
 }
 
-
-
 /**
  * 代理玩家列表
  * @param {*} event 
@@ -58,15 +56,15 @@ export async function agentPlayerList(event, context, cb) {
 
     if(role == RoleCodeEnum.Agent) {
         //找到所有下级
-        let [childrenError, childrenList] = new MerchantModel().agentChildListByUids([tokenInfo.userId]);
-        let buIds = childrenList.map((item) => +tem.displayId);
-        uids.push(+displayId);
+        let [childrenError, childrenList] = await new MerchantModel().agentChildListByUids([tokenInfo.userId]);
+        if(childrenError) return ResFail(cb, childrenError)
+        let buIds = childrenList.map((item) => +item.displayId);
+        buIds.push(+displayId);
         let userModel = new UserModel();
         //找到代理所有用户
-        userModel.findByBuIds(buIds);
-        [err, userList] = await userModel.scan(requestParams);
+        [err, userList] = await userModel.findByBuIds(buIds);
     }else {
-        return ResOK(cb, { list: [] })
+        return ResOK(cb, { list: []})
     }
     if (err) {
         return ResFail(cb, err)
@@ -77,6 +75,221 @@ export async function agentPlayerList(event, context, cb) {
         }, this);
     
     ResOK(cb, {list: userList});
+}
+/**
+ * 玩家存点
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+export async function agentPlayerCudian(event, context, cb){
+    //json转换
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+    if(parserErr) return cb(null, ReHandler.fail(parserErr));
+    const [tokenErr, token] = await Model.currentToken(event);
+    if (tokenErr) {
+        return ResFail(cb, tokenErr)
+    }
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    if(e) {
+        return ResFail(cb, e)
+    }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = athena.Util.checkProperties([
+        {name : "userName", type:"S"},
+        {name : "points", type:"N",min:1},
+    ], requestParams);
+    if(checkAttError){
+        Object.assign(checkAttError, {params: errorParams});
+        return cb(null, ReHandler.fail(checkAttError));
+    } 
+    let [userErr, userInfo] = await new UserModel().get({userName:requestParams.userName});
+    if(userErr) {
+        return ResFail(cb, userErr)
+    }
+    if(!userInfo) {
+        return ResFail(cb, new CHeraErr(CODES.userNotExist));
+    }
+    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(tokenInfo.userId);
+
+    if(queryMerchantError) {
+        return ResFail(cb, queryMerchantError); 
+    }
+    if(!merchantInfo) {
+        return ResFail(cb, new CHeraErr(CODES.AgentNotExist)); 
+    }
+    let [cudianErr] = await cudian(userInfo, merchantInfo, requestParams);
+    if(cudianErr) {
+        return ResFail(cb, cudianErr);
+    }
+    let [userBErr, points] = await new UserBillModel({userName:userInfo.userName}).getBalance();
+    if(userBErr) {
+        return ResFail(cb, cudianErr);
+    }
+    ResOK(cb, {data:{points}});
+}
+
+/**
+ * 玩家取点
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+export async function agentPlayerQudian(event, context, cb){
+    //json转换
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+    if(parserErr) return cb(null, ReHandler.fail(parserErr));
+    const [tokenErr, token] = await Model.currentToken(event);
+    if (tokenErr) {
+        return ResFail(cb, tokenErr)
+    }
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    if(e) {
+        return ResFail(cb, e)
+    }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = athena.Util.checkProperties([
+        {name : "userName", type:"S"},
+        {name : "points", type:"N",min:1},
+    ], requestParams);
+    if(checkAttError){
+        Object.assign(checkAttError, {params: errorParams});
+        return cb(null, ReHandler.fail(checkAttError));
+    } 
+    let [userErr, userInfo] = await new UserModel().get({userName:requestParams.userName});
+    if(userErr) {
+        return ResFail(cb, userErr)
+    }
+    if(!userInfo) {
+        return ResFail(cb, new CHeraErr(CODES.userNotExist));
+    }
+    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(tokenInfo.userId);
+
+    if(queryMerchantError) {
+        return ResFail(cb, queryMerchantError); 
+    }
+    if(!merchantInfo) {
+        return ResFail(cb, new CHeraErr(CODES.AgentNotExist)); 
+    }
+    let [cudianErr] = await qudian(userInfo, merchantInfo, requestParams);
+    if(cudianErr) {
+        return ResFail(cb, cudianErr);
+    }
+    let [userBErr, points] = await new UserBillModel({userName:userInfo.userName}).getBalance();
+    if(userBErr) {
+        return ResFail(cb, cudianErr);
+    }
+    ResOK(cb, {data:{points}});
+}
+
+async function qudian(userInfo, merchantInfo, requestParams) {
+    //玩家余额
+    let [playerBError, playerBalance] = await new UserBillModel({userName:userInfo.userName}).getBalance();
+    if(playerBError)return ResFail(cb, agentBError);
+    if(playerBalance < requestParams.points) {
+        return [new CHeraErr(CODES.AgentBalanceIns), null];
+    }
+    //玩家账单
+    let baseBillModel = {
+      fromRole : RoleCodeEnum.Agent,
+      toRole : RoleCodeEnum.Player,
+      fromUser : merchantInfo.username,
+      toUser : userInfo.userName,
+      msn : "000",
+      amount : +requestParams.points,
+      operator : merchantInfo.username,
+      remark : requestParams.remark,
+      gameType : -1,
+      typeName : "代理取点"
+    }
+    let userBillModel = new UserBillModel({
+        ...baseBillModel,
+        action : -1,
+        kindId : -2,
+        userId : userInfo.userId,
+        userName : userInfo.userName,
+        type : Type.agentOper
+    });
+    let [savePlayerError] = await userBillModel.save();
+    if(savePlayerError) return [savePlayerError, null]
+    //商户点数变化
+    let merchantBillModel = new MerchantBillModel({
+        ...baseBillModel,
+        action : 1,
+        userId :merchantInfo.userId,
+        username : merchantInfo.username,
+    });
+    let [mError] = await merchantBillModel.save();
+
+    //更新玩家余额
+    //查账
+    let [getError, userSumAmount] = await userBillModel.getBalance();
+    if(getError) return [getError,null]
+    //更新余额
+    console.log("用户余额");
+    console.log(userSumAmount);
+    let [updateError] = await new UserModel().update({userName:userInfo.userName},{balance : userSumAmount});
+    if(updateError) return [updateError,null]
+    return [null, null];
+}
+/**
+ * 玩家存点
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+async function cudian(userInfo, merchantInfo, requestParams){
+    //代理余额
+    let [agentBError, agentBalance] = await new MerchantBillModel({userId:merchantInfo.userId}).getBlance();
+    agentBalance += +merchantInfo.points;  //需要加上初始点数
+    console.log("商家点数");
+    console.log(agentBalance);
+    if(agentBError)return ResFail(cb, agentBError);
+    if(agentBalance < requestParams.points) {
+        return [new CHeraErr(CODES.AgentBalanceIns), null];
+    }
+    //玩家账单
+    let baseBillModel = {
+      fromRole : RoleCodeEnum.Agent,
+      toRole : RoleCodeEnum.Player,
+      fromUser : merchantInfo.username,
+      toUser : userInfo.userName,
+      msn : "000",
+      amount : +requestParams.points,
+      operator : merchantInfo.username,
+      remark : requestParams.remark,
+      gameType : -1,
+      typeName : "代理存点"
+    }
+    let userBillModel = new UserBillModel({
+        ...baseBillModel,
+        action : 1,
+        kindId : -2,
+        userId : userInfo.userId,
+        userName : userInfo.userName,
+        type : Type.agentOper
+    });
+    let [savePlayerError] = await userBillModel.save();
+    if(savePlayerError) return [savePlayerError, null]
+    //商户点数变化
+    let merchantBillModel = new MerchantBillModel({
+        ...baseBillModel,
+        action : -1,
+        userId :merchantInfo.userId,
+        username : merchantInfo.username,
+    });
+    let [mError] = await merchantBillModel.save();
+
+    //更新玩家余额
+    //查账
+    let [getError, userSumAmount] = await userBillModel.getBalance();
+    if(getError) return [getError,null]
+    //更新余额
+    console.log("用户余额");
+    console.log(userSumAmount);
+    let [updateError] = await new UserModel().update({userName:userInfo.userName},{balance : userSumAmount});
+    if(updateError) return [updateError,null]
+    return [null, null];
 }
 
 /**
@@ -174,15 +387,17 @@ export async function createPlayer(event, context, cb) {
     if(merchantInfo.role != RoleCodeEnum.Agent) {
         return ResFail(cb, new CHeraErr(CODES.NotAuth)); 
     }
-    let {suffix, msn} = merchantInfo;
+    let {suffix} = merchantInfo;
     //实际的用户名
     let userName = `${suffix}_${requestParams.userName}`;
 
     let userModel = new UserModel({
         ...requestParams,
         buId : merchantInfo.displayId,
+        userName : userName,
+        msn : "000"
     });
-    let [existError, flag] = await user.isExist(userName);
+    let [existError, flag] = await userModel.isExist(userName);
     if(existError) return ResFail(cb, existError);
     //用户已经注册
     if(flag) return ResFail(cb, new CHeraErr(CODES.userAlreadyRegister));
@@ -191,20 +406,23 @@ export async function createPlayer(event, context, cb) {
     
     //代理余额
     let [agentBError, agentBalance] = await new MerchantBillModel({userId}).getBlance();
+    agentBalance += +merchantInfo.points;  //需要加上初始点数
     if(agentBError)return ResFail(cb, agentBError);
     if(agentBalance < requestParams.points) {
         return ResFail(cb, new CHeraErr(CODES.AgentBalanceIns));
     }
     //保存玩家
-    let [userSaveError, userInfo] = await userModel.save();
+    let [userSaveError] = await userModel.save();
     if(userSaveError) return ResFail(cb, userSaveError);
+    let [userGetError, userInfo] = await new UserModel().get({userName});
+    if(userGetError) return ResFail(cb, userSaveError);
     //玩家账单
     let baseBillModel = {
       fromRole : RoleCodeEnum.Agent,
       toRole : RoleCodeEnum.Player,
       fromUser : username,
       toUser : userName,
-      msn : msn,
+      msn : "000",
       amount : +requestParams.points,
       operator : username,
       remark : requestParams.remark,
@@ -228,8 +446,14 @@ export async function createPlayer(event, context, cb) {
         userId :merchantInfo.userId,
         username : merchantInfo.username,
     });
-    let [mError, amount] = await merchantBillModel.save();
+    let [mError] = await merchantBillModel.save();
     if(mError) return callback(null, ReHandler.fail(mError));
+    //更新玩家余额
+    let [getBaError, userSumAmount] = await userBillModel.getBalance();
+    if(getBaError) return callback(null, ReHandler.fail(getBaError));
+    //更新余额
+    let [updateBaError] = await new UserModel().update({userName},{balance : userSumAmount});
+    if(updateBaError) return callback(null, ReHandler.fail(updateBaError));
     ResOK(cb, {data : userInfo});
 }
 

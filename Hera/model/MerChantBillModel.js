@@ -52,7 +52,7 @@ export class MerchantBillModel extends athena.BaseModel {
         records.forEach(function(element) {
             sumMount += element.amount;
         });
-        return [null, sumMount.toFixed(2)];
+        return [null, +sumMount.toFixed(2)];
     }
 
    
