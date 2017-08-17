@@ -145,7 +145,7 @@ export const Model = {
     let password = ''
     let randomLength = Math.floor(Math.random() * (maxLength - minLength)) + minLength
     while (!isStrongEnough(password)) {
-      password = generatePassword(randomLength, false, /[\w\d\?\-]/)
+      password = generatePassword(randomLength, false, /[\w\d\?\-\.\@\#\$\%\^\&\*\(\)\+\~\!\:\{\}\;]/)
     }
     return password
   },

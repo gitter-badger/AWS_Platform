@@ -77,6 +77,14 @@ const gameList = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
+
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new GameCheck().checkQuery(gameParams)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+
   let [err, ret] = [1, 1]
   // 普通游戏列表
   // if (!gameParams.parent || gameParams.parent == RoleCodeEnum['PlatformAdmin'] || gameParams.parent == '01') {

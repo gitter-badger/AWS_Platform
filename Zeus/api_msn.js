@@ -14,7 +14,6 @@ import {
   RoleCodeEnum,
   RoleEditProps
 } from './lib/all'
-import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { LogModel } from './model/LogModel'
@@ -72,6 +71,12 @@ const checkMsn = async (e, c, cb) => {
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
     return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new MsnCheck().check(params)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
   }
   // 业务操作
   const [checkErr, checkRet] = await new MsnModel().checkMSN(params)

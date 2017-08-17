@@ -15,9 +15,13 @@
         }
     },
     "body": {
-        "toolName": "测试道具1",
-        "toolId": "278779",
-        "price": 6.0,
-        "num":10
+        "remark": "这是道具测试03的备注_修改",
+        "icon": "icon03_修改",
+        "toolName": "道具测试03",
+        "toolStatus": 1,
+        "updatedAt": 1502767019687,
+        "createdAt": 1502767019687,
+        "toolId": "961040",
+        "desc": "这是道具测试03的描述_修改"
     }
 }

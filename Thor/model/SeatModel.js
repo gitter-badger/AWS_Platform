@@ -1,4 +1,4 @@
-import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, SeatStatusEnum, SeatTypeEnum, SeatContentTypeEnum } from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, SeatStatusEnum, SeatTypeEnum } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
@@ -21,16 +21,30 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam 
      */
     async add(inparam) {
-        let contentType = SeatContentTypeEnum['tool']
+        // 判断编号是否重复
+        const [existErr, exist] = await this.isExist({
+            IndexName: 'SeatTypeIndex',
+            KeyConditionExpression: 'seatType = :seatType AND #order = :order',
+            ExpressionAttributeNames: {
+                '#order': 'order'
+            },
+            ExpressionAttributeValues: {
+                ':seatType': inparam.seatType,
+                ':order': inparam.order
+            }
+        })
+        if (existErr) {
+            return [existErr, 0]
+        }
+        if (exist) {
+            return [BizErr.ItemExistErr('编号已存在'), 0]
+        }
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
-        for (let item in inparam.content) {
-            if (inparam.content['toolId']) {
-                contentIds += ('tool_' + inparam.content['toolId'] + ',')
-            } else {
-                contentIds += ('package_' + inparam.content['packageId'] + ',')
-                contentType = SeatContentTypeEnum['package']
-            }
+        if (inparam.content['toolId']) {
+            contentIds += ('tool_' + inparam.content['toolId'] + ',')
+        } else {
+            contentIds += ('package_' + inparam.content['packageId'] + ',')
         }
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
         // 保存
@@ -51,9 +65,9 @@ export class SeatModel extends BaseModel {
      */
     async list(inparam) {
         // 查询
-        const [err, ret] = await this.query({
+        const [err, ret] = await this.scan({
             IndexName: 'SeatTypeIndex',
-            KeyConditionExpression: 'seatType = :seatType',
+            FilterExpression: 'seatType = :seatType',
             ExpressionAttributeValues: {
                 ':seatType': inparam.seatType,
             }
@@ -61,8 +75,7 @@ export class SeatModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
-        const sortResult = _.sortBy(ret.Items, ['order'])
-        return [0, sortResult]
+        return [0, ret.Items]
     }
 
     /**
@@ -108,6 +121,29 @@ export class SeatModel extends BaseModel {
      * @param {席位对象} inparam 
      */
     async update(inparam) {
+        // 判断编号是否重复
+        const [existErr, exist] = await this.query({
+            IndexName: 'SeatTypeIndex',
+            KeyConditionExpression: 'seatType = :seatType AND #order = :order',
+            ExpressionAttributeNames: {
+                '#order': 'order'
+            },
+            ExpressionAttributeValues: {
+                ':seatType': inparam.seatType,
+                ':order': inparam.order
+            }
+        })
+        if (existErr) {
+            return [existErr, 0]
+        }
+        console.info('测试数据')
+        console.info(exist)
+        console.info(inparam.order)
+        // console.info(exist.Items[0].order)
+        
+        if (exist && exist.Items[0] && inparam.seatId != exist.Items[0].seatId) {
+            return [BizErr.ItemExistErr('编号已存在'), 0]
+        }
         // 更新
         const [err, ret] = await this.getOne(inparam)
         if (err) {
@@ -127,14 +163,12 @@ export class SeatModel extends BaseModel {
 
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
-        for (let item in inparam.content) {
-            if (inparam.content['toolId']) {
-                contentIds += ('tool_' + inparam.content['toolId'] + ',')
-            } else {
-                contentIds += ('package_' + inparam.content['packageId'] + ',')
-            }
+        if (inparam.content['toolId']) {
+            contentIds += ('tool_' + inparam.content['toolId'] + ',')
+        } else {
+            contentIds += ('package_' + inparam.content['packageId'] + ',')
         }
-        inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
+        ret.contentIds = contentIds.substr(0, contentIds.length - 1)
 
         return await this.putItem(ret)
     }

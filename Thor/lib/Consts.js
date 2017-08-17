@@ -62,8 +62,8 @@ export const SeatTypeEnum = {
 }
 // 展位内容类型枚举
 export const SeatContentTypeEnum = {
-  'tool': '道具',
-  'package': '礼包'
+  '1': '道具',
+  '2': '礼包'
 }
 // 账单属性
 export const BillMo = function () {

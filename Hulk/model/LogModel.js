@@ -62,11 +62,12 @@ export class LogModel extends BaseModel {
                 ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
                 KeyConditionExpression: "#role = :role",
-                FilterExpression: "#type = :type AND #parent = :parent",
+                FilterExpression: "(#type = :type AND #parent = :parent) OR (#type = :type AND #userId = :parent)",
                 ExpressionAttributeNames: {
                     '#role': 'role',
                     '#type': 'type',
-                    '#parent': 'parent'
+                    '#parent': 'parent',
+                    '#userId': 'userId'
                 },
                 ExpressionAttributeValues: {
                     ':role': inparam.role.toString(),

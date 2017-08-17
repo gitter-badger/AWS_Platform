@@ -14,7 +14,6 @@ import {
   RoleCodeEnum,
   RoleEditProps
 } from './lib/all'
-import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'

@@ -68,6 +68,12 @@ const seatList = async (e, c, cb) => {
     if (jsonParseErr) {
         return ResErr(cb, jsonParseErr)
     }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = new SeatCheck().checkQuery(inparam)
+    if (checkAttError) {
+        Object.assign(checkAttError, { params: errorParams })
+        return ResErr(cb, checkAttError)
+    }
     // 业务操作
     let [err, ret] = await new SeatModel().list(inparam)
     // 结果返回

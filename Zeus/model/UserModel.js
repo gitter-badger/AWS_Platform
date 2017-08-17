@@ -247,8 +247,8 @@ export class UserModel extends BaseModel {
     // 检查用户是否重复
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]
-        // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-        if (role === RoleCodeEnum['PlatformAdmin']) {
+        // 对于平台管理员或代理来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
+        if (role === RoleCodeEnum['PlatformAdmin'] || role === RoleCodeEnum['Agent']) {
             [err, ret] = await this.queryUserBySuffix(role, suffix, username)
         } else {
             // 对于其他用户，角色和前缀具有联合唯一性

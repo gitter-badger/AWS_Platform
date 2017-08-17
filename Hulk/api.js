@@ -152,9 +152,14 @@ const logList = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   //只能是管理员或线路商
-  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Manager']) {
+  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+    inparam.parent = null
+  } else if (token.role == RoleCodeEnum['Manager']) {
+    inparam.parent = token.userId
+  } else {
     return [BizErr.TokenErr('must admin/manager token'), 0]
   }
+
   // 业务操作
   let [err, ret] = await new LogModel().logPage(inparam)
   // 结果返回

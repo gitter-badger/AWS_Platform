@@ -4,11 +4,11 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_cheney",
+      "username": "Platform_NAtest",
       "parent": "00",
       "role": "1",
-      "userId": "eb827426-695c-4df1-8205-ba2e14153b49",
-      "principalId": "eb827426-695c-4df1-8205-ba2e14153b49"
+      "userId": "dac4e3e2-607d-4817-b8f9-116a0f9464f7",
+      "principalId": "dac4e3e2-607d-4817-b8f9-116a0f9464f7"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
@@ -18,6 +18,7 @@
     "role": "10",
     "pageSize": 20,
     "startKey": null,
-    "type": "login"
+    "type": "login",
+    "parent":null
   }
 }

@@ -1,4 +1,4 @@
-import {Tables,Codes,BizErr,Trim,Empty,Model,Keys,Pick,Omit,RoleCodeEnum,RoleModels,ToolStatusEnum} from '../lib/all'
+import { Tables, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels, ToolStatusEnum } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 import { PackageModel } from './PackageModel'
@@ -24,10 +24,6 @@ export class ToolModel extends BaseModel {
      * @param {*} inparam 
      */
     async addTool(inparam) {
-        // Start:从编号池获取新编号
-        const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
-        if (uucodeErr) { return [uucodeErr, 0] }
-        inparam.toolId = uucodeRet
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
             KeyConditionExpression: 'toolName = :toolName',
@@ -41,6 +37,16 @@ export class ToolModel extends BaseModel {
         if (exist) {
             return [BizErr.ItemExistErr('道具已存在'), 0]
         }
+
+        // Start:从编号池获取新编号
+        if (inparam.toolName == '钻石') {
+            inparam.toolId = '100000'
+        } else {
+            const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
+            if (uucodeErr) { return [uucodeErr, 0] }
+            inparam.toolId = uucodeRet
+        }
+
         const dataItem = {
             ...this.item,
             ...inparam
@@ -51,7 +57,7 @@ export class ToolModel extends BaseModel {
             return [putErr, 0]
         }
         // End:记录生成的编码
-        this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: uucodeRet } })
+        this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: inparam.toolId } })
         return [0, dataItem]
     }
 
@@ -162,7 +168,7 @@ export class ToolModel extends BaseModel {
             return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
         }
         // 更新
-        [err, ret] = await this.getOne(inparam.toolName, inparam.toolId)
+        [err, ret] = await this.getOne(inparam)
         if (err) {
             return [err, 0]
         }
@@ -172,8 +178,9 @@ export class ToolModel extends BaseModel {
         ret.icon = inparam.icon
         ret.desc = inparam.desc
         ret.remark = inparam.remark
-        ret.toolStatus = inparam.toolStatus
+        // ret.toolStatus = inparam.toolStatus
         ret.updatedAt = Model.timeStamp()
+        console.info(ret)
         return await this.putItem(ret)
     }
 
@@ -201,6 +208,10 @@ export class ToolModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
+
+        // End:删除生成的编码
+        this.db$('delete', { TableName: Tables.ZeusPlatformCode, Key: { type: 'tool', code: inparam.toolId } })
+
         return [0, ret]
     }
 }

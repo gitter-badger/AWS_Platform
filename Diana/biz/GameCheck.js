@@ -66,4 +66,32 @@ export class GameCheck {
 
         return [checkAttError, errorParams]
     }
+
+    /**
+     * 检查查询
+     * @param {*} inparam 
+     */
+    checkQuery(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "gameType", type: "NS", min: 5, max: 17 }]
+            , inparam)
+
+        if (checkAttError) {
+            return [checkAttError, errorParams]
+        }
+
+        // 如果类型参数为空，默认查询所有类型
+        if (!inparam.gameType) {
+            inparam.gameType = ''
+            for (let item in GameTypeEnum) {
+                inparam.gameType += (item + ',')
+            }
+            inparam.gameType = inparam.gameType.substr(0, inparam.gameType.length - 1)
+        }
+
+        // 数据类型处理
+        inparam.gameType = inparam.gameType.toString()
+        inparam.keyword = inparam.keyword || null
+        return [checkAttError, errorParams]
+    }
 }

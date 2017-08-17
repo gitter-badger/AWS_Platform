@@ -71,6 +71,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
+
   // 检查用户是否已经存在
   const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
   if (queryUserErr) {
@@ -102,6 +103,20 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (queryParentErr) {
     return [queryParentErr, 0]
   }
+
+  // 如果是线路商创建商户，检查可用余额
+  // if (parentUser.role === RoleCodeEnum['Manager'] && CheckUser.role === RoleCodeEnum['Merchant']) {
+  //   // 查询已用商户已用数量
+  //   let merchantUsedCount = 0
+  //   const [err, ret] = await new UserModel().listChildUsers(parentUser, RoleCodeEnum['Merchant'])
+  //   if (ret && ret.length > 0) {
+  //     merchantUsedCount = ret.length
+  //   }
+  //   if (merchantUsedCount >= parentUser.limit) {
+  //     return [BizErr.InparamErr('商户可用名额不足'), 0]
+  //   }
+  // }
+
   // 初始点数
   const initPoints = CheckUser.points
   // 检查余额
@@ -188,47 +203,47 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // 校验用户密码
   const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
   if (!valid) {
-    return [BizErr.PasswordErr(), 0]
+    return [BizErr.PasswordErr(), User]
   }
   // 检查非管理员的有效期
   const [periodErr, periodRet] = await new UserModel().checkContractPeriod(User)
   if (periodErr) {
-    return [periodErr, 0]
+    return [periodErr, User]
   }
   // 检查用户是否被锁定
   if (User.status == StatusEnum.Disable) {
-    return [BizErr.UserLockedErr(), 0]
+    return [BizErr.UserLockedErr(), User]
   }
   // 如果是商户，检查白名单
-  let whiteFlag = false
-  if (roleCode == RoleCodeEnum.Merchant) {
-    // 白名单为空，默认放行
-    if (!User.loginWhiteList) {
-      whiteFlag = true
-    }
-    // 白名单不为空，则校验
-    else {
-      let whiteList = User.loginWhiteList
-      let whiteArr = whiteList.split(';')
-      for (let white of whiteArr) {
-        if (white == '0.0.0.0') {
-          whiteFlag = true
-          break
-        }
-        if (white == User.lastIP) {
-          whiteFlag = true
-          break
-        }
-      }
-    }
-  }
-  // 非商户，不检查白名单
-  else {
-    whiteFlag = true
-  }
-  if (!whiteFlag) {
-    return [BizErr.UserIPErr('IP不合法：' + User.lastIP), 0]
-  }
+  // let whiteFlag = false
+  // if (roleCode == RoleCodeEnum.Merchant) {
+  //   // 白名单为空，默认放行
+  //   if (!User.loginWhiteList) {
+  //     whiteFlag = true
+  //   }
+  //   // 白名单不为空，则校验
+  //   else {
+  //     let whiteList = User.loginWhiteList
+  //     let whiteArr = whiteList.split(';')
+  //     for (let white of whiteArr) {
+  //       if (white == '0.0.0.0') {
+  //         whiteFlag = true
+  //         break
+  //       }
+  //       if (white == User.lastIP) {
+  //         whiteFlag = true
+  //         break
+  //       }
+  //     }
+  //   }
+  // }
+  // // 非商户，不检查白名单
+  // else {
+  //   whiteFlag = true
+  // }
+  // if (!whiteFlag) {
+  //   return [BizErr.UserIPErr('IP不合法：' + User.lastIP), User]
+  // }
   // 更新用户信息
   User.lastIP = UserLoginInfo.lastIP
   const [saveUserErr, saveUserRet] = await saveUser(User)
@@ -324,7 +339,7 @@ const getRole = async (code) => {
 const saveUser = async (userInfo) => {
   // 线路商或商户，从编码池获取新编码
   let [uucodeErr, uucodeRet] = [0, 0]
-  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role) {
+  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role || RoleCodeEnum['Agent'] == userInfo.role) {
     [uucodeErr, uucodeRet] = await Model.uucode('displayId', 6)
     if (uucodeErr) {
       return [uucodeErr, 0]
