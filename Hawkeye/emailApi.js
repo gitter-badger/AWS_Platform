@@ -8,14 +8,16 @@ import {ReHandler, JwtVerify} from "./lib/Response";
 
 import {Model} from "./lib/Dynamo";
 
-import {NoticeModel} from "./model/NoticeModel"
+import {EmailModel} from "./model/EmailModel"
 
 import {MerchantModel} from "./model/MerchantModel"
+
+import {ToolModel} from "./model/ToolModel"
 
 import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
 /**
- * 添加公告
+ * 添加邮件
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
@@ -29,52 +31,64 @@ const add = async(e, c, cb) => {
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "title", type:"S"},
       {name : "content", type:"S"},
-      {name : "showTime", type:"N"},
-      {name : "startTime", type:"N"},
-      {name : "endTime", type:"N"},
-      {name : "splitTime", type:"N"},
+      {name : "tools", type:"J"},
+      {name : "sendTime", type:"N"},
       {name : "kindId", type:"S"},
-      {name : "msn", type:"N"},
-      {name : "frequency", type:"N"},
+      {name : "msn", type:"N"}
   ], requestParams);
+  
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
-  let [gameInfoErr, gameName] = getGameName(requestParams);
-  if(gameInfoErr) {
-    return errorHandle(cb, gameInfoErr);
-  }
+  //变量
+  let {tools, kindId} = requestParams;
   requestParams.userId = userInfo.userId;
-  requestParams.gameName = gameName;
-  let noticeModel = new NoticeModel(requestParams);
-  let [saveErr] = await noticeModel.save();
+  requestParams.sendUser = userInfo.displayName;
+  //检查道具数量
+  if(tools.length > 12) {
+    return errorHandle(cb, new CHeraErr(CODES.toolMoreThan));
+  }
+  
+  //根据kindId找到游戏
+  if(requestParams.kindId == -1) {
+    requestParams.gameName = "全部";
+  }else {
+    let gameInfo = GameTypeEnum[kindId]
+    if(!gameInfo) {
+      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
+    }
+    requestParams.gameName = gameInfo.name;
+  }
+  //找道具
+  let toolModel = new ToolModel();
+  for(let i = 0; i < tools.length; i++) {
+    if(!tools[i].toolId) {
+      let cError = new CHeraErr(CODES.DataError);
+      Object.assign(cError,{params:["tools"]});
+      return errorHandle(cb, cError);
+    }
+  }
+  let toolIds = tools.map((item) => item.toolId);
+  let [toolListError, toolList] = await toolModel.findByIds(toolIds);
+  //如果道具数量不相等，道具ID有误，返回错误
+  if(toolList.length != toolIds.length) {
+    return errorHandle(cb, new CHeraErr(CODES.toolNotExist));
+  }
+  //填充邮件道具实体
+  let emailModel = new EmailModel(requestParams);
+  emailModel.setTools(toolList, tools);
+  let [saveErr] = await emailModel.save();
   if(saveErr) {
     return errorHandle(cb, saveErr);
   }
-  cb(null, ReHandler.success({data:noticeModel.setProperties()}));
-}
-
-function getGameName(requestParams){
-  //根据kindId找到游戏
-  let gameName = '';
-  if(requestParams.kindId == 0) {
-    gameName = "广场";
-  }else if(requestParams.kindId == -1) {
-    gameName = "所有游戏";
-  }else{
-    let gameInfo = GameTypeEnum[requestParams.kindId]
-    gameName = gameInfo.name;
-    if(!gameInfo) {
-      return [new CHeraErr(CODES.gameNotExist), gameName]
-    }
-  }
-  return [null, gameName];
+  cb(null, ReHandler.success({data:emailModel.setProperties()}));
 }
 
 /**
- * 修改公告
+ * 修改邮件
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
@@ -88,45 +102,69 @@ const update = async(e, c, cb) => {
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-    {name : "noid", type:"S"},
+    {name : "emid", type:"S"},
+    {name : "title", type:"S"},
     {name : "content", type:"S"},
-    {name : "showTime", type:"N"},
-    {name : "startTime", type:"N"},
-    {name : "endTime", type:"N"},
-    {name : "splitTime", type:"N"},
-    {name : "msn", type:"N"},
+    {name : "tools", type:"J"},
+    {name : "sendTime", type:"N"},
     {name : "kindId", type:"S"},
-    {name : "frequency", type:"N"},
+    {name : "msn", type:"N"}
   ], requestParams);
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
     return errorHandle(cb, checkAttError);
   }
-  //找到这个公告
-  let [getErr, noticeInfo] = await new NoticeModel().get({noid:requestParams.noid});
+  let {emid, kindId, tools} = requestParams;
+  //找到这个邮件
+  let [getErr, emailInfo] = await new EmailModel().get({emid});
   if(getErr) {
     return errorHandle(cb, getErr);
   }
-  if(!noticeInfo) {
-    return errorHandle(cb, new CHeraErr(CODES.noticeNotExist));
+  if(!emailInfo) {
+    return errorHandle(cb, new CHeraErr(CODES.emailNotExist));
+  }
+  if(emailInfo.sendTime < Date.now()) {
+    return errorHandle(cb, new CHeraErr(CODES.emailUpdateError));
   }
   //根据kindId找到游戏
-  let [gameInfoErr, gameName] = getGameName(requestParams);
-  if(gameInfoErr) {
-    return errorHandle(cb, gameInfoErr);
+  if(requestParams.kindId == -1) {
+    requestParams.gameName = "全部";
+  }else {
+    let gameInfo = GameTypeEnum[kindId]
+    if(!gameInfo) {
+      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
+    }
+    requestParams.gameName = gameInfo.name;
   }
-  requestParams.gameName = gameName;
-  let noticeModel = new NoticeModel(requestParams);
-  delete noticeModel.noid;
-  let [updateErr] = await noticeModel.update({noid:requestParams.noid});
+  //找道具
+  let toolModel = new ToolModel();
+  for(let i = 0; i < tools.length; i++) {
+    if(!tools[i].toolId) {
+      let cError = new CHeraErr(CODES.DataError);
+      Object.assign(cError,{params:["tools"]});
+      return errorHandle(cb, cError);
+    }
+  }
+  let toolIds = tools.map((item) => item.toolId);
+  let [toolListError, toolList] = await toolModel.findByIds(toolIds);
+  //如果道具数量不相等，道具ID有误，返回错误
+  if(toolList.length != toolIds.length) {
+    return errorHandle(cb, new CHeraErr(CODES.toolNotExist));
+  }
+  console.log(toolList);
+  //填充邮件道具实体
+  let emailModel = new EmailModel(requestParams);
+  emailModel.setTools(toolList, tools);
+  delete emailModel.emid;
+  let [updateErr] = await emailModel.update({emid:requestParams.emid});
   if(updateErr) {
     return errorHandle(cb, updateErr);
   }
-  cb(null, ReHandler.success({data:noticeModel.setProperties()}));
+  cb(null, ReHandler.success({data:emailModel.setProperties()}));
 }
 
 /**
- * 公告列表
+ * 邮件列表
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
@@ -138,7 +176,7 @@ const list = async(e, c, cb) => {
   }
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if(parserErr) return errorHandle(cb, parserErr);
-  let [scanErr, list] = await new NoticeModel().scan({});
+  let [scanErr, list] = await new EmailModel().scan({});
   if(scanErr) {
     return errorHandle(cb, scanErr);
   } 
@@ -146,35 +184,26 @@ const list = async(e, c, cb) => {
 }
 
 /**
- * 商家列表
+ * 道具列表
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
  */
-const merchantList = async(e, c, cb) => {
+const toolList = async(e, c, cb) => {
   let [beforeErr, userInfo] = await validateToken(e);
   if(beforeErr) {
     return errorHandle(cb, beforeErr);
   }
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if(parserErr) return errorHandle(cb, parserErr);
-  let merchantModel = new MerchantModel();
-  let [merchantErr, merchantList] = await merchantModel.all();
-  if(merchantErr) {
-    return errorHandle(cb, merchantErr);
+  let [scanErr, list] = await new ToolModel().scan({});
+  if(scanErr) {
+    return errorHandle(cb, scanErr);
   }
-  merchantList = merchantList || [];
-  let returnList = merchantList.map((item) => {
-    return {
-      msn : item.msn,
-      displayName : item.displayName
-    }
-  })
-  returnList.unshift({
-    msn : -1,
-    displayName : "所有"
+  let reList = list.map((item) => {
+    return {toolId: item.toolId,toolName:item.toolName}
   });
-  cb(null, ReHandler.success({list:returnList}));
+  cb(null, ReHandler.success({list:reList}));
 }
 
 /**
@@ -191,21 +220,24 @@ const remove = async(e, c, cb) => {
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-    {name : "noid", type:"S"}
+    {name : "emid", type:"S"}
   ], requestParams);
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
     return errorHandle(cb, checkAttError);
   }
-  //找到这个公告
-  let [getErr, noticeInfo] = await new NoticeModel().get({noid:requestParams.noid});
+  //找到这个邮件
+  let [getErr, emailInfo] = await new EmailModel().get({emid:requestParams.emid});
   if(getErr) {
     return errorHandle(cb, getErr);
   }
-  if(!noticeInfo) {
-    return errorHandle(cb, new CHeraErr(CODES.noticeNotExist));
+  if(!emailInfo) {
+    return errorHandle(cb, new CHeraErr(CODES.emailNotExist));
   }
-  let [removeErr] = await new NoticeModel().remove({noid:requestParams.noid});
+  if(emailInfo.sendTime < Date.now()) {
+    return errorHandle(cb, new CHeraErr(CODES.emailUpdateError));
+  }
+  let [removeErr] = await new EmailModel().remove({emid:requestParams.emid});
   if(removeErr) {
     return errorHandle(cb, removeErr);
   }
@@ -223,6 +255,7 @@ const validateToken = async(e) => {
     if (tokenErr) {
         return [tokenErr, null];
     }
+    
     const [te, tokenInfo] = await JwtVerify(token[1])
     if(te) {
         return [te, nuyll];
@@ -230,29 +263,14 @@ const validateToken = async(e) => {
     let role = tokenInfo.role;
     let userId = tokenInfo.userId;
     let displayId = +tokenInfo.displayId;
+    let displayName = tokenInfo.displayName
     if(role != RoleCodeEnum.PlatformAdmin && role != RoleCodeEnum.Manager) {
       return [new CHeraErr(CODES.notAuth), null];
     }
-    return [null, {userId, displayId}];
+    return [null, {userId, displayId, displayName}];
 }
 
-/**
- * 错误处理
- */
-const errorHandle = (cb, error) =>{
-  let errObj = {};
-    errObj.err = error;
-    errObj.code = error.code;
-    cb(null, ReHandler.fail(errObj));
-}
 
-export{
-    add,
-    update,
-    merchantList,
-    remove,
-    list
-}
 
 // TOKEN验证
 export const jwtverify = async (e, c, cb) => {
@@ -268,4 +286,21 @@ export const jwtverify = async (e, c, cb) => {
     return c.fail('Unauthorized')
   }
   return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+}
+/**
+ * 错误处理
+ */
+const errorHandle = (cb, error) =>{
+  let errObj = {};
+    errObj.err = error;
+    errObj.code = error.code;
+    cb(null, ReHandler.fail(errObj));
+}
+  
+export{
+    add,
+    update,
+    list,
+    toolList,
+    remove
 }

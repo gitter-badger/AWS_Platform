@@ -99,11 +99,32 @@ functions:
           path: /game/tool/list
           method: get
           cors: true
+  seatList:  #席位列表列表
+    handler: openApi_tool.seatList
+    events:
+      - http:
+          path: /game/seat/list
+          method: get
+          cors: true
+  packageList:  #道具包列表
+    handler: openApi_tool.packageList
+    events:
+      - http:
+          path: /game/package/list
+          method: get
+          cors: true
   buy:  #购买道具
     handler: openApi_tool.playerBuyProp
     events:
       - http:
-          path: /game/tool/buy
+          path: /game/prop/buy
+          method: post
+          cors: true
+  buyDiamonds:  #购买钻石
+    handler: openApi_tool.playerBuyDiamonds
+    events:
+      - http:
+          path: /game/diamonds/buy
           method: post
           cors: true
   playerRecord:  #获取玩家记录验证

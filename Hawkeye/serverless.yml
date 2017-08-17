@@ -76,3 +76,50 @@ functions:
           path: /notice/info
           method: post
           cors: true
+  emailInfo :  #邮件信息
+    handler: openApi.emailInfo
+    events:
+      - http:
+          path: /email/info
+          method: post
+          cors: true
+  addEmail:  #添加邮件
+    handler: emailApi.add
+    events:
+      - http:
+          path: /email/add
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  updateEmail:  #修改邮件
+    handler: emailApi.update
+    events:
+      - http:
+          path: /email/update
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  removeEmail:  #删除邮件
+    handler: emailApi.remove
+    events:
+      - http:
+          path: /email/remove
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  listEmail:  #邮件列表
+    handler: emailApi.list
+    events:
+      - http:
+          path: /email/list
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  toolList :  #道具列表
+    handler: emailApi.toolList
+    events:
+      - http:
+          path: /email/tool/list
+          method: post
+          cors: true
+          authorizer: tokenVerify

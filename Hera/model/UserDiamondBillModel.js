@@ -9,33 +9,20 @@ import {Model} from "../lib/Dynamo"
 
 
 
-export class UserBillModel extends athena.BaseModel {
-    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
-        super(TABLE_NAMES.BILL_USER);
+export class UserDiamondBillModel extends athena.BaseModel {
+    constructor({seatId, userId, action, userName, msn, originalDiamonds,diamonds, toolId, kindId} = {}) {
+        super(TABLE_NAMES.BILL_DIAMOND_USER);
+        this.seatId = seatId;
         this.billId = Util.uuid();
         this.userId = +userId
         this.action = +action;
         this.userName = userName;
         this.msn = msn;
-        this.fromRole = fromRole;
-        this.toRole = toRole || Model.StringValue;
-        this.fromUser = fromUser;
-        this.toUser = toUser || Model.StringValue;
-        this.merchantName = merchantName || Model.StringValue;
-        this.originalAmount = 0;
-        this.operator = operator;
+        this.originalDiamonds = 0;
         this.createAt = Date.now();
-        this.updateAt = Date.now();
-        this.amount = +amount;
-        this.seatInfo = seatInfo;
-        this.kindId = kindId || -1;  //-1表示中心钱包的
-        this.toolId = toolId || -1;
-        this.toolName = toolName || Model.StringValue;
-        this.type = type;
-        this.remark = remark || Model.StringValue;
-        this.setAmount(amount);
-        this.typeName = typeName;
-        this.gameType = gameType;
+        this.diamonds = +diamonds;
+        this.toolId = toolId;
+        this.kindId = kindId || "0"; //游戏ID，如果是大厅，则为0
     }
     setAmount(amount){
         if(this.action ==-1) {
@@ -46,12 +33,12 @@ export class UserBillModel extends athena.BaseModel {
         }
     }
     async getBalance(){
-        let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], "userNameIndex", true);
+        let [err, records] = await this.get({userName:this.userName},["userName","diamonds"], "UserNameIndex", true);
         if(err) return [err, 0];
         records = records || [];
         let sumMount = 0;
         records.forEach(function(element) {
-            sumMount += element.amount;
+            sumMount += +element.diamonds;
         });
         return [null, sumMount];
     }
