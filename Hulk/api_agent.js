@@ -223,7 +223,13 @@ const agentUpdate = async (e, c, cb) => {
  */
 const availableAgents = async (e, c, cb) => {
     const res = { m: 'avalibleAgents' }
-    const [err, ret] = await new UserModel().listAvailableAgents()
+    // 入参转换
+    const [jsonParseErr, inparam] = JSONParser(e && e.body)
+    if (jsonParseErr) {
+        return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
+    }
+    // 业务操作
+    const [err, ret] = await new UserModel().listAvailableAgents(inparam)
     if (err) {
         return ResFail(cb, { ...res, err: err }, err.code)
     }
