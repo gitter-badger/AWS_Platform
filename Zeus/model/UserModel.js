@@ -145,11 +145,14 @@ export class UserModel extends BaseModel {
         const [queryErr, queryRet] = await this.query({
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
+            FilterExpression: '#status = :status',
             ExpressionAttributeNames: {
-                '#role': 'role'
+                '#role': 'role',
+                '#status': 'status'
             },
             ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Manager']
+                ':role': RoleCodeEnum['Manager'],
+                ':status': StatusEnum.Enable
             }
         })
         if (queryErr) {
@@ -174,7 +177,6 @@ export class UserModel extends BaseModel {
                 label: item.suffix
             }
         })
-        console.info(viewList)
         return [0, viewList]
     }
 

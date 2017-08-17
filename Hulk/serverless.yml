@@ -89,6 +89,15 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
+  availableAgents: # 可用代理列表
+    handler: api_agent.availableAgents
+    events:
+      -
+        http:
+          path: availableAgents
+          method: get
+          cors: true
+          authorizer: tokenAuth
   agentUpdate: # 代理更新
     handler: api_agent.agentUpdate
     events:

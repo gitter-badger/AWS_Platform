@@ -2,8 +2,8 @@ import { Model } from './Dynamo'
 // 性别枚举
 export const GenderEnum = {
   Male: 1,
-  Female: 0,
-  Trans: 2
+  Female: 2,
+  Trans: 0
 }
 // 状态枚举
 export const StatusEnum = {

@@ -119,6 +119,18 @@ const agentUpdate = async (e, c, cb) => {
     return ResOK(cb, { ...res, payload: updateRet })
 }
 
+/**
+ * 可用代理
+ */
+const availableAgents = async (e, c, cb) => {
+    const res = { m: 'avalibleAgents' }
+    const [err, ret] = await new UserModel().listAvailableAgents()
+    if (err) {
+        return ResFail(cb, { ...res, err: err }, err.code)
+    }
+    return ResOK(cb, { ...res, payload: ret })
+}
+
 // ==================== 以下为内部方法 ====================
 
 /**
@@ -127,5 +139,6 @@ const agentUpdate = async (e, c, cb) => {
 export {
     agentList,                 // 代理列表
     agentOne,                  // 代理
-    agentUpdate                // 代理更新
+    agentUpdate,               // 代理更新
+    availableAgents            // 可用代理列表
 }
