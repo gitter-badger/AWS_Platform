@@ -154,10 +154,11 @@ export const RoleModels = {
       ...PlatformBaseBizRole(),
       // suffix: 'AGENT',                     // 前缀
       // apiKey: Model.uuid(),                // APIKEY
+      // loginWhiteList: '0.0.0.0'            // 登录白名单
       agentEmail: Model.StringValue,          // 代理邮箱
       vedioMix: Model.NumberValue,            // 电子游戏洗码比
       liveMix: Model.NumberValue              // 真人视讯洗码比
-      // loginWhiteList: '0.0.0.0'            // 登录白名单
+      
     }
   },
   '10000': function () {

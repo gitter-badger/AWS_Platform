@@ -18,16 +18,17 @@ export class AgentCheck {
             { name: "hostContact", type: "S", min: 5, max: 40 },
             { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
 
-            // 帐号管理员
-            { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "adminContact", type: "S", min: 1, max: 40 },
             // 代理
             { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
             { name: "rate", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "vedioMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "liveMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
+
+            // 帐号管理员
+            // { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "adminContact", type: "S", min: 1, max: 40 },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
@@ -67,12 +68,14 @@ export class AgentCheck {
             { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "vedioMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "liveMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
-            // 帐号管理员
-            { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "adminContact", type: "S", min: 1, max: 40 },
+            
             // 代理
             { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+
+            // 帐号管理员
+            // { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "adminContact", type: "S", min: 1, max: 40 },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
