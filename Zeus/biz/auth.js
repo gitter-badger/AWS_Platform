@@ -52,7 +52,6 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
 }
 
 /**
- * 接口编号：2
  * 专门用于创建商户/建站商
  * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息
@@ -136,7 +135,9 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     parentName: parentUser.username,
     parentDisplayName: parentUser.displayName,
     parentSuffix: parentUser.suffix,
-    points: Model.NumberValue
+    points: Model.NumberValue,
+    level: parentUser.level + 1,
+    levelIndex: parentUser.levelIndex ? parentUser.levelIndex + ',' + parentUser.userId : Model.DefaultParent
   }
   //推送给游戏服务器(A3)
   // let pushModel = new PushModel(User);

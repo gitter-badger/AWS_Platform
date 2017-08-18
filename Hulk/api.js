@@ -28,27 +28,40 @@ const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 用户余额
+ * 包含所剩余额
+ * 包含出账金额
  */
 const billOne = async (e, c, cb) => {
+  // 获取入参
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.userId) {
     return ResErr(cb, paramsErr)
   }
+  // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
+  // 查询用户
   const [queryErr, user] = await new UserModel().queryUserById(params.userId)
   if (queryErr) {
     return ResErr(cb, queryErr)
   }
+  // 查询余额
   const [balanceErr, balance] = await new BillModel().checkBalance(token, user)
   if (balanceErr) {
     return ResErr(cb, balanceErr)
   }
+  // 查询出账
+  const [outErr, out] = await new BillModel().checkUserOut(user)
+  if (outErr) {
+    return ResErr(cb, outErr)
+  }
+  // 返回数据
   return ResOK(cb, {
     payload: {
       balance: balance,
+      out: out,
       userId: params.userId
     }
   })

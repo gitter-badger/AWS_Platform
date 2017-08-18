@@ -71,6 +71,32 @@ functions:
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是代理接口服务 ====================
+  agentAdminNew: # 代理管理员注册
+    handler: api_agent.agentAdminNew
+    events:
+      -
+        http:
+          path: agentAdminNew
+          method: post
+          cors: true
+          # authorizer: tokenAuth
+  agentNew: # 代理注册
+    handler: api_agent.agentNew
+    events:
+      -
+        http:
+          path: agentNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  agentLogin: # 代理登录
+    handler: api_agent.agentLogin
+    events:
+      -
+        http:
+          path: agentLogin
+          method: post
+          cors: true
   agentList: # 代理列表
     handler: api_agent.agentList
     events:
@@ -87,6 +113,15 @@ functions:
         http:
           path: agentOne/{id}
           method: get
+          cors: true
+          authorizer: tokenAuth
+  availableAgents: # 可用代理列表
+    handler: api_agent.availableAgents
+    events:
+      -
+        http:
+          path: availableAgents
+          method: post
           cors: true
           authorizer: tokenAuth
   agentUpdate: # 代理更新

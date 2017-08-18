@@ -139,43 +139,51 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 查看可用线路商
+     * 查看可用代理
      */
-    async listAvalibleManagers() {
-        const [queryErr, queryRet] = await this.query({
+    async listAvailableAgents(inparam) {
+        // 查询所有可用代理
+        const allAgent = {
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
+            FilterExpression: '#status = :status',
             ExpressionAttributeNames: {
-                '#role': 'role'
+                '#role': 'role',
+                '#status': 'status'
             },
             ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Manager']
+                ':role': RoleCodeEnum['Agent'],
+                ':status': StatusEnum.Enable
             }
-        })
+        }
+        // 查询用户的所有可用代理
+        const childAgent = {
+            IndexName: 'RoleSuffixIndex',
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#status = :status AND #parent = :parent',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#status': 'status',
+                '#parent': 'parent'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['Agent'],
+                ':status': StatusEnum.Enable,
+                ':parent': inparam.parent
+            }
+        }
+        let [queryErr, queryRet] = [1, 1]
+        if (inparam.parent) {
+            [queryErr, queryRet] = await this.query(childAgent)
+        }
+        else {
+            [queryErr, queryRet] = await this.query(allAgent)
+        }
+
         if (queryErr) {
             return [queryErr, 0]
         }
-
-        // 查询已用商户已用数量
-        let userArr = []
-        for (let user of queryRet.Items) {
-            const [err, childs] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
-            if (err) {
-                return [err, 0]
-            }
-            else if (childs.length < user.limit) {
-                userArr.push(user)
-            }
-        }
-
-        const viewList = _.map(userArr, (item) => {
-            return {
-                value: item.userId,
-                label: item.suffix
-            }
-        })
-        console.info(viewList)
-        return [0, viewList]
+        return [0, queryRet.Items]
     }
 
     /**

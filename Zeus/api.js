@@ -122,8 +122,7 @@ const userNew = async (e, c, cb) => {
     return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
   }
 
-  return ResOK(cb, { ...res, payload: resgisterUserRet });
-
+  return ResOK(cb, { ...res, payload: resgisterUserRet })
 }
 
 /**
@@ -241,10 +240,14 @@ const checkUserExist = async (e, c, cb) => {
   if (!inparam.role || !inparam.suffix || !inparam.username) {
     return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
-  // 身份令牌，只有管理员有权限
-  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  // 获取身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
+  }
+  //创建用户账号的只能是管理员或线路商
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Agent']) {
+    return [BizErr.TokenErr('must admin/agent token'), 0]
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
@@ -270,10 +273,14 @@ const checkSuffixExist = async (e, c, cb) => {
   if (!inparam.role || !inparam.suffix) {
     return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
-  // 身份令牌，只有管理员有权限
-  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  // 获取身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
+  }
+  //创建用户账号的只能是管理员或线路商
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Agent']) {
+    return [BizErr.TokenErr('must admin/agent token'), 0]
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, null)
@@ -299,10 +306,14 @@ const checkNickExist = async (e, c, cb) => {
   if (!inparam.role || !inparam.displayName) {
     return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
-  // 身份令牌，只有管理员有权限
-  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  // 获取身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
+  }
+  //创建用户账号的只能是管理员或线路商
+  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Agent']) {
+    return [BizErr.TokenErr('must admin/agent token'), 0]
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkNickExist(inparam.role, inparam.displayName)

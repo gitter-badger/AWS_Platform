@@ -13,15 +13,114 @@ import {
     RoleCodeEnum,
     RoleEditProps
 } from './lib/all'
+import { AgentModel } from './model/AgentModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
-import { UserCheck } from './biz/UserCheck'
+import { AgentCheck } from './biz/AgentCheck'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
+
+/**
+ * 代理管理员注册
+ */
+const agentAdminNew = async (e, c, cb) => {
+    const res = { m: 'agentAdminNew' }
+    // 从POST 的body中获取提交数据
+    const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+    if (jsonParseErr) {
+        return ResErr(cb, jsonParseErr)
+    }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = new AgentCheck().checkAdmin(userInfo)
+    if (checkAttError) {
+        Object.assign(checkAttError, { params: errorParams })
+        return ResErr(cb, checkAttError)
+    }
+    // 获取令牌，只有代理管理员有权限
+    // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
+    // if (tokenErr) {
+    //     return ResErr(cb, tokenErr)
+    // }
+    // 业务操作
+    const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
+    const [registerUserErr, resgisterUserRet] = await new AgentModel().registerAdmin(token, Model.addSourceIP(e, userInfo))
+    // 操作日志记录
+    userInfo.operateAction = '创建代理管理员'
+    userInfo.operateToken = token
+    new LogModel().addOperate(Model.addSourceIP(e, userInfo), registerUserErr, resgisterUserRet)
+    // 结果返回
+    if (registerUserErr) {
+        return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code)
+    }
+
+    return ResOK(cb, { ...res, payload: resgisterUserRet })
+}
+
+/**
+ * 代理注册
+ */
+const agentNew = async (e, c, cb) => {
+    const res = { m: 'agentNew' }
+    // 从POST 的body中获取提交数据
+    const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+    if (jsonParseErr) {
+        return ResErr(cb, jsonParseErr)
+    }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = new AgentCheck().check(userInfo)
+    if (checkAttError) {
+        Object.assign(checkAttError, { params: errorParams })
+        return ResErr(cb, checkAttError)
+    }
+    // 获取令牌，只有代理有权限
+    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
+    if (tokenErr) {
+        return ResErr(cb, tokenErr)
+    }
+    // 业务操作
+    const [registerUserErr, resgisterUserRet] = await new AgentModel().register(token, Model.addSourceIP(e, userInfo))
+    // 操作日志记录
+    userInfo.operateAction = '创建代理'
+    userInfo.operateToken = token
+    new LogModel().addOperate(Model.addSourceIP(e, userInfo), registerUserErr, resgisterUserRet)
+    // 结果返回
+    if (registerUserErr) {
+        return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code)
+    }
+
+    return ResOK(cb, { ...res, payload: resgisterUserRet })
+}
+
+/**
+ * 代理登录
+ */
+const agentLogin = async (e, c, cb) => {
+    const res = { m: 'agentLogin' }
+    // 输入参数转换与校验
+    const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
+    if (jsonParseErr) {
+        return ResErr(cb, jsonParseErr)
+    }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = new AgentCheck().checkLogin(userLoginInfo)
+    if (checkAttError) {
+        Object.assign(checkAttError, { params: errorParams })
+        return ResErr(cb, checkAttError)
+    }
+    // 用户登录
+    const [loginUserErr, loginUserRet] = await new AgentModel().login(Model.addSourceIP(e, userLoginInfo))
+    // 登录日志
+    new LogModel().addLogin(Model.addSourceIP(e, userLoginInfo), loginUserErr, Model.addSourceIP(e, loginUserRet))
+    // 结果返回
+    if (loginUserErr) {
+        return ResFail(cb, { ...res, err: loginUserErr }, loginUserErr.code)
+    }
+    return ResOK(cb, { ...res, payload: loginUserRet })
+}
 
 /**
  * 单个代理
@@ -86,7 +185,7 @@ const agentUpdate = async (e, c, cb) => {
         return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
     }
     //检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkUserUpdate(inparam)
+    let [checkAttError, errorParams] = new AgentCheck().checkUpdate(inparam)
     if (checkAttError) {
         Object.assign(checkAttError, { params: errorParams })
         return ResErr(cb, checkAttError)
@@ -119,13 +218,35 @@ const agentUpdate = async (e, c, cb) => {
     return ResOK(cb, { ...res, payload: updateRet })
 }
 
+/**
+ * 可用代理
+ */
+const availableAgents = async (e, c, cb) => {
+    const res = { m: 'avalibleAgents' }
+    // 入参转换
+    const [jsonParseErr, inparam] = JSONParser(e && e.body)
+    if (jsonParseErr) {
+        return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
+    }
+    // 业务操作
+    const [err, ret] = await new UserModel().listAvailableAgents(inparam)
+    if (err) {
+        return ResFail(cb, { ...res, err: err }, err.code)
+    }
+    return ResOK(cb, { ...res, payload: ret })
+}
+
 // ==================== 以下为内部方法 ====================
 
 /**
-  api export
-**/
+ * api export
+ */
 export {
+    agentLogin,                // 代理登录
+    agentAdminNew,             // 代理管理员注册
+    agentNew,                  // 代理注册
     agentList,                 // 代理列表
     agentOne,                  // 代理
-    agentUpdate                // 代理更新
+    agentUpdate,               // 代理更新
+    availableAgents            // 可用代理列表
 }

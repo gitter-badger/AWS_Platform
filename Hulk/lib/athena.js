@@ -254,6 +254,7 @@ export const RegEnum = {
     COMPANYCONTACT: /^[\u4E00-\u9FA5A-Za-z0-9]{2,16}$/,
     COMPANYCONTACTWAY: /^[0-9]{2,20}$/,
 
+    DISPLAYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{4,10}$/,
     USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
     HOSTNAME: /^[\u4E00-\u9FA5A-Za-z]{5,16}$/,
 
