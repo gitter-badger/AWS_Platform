@@ -9,7 +9,7 @@ import {
   BizErr,
 } from './lib/all'
 
-import {GameTypeEnum} from "./lib/Consts"
+import {GameTypeEnum} from "./lib/all"
 
 import {GameModel} from "./model/GameModel"
 

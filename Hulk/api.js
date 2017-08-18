@@ -6,7 +6,6 @@ import {
   Model,
   Tables,
   StatusEnum,
-  GenderEnum,
   RoleCodeEnum,
   RoleEditProps,
   Trim,

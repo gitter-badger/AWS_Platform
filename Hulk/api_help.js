@@ -10,7 +10,7 @@ import {UserHelpModel, UserHelpGenreModel} from "./model/UserHelpModel";
 import {UserModel} from "./model/UserModel";
 
 
-import {RoleCodeEnum} from "./lib/Consts";
+import {RoleCodeEnum} from "./lib/all";
 
 
 /**

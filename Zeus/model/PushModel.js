@@ -1,4 +1,4 @@
-let {RoleCodeEnum} = require("../lib/Consts");
+let {RoleCodeEnum} = require("../lib/all");
 
 import { pushUserInfo } from "../lib/TcpUtil"
 import {GameModel} from "./GameModel"

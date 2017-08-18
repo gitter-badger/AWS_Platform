@@ -9,7 +9,6 @@ import {
     Keys,
     Pick,
     Omit,
-    StatusEnum,
     RoleCodeEnum,
     RoleModels
 } from '../lib/all'
