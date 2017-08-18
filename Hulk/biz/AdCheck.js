@@ -7,6 +7,8 @@ export class AdCheck {
     check(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "adName", type: "S", min: 1, max: 20 },
+            { name: "img", type: "S", min: null, max: null, equal: athena.RegEnum.URL },
+            { name: "url", type: "S", min: null, max: null, equal: athena.RegEnum.URL },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
@@ -14,9 +16,9 @@ export class AdCheck {
             return [checkAttError, errorParams]
         }
 
-        if(!inparam.imgs || inparam.imgs.length < 1 || inparam.imgs.length > 5){
-            return [{ "imgs": -1, "msg": "需要图片1-5张", "params": ["imgs"] }, 'imgs']
-        }
+        // if(!inparam.imgs || inparam.imgs.length < 1 || inparam.imgs.length > 5){
+        //     return [{ "imgs": -1, "msg": "需要图片1-5张", "params": ["imgs"] }, 'imgs']
+        // }
 
         // 数据类型处理
         inparam.adStatus = AdStatusEnum.Enable
@@ -53,6 +55,8 @@ export class AdCheck {
     checkUpdate(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "adId", type: "N", min: 100000, max: 999999 },
+            { name: "img", type: "S", min: null, max: null, equal: athena.RegEnum.URL },
+            { name: "url", type: "S", min: null, max: null, equal: athena.RegEnum.URL },
             { name: "adName", type: "S", min: 1, max: 20 },
             { name: "adStatus", type: "N", min: 0, max: 1 },
 
@@ -63,9 +67,9 @@ export class AdCheck {
             return [checkAttError, errorParams]
         }
 
-        if(!inparam.imgs || inparam.imgs.length < 1 || inparam.imgs.length > 5){
-            return [{ "imgs": -1, "msg": "需要图片1-5张", "params": ["imgs"] }, 'imgs']
-        }
+        // if(!inparam.imgs || inparam.imgs.length < 1 || inparam.imgs.length > 5){
+        //     return [{ "imgs": -1, "msg": "需要图片1-5张", "params": ["imgs"] }, 'imgs']
+        // }
 
         // 数据类型处理
         inparam.adId = inparam.adId.toString()

@@ -122,7 +122,8 @@ export class AdModel extends BaseModel {
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
-        ret.imgs = inparam.imgs
+        ret.img = inparam.img
+        ret.url = inparam.url
         ret.remark = inparam.remark
         // ret.adStatus = inparam.adStatus
         ret.updatedAt = Model.timeStamp()
