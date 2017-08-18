@@ -141,19 +141,21 @@ export class UserModel extends BaseModel {
     /**
      * 查看可用代理
      */
-    async listAvailableAgents(inparam) {
+    async listAvailableAgents(token, inparam) {
         // 查询所有可用代理
         const allAgent = {
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status',
+            FilterExpression: '#status = :status And #userId <> :userId',
             ExpressionAttributeNames: {
                 '#role': 'role',
-                '#status': 'status'
+                '#status': 'status',
+                '#userId': 'userId'
             },
             ExpressionAttributeValues: {
                 ':role': RoleCodeEnum['Agent'],
-                ':status': StatusEnum.Enable
+                ':status': StatusEnum.Enable,
+                ':userId': token.userId
             }
         }
         // 查询用户的所有可用代理
@@ -177,7 +179,7 @@ export class UserModel extends BaseModel {
             [queryErr, queryRet] = await this.query(allAgent)
         }
         else {
-            [queryErr, queryRet] = await this.query(childAgent)
+            [queryErr, queryRet] = await this.scan(childAgent)
         }
 
         if (queryErr) {
