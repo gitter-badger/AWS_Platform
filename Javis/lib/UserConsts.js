@@ -1,4 +1,5 @@
 // ==================== 以下是全系统用户实体 ====================
+import { Model } from './Dynamo'
 // 普通状态枚举
 export const StatusEnum = {
   Enable: 1,

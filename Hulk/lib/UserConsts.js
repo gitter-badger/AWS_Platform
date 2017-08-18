@@ -1,4 +1,5 @@
 // ==================== 以下是全系统用户实体 ====================
+import { Model } from './Dynamo'
 export const GenderEnum = {
   Male: 1,
   Female: 2,

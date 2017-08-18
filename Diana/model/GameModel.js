@@ -11,7 +11,6 @@ import {
     Omit,
     RoleCodeEnum,
     GameTypeEnum,
-    GameStatusEnum,
     RoleModels
 } from '../lib/all'
 import _ from 'lodash'
