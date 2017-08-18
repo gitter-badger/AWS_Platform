@@ -11,6 +11,7 @@ export {
   RoleEditProps
 } from './UserConsts'
 export {
-  BillMo
+  BillMo,
+  AdStatusEnum
 }
 from './Consts'

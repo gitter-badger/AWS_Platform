@@ -1,4 +1,9 @@
 import { Model } from './Dynamo'
+// 普通状态枚举
+export const AdStatusEnum = {
+  Enable: 1,
+  Disable: 0
+}
 /**
  * 账单实体
  */

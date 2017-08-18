@@ -133,6 +133,61 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  # ==================== 以下是公告管理接口服务 ====================
+  adNew: #创建公告
+    handler: api_ad.adNew
+    events:
+      -
+        http:
+          path: adNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adList: #公告列表
+    handler: api_ad.adList
+    events:
+      -
+        http:
+          path: adList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adOne: #单个公告
+    handler: api_ad.adOne
+    events:
+      -
+        http:
+          path: adOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adChangeStatus: #变更公告状态
+    handler: api_ad.adChangeStatus
+    events:
+      -
+        http:
+          path: adChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adUpdate: #公告更新
+    handler: api_ad.adUpdate
+    events:
+      -
+        http:
+          path: adUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adDelete: #公告删除
+    handler: api_ad.adDelete
+    events:
+      -
+        http:
+          path: adDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是帮助中心接口服务 ====================
   helpGenreList: 
     handler: api_help.helpGenreList
