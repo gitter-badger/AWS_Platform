@@ -1,8 +1,6 @@
 import { Tables, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
-import { PackageModel } from './PackageModel'
-import { SeatModel } from './SeatModel'
 
 export class AdModel extends BaseModel {
     constructor() {
