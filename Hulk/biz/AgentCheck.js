@@ -18,15 +18,16 @@ export class AgentCheck {
             { name: "hostContact", type: "S", min: 5, max: 40 },
             { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
 
-            { name: "rate", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
-            { name: "vedioMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
-            { name: "liveMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
             // 帐号管理员
             { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
             { name: "adminContact", type: "S", min: 1, max: 40 },
             // 代理
             { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+
+            { name: "rate", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
+            { name: "vedioMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
+            { name: "liveMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
@@ -39,9 +40,11 @@ export class AgentCheck {
         inparam.points = parseFloat(Model.PlatformAdminDefaultPoints)
         inparam.role = RoleCodeEnum.Agent
         inparam.suffix = 'Agent'
-        inparam.parent = Model.DefaultParent
+        inparam.parent = Model.NoParent
         inparam.contractPeriod = 0
         inparam.isforever = true
+        inparam.level = 0
+        inparam.levelIndex = 0
 
         return [checkAttError, errorParams]
     }
@@ -55,7 +58,6 @@ export class AgentCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
-            { name: "parent", type: "S", min: 36, max: 36 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },

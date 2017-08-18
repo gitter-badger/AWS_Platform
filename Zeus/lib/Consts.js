@@ -60,6 +60,9 @@ const UserRole = function () {
     passhash: Model.StringValue,          // 密码hash
     parent: Model.NoParent,               // 默认没有上级
 
+    level: Model.NumberValue,             // 层级
+    levelIndex: Model.StringValue,        // 层级索引
+
     lastIP: Model.StringValue,            // 最后IP
     loginAt: Model.timeStamp(),           // 登录时间
     enabledAt: Model.timeStamp(),         // 启用时间
@@ -82,7 +85,6 @@ const PlatformBaseBizRole = function () {
     rate: Model.NumberValue,              // 抽成比
     isforever: false,                     // 是否永久
     contractPeriod: Model.StringValue,    // 有效期
-    gameList: [],                         // 游戏类型列表
     remark: Model.StringValue,            // 备注
     gender: GenderEnum.Trans,             // 性别
     hostName: Model.StringValue,          // 负责人姓名
@@ -119,8 +121,9 @@ export const RoleModels = {
   '10': function () {
     return { // 线路商
       ...PlatformBaseBizRole(),
+      gameList: [],                         // 游戏类型列表
       managerEmail: Model.StringValue,      // 线路商邮箱
-      limit: Model.NumberValue,             // 可用名额
+      limit: Model.NumberValue              // 可用名额
       // gmUsername: Model.StringValue,
       // gmPassword: Model.StringValue,
     }
@@ -128,6 +131,7 @@ export const RoleModels = {
   '100': function () {
     return { // 商户
       ...PlatformBaseBizRole(),
+      gameList: [],                         // 游戏类型列表
       msn: Model.StringValue,               // 线路号
       apiKey: Model.uuid(),                 // APIKEY
       merchantEmail: Model.StringValue,     // 商户邮箱
@@ -138,10 +142,12 @@ export const RoleModels = {
   '1000': function () {
     return {// 代理
       ...PlatformBaseBizRole(),
-      // suffix: 'AGENT',                      // 前缀
-      // apiKey: Model.uuid(),                 // APIKEY
-      agentEmail: Model.StringValue,        // 代理邮箱
-      // loginWhiteList: '0.0.0.0'             // 登录白名单
+      // suffix: 'AGENT',                     // 前缀
+      // apiKey: Model.uuid(),                // APIKEY
+      agentEmail: Model.StringValue,          // 代理邮箱
+      vedioMix: Model.NumberValue,            // 电子游戏洗码比
+      liveMix: Model.NumberValue              // 真人视讯洗码比
+      // loginWhiteList: '0.0.0.0'            // 登录白名单
     }
   },
   '10000': function () {
@@ -191,15 +197,15 @@ export const RoleEditProps = {
     'hostContact',
     'password',
     'rate',
-    'gameList',
-    'loginWhiteList',
     'agentEmail',
     'adminName',
     'adminEmail',
     'adminContact',
     'contractPeriod',
+    'isforever',
     'remark',
-    'isforever'
+    'vedioMix',
+    'liveMix'
   ],
   '10000': []
 }
@@ -255,6 +261,11 @@ export const RoleDisplay = {
     'displayName',
     'apiKey',
     'displayId',
-    'updatedAt'
+    'updatedAt',
+    'contractPeriod',
+    'isforever',
+    'remark',
+    'vedioMix',
+    'liveMix'
   ]
 }

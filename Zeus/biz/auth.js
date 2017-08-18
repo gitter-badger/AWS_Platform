@@ -135,7 +135,9 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     parentName: parentUser.username,
     parentDisplayName: parentUser.displayName,
     parentSuffix: parentUser.suffix,
-    points: Model.NumberValue
+    points: Model.NumberValue,
+    level: parentUser.level + 1,
+    levelIndex: parentUser.levelIndex ? parentUser.levelIndex + ',' + parentUser.userId : Model.DefaultParent
   }
   //推送给游戏服务器(A3)
   // let pushModel = new PushModel(User);

@@ -70,6 +70,9 @@ const UserRole = function () {
     passhash: Model.StringValue,          // 密码hash
     parent: Model.NoParent,               // 默认没有上级
 
+    level: Model.NumberValue,             // 层级
+    levelIndex: Model.StringValue,        // 层级索引
+
     lastIP: Model.StringValue,            // 最后IP
     loginAt: Model.timeStamp(),           // 登录时间
     enabledAt: Model.timeStamp(),         // 启用时间
