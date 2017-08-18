@@ -97,7 +97,7 @@ export class AdModel extends BaseModel {
      */
     async changeStatus(inparam) {
         // 变更状态
-        [err, ret] = await this.updateItem({
+        const [err, ret] = await this.updateItem({
             Key: {
                 'adId': inparam.adId
             },
@@ -115,7 +115,7 @@ export class AdModel extends BaseModel {
      */
     async updateAd(inparam) {
         // 更新
-        [err, ret] = await this.getOne(inparam)
+        const [err, ret] = await this.getOne(inparam)
         if (err) {
             return [err, 0]
         }
@@ -126,7 +126,6 @@ export class AdModel extends BaseModel {
         ret.remark = inparam.remark
         // ret.adStatus = inparam.adStatus
         ret.updatedAt = Model.timeStamp()
-        console.info(ret)
         return await this.putItem(ret)
     }
 
@@ -136,7 +135,7 @@ export class AdModel extends BaseModel {
      */
     async delete(inparam) {
         // 删除
-        [err, ret] = await this.deleteItem({
+        const [err, ret] = await this.deleteItem({
             Key: {
                 'adId': inparam.adId
             }

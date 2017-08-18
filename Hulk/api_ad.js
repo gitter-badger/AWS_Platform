@@ -101,7 +101,6 @@ const adChangeStatus = async (e, c, cb) => {
   }
   // 业务操作
   const [err, ret] = await new AdModel().changeStatus(inparam)
-
   // 操作日志记录
   inparam.operateAction = '公告状态变更'
   inparam.operateToken = token
