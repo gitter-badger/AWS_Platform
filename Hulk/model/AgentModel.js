@@ -116,7 +116,7 @@ export class AgentModel extends BaseModel {
             parentSuffix: parentUser.suffix,
             points: Model.NumberValue,
             level: parentUser.level + 1,
-            levelIndex: parent.levelIndex ? parent.levelIndex + ',' + parentUser.userId : Model.DefaultParent
+            levelIndex: parentUser.levelIndex ? parentUser.levelIndex + ',' + parentUser.userId : Model.DefaultParent
         }
         const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
