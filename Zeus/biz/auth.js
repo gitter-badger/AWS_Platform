@@ -57,6 +57,7 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
  */
 export const RegisterUser = async (token = {}, userInfo = {}) => {
   // 生成注册用户信息
+  const bizRole = RoleModels[userInfo.role]()
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
