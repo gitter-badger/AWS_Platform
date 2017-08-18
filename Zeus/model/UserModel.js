@@ -11,7 +11,6 @@ import {
     Omit,
     StatusEnum,
     RoleCodeEnum,
-    MSNStatusEnum,
     RoleModels
 } from '../lib/all'
 import _ from 'lodash'
