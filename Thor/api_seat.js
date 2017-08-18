@@ -5,7 +5,6 @@ import {
     JSONParser,
     Model,
     Tables,
-    SeatStatusEnum,
     SeatTypeEnum,
     RoleCodeEnum,
     Trim,
