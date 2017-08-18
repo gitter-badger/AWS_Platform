@@ -663,7 +663,7 @@ async function updatePassword(event, context, callback) {
     if(userExistError) return callback(null, ReHandler.fail(userExistError));
     if(!userRecord) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
     user.cryptoPassword();
-    let [updateError] = await user.update({userName:userInfo.userName},{userPwd:user.userPwd});
+    let [updateError] = await user.update({userName:userInfo.userName},{userPwd:user.userPwd,password:requestParams.userPwd});
     if(updateError) {
       return callback(null, ReHandler.fail(updateError));
     }

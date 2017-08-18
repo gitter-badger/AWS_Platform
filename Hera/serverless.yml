@@ -197,6 +197,14 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  updateAgentPassword:  #修改代理玩家密码
+    handler: agentApi.updatePassword
+    events:
+      - http:
+          path: /agent/player/password
+          method: post
+          cors: true
+          authorizer: tokenVerify
   batchForzen:  #批量冻结/解冻玩家 1解冻,2,冻结
     handler: managerApi.batchForzen
     events:

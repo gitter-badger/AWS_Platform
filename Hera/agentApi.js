@@ -372,6 +372,10 @@ export async function createPlayer(event, context, cb) {
         {name : "points", type:"N"},
         {name : "remark", type:"S", min:1, max:200},
     ], requestParams);
+    if(checkAttError){
+        Object.assign(checkAttError, {params: errorParams});
+        return cb(null, ReHandler.fail(checkAttError));
+    } 
     //创建者信息
     let {userId,username} = tokenInfo;
     //获取商家信息
@@ -488,7 +492,52 @@ export async function agentPlayerInfo(event, context, cb) {
         updateAt : userInfo.updateAt
     }});
 }
+/**
+ * 
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+export async function updatePassword(event, context, cb) {
+    console.log(event);
+    const [tokenErr, token] = await Model.currentToken(event);
+    if (tokenErr) {
+        return ResFail(cb, tokenErr)
+    }
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    if(e) {
+        return ResFail(cb, e)
+    }
+    //json转换
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+    if(parserErr) {
+        return ResFail(cb, parserErr);
+    }
+    //检查参数是否合法
+    let [checkAttError, errorParams] = athena.Util.checkProperties([
+        {name : "userName", type:"S"}
+    ], requestParams);
 
+    if(checkAttError){
+        Object.assign(checkAttError, {params: errorParams});
+        return ResFail(cb, checkAttError);
+    } 
+    let {userName} = requestParams;
+    let password = Util.generatorPassword();
+    requestParams.userPwd = password;
+    let user = new UserModel(requestParams);
+    let [userExistError, userRecord] = await user.get({userName});
+    if(userExistError) return ResFail(cb, userExistError);
+    if(!userRecord) return ResFail(cb, userRecord);
+    user.cryptoPassword();
+    let [updateError] = await user.update({userName:userName},{userPwd:user.userPwd,password:password});
+    if(updateError) {
+      return callback(null, ReHandler.fail(updateError));
+    }
+    ResOK(cb, {data : {
+        password
+    }});
+}
 
 // TOKEN验证
 export const jwtverify = async (e, c, cb) => {
