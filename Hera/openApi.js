@@ -18,6 +18,8 @@ import {MSNModel} from "./model/MSNModel";
 
 import {GameModel} from "./model/GameModel";
 
+import {GameRecordModel} from "./model/GameRecordModel";
+
 import {MerchantBillModel,Action} from "./model/MerchantBillModel";
 
 import {UserRecordModel} from "./model/UserRecordModel";
@@ -701,6 +703,27 @@ async function updateUserInfo(event, context, callback) {
   callback(null, ReHandler.success());
 }
 
+/**
+ * 玩家游戏记录
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function playerGameRecord(event, context, callback) {
+  console.log(event);
+  let [validateError, params, userInfo, requestParams] = await validateGame(event)
+  if(validateError) {
+     Object.assign(validateError, {params: params});
+     return callback(null, ReHandler.fail(validateError));
+  }
+  let gameRecord = new GameRecordModel({record:requestParams,userId:userInfo.userId});
+  let [saveErr] = await gameRecord.save();
+  if(saveErr) {
+    return callback(null, ReHandler.fail(saveErr));
+  }
+  callback(null, ReHandler.success({}));
+}
+
 async function validateGame(event, params = []){
    //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
@@ -732,4 +755,5 @@ export{
   joinGame, //进入游戏
   updatePassword, //修改密码
   updateUserInfo,  //修改用户基本信息
+  playerGameRecord, //玩家记录
 }

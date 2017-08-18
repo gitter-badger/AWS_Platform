@@ -34,8 +34,6 @@ export class MerchantModel extends athena.BaseModel {
     async agentChildListByUids(uids, intoArray = []) {
         let [parentsError, userList] = await this.findByParents(uids);  
         if(parentsError) return [parentsError, null];
-        console.log("111122222222");
-        console.log(userList);
         if(userList.length == 0) {
             return [null, intoArray];
         }else {

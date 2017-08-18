@@ -83,14 +83,7 @@ const add = async(e, c, cb) => {
   cb(null, ReHandler.success({data:emailModel.setProperties()}));
 }
 
-/**
- * 接收邮件
- * @param {*} e 
- * @param {*} c 
- * @param {*} cb 
- */
-const acceptMail = async(e, c, cb) => {
-}
+
 
 /**
  * 修改邮件

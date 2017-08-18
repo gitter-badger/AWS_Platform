@@ -43,4 +43,6 @@ export class EmailModel extends athena.BaseModel {
         }, this);
         this.tools = tools;
     }
+    isUser(userId, email) {
+    }
 }

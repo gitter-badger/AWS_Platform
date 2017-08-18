@@ -10,6 +10,8 @@ import {NoticeModel} from "./model/NoticeModel"
 
 import {EmailModel} from "./model/EmailModel"
 
+import {Util} from "./lib/Util"
+
 
 
 
@@ -74,6 +76,43 @@ const emailInfo = async(e, c, cb) => {
     return errorHandle(cb, new CHeraErr(CODES.noticeNotExist));
   }
   cb(null, ReHandler.success({data:emailInfo}));
+}
+
+/**
+ * 接收邮件
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const acceptMail = async(e, c, cb) => {
+  console.log(e);
+  //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body);
+  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+    //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "emid", type:"S"},
+      {name : "userId", type:"N"},
+  ], requestParams);
+  //验证token
+  let {userid,emid} = requestParams;
+  let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
+  if(err ||  !userInfo || !Object.is(+userId, +userInfo.userId)){
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
+  }
+
+  //找到邮件
+  let emailModel = new EmailModel();
+  let [emailError, emailInfo] = await emailModel.get({emid});
+  emailModel = new EmailModel(emailInfo);
+  if(emailError) {
+    return errorHandle(cb, emailError);
+  }
+  if(!emailInfo) {
+    return errorHandle(cb, new CHeraErr(CODES.emailNotExist));
+  }
+  //检查邮件的归属
+  let [user, flag] =  await emailModel.isUser();
 }
 /**
  * 错误处理

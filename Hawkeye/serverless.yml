@@ -123,3 +123,23 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  resources:
+  Resources:
+    HawkeyePlayerEamilRecord: #玩家接收邮件记录
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyePlayerEamilRecord
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

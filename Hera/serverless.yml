@@ -85,6 +85,13 @@ functions:
           path: /game/player/balance
           method: get
           cors: true
+  gameRecord:  #游戏记录
+    handler: openApi.playerGameRecord
+    events:
+      - http:
+          path: /game/player/record
+          method: post
+          cors: true
   joinGame:  #玩家进入游戏
     handler: openApi.joinGame
     events:
