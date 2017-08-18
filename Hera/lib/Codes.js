@@ -34,7 +34,8 @@ export const CODES = {
 
     AgentNotExist : 14000,  //代理不存在
     NotAuth : 14001,  //没有权限
-    AgentBalanceIns : 14002 //代理点数不足
+    AgentBalanceIns : 14002, //代理点数不足
+    nicknameAlreadyExist : 14003  //昵称已存在
 
 }
 
@@ -67,7 +68,8 @@ const errorMessage = {
   "13007" : "购买的不是道具",
   "14000" : "代理不存在",
   "14001" : "你没有权限",
-  "14002" : "你的点数不足"
+  "14002" : "你的点数不足",
+  "14003" : "昵称已存在"
 }
 
 

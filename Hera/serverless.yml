@@ -181,16 +181,16 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  agentPlayerDeposit:  #玩家存点
-    handler: agentApi.agentPlayerCudian
+  agentPlayerDeposit:  #玩家取点
+    handler: agentApi.agentPlayerQudian
     events:
       - http:
           path: /agent/player/take
           method: post
           cors: true
           authorizer: tokenVerify
-  agentPlayerTake:  #玩家取点
-    handler: agentApi.agentPlayerQudian
+  agentPlayerTake:  #玩家存点
+    handler: agentApi.agentPlayerCudian
     events:
       - http:
           path: /agent/player/deposit

@@ -10,6 +10,8 @@ import {Model} from "./lib/Dynamo";
 
 import {EmailModel} from "./model/EmailModel"
 
+import {UserModel} from "./model/UserModel"
+
 import {MerchantModel} from "./model/MerchantModel"
 
 import {ToolModel} from "./model/ToolModel"
@@ -41,7 +43,7 @@ const add = async(e, c, cb) => {
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
-    
+  
   //变量
   let {tools, kindId} = requestParams;
   //检查tools格式是否正确
@@ -51,7 +53,7 @@ const add = async(e, c, cb) => {
       return errorHandle(cb, new CHeraErr(CODES.DataError));
     }
   }
-  requestParams.userId = userInfo.userId;
+  requestParams.sendUserId = userInfo.userId;
   requestParams.sendUser = userInfo.displayName;
   //检查道具数量
   if(tools.length > 12) {
@@ -75,6 +77,17 @@ const add = async(e, c, cb) => {
   //   return errorHandle(cb, new CHeraErr(CODES.toolNotExist));
   // }
   // //填充邮件道具实体
+  let nickname = requestParams.nickname;
+  if(nickname) {
+    let [nickNameErr, nickUser] = await new UserModel().getUserByNickname(nickname);
+    if(nickNameErr) {
+      return errorHandle(cb, nickNameErr);
+    }
+    if(!nickUser) {
+      return errorHandle(cb, new CHeraErr(CODES.userNotExist));
+    }
+    requestParams.userId = nickUser.userId;
+  }
   let emailModel = new EmailModel(requestParams);
   let [saveErr] = await emailModel.save();
   if(saveErr) {

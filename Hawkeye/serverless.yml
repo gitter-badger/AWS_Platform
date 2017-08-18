@@ -107,6 +107,13 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  acceptMail:  #接收邮件
+    handler: openApi.acceptMail
+    events:
+      - http:
+          path: /email/accept
+          method: post
+          cors: true
   listEmail:  #邮件列表
     handler: emailApi.list
     events:
@@ -123,7 +130,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  resources:
+resources:
   Resources:
     HawkeyePlayerEamilRecord: #玩家接收邮件记录
       Type: AWS::DynamoDB::Table
@@ -131,15 +138,18 @@ functions:
         TableName: HawkeyePlayerEamilRecord
         AttributeDefinitions:
           -
-            AttributeName: sn
-            AttributeType: S
-          -
             AttributeName: userId
             AttributeType: N
+          -
+            AttributeName: emid
+            AttributeType: S
         KeySchema:
           -
-            AttributeName: sn
+            AttributeName: userId
             KeyType: HASH
+          -
+            AttributeName: emid
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

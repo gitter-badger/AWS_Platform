@@ -1,7 +1,6 @@
 let  athena  = require("../lib/athena");
 let {RoleCodeEnum} = require("../lib/Consts");
-import {Model} from "../lib/Dynamo"
-import {TABLE_NAMES} from "../config";
+import {Model, Tables} from "../lib/Dynamo"
 import {Util} from "../lib/Util"
 
 export const State = {
@@ -17,8 +16,8 @@ export const PaymentState = {  //是否可以进行转账操作
     forbid : 2 //禁止（正在游戏中不能转账）
 }
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic,remark, balance} = {}) {
-        super(TABLE_NAMES.TABLE_USER);
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic,remark} = {}) {
+        super(Tables.HeraGamePlayer);
         this.userName = userName;
         this.userPwd = userPwd;
         this.buId = buId ? +buId : -1;
@@ -27,7 +26,7 @@ export class UserModel extends athena.BaseModel {
         this.updateAt = Date.now();
         this.createAt = Date.now();
         this.merchantName = merchantName || Model.StringValue;
-        this.balance = balance || 0;
+        this.balance = 0;
         this.msn = msn;
         this.sex = sex || 0;
         this.remark = remark || Model.StringValue;
@@ -44,6 +43,11 @@ export class UserModel extends athena.BaseModel {
      */
     isExist(userName) {
         return super.isExist({userName});
+    }
+    async getUserByNickname(nickname) {
+        let [scanErr, userList] = await this.scan({nickname});
+        if(scanErr) return [scanErr, null];
+        return [null, userList[0]]
     }
     findByBuIds(buIds) {
         let filterExpression = "",
@@ -64,11 +68,6 @@ export class UserModel extends athena.BaseModel {
                 reslove([err, 0]);
             })
         })
-    }
-    async getUserByNickname(nickname) {
-        let [scanErr, userList] = await this.scan({nickname});
-        if(scanErr) return [scanErr, null];
-        return [null, userList[0]]
     }
     isGames(user) {
         return user.payState == PaymentState.forbid;

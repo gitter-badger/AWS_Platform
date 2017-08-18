@@ -32,6 +32,7 @@ export const CODES = {
     toolMoreThan : 13103,  //道具超过12个
     emailNotExist : 13104, //邮件不存在
     emailUpdateError:13105,  //邮件已经发送，不能修改
+    emailAlreadyAcceptError:13106,  //该邮件已经领取
 }
 
 const errorMessage = {
@@ -60,7 +61,8 @@ const errorMessage = {
   "13102" : "道具不存在",
   "13103" : "道具超过12个",
   "13104" : "邮件不存在",
-  "13105" : "邮件已经发送，不能修改"
+  "13105" : "邮件已经发送，不能修改",
+  "13106" : "该邮件已经领取"
 }
 
 

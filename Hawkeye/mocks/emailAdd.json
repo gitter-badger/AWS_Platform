@@ -5,7 +5,7 @@
     "body" : {
         "content" : "这是一条邮件的内容",
         "title" : "新手福利",
-        "nickname" : "abcdeff",
+        "nickname" : "小白",
         "sendTime" : 150125254124,
         "tools" : [
             {

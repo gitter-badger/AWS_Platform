@@ -1,0 +1,9 @@
+{
+    "headers" : {
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNIQV9kYXkwMDEiLCJzdWZmaXgiOiJTSEEiLCJ1c2VySWQiOjEyNzIzOSwiaWF0IjoxNTAzMDI4OTUzfQ.x4vFO95YdclaQF6jiuqfg4ND-favPkgtLAW3igD1YOQ"
+    },
+    "body" : {
+        "emid" : "6a2d5ef5-27de-4119-80c2-9d556b0a9d41",
+        "userId" : "127239"
+    }
+}

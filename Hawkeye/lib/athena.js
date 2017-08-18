@@ -76,6 +76,7 @@ export class BaseModel{
         })
     }
     get(conditions, returnValues = [],indexName,all){
+        console.log(conditions);
         let keyConditionExpression = "";
         let expressionAttributeValues = {};
         for(let key in conditions){

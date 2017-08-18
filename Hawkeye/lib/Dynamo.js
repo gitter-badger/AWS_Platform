@@ -16,24 +16,28 @@ const db$ = (action,params)=>{
 // table names
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformRole = 'ZeusPlatformRole'
-const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
+const HeraGamePlayer = 'HeraGamePlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const HawkeyeGameNotice = 'HawkeyeGameNotice'
 const DianaPlatformTool = 'DianaPlatformTool'
 const HawkeyeGameEmail = 'HawkeyeGameEmail'
+const HeraGameDiamondBill = 'HeraGameDiamondBill'
+const HawkeyePlayerEamilRecord = "HawkeyePlayerEamilRecord";
 
 export const Tables = {
   ZeusPlatformUser,
+  HeraGameDiamondBill,
   ZeusPlatformRole,
-  ZeusPlatformPlayer,
+  HeraGamePlayer,
   ZeusPlatformBill,
   ZeusPlatformGame,
   ZeusPlatformMSN,
   HawkeyeGameNotice,
   DianaPlatformTool,
-  HawkeyeGameEmail
+  HawkeyeGameEmail,
+  HawkeyePlayerEamilRecord,
 }
 
 

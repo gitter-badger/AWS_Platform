@@ -1,12 +1,11 @@
 
 {
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfdGVzdDAwMSIsInN1ZmZpeCI6IkNaU1kiLCJ1c2VySWQiOjk4NTg2NiwiaWF0IjoxNTAyMzM1ODY0fQ.sa5vv6HAQAgLSUNsvnxIygNW4OivplF5JHT11WUcinE"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNIQV9kYXkwMDEiLCJzdWZmaXgiOiJTSEEiLCJ1c2VySWQiOjEyNzIzOSwiaWF0IjoxNTAzMDQxMjk0fQ.md7aXDksZJ61i0rLkuqiDOsbB6E2mRkR7ghlwau2TL8"
     },
     "body":{
-        "userId" : "123456",
-        "nickname" : "小不点",
-        "gameId" : "30001",
+        "userId" : "127239",
+        "nickname" : "小白",
         "headPic" :"https://baidu.com"
     }
 }

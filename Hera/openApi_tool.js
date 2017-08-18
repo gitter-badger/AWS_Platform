@@ -249,7 +249,7 @@ async function playerBuyDiamonds(event, context, callback){
     userId : userId,
     action :1,
     userName : userModel.userName,
-    msn : merchantModel.msn,
+    msn : merchantModel.msn || "000",
     diamonds : +diamonds,
     toolId : 1,
     kindId : requestParams.kindId

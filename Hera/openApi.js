@@ -351,14 +351,17 @@ async function gamePlayerA3Login(event, context, callback) {
 
   //根据线路号获取商家
   let msnModel = new MSNModel();
-  let [msnError, merchantInfo] = await msnModel.findMerchantByMsn(msn);
-  if(msnError) {
-    return callback(null, ReHandler.fail(msnError));
+  let msnError, merchantInfo;
+  if(msn != "000") {
+    [msnError, merchantInfo] = await msnModel.findMerchantByMsn(msn);
+    if(msnError) {
+      return callback(null, ReHandler.fail(msnError));
+    }
+    if(!merchantInfo) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
+    }
+    userName = `${merchantInfo.suffix}_${userName}`; 
   }
-  if(!merchantInfo) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
-  }
-  userName = `${merchantInfo.suffix}_${userName}`; 
   let user = new UserModel(requestParams);
   let [userExistError, userInfo] = await user.get({userName:userName});
   if(userExistError) return callback(null, ReHandler.fail(userExistError));
@@ -367,7 +370,6 @@ async function gamePlayerA3Login(event, context, callback) {
   if(userInfo.state == State.forzen) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
   //验证密码
   let flag = user.vertifyPassword(userInfo.userPwd);
-  
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let suffix = userInfo.userName.split("_")[0];
   let loginToken = Util.createTokenJWT({userName : userInfo.userName, suffix:suffix, userId:+userInfo.userId});
@@ -692,6 +694,18 @@ async function updateUserInfo(event, context, callback) {
     if(Object.is(key, "nickname") || Object.is(key, "headPic") || Object.is(key, "sex")) {
       if(requestParams[key]) {
           obj[key] = requestParams[key];
+      }
+    }
+  }
+  //nickname不能重复
+  if(requestParams.nickname){
+    let [nicknameErr, nickUser] = await new UserModel().getUserByNickname(requestParams.nickname);
+    if(nicknameErr) {
+      return callback(null, ReHandler.fail(nicknameErr));
+    }
+    if(nickUser) {
+      if(nickUser.userId != userInfo.userId) {  //如果不是本人
+        return callback(null, ReHandler.fail(new CHeraErr(CODES.nicknameAlreadyExist)));
       }
     }
   }

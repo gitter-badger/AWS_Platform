@@ -389,13 +389,14 @@ export async function createPlayer(event, context, cb) {
     }
     let {suffix} = merchantInfo;
     //实际的用户名
-    let userName = `${suffix}_${requestParams.userName}`;
+    let userName = requestParams.userName;
 
     let userModel = new UserModel({
         ...requestParams,
         buId : merchantInfo.displayId,
         userName : userName,
-        msn : "000"
+        msn : "000",
+        balance : +requestParams.points
     });
     let [existError, flag] = await userModel.isExist(userName);
     if(existError) return ResFail(cb, existError);
@@ -435,7 +436,8 @@ export async function createPlayer(event, context, cb) {
         kindId : -2,
         userId : userInfo.userId,
         userName : userName,
-        type : Type.agentOper
+        type : Type.agentOper,
+        
     });
     let [savePlayerError] = await userBillModel.save();
     if(savePlayerError) return ResFail(cb, savePlayerError);
