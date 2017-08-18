@@ -766,6 +766,9 @@ resources:
           -
             AttributeName: adId
             AttributeType: S
+          -
+            AttributeName: adName
+            AttributeType: S
         KeySchema:
           -
             AttributeName: adId
@@ -773,3 +776,15 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: AdNameIndex
+            KeySchema:
+              -
+                AttributeName: adName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1

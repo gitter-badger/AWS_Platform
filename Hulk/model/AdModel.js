@@ -23,6 +23,7 @@ export class AdModel extends BaseModel {
     async addAd(inparam) {
         // 判断是否重复
         const [existErr, exist] = await this.isExist({
+            IndexName: 'AdNameIndex',
             KeyConditionExpression: 'adName = :adName',
             ExpressionAttributeValues: {
                 ':adName': inparam.adName
@@ -121,8 +122,7 @@ export class AdModel extends BaseModel {
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
-        ret.icon = inparam.icon
-        ret.desc = inparam.desc
+        ret.imgs = inparam.imgs
         ret.remark = inparam.remark
         // ret.adStatus = inparam.adStatus
         ret.updatedAt = Model.timeStamp()

@@ -87,7 +87,7 @@ const toolOne = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  let [err, ret] = await new ToolModel().getOne(inparam.toolName, inparam.toolId)
+  let [err, ret] = await new ToolModel().getOne(inparam)
   if (err) {
     return ResFail(cb, { ...errRes, err: err }, err.code)
   }

@@ -71,7 +71,7 @@ const adOne = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  let [err, ret] = await new AdModel().getOne(inparam.adName, inparam.adId)
+  let [err, ret] = await new AdModel().getOne(inparam)
   if (err) {
     return ResFail(cb, { ...res, err: err }, err.code)
   }
