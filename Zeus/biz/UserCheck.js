@@ -16,7 +16,7 @@ export class UserCheck {
             { name: "adminContact", type: "S", min: 1, max: 40 },
             { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
-            { name: "displayName", type: "NREG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
+            // { name: "displayName", type: "NREG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
             // { name: "hostName", type: "NREG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             // { name: "hostContact", type: "NS", min: 5, max: 40 },
 
