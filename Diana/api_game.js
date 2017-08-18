@@ -6,8 +6,6 @@ import {
   Model,
   Tables,
   GameTypeEnum,
-  StatusEnum,
-  GenderEnum,
   RoleCodeEnum,
   RoleEditProps,
   Trim,

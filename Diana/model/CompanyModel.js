@@ -10,8 +10,7 @@ import {
     Pick,
     Omit,
     RoleCodeEnum,
-    RoleModels,
-    CompanyStatusEnum
+    RoleModels
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'

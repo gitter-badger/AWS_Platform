@@ -1,5 +1,5 @@
 let  athena  = require("../lib/athena");
-let {RoleCodeEnum} = require("../lib/Consts");
+let {RoleCodeEnum} = require("../lib/all");
 import {TABLE_NAMES} from "../config";
 
 export const State = {

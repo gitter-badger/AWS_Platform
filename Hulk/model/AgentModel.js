@@ -98,7 +98,7 @@ export class AgentModel extends BaseModel {
         // 初始点数
         const initPoints = CheckUser.points
         // 检查余额
-        const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
+        const [queryBalanceErr, balance] = await new BillModel().checkUserBalance(token, parentUser)
         if (queryBalanceErr) {
             return [queryBalanceErr, 0]
         }

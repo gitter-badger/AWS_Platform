@@ -10,7 +10,7 @@ import {PlatformUserModel} from "./model/PlatformUserModel"
 
 import {PlatformBillModel} from "./model/PlatformBillModel"
 
-import {RoleCodeEnum} from "./lib/Consts";
+import {RoleCodeEnum} from "./lib/all";
 
 const Utils = {
     getweekFirstTime : function(date){

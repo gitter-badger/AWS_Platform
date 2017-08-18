@@ -7,37 +7,49 @@
       "username": "Platform_NAtest",
       "parent": "00",
       "role": "1",
-      "userId": "ba8f2601-245c-456c-8cac-47b737d0798a"
+      "userId": "e11d4411-9d60-4592-a78c-a81d242dc0ee"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "role": "10",
-    "suffix": "as",
-    "displayName": "sdasdasd",
-    "rate": "11",
-    "managerEmail": "asdas@asdasd.com",
-    "parent": "",
-    "remark": "asdasd",
-    "hostName": "asdasd",
-    "hostContact": "asdasdas",
+    "role": "100",
+    "suffix": "Alook1",
+    "displayName": "一二三四五六七八九十",
+    "rate": "100",
+    "merchantEmail": "1@q.com",
+    "hostName": "一二三四五六七八九十",
+    "hostContact": "一二三四五六七八九十",
+    "parent": "6d076243-5b90-426b-a92f-a11138b70270",
+    "remark": "一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十",
     "contractPeriod": 0,
     "isforever": true,
-    "points": "11",
-    "limit": "2",
+    "points": "808000",
+    "msn": "022",
     "gameList": [
       {
-        "code": "30000",
+        "name": "棋牌游戏",
+        "url": "http://192.168.3.131/webadmin/public/admin/api/checkLoginAccess",
+        "code": "10000"
+      },
+      {
         "name": "真人视讯",
-        "url": "http://146.88.71.30:8011/player/login"
+        "url": "http://146.88.71.30:8011/player/login",
+        "code": "30000"
+      },
+      {
+        "name": "电子游戏",
+        "url": "http://test.com",
+        "code": "40000"
       }
     ],
-    "username": "asdasd",
-    "password": "d{^ER2(-Yp:1Lg",
-    "adminName": "asdasd",
-    "adminEmail": "asdasd@asdasd.com",
-    "adminContact": "asdasdasd"
+    "loginWhiteList": "0.0.0.0",
+    "frontURL": "Https://www.baidu.com",
+    "username": "一二三四五六七八九十",
+    "password": "AOp2IlzV?lxzY",
+    "adminName": "一二三四五六七八九十",
+    "adminEmail": "test@qq.com",
+    "adminContact": "一二三四五六七八九十"
   }
 }

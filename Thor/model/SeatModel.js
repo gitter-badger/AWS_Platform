@@ -1,4 +1,4 @@
-import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, SeatStatusEnum, SeatTypeEnum } from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 

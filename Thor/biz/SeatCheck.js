@@ -1,4 +1,4 @@
-import { Model, SeatStatusEnum, SeatTypeEnum } from '../lib/all'
+import { Model } from '../lib/all'
 const athena = require("../lib/athena")
 export class SeatCheck {
     /**

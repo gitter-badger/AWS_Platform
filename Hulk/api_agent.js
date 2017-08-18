@@ -9,7 +9,6 @@ import {
     JwtVerify,
     GeneratePolicyDocument,
     BizErr,
-    StatusEnum,
     RoleCodeEnum,
     RoleEditProps
 } from './lib/all'
@@ -228,8 +227,13 @@ const availableAgents = async (e, c, cb) => {
     if (jsonParseErr) {
         return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
     }
+    // 身份令牌校验
+    const [tokenErr, token] = await Model.currentToken(e)
+    if (tokenErr) {
+        return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+    }
     // 业务操作
-    const [err, ret] = await new UserModel().listAvailableAgents(inparam)
+    const [err, ret] = await new UserModel().listAvailableAgents(token, inparam)
     if (err) {
         return ResFail(cb, { ...res, err: err }, err.code)
     }

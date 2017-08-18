@@ -5,8 +5,6 @@ import {
   JSONParser,
   Model,
   Tables,
-  StatusEnum,
-  GenderEnum,
   RoleCodeEnum,
   RoleEditProps,
   Trim,

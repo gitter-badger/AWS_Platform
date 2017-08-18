@@ -21,8 +21,7 @@ import { BillModel } from '../model/BillModel'
 import { PushModel } from '../model/PushModel'
 
 /**
- * 接口编号：0
- * 现在注册分成两部分 1. 管理员注册 2. 商户/建站商注册
+ * 管理员注册
  * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息
  */
@@ -52,21 +51,13 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
 }
 
 /**
- * 专门用于创建商户/建站商
+ * 建站商/商户注册
  * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息
  */
 export const RegisterUser = async (token = {}, userInfo = {}) => {
-  // 检查角色码
-  if (userInfo.role === RoleCodeEnum['PlatformAdmin']) {
-    return [BizErr.ParamErr('该接口不能创建管理员角色'), 0]
-  }
-  // 根据角色码查询角色
-  const [roleNotFoundErr, bizRole] = await getRole(userInfo.role)
-  if (roleNotFoundErr) {
-    return [roleNotFoundErr, 0]
-  }
   // 生成注册用户信息
+  const bizRole = RoleModels[userInfo.role]()
   userInfo = Omit(userInfo, ['userId', 'passhash'])
   const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
@@ -177,32 +168,25 @@ export const LoginUser = async (userLoginInfo = {}) => {
     return [checkErr, 0]
   }
   // 获取用户身份
-  const roleCode = userLoginInfo.role
-  const [roleNotFoundErr, Role] = await getRole(roleCode)
-  if (roleNotFoundErr) {
-    return [roleNotFoundErr, 0]
-  }
+  const Role = RoleModels[userLoginInfo.role]()
   // 组装用户登录信息
-  const UserLoginInfo = Pick({
+  const LoginInfo = Pick({
     ...Role,
     ...userLoginInfo
   }, Keys(Role))
-  const username = UserLoginInfo.username
-  const suffix = UserLoginInfo.suffix
+  const username = LoginInfo.username
+  const suffix = LoginInfo.suffix
   // 查询用户信息
-  const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(roleCode, suffix, username)
+  const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(LoginInfo.role, suffix, username)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
   if (queryUserRet.Items.length === 0) {
-    return [BizErr.UserNotFoundErr(), 0]
-  }
-  if (queryUserRet.Items.length > 1) {
-    return [BizErr.DBErr(), 0]
+    return [BizErr.UserNotFoundErr('创建人不存在'), 0]
   }
   const User = queryUserRet.Items[0]
   // 校验用户密码
-  const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
+  const valid = await Model.hashValidate(LoginInfo.password, User.passhash)
   if (!valid) {
     return [BizErr.PasswordErr(), User]
   }
@@ -246,7 +230,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [BizErr.UserIPErr('IP不合法：' + User.lastIP), User]
   // }
   // 更新用户信息
-  User.lastIP = UserLoginInfo.lastIP
+  User.lastIP = LoginInfo.lastIP
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, User]
@@ -328,14 +312,6 @@ const queryParent = async (token, parent) => {
   return [0, user]
 }
 
-// 根据角色码获取角色
-const getRole = async (code) => {
-  if (!RoleModels[code]) {
-    return [BizErr.ParamErr('Role is not found'), 0]
-  }
-  return [0, RoleModels[code]()]
-}
-
 // 保存用户
 const saveUser = async (userInfo) => {
   // 线路商或商户，从编码池获取新编码
@@ -350,7 +326,6 @@ const saveUser = async (userInfo) => {
 
   // 组装用户信息
   const baseModel = Model.baseModel()
-  const roleDisplay = RoleDisplay[userInfo.role]
   const UserItem = {
     ...baseModel,
     ...userInfo,
@@ -400,6 +375,7 @@ const saveUser = async (userInfo) => {
     Store$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'displayId', code: uucodeRet } })
   }
 
+  const roleDisplay = RoleDisplay[userInfo.role]
   const ret = Pick(UserItem, roleDisplay)
   return [0, ret]
 }

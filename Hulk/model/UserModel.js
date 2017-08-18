@@ -139,54 +139,6 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 查看可用代理
-     */
-    async listAvailableAgents(inparam) {
-        // 查询所有可用代理
-        const allAgent = {
-            IndexName: 'RoleSuffixIndex',
-            KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#status': 'status'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Agent'],
-                ':status': StatusEnum.Enable
-            }
-        }
-        // 查询用户的所有可用代理
-        const childAgent = {
-            IndexName: 'RoleSuffixIndex',
-            KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status AND #parent = :parent',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#status': 'status',
-                '#parent': 'parent'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Agent'],
-                ':status': StatusEnum.Enable,
-                ':parent': inparam.parent
-            }
-        }
-        let [queryErr, queryRet] = [1, 1]
-        if (inparam.parent) {
-            [queryErr, queryRet] = await this.query(childAgent)
-        }
-        else {
-            [queryErr, queryRet] = await this.query(allAgent)
-        }
-
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        return [0, queryRet.Items]
-    }
-
-    /**
      * 查询管理员列表
      * @param {*} token 
      */
@@ -378,6 +330,56 @@ export class UserModel extends BaseModel {
         // 按照时间排序
         const sortResult = _.sortBy(users, ['createdAt']).reverse()
         return [0, sortResult]
+    }
+
+    /**
+     * 查看可用代理
+     */
+    async listAvailableAgents(token, inparam) {
+        // 查询所有可用代理
+        const allAgent = {
+            IndexName: 'RoleSuffixIndex',
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#status = :status And #userId <> :userId',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#status': 'status',
+                '#userId': 'userId'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['Agent'],
+                ':status': StatusEnum.Enable,
+                ':userId': token.userId
+            }
+        }
+        // 查询用户的所有可用代理
+        const childAgent = {
+            IndexName: 'RoleSuffixIndex',
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#status = :status AND contains(#levelIndex,:levelIndex)',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#status': 'status',
+                '#levelIndex': 'levelIndex'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['Agent'],
+                ':status': StatusEnum.Enable,
+                ':levelIndex': inparam.parent
+            }
+        }
+        let [queryErr, queryRet] = [1, 1]
+        if (!inparam.parent) {
+            [queryErr, queryRet] = await this.query(allAgent)
+        }
+        else {
+            [queryErr, queryRet] = await this.query(childAgent)
+        }
+
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        return [0, queryRet.Items]
     }
 
     // const params = {

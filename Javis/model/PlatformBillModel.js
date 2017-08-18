@@ -1,7 +1,7 @@
 let  athena  = require("../lib/athena");
 
 import {Tables} from "../lib/Dynamo"
-import {RoleCodeEnum, BillActionEnum} from "../lib/Consts";
+import {RoleCodeEnum, BillActionEnum} from "../lib/all";
 
 import {CODES, CHeraErr} from "../lib/Codes";
 
