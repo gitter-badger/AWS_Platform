@@ -47,6 +47,7 @@ export const BillMo = function () {
     remark: Model.StringValue
   }
 }
+
 /**
  * 角色基类
  */
@@ -122,10 +123,8 @@ export const RoleModels = {
     return { // 线路商
       ...PlatformBaseBizRole(),
       gameList: [],                         // 游戏类型列表
-      managerEmail: Model.StringValue,      // 线路商邮箱
-      limit: Model.NumberValue              // 可用名额
-      // gmUsername: Model.StringValue,
-      // gmPassword: Model.StringValue,
+      limit: Model.NumberValue,             // 可用名额
+      managerEmail: Model.StringValue       // 线路商邮箱
     }
   },
   '100': function () {
@@ -134,20 +133,17 @@ export const RoleModels = {
       gameList: [],                         // 游戏类型列表
       msn: Model.StringValue,               // 线路号
       apiKey: Model.uuid(),                 // APIKEY
-      merchantEmail: Model.StringValue,     // 商户邮箱
       frontURL: Model.StringValue,          // 商户站点
-      loginWhiteList: '0.0.0.0'             // 登录白名单
+      loginWhiteList: '0.0.0.0',            // 登录白名单
+      merchantEmail: Model.StringValue,     // 商户邮箱
     }
   },
   '1000': function () {
     return {// 代理
       ...PlatformBaseBizRole(),
-      // suffix: 'AGENT',                     // 前缀
-      // apiKey: Model.uuid(),                // APIKEY
-      agentEmail: Model.StringValue,          // 代理邮箱
       vedioMix: Model.NumberValue,            // 电子游戏洗码比
-      liveMix: Model.NumberValue              // 真人视讯洗码比
-      // loginWhiteList: '0.0.0.0'            // 登录白名单
+      liveMix: Model.NumberValue,             // 真人视讯洗码比
+      agentEmail: Model.StringValue           // 代理邮箱
     }
   },
   '10000': function () {
@@ -155,117 +151,128 @@ export const RoleModels = {
   }
 }
 /**
+ * 角色显示属性
+ */
+export const RoleDisplay = {
+  '0': [],
+  '1': [// 平台管理员
+    'userId',
+    'role',
+    'suffix',
+    'username',
+    'password',
+    'parent',
+    'parentName',
+    'displayName'
+  ],
+  '10': [// 线路商
+    'userId',
+    'role',
+    'suffix',
+    'username',
+    'password',
+    'parent',
+    'parentName',
+    'displayName',
+
+    'displayId',        // 显示ID
+    'contractPeriod',   // 有效期
+    'isforever',        // 是否永久
+    'updatedAt',        // 更新时间
+    'remark'            // 备注
+  ],
+  '100': [// 商户
+    'userId',
+    'role',
+    'suffix',
+    'username',
+    'password',
+    'parent',
+    'parentName',
+    'displayName',
+
+    'msn',            // 商户线路号
+    'apiKey',         // 商户APIKEY
+
+    'displayId',
+    'contractPeriod',
+    'isforever',
+    'updatedAt',
+    'remark'
+  ],
+  '1000': [// 代理
+    'userId',
+    'role',
+    'suffix',
+    'username',
+    'password',
+    'parent',
+    'parentName',
+    'displayName',
+
+    'vedioMix',       // 电子游戏洗码比
+    'liveMix',        // 真人视讯洗码比
+
+    'displayId',
+    'contractPeriod',
+    'isforever',
+    'updatedAt',
+    'remark'
+  ]
+}
+/**
  * 角色可修改属性
  */
 export const RoleEditProps = {
   '0': [],
   '1': [],
-  '10': [
+  '10': [// 线路商
     'hostName',
     'hostContact',
-    'password',
-    'rate',
-    'limit',
-    'gameList',
     'managerEmail',
     'adminName',
     'adminEmail',
     'adminContact',
-    'contractPeriod',
-    'remark',
-    'isforever'
-  ],
-  '100': [
-    'hostName',
-    'hostContact',
     'password',
     'rate',
-    'limit',
     'gameList',
-    'loginWhiteList',
-    'frontURL',
+
+    'limit',          // 线路商可用名额
+
+    'contractPeriod',
+    'isforever',
+    'remark'
+  ],
+  '100': [// 商户
+    'hostName',
+    'hostContact',
     'merchantEmail',
     'adminName',
     'adminEmail',
     'adminContact',
+    'password',
+    'rate',
+    'gameList',
+
+    'loginWhiteList', // 商户白名单
+    'frontURL',       // 商户前端URL
+
     'contractPeriod',
     'remark',
     'isforever'
   ],
-  '1000': [
+  '1000': [// 代理
     'hostName',
     'hostContact',
+    'agentEmail',
     'password',
     'rate',
-    'agentEmail',
-    'adminName',
-    'adminEmail',
-    'adminContact',
     'contractPeriod',
     'isforever',
-    'remark',
-    'vedioMix',
-    'liveMix'
+
+    'vedioMix',     // 电子游戏洗码比
+    'liveMix',      // 真人视讯洗码比
+    'remark'
   ],
   '10000': []
-}
-/**
- * 角色显示属性
- */
-export const RoleDisplay = {
-  '0': [],
-  '1': [
-    'username',
-    'password',
-    'suffix',
-    'parent',
-    'parentName',
-    'userId',
-    'role',
-    'displayName'
-  ],
-  '10': [
-    'username',
-    'password',
-    'suffix',
-    'parent',
-    'parentName',
-    'userId',
-    'role',
-    'displayName',
-    'updatedAt',
-    'displayId'
-  ],
-  '100': [
-    'username',
-    'password',
-    'msn',
-    'suffix',
-    'parent',
-    'parentName',
-    'userId',
-    'role',
-    'displayName',
-    'apiKey',
-    'displayId',
-    'updatedAt'
-  ],
-  '1000': [
-    'username',
-    'password',
-    'suffix',
-    'parent',
-    'parentName',
-    'userId',
-    'role',
-    'displayName',
-    'apiKey',
-    'displayId',
-    'updatedAt',
-    'contractPeriod',
-    'isforever',
-    'remark',
-    'vedioMix',
-    'liveMix'
-  ]
 }
