@@ -4,7 +4,6 @@ export { Codes, BizErr } from './Codes'
 export { Stream$ } from './Rx5'
 export { Store$, Tables, Model } from './Dynamo'
 export {
-  StatusEnum,
   RoleCodeEnum,
   RoleModels,
   RoleDisplay,
