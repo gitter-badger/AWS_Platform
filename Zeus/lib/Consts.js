@@ -67,6 +67,10 @@ const UserRole = function () {
     loginAt: Model.timeStamp(),           // 登录时间
     enabledAt: Model.timeStamp(),         // 启用时间
     status: StatusEnum.Enable,            // 状态
+
+    adminName: Model.StringValue,         // 管理帐号的管理员姓名
+    adminEmail: Model.StringValue,        // 管理帐号的管理员邮箱
+    adminContact: Model.StringValue       // 管理帐号的管理员联系方式
   }
 }
 /**
@@ -88,11 +92,7 @@ const PlatformBaseBizRole = function () {
     remark: Model.StringValue,            // 备注
     gender: GenderEnum.Trans,             // 性别
     hostName: Model.StringValue,          // 负责人姓名
-    hostContact: Model.StringValue,       // 负责人联系方式
-    adminName: Model.StringValue,         // 管理帐号的管理员姓名
-    adminEmail: Model.StringValue,        // 管理帐号的管理员邮箱
-    adminContact: Model.StringValue       // 管理帐号的管理员联系方式
-
+    hostContact: Model.StringValue        // 负责人联系方式
   }
 }
 /**
