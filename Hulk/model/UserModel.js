@@ -160,24 +160,24 @@ export class UserModel extends BaseModel {
         const childAgent = {
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status AND #parent = :parent',
+            FilterExpression: '#status = :status AND contains(levelIndex,:levelIndex)',
             ExpressionAttributeNames: {
                 '#role': 'role',
                 '#status': 'status',
-                '#parent': 'parent'
+                '#levelIndex': 'levelIndex'
             },
             ExpressionAttributeValues: {
                 ':role': RoleCodeEnum['Agent'],
                 ':status': StatusEnum.Enable,
-                ':parent': inparam.parent
+                ':levelIndex': inparam.parent
             }
         }
         let [queryErr, queryRet] = [1, 1]
-        if (inparam.parent) {
-            [queryErr, queryRet] = await this.query(childAgent)
+        if (!inparam.parent) {
+            [queryErr, queryRet] = await this.query(allAgent)
         }
         else {
-            [queryErr, queryRet] = await this.query(allAgent)
+            [queryErr, queryRet] = await this.query(childAgent)
         }
 
         if (queryErr) {

@@ -74,145 +74,171 @@ export const BillMo = function () {
     remark: Model.StringValue
   }
 }
-// 用户角色基类
+/**
+ * 角色基类
+ */
 const UserRole = function () {
   return {
-    userId: Model.uuid(),
-    username: Model.StringValue,
-    password: Model.StringValue,
-    passhash: Model.StringValue,
-    parent: Model.StringValue,
-    role: Model.StringValue
+    role: Model.StringValue,              // 角色
+    userId: Model.uuid(),                 // 用户ID
+    username: Model.StringValue,          // 完整账号名
+    uname: Model.StringValue,             // 帐号名
+    password: Model.StringValue,          // 密码
+    passhash: Model.StringValue,          // 密码hash
+    parent: Model.NoParent,               // 默认没有上级
+
+    level: Model.NumberValue,             // 层级
+    levelIndex: Model.StringValue,        // 层级索引
+
+    lastIP: Model.StringValue,            // 最后IP
+    loginAt: Model.timeStamp(),           // 登录时间
+    enabledAt: Model.timeStamp(),         // 启用时间
+    status: StatusEnum.Enable,            // 状态
+
+    adminName: Model.StringValue,         // 管理帐号的管理员姓名
+    adminEmail: Model.StringValue,        // 管理帐号的管理员邮箱
+    adminContact: Model.StringValue       // 管理帐号的管理员联系方式
   }
 }
-// 平台用户角色属性
+/**
+ * 平台角色基类
+ */
 const PlatformBaseBizRole = function () {
   return {
     ...UserRole(),
-    displayId: Model.StringValue,
-    displayName: Model.StringValue,
-    suffix: Model.StringValue,
-    limit: Model.NumberValue,
+    parent: Model.DefaultParent,          // 默认上级平台
+    parentName: Model.DefaultParentName,  // 默认上级平台名称
+    displayId: Model.NumberValue,         // 显示ID
+    displayName: Model.StringValue,       // 显示名称
+    suffix: Model.StringValue,            // 前缀
     children: Model.NumberValue,
-    points: Model.NumberValue,
-    rate: Model.NumberValue,
-    gameList: [],
-    parent: Model.StringValue,
-    status: StatusEnum.Enable,
-    remark: Model.StringValue,
-    gender: GenderEnum.Male,
-    lastIP: Model.StringValue,
-    enabledAt: Model.timeStamp(),
-    loginAt: Model.timeStamp()
+    points: Model.NumberValue,            // 初始积分
+    rate: Model.NumberValue,              // 抽成比
+    isforever: false,                     // 是否永久
+    contractPeriod: Model.StringValue,    // 有效期
+    remark: Model.StringValue,            // 备注
+    gender: GenderEnum.Trans,             // 性别
+    hostName: Model.StringValue,          // 负责人姓名
+    hostContact: Model.StringValue        // 负责人联系方式
   }
 }
-// 用户角色属性
+/**
+ * 角色实体
+ */
 export const RoleModels = {
   '0': function () {
     return {
       ...UserRole(),
-      parent: Model.NoParent,
+      parentName: Model.NoParentName,
+      role: RoleCodeEnum['SuperAdmin'],
       displayName: '超级管理员',
-      loginAt: Model.timeStamp(),
-      enabledAt: Model.timeStamp(),
-      status: StatusEnum.Enable,
       suffix: 'NAPlay'
     }
   },
   '1': function () {
     return {
       ...UserRole(),
-      parent: Model.NoParent,
       parentName: Model.NoParentName,
+      role: RoleCodeEnum['PlatformAdmin'],
       displayName: '平台管理员',
-      loginAt: Model.timeStamp(),
-      enabledAt: Model.timeStamp(),
-      status: StatusEnum.Enable,
       suffix: 'Platform',
-      points: Model.PlatformAdminDefaultPoints,
-      adminName: Model.StringValue,
-      role: RoleCodeEnum['PlatformAdmin']
+      points: Model.PlatformAdminDefaultPoints
     }
   },
   '10': function () {
-    return { // 建站代理商
+    return { // 线路商
       ...PlatformBaseBizRole(),
-      managerName: Model.StringValue,
-      managerEmail: Model.StringValue,
-      hostName: Model.StringValue,
-      hostContact: Model.StringValue,
-      adminName: Model.StringValue,
-      adminEmail: Model.StringValue,
-      adminContact: Model.StringValue,
-      contractPeriod: Model.StringValue,
-      gmUsername: Model.StringValue,
-      gmPassword: Model.StringValue,
-      parent: Model.DefaultParent,
-      parentName: Model.DefaultParentName
+      gameList: [],                         // 游戏类型列表
+      managerEmail: Model.StringValue,      // 线路商邮箱
+      limit: Model.NumberValue              // 可用名额
+      // gmUsername: Model.StringValue,
+      // gmPassword: Model.StringValue,
     }
   },
   '100': function () {
     return { // 商户
       ...PlatformBaseBizRole(),
-      msn: Model.StringValue,
-      apiKey: Model.uuid(),
-      merchantName: Model.StringValue,
-      merchantEmail: Model.StringValue,
-      hostName: Model.StringValue,
-      hostContact: Model.StringValue,
-      adminName: Model.StringValue,
-      adminEmail: Model.StringValue,
-      adminContact: Model.StringValue,
-      contractPeriod: Model.StringValue,
-      frontURL: Model.StringValue,
-      parent: Model.DefaultParent,
-      parentName: Model.DefaultParentName,
-      loginWhiteList: []
+      gameList: [],                         // 游戏类型列表
+      msn: Model.StringValue,               // 线路号
+      apiKey: Model.uuid(),                 // APIKEY
+      merchantEmail: Model.StringValue,     // 商户邮箱
+      frontURL: Model.StringValue,          // 商户站点
+      loginWhiteList: '0.0.0.0'             // 登录白名单
     }
   },
   '1000': function () {
-    return {}
+    return {// 代理
+      ...PlatformBaseBizRole(),
+      // suffix: 'AGENT',                     // 前缀
+      // apiKey: Model.uuid(),                // APIKEY
+      agentEmail: Model.StringValue,          // 代理邮箱
+      vedioMix: Model.NumberValue,            // 电子游戏洗码比
+      liveMix: Model.NumberValue              // 真人视讯洗码比
+      // loginWhiteList: '0.0.0.0'            // 登录白名单
+    }
   },
   '10000': function () {
     return {}
   }
 }
-// 用户修改属性
+/**
+ * 角色可修改属性
+ */
 export const RoleEditProps = {
   '0': [],
   '1': [],
   '10': [
     'hostName',
     'hostContact',
+    'password',
     'rate',
     'limit',
     'gameList',
     'managerEmail',
-    'remark',
     'adminName',
     'adminEmail',
     'adminContact',
-    'contractPeriod'
+    'contractPeriod',
+    'remark',
+    'isforever'
   ],
   '100': [
     'hostName',
     'hostContact',
+    'password',
     'rate',
     'limit',
     'gameList',
-    'managerEmail',
     'loginWhiteList',
     'frontURL',
-    'remark',
+    'merchantEmail',
     'adminName',
     'adminEmail',
     'adminContact',
-    'contractPeriod'
+    'contractPeriod',
+    'remark',
+    'isforever'
   ],
-  '1000': [],
+  '1000': [
+    'hostName',
+    'hostContact',
+    'password',
+    'rate',
+    'agentEmail',
+    'adminName',
+    'adminEmail',
+    'adminContact',
+    'contractPeriod',
+    'isforever',
+    'remark',
+    'vedioMix',
+    'liveMix'
+  ],
   '10000': []
 }
-// 用户展示属性
+/**
+ * 角色显示属性
+ */
 export const RoleDisplay = {
   '0': [],
   '1': [
@@ -250,5 +276,23 @@ export const RoleDisplay = {
     'apiKey',
     'displayId',
     'updatedAt'
+  ],
+  '1000': [
+    'username',
+    'password',
+    'suffix',
+    'parent',
+    'parentName',
+    'userId',
+    'role',
+    'displayName',
+    'apiKey',
+    'displayId',
+    'updatedAt',
+    'contractPeriod',
+    'isforever',
+    'remark',
+    'vedioMix',
+    'liveMix'
   ]
 }
