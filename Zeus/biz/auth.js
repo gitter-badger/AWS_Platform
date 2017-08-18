@@ -21,8 +21,7 @@ import { BillModel } from '../model/BillModel'
 import { PushModel } from '../model/PushModel'
 
 /**
- * 接口编号：0
- * 现在注册分成两部分 1. 管理员注册 2. 商户/建站商注册
+ * 管理员注册
  * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息
  */
@@ -52,7 +51,7 @@ export const RegisterAdmin = async (token = {}, userInfo = {}) => {
 }
 
 /**
- * 专门用于创建建站商/商户
+ * 建站商/商户注册
  * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息
  */
