@@ -55,12 +55,14 @@ export const JwtSign = (data) =>{
 
 export const GeneratePolicyDocument = (principalId, effect, resource,userInfo) => {
 	var authResponse = {};
-	authResponse.principalId = principalId;
+	authResponse.principalId = principalId
   authResponse.context = {}
   authResponse.context.username = userInfo.username
   authResponse.context.role = userInfo.role
   authResponse.context.userId = userInfo.userId
   authResponse.context.parent = userInfo.parent
+  authResponse.context.suffix = userInfo.suffix
+  authResponse.context.level = userInfo.level
 	if (effect && resource) {
 		var policyDocument = {};
 		policyDocument.Version = '2012-10-17'; // default version

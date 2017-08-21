@@ -132,20 +132,22 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    'password',
+    // 'password',
     'parent',
     'parentName',
-    'displayName'
+    'displayName',
+    'level'
   ],
   '10': [// 线路商
     'userId',
     'role',
     'suffix',
     'username',
-    'password',
+    // 'password',
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'displayId',        // 显示ID
     'contractPeriod',   // 有效期
@@ -158,10 +160,11 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    'password',
+    // 'password',
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'msn',            // 商户线路号
     'apiKey',         // 商户APIKEY
@@ -177,10 +180,11 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    'password',
+    // 'password',
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'vedioMix',       // 电子游戏洗码比
     'liveMix',        // 真人视讯洗码比
