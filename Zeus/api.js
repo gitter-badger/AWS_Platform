@@ -1,5 +1,5 @@
 import { Success, Fail, Codes, JSONParser, Model, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
-import { RegisterAdmin, RegisterUser, LoginUser, UserGrabToken } from './biz/auth'
+import { RegisterAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
@@ -141,23 +141,23 @@ const userAuth = async (e, c, cb) => {
 /**
  * 获取用户TOKEN
  */
-const userGrabToken = async (e, c, cb) => {
-  const errRes = { m: 'userGrabToken error'/*, input: e*/ }
-  const res = { m: 'userGrabToken' }
-  // username suffix role and apiKey
-  const [jsonParseErr, userInfo] = JSONParser(e && e.body)
-  if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
-  }
-  // 业务操作
-  const [tokenErr, userToken] = await UserGrabToken(Model.addSourceIP(e, userInfo))
-  // 结果返回
-  if (tokenErr) {
-    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
-  }
-  return ResOK(cb, { ...res, payload: userToken })
+// const userGrabToken = async (e, c, cb) => {
+//   const errRes = { m: 'userGrabToken error'/*, input: e*/ }
+//   const res = { m: 'userGrabToken' }
+//   // username suffix role and apiKey
+//   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+//   if (jsonParseErr) {
+//     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+//   }
+//   // 业务操作
+//   const [tokenErr, userToken] = await UserGrabToken(Model.addSourceIP(e, userInfo))
+//   // 结果返回
+//   if (tokenErr) {
+//     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
+//   }
+//   return ResOK(cb, { ...res, payload: userToken })
 
-}
+// }
 
 /**
  * 变更用户状态
@@ -489,7 +489,7 @@ export {
   checkSuffixExist,             // 检查前缀是否被占用
   checkNickExist,               // 检查昵称是否被占用
 
-  userGrabToken,                // 使用apiKey登录获取用户信息
+  // userGrabToken,                // 使用apiKey登录获取用户信息
   updatePassword,               // 更新密码
   randomPassword                // 随机密码
 }
