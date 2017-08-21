@@ -233,7 +233,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // }
   // 更新用户信息
   User.lastIP = LoginInfo.lastIP
-  const [saveUserErr, Ret] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
+  const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
