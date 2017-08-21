@@ -146,6 +146,8 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
     toUser: saveUserRet.username,
     toRole: saveUserRet.role,
+    toLevel: saveUserRet.level,
+    toDisplayName: saveUserRet.displayName,
     amount: initPoints,
     operator: token.username,
     remark: '初始点数'
@@ -231,18 +233,23 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // }
   // 更新用户信息
   User.lastIP = LoginInfo.lastIP
-  const [saveUserErr, saveUserRet] = await saveUser(User)
+  const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
   if (saveUserErr) {
-    return [saveUserErr, User]
+    return [saveUserErr, 0]
   }
+  // const [saveUserErr, saveUserRet] = await saveUser(User)
+  // if (saveUserErr) {
+  //   return [saveUserErr, User]
+  // }
   // 返回用户身份令牌
-  return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
+  return [0, { ...User, token: Model.token(User) }]
 }
 
 /**
  * 获取用户TOKEN
  * @param {*} userInfo 
  */
+/*
 export const UserGrabToken = async (userInfo = {}) => {
   if (!userInfo.username || !userInfo.apiKey || !userInfo.suffix) {
     return [BizErr.ParamErr('missing params'), 0]
@@ -286,14 +293,19 @@ export const UserGrabToken = async (userInfo = {}) => {
   }
   // 更新用户登录信息
   const UserLastLogin = { ...User.Items[0], lastIP: userInfo.lastIP }
-  const [saveUserErr, savedUser] = await saveUser(UserLastLogin)
+  const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: UserLastLogin })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
+  // const [saveUserErr, savedUser] = await saveUser(UserLastLogin)
+  // if (saveUserErr) {
+  //   return [saveUserErr, 0]
+  // }
   // 返回身份令牌
-  return [0, { ...savedUser, token: Model.token(savedUser) }
+  return [0, { ...UserLastLogin, token: Model.token(UserLastLogin) }
   ]
 }
+*/
 
 // ==================== 以下为内部方法 ====================
 

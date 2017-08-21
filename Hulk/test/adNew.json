@@ -4,31 +4,19 @@
     },
     "requestContext": {
         "authorizer": {
-            "username": "Agent_NAagent",
+            "username": "Platform_NAtest",
             "parent": "00",
-            "role": "1000",
-            "userId": "cbfaa49d-6bb2-40c8-bc8f-3d768f6f3a04"
+            "role": "1",
+            "userId": "e11d4411-9d60-4592-a78c-a81d242dc0ee"
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "role": "1000",
-        "suffix": "First",
-        "displayName": "asddsa",
-        "rate": "100",
-        "liveMix": "100",
-        "vedioMix": "100",
-        "parent": "01",
-        "remark": "safsadfasdfdas",
-        "contractPeriod": 0,
-        "isforever": true,
-        "points": "10000",
-        "agentEmail": "sdafsdf@asdfsad.as",
-        "hostName": "sadfsdafas",
-        "hostContact": "asdfasdfas",
-        "username": "asdfasfa",
-        "password": "@3@?FYpS"
+        "adName": "asdsadasd",
+        "url": "http://ouef62ous.bkt.clouddn.com/516634_gongping.jpg",
+        "img": "http://ouef62ous.bkt.clouddn.com/516634_gongping.jpg",
+        "remark": "sadasdasd"
     }
 }

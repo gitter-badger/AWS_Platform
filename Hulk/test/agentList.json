@@ -7,28 +7,11 @@
             "username": "Agent_NAagent",
             "parent": "00",
             "role": "1000",
-            "userId": "cbfaa49d-6bb2-40c8-bc8f-3d768f6f3a04"
+            "userId": "cbfaa49d-6bb2-40c8-bc8f-3d768f6f3a04",
+            "suffix": "Agent"
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
-    },
-    "body": {
-        "role": "1000",
-        "suffix": "First",
-        "displayName": "asddsa",
-        "rate": "100",
-        "liveMix": "100",
-        "vedioMix": "100",
-        "parent": "01",
-        "remark": "safsadfasdfdas",
-        "contractPeriod": 0,
-        "isforever": true,
-        "points": "10000",
-        "agentEmail": "sdafsdf@asdfsad.as",
-        "hostName": "sadfsdafas",
-        "hostContact": "asdfasdfas",
-        "username": "asdfasfa",
-        "password": "@3@?FYpS"
     }
 }

@@ -159,6 +159,7 @@ export class SeatModel extends BaseModel {
         ret.seatType = inparam.seatType
         ret.sum = inparam.sum
         ret.content = inparam.content
+        ret.icon = inparam.icon
         ret.updatedAt = Model.timeStamp()
 
         // 获取所有添加的道具/礼包id，组合字符串以便查询

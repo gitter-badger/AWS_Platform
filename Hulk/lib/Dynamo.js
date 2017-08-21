@@ -37,6 +37,8 @@ const DianaPlatformCompany = 'DianaPlatformCompany'
 const DianaPlatformTool = 'DianaPlatformTool'
 const DianaPlatformPackage = 'DianaPlatformPackage'
 
+const HulkPlatformAd = 'HulkPlatformAd'
+
 export const Tables = {
   ZeusPlatformUser,
   ZeusPlatformBill,
@@ -48,7 +50,9 @@ export const Tables = {
   DianaPlatformGame,
   DianaPlatformCompany,
   DianaPlatformTool,
-  DianaPlatformPackage
+  DianaPlatformPackage,
+
+  HulkPlatformAd
 }
 
 /**

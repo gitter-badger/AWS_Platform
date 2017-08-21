@@ -101,7 +101,6 @@ const billList = async (e, c, cb) => {
  * 转账
  */
 const billTransfer = async (e, c, cb) => {
-  const errRes = { m: 'billTransfer err'/*, input: e*/ }
   const res = { m: 'billTransfer' }
   // 入参数据转换
   const [jsonParseErr, transferInfo] = JSONParser(e && e.body)
@@ -124,14 +123,23 @@ const billTransfer = async (e, c, cb) => {
   if (queryErr) {
     return ResFail(cb, queryErr)
   }
+  // 获取目的账户
+  const [queryErr2, toUser] = await new UserModel().getUserByName(transferInfo.toRole, transferInfo.toUser)
+  if (queryErr2) {
+    return ResFail(cb, queryErr2)
+  }
+  // 设置操作人TOKEN
   fromUser.operatorToken = token
   // 获取fromUser的当前余额
   const [userBalanceErr, userBalance] = await new BillModel().checkUserBalance(fromUser)
   if (userBalanceErr) {
     return ResErr(cb, userBalanceErr)
   }
+  // 开始转账业务
   const [depositBillErr, depositBillRet] = await new BillModel().billTransfer(fromUser, {
     ...transferInfo,
+    toLevel: toUser.level,
+    toDisplayName: toUser.displayName,
     amount: Math.min(userBalance, transferInfo.amount)
   })
   if (depositBillErr) {

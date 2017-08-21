@@ -72,6 +72,15 @@ const managerOne = async (e, c, cb) => {
   }
   // 业务操作
   const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
+
+  // 查询已用商户已用数量
+  const [err, ret] = await new UserModel().listChildUsers(manager, RoleCodeEnum['Merchant'])
+  if (ret && ret.length > 0) {
+    manager.merchantUsedCount = ret.length
+  } else {
+    manager.merchantUsedCount = 0
+  }
+
   // 结果返回
   if (managerErr) {
     return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)

@@ -726,6 +726,7 @@ resources:
           WriteCapacityUnits: 1  
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
+
     HeraGameDiamondBill:  #钻石账单
       Type: AWS::DynamoDB::Table
       Properties:
@@ -750,6 +751,37 @@ resources:
             KeySchema:
               -
                 AttributeName: userName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+              
+    HulkPlatformAd: #广告表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HulkPlatformAd
+        AttributeDefinitions:
+          -
+            AttributeName: adId
+            AttributeType: S
+          -
+            AttributeName: adName
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: adId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: AdNameIndex
+            KeySchema:
+              -
+                AttributeName: adName
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

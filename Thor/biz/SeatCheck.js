@@ -12,6 +12,7 @@ export class SeatCheck {
             { name: "sum", type: "N", min: 1, max: 100000000 },
             { name: "seatStatus", type: "N", min: 1, max: 2 },
             { name: "contentType", type: "N", min: 1, max: 2 },
+            { name: "icon", type: "NS", min: 1, max: 20 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
@@ -34,6 +35,7 @@ export class SeatCheck {
         inparam.price = parseFloat(inparam.price)
         inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue
+        inparam.icon = inparam.icon || Model.StringValue
         return [checkAttError, errorParams]
     }
 
@@ -88,6 +90,7 @@ export class SeatCheck {
             { name: "sum", type: "N", min: 1, max: 100000000 },
             { name: "seatStatus", type: "N", min: 1, max: 2 },
             { name: "contentType", type: "N", min: 1, max: 2 },
+            { name: "icon", type: "NS", min: 1, max: 20 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
@@ -110,6 +113,7 @@ export class SeatCheck {
         inparam.price = parseFloat(inparam.price)
         inparam.seatType = inparam.seatType.toString()
         inparam.remark = inparam.remark || Model.StringValue
+        inparam.icon = inparam.icon || Model.StringValue
 
         return [checkAttError, errorParams]
     }
