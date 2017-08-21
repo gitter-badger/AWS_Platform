@@ -242,7 +242,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [saveUserErr, User]
   // }
   // 返回用户身份令牌
-  return [0, { ...User, token: Model.token(User) }]
+  return [0, { ...User, token: Model.token(Pick(User, RoleDisplay[User.role])) }]
 }
 
 /**
