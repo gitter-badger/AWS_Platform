@@ -48,6 +48,9 @@ export const BizErr = {
   UserNotFoundErr: (errMsg = '用户未找到') => {
     return { code: Codes.UserNotFound, msg: errMsg }
   },
+  UserExistErr: (errMsg = '用户已存在') => {
+    return { code: Codes.DuplicateUser, msg: errMsg }
+  },
   ParamErr: (errMsg = '参数错误') => {
     return { code: Codes.ParamError, msg: errMsg }
   },
