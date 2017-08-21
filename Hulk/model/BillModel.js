@@ -172,8 +172,10 @@ export class BillModel extends BaseModel {
         // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
         // 当前登录用户只能查询自己的余额
         // 上级可以查询下级余额
-        if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
-            return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
+        if (!(token.role == RoleCodeEnum['PlatformAdmin'] ||
+            user.userId === token.userId || user.parent === token.userId ||
+            (RoleCodeEnum['Agent'] === token.role && token.suffix == 'Agent'))) {
+            return [BizErr.TokenErr('only admin/agent/parent or user himself can check users balance'), 0]
         }
         return await this.checkUserBalance(user)
     }

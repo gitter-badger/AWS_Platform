@@ -308,15 +308,17 @@ export class UserModel extends BaseModel {
                 ':role': roleCode
             }
         }
-        if (RoleCodeEnum['PlatformAdmin'] === token.role || (RoleCodeEnum['Agent'] === token.role && token.suffix == 'Agent')) {
+        if (RoleCodeEnum['Agent'] === token.role && token.suffix == 'Agent') {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role',
+                FilterExpression: 'userId <> :userId',
                 ExpressionAttributeNames: {
-                    '#role': 'role'
+                    '#role': 'role',
                 },
                 ExpressionAttributeValues: {
-                    ':role': roleCode
+                    ':role': roleCode,
+                    ':userId': token.userId
                 }
             }
         }
@@ -340,7 +342,7 @@ export class UserModel extends BaseModel {
         const allAgent = {
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status And #userId <> :userId',
+            FilterExpression: '#status = :status AND #userId <> :userId',
             ExpressionAttributeNames: {
                 '#role': 'role',
                 '#status': 'status',
