@@ -1,18 +1,4 @@
-import {
-  Success,
-  Fail,
-  Codes,
-  JSONParser,
-  Model,
-  Tables,
-  RoleCodeEnum,
-  RoleEditProps,
-  Trim,
-  Pick,
-  JwtVerify,
-  GeneratePolicyDocument,
-  BizErr
-} from './lib/all'
+import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))

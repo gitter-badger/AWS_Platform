@@ -1,4 +1,4 @@
-import {Success,Fail,Codes,JSONParser,Model,RoleCodeEnum,Trim,Pick,JwtVerify,BizErr} from './lib/all'
+import {Success,Fail,Codes,JSONParser,Model,RoleCodeEnum,Trim,Pick,BizErr} from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { AdModel } from './model/AdModel'

@@ -1,17 +1,4 @@
-import {
-  Success,
-  Fail,
-  Codes,
-  JSONParser,
-  Model,
-  Tables,
-  RoleCodeEnum,
-  Trim,
-  Pick,
-  JwtVerify,
-  GeneratePolicyDocument,
-  BizErr
-} from './lib/all'
+import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { ToolModel } from './model/ToolModel'
@@ -172,36 +159,36 @@ const toolUpdate = async (e, c, cb) => {
  * 删除
  */
 const toolDelete = async (e, c, cb) => {
-    // 数据输入，转换，校验
-    const res = { m: 'toolDelete' }
-    const [jsonParseErr, inparam] = JSONParser(e && e.body)
-    if (jsonParseErr) {
-        return ResErr(cb, jsonParseErr)
-    }
-    //检查参数是否合法
-    let [checkAttError, errorParams] = new ToolCheck().checkDelete(inparam)
-    if (checkAttError) {
-        Object.assign(checkAttError, { params: errorParams })
-        return ResErr(cb, checkAttError)
-    }
-    // 获取令牌，只有管理员有权限
-    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-    if (tokenErr) {
-        return ResErr(cb, tokenErr)
-    }
-    // 业务操作
-    const [err, ret] = await new ToolModel().delete(inparam)
+  // 数据输入，转换，校验
+  const res = { m: 'toolDelete' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new ToolCheck().checkDelete(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  const [err, ret] = await new ToolModel().delete(inparam)
 
-    // 操作日志记录
-    inparam.operateAction = '道具删除'
-    inparam.operateToken = token
-    new LogModel().addOperate(inparam, err, ret)
+  // 操作日志记录
+  inparam.operateAction = '道具删除'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
 
-    if (err) {
-        return ResFail(cb, { ...res, err: err }, err.code)
-    } else {
-        return ResOK(cb, { ...res, payload: ret })
-    }
+  if (err) {
+    return ResFail(cb, { ...res, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
 }
 
 // ==================== 以下为内部方法 ====================
