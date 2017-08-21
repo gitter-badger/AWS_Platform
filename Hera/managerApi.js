@@ -56,7 +56,7 @@ export async function gamePlayerList(event, context, cb) {
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
         [err, userList] = await userModel.scan(requestParams);
-    }else if(role == RoleCodeEnum.Merchant || role) { //如果是商家或者代理
+    }else if(role == RoleCodeEnum.Merchant) { //如果是商家或者代理
         requestParams = requestParams || {};
         requestParams.buId = displayId;
         [err, userList] = await userModel.scan(requestParams);
@@ -65,6 +65,13 @@ export async function gamePlayerList(event, context, cb) {
     }
     if (err) {
         return ResFail(cb, err)
+    }
+    for(let i = 0; i < userList.length; i++) {
+        let element = userList[i];
+        if(element.msn == "000") {
+            userList.splice(i, 1);
+            i --;
+        }
     }
     userList = userList || [];
     userList.forEach(function(element) {

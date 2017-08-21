@@ -10,7 +10,7 @@ import {Model} from "../lib/Dynamo"
 
 
 export class MerchantBillModel extends athena.BaseModel {
-    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser, gameId, remark} = {}) {
+    constructor({userId, action, amount, userName, operator, fromRole, toRole, fromUser, toUser, gameId, remark, fromLeval, toLeval} = {}) {
         super(TABLE_NAMES.PLATFORM_BILL);
         this.sn = Util.uuid();
         this.userId = userId;
@@ -21,6 +21,8 @@ export class MerchantBillModel extends athena.BaseModel {
         this.toRole = toRole;
         this.fromUser = fromUser;
         this.toUser = toUser;
+        this.fromLeval = fromLeval;
+        this.toLeval = toLeval;
         this.operator = operator;
         this.username = userName;
         this.createdAt = Date.now();

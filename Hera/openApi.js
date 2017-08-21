@@ -41,8 +41,9 @@ function validateIp(event, merchant) {
   console.log(event.requestContext.identity);
   console.log(whiteList);
   let sourceIp = event.requestContext.identity.sourceIp;
+  let allIp = whiteList.find((ip) => ip == "0.0.0.0");
   let whiteIp = whiteList.find((ip) => ip == sourceIp);
-  if(whiteIp) return true;
+  if(whiteIp || allIp) return true;
   return false;
 }
 

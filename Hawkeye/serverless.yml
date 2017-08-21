@@ -132,10 +132,10 @@ functions:
           authorizer: tokenVerify
 resources:
   Resources:
-    HawkeyePlayerEamilRecord: #玩家接收邮件记录
+    HawkeyePlayerEmailRecord: #玩家接收邮件记录
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: HawkeyePlayerEamilRecord
+        TableName: HawkeyePlayerEmailRecord
         AttributeDefinitions:
           -
             AttributeName: userId

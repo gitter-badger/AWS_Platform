@@ -200,7 +200,7 @@ export class Util{
                 if (min && strLength < min) error = true;
                 if (max && strLength > max) error = true;
                 if (equal) error = !Object.is(value, equal);
-                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, value];
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, value.toString().trim()];
             }
             case "N": {
                 if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];

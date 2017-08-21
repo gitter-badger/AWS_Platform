@@ -1,5 +1,6 @@
 export const TABLE_NAMES = {
     TABLE_USER : "HeraGamePlayer",
+    "HeraGameRecord" : "HeraGameRecord",
     BILL_USER : "HeraGamePlayerBill",
     BILL_DIAMOND_USER : "HeraGameDiamondBill",
     PLATFORM_BILL : "ZeusPlatformBill",

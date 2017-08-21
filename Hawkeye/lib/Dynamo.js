@@ -24,7 +24,7 @@ const HawkeyeGameNotice = 'HawkeyeGameNotice'
 const DianaPlatformTool = 'DianaPlatformTool'
 const HawkeyeGameEmail = 'HawkeyeGameEmail'
 const HeraGameDiamondBill = 'HeraGameDiamondBill'
-const HawkeyePlayerEamilRecord = "HawkeyePlayerEamilRecord";
+const HawkeyePlayerEmailRecord = "HawkeyePlayerEmailRecord";
 
 export const Tables = {
   ZeusPlatformUser,
@@ -37,7 +37,7 @@ export const Tables = {
   HawkeyeGameNotice,
   DianaPlatformTool,
   HawkeyeGameEmail,
-  HawkeyePlayerEamilRecord,
+  HawkeyePlayerEmailRecord,
 }
 
 

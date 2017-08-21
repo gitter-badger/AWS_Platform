@@ -207,6 +207,7 @@ async function qudian(userInfo, merchantInfo, requestParams) {
         action : -1,
         kindId : -2,
         userId : userInfo.userId,
+        originalAmount : playerBalance,
         userName : userInfo.userName,
         type : Type.agentOper
     });
@@ -239,6 +240,12 @@ async function qudian(userInfo, merchantInfo, requestParams) {
  * @param {*} cb 
  */
 async function cudian(userInfo, merchantInfo, requestParams){
+    //玩家余额
+    let [playerBError, playerBalance] = await new UserBillModel({userName:userInfo.userName}).getBalance();
+    if(playerBError)return ResFail(cb, agentBError);
+    if(playerBalance < requestParams.points) {
+        return [new CHeraErr(CODES.AgentBalanceIns), null];
+    }
     //代理余额
     let [agentBError, agentBalance] = await new MerchantBillModel({userId:merchantInfo.userId}).getBlance();
     agentBalance += +merchantInfo.points;  //需要加上初始点数
@@ -267,6 +274,7 @@ async function cudian(userInfo, merchantInfo, requestParams){
         kindId : -2,
         userId : userInfo.userId,
         userName : userInfo.userName,
+        originalAmount : playerBalance,
         type : Type.agentOper
     });
     let [savePlayerError] = await userBillModel.save();
@@ -368,7 +376,7 @@ export async function createPlayer(event, context, cb) {
     let [checkAttError, errorParams] = athena.Util.checkProperties([
         {name : "userName", type:"S", min:6, max:12},
         {name : "userPwd", type:"S", min:6, max :16},
-        {name : "nickname", type:"S", min:3, max :16},
+        {name : "nickname", type:"S"},
         {name : "points", type:"N"},
         {name : "remark", type:"S", min:1, max:200},
     ], requestParams);
@@ -394,11 +402,13 @@ export async function createPlayer(event, context, cb) {
     let {suffix} = merchantInfo;
     //实际的用户名
     let userName = requestParams.userName;
-
+    console.log("merchantInfo");
+    console.log(merchantInfo);
     let userModel = new UserModel({
         ...requestParams,
         buId : merchantInfo.displayId,
         userName : userName,
+        merchantName : merchantInfo.displayName,
         msn : "000",
         balance : +requestParams.points
     });
@@ -431,6 +441,7 @@ export async function createPlayer(event, context, cb) {
       amount : +requestParams.points,
       operator : username,
       remark : requestParams.remark,
+      originalAmount : 0,
       gameType : -1,
       typeName : "代理存点"
     }
@@ -528,7 +539,7 @@ export async function updatePassword(event, context, cb) {
     let user = new UserModel(requestParams);
     let [userExistError, userRecord] = await user.get({userName});
     if(userExistError) return ResFail(cb, userExistError);
-    if(!userRecord) return ResFail(cb, userRecord);
+    if(!userRecord) return ResFail(cb, new CHeraErr(CODES.userNotExist));
     user.cryptoPassword();
     let [updateError] = await user.update({userName:userName},{userPwd:user.userPwd,password:password});
     if(updateError) {
