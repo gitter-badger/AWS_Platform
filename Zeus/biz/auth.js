@@ -242,7 +242,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [saveUserErr, User]
   // }
   // 返回用户身份令牌
-  return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
+  return [0, { ...User, token: Model.token(User) }]
 }
 
 /**
@@ -292,7 +292,7 @@ export const UserGrabToken = async (userInfo = {}) => {
   }
   // 更新用户登录信息
   const UserLastLogin = { ...User.Items[0], lastIP: userInfo.lastIP }
-  const [saveUserErr, Ret] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: UserLastLogin })
+  const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: UserLastLogin })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -301,7 +301,7 @@ export const UserGrabToken = async (userInfo = {}) => {
   //   return [saveUserErr, 0]
   // }
   // 返回身份令牌
-  return [0, { ...savedUser, token: Model.token(savedUser) }
+  return [0, { ...UserLastLogin, token: Model.token(UserLastLogin) }
   ]
 }
 
