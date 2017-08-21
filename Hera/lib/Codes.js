@@ -35,7 +35,8 @@ export const CODES = {
     AgentNotExist : 14000,  //代理不存在
     NotAuth : 14001,  //没有权限
     AgentBalanceIns : 14002, //代理点数不足
-    nicknameAlreadyExist : 14003  //昵称已存在
+    nicknameAlreadyExist : 14003,  //昵称已存在
+    mixError : 14004,//洗码比有误
 
 }
 
@@ -69,7 +70,8 @@ const errorMessage = {
   "14000" : "代理不存在",
   "14001" : "你没有权限",
   "14002" : "你的点数不足",
-  "14003" : "昵称已存在"
+  "14003" : "昵称已存在",
+  "14004" : "洗码比有误"
 }
 
 

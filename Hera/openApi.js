@@ -1,6 +1,8 @@
 
 let  athena  = require("./lib/athena");
 
+let zlib = require('zlib');
+
 import {CODES, CHeraErr} from "./lib/Codes";
 
 import {ReHandler} from "./lib/Response";
@@ -25,6 +27,7 @@ import {MerchantBillModel,Action} from "./model/MerchantBillModel";
 import {UserRecordModel} from "./model/UserRecordModel";
 
 import {UserDiamondBillModel} from "./model/UserDiamondBillModel";
+
 
 import {Util} from "./lib/Util"
 
@@ -725,16 +728,41 @@ async function updateUserInfo(event, context, callback) {
  * @param {*} callback 
  */
 async function playerGameRecord(event, context, callback) {
-  console.log(event);
-  let [validateError, params, userInfo, requestParams] = await validateGame(event)
-  if(validateError) {
-     Object.assign(validateError, {params: params});
-     return callback(null, ReHandler.fail(validateError));
+   //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  if(parserErr) return [parserErr, [], null, requestParams];
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+    {name:"records", type:"S"}
+  ], requestParams);
+  if(checkAttError) {
+    Object.assign(checkAttError, {params: errorParams});
+      return callback(null, ReHandler.fail(checkAttError));
   }
-  let gameRecord = new GameRecordModel({record:requestParams,userId:userInfo.userId});
-  let [saveErr] = await gameRecord.save();
-  if(saveErr) {
-    return callback(null, ReHandler.fail(saveErr));
+  let {records} = requestParams;
+  let buffer = Buffer.from(records, 'base64');
+  let str = zlib.unzipSync(buffer).toString();
+  let [parseRecordErr, list] = athena.Util.parseJSON(str);
+  if(parseRecordErr) {
+    return callback(null, ReHandler.fail(parseRecordErr));
+  }
+  records = list;
+  let batchSaveArr = [];
+  records = records.slice(0,2);
+  console.log(records);
+  for(let i = 0; i <records.length; i++) {
+    let record = records[i];
+    let {userId, userName, betId, betTime} = record;
+    batchSaveArr.push({
+      userId,
+      userName, 
+      betId : betId+"",
+      betTime : new Date(betTime).getTime(),
+      record
+    })
+  }
+  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
+  if(batchSaveErr) {
+    return callback(null, ReHandler.fail(batchSaveErr));
   }
   callback(null, ReHandler.success({}));
 }

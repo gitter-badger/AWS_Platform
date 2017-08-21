@@ -130,6 +130,14 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  agentMix:  #代理洗码点
+    handler: agentApi.agentMix
+    events:
+      - http:
+          path: /agent/mix
+          method: post
+          cors: true
+          authorizer: tokenVerify
 resources:
   Resources:
     HawkeyePlayerEmailRecord: #玩家接收邮件记录

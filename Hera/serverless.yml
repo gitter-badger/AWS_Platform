@@ -205,6 +205,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  
   batchForzen:  #批量冻结/解冻玩家 1解冻,2,冻结
     handler: managerApi.batchForzen
     events:
@@ -251,12 +252,18 @@ resources:
         TableName: HeraGameRecord
         AttributeDefinitions:
           -
-            AttributeName: id
+            AttributeName: userName
+            AttributeType: S
+          -
+            AttributeName: betId
             AttributeType: S
         KeySchema:
           -
-            AttributeName: id
+            AttributeName: userName
             KeyType: HASH
+          -
+            AttributeName: betId
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

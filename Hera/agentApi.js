@@ -376,8 +376,9 @@ export async function createPlayer(event, context, cb) {
     let [checkAttError, errorParams] = athena.Util.checkProperties([
         {name : "userName", type:"S", min:6, max:12},
         {name : "userPwd", type:"S", min:6, max :16},
-        {name : "nickname", type:"S"},
         {name : "points", type:"N"},
+        {name : "liveMix", type:"N",min:0}, //真人洗码比
+        {name : "vedioMix", type:"N",min:0}, //电子游戏洗码比
         {name : "remark", type:"S", min:1, max:200},
     ], requestParams);
     if(checkAttError){
@@ -398,6 +399,10 @@ export async function createPlayer(event, context, cb) {
     }
     if(merchantInfo.role != RoleCodeEnum.Agent) {
         return ResFail(cb, new CHeraErr(CODES.NotAuth)); 
+    }
+    let {liveMix, vedioMix} = merchantInfo;
+    if(requestParams.liveMix > liveMix || requestParams.vedioMix > vedioMix) {
+        return ResFail(cb, new CHeraErr(CODES.mixError)); 
     }
     let {suffix} = merchantInfo;
     //实际的用户名
