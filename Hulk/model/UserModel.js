@@ -308,7 +308,7 @@ export class UserModel extends BaseModel {
                 ':role': roleCode
             }
         }
-        if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+        if (RoleCodeEnum['PlatformAdmin'] === token.role || (RoleCodeEnum['Agent'] === token.role && token.suffix == 'Agent')) {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role',
