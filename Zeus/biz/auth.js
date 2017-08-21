@@ -233,10 +233,14 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // }
   // 更新用户信息
   User.lastIP = LoginInfo.lastIP
-  const [saveUserErr, saveUserRet] = await saveUser(User)
+  const [saveUserErr, Ret] = await Store$('put', User)
   if (saveUserErr) {
-    return [saveUserErr, User]
+    return [saveUserErr, 0]
   }
+  // const [saveUserErr, saveUserRet] = await saveUser(User)
+  // if (saveUserErr) {
+  //   return [saveUserErr, User]
+  // }
   // 返回用户身份令牌
   return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
 }
@@ -288,10 +292,14 @@ export const UserGrabToken = async (userInfo = {}) => {
   }
   // 更新用户登录信息
   const UserLastLogin = { ...User.Items[0], lastIP: userInfo.lastIP }
-  const [saveUserErr, savedUser] = await saveUser(UserLastLogin)
+  const [saveUserErr, Ret] = await Store$('put', UserLastLogin)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
+  // const [saveUserErr, savedUser] = await saveUser(UserLastLogin)
+  // if (saveUserErr) {
+  //   return [saveUserErr, 0]
+  // }
   // 返回身份令牌
   return [0, { ...savedUser, token: Model.token(savedUser) }
   ]
