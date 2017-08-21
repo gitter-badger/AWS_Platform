@@ -297,15 +297,18 @@ export class UserModel extends BaseModel {
      * @param {*} roleCode 
      */
     async listChildUsers(token, roleCode) {
-        var query = {
-            IndexName: 'RoleParentIndex',
-            KeyConditionExpression: '#role = :role and parent = :parent',
+        // 查询用户的所有可用代理
+        let query = {
+            IndexName: 'RoleSuffixIndex',
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: 'contains(#levelIndex,:levelIndex)',
             ExpressionAttributeNames: {
-                '#role': 'role'
+                '#role': 'role',
+                '#levelIndex': 'levelIndex'
             },
             ExpressionAttributeValues: {
-                ':parent': token.userId,
-                ':role': roleCode
+                ':role': RoleCodeEnum['Agent'],
+                ':levelIndex': token.userId
             }
         }
         if (RoleCodeEnum['Agent'] === token.role && token.suffix == 'Agent') {
