@@ -249,6 +249,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
  * 获取用户TOKEN
  * @param {*} userInfo 
  */
+/*
 export const UserGrabToken = async (userInfo = {}) => {
   if (!userInfo.username || !userInfo.apiKey || !userInfo.suffix) {
     return [BizErr.ParamErr('missing params'), 0]
@@ -304,6 +305,7 @@ export const UserGrabToken = async (userInfo = {}) => {
   return [0, { ...UserLastLogin, token: Model.token(UserLastLogin) }
   ]
 }
+*/
 
 // ==================== 以下为内部方法 ====================
 

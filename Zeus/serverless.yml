@@ -91,14 +91,14 @@ functions:
           path: users/auth
           method: post
           cors: true
-  userGrabToken: #获取用户TOKEN
-    handler: api.userGrabToken
-    events:
-      -
-        http:
-          path: users/token
-          method: post
-          cors: true
+  # userGrabToken: #获取用户TOKEN
+  #   handler: api.userGrabToken
+  #   events:
+  #     -
+  #       http:
+  #         path: users/token
+  #         method: post
+  #         cors: true
   checkUserExist: #检查用户是否被占用
     handler: api.checkUserExist
     events:

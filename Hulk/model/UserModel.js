@@ -308,7 +308,6 @@ export class UserModel extends BaseModel {
                 ':role': roleCode
             }
         }
-        console.info(token)
         if (RoleCodeEnum['PlatformAdmin'] === token.role || (RoleCodeEnum['Agent'] === token.role && token.suffix == 'Agent')) {
             query = {
                 IndexName: 'RoleParentIndex',
