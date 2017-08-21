@@ -471,9 +471,6 @@ const jwtverify = async (e, c, cb) => {
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }
 
-/**
-  api export
-**/
 export {
   jwtverify,                    // 用于进行token验证的方法
   eva,                          // 用于创建系统的第一个管理员账号
