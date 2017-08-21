@@ -233,7 +233,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // }
   // 更新用户信息
   User.lastIP = LoginInfo.lastIP
-  const [saveUserErr, Ret] = await Store$('put', User)
+  const [saveUserErr, Ret] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -292,7 +292,7 @@ export const UserGrabToken = async (userInfo = {}) => {
   }
   // 更新用户登录信息
   const UserLastLogin = { ...User.Items[0], lastIP: userInfo.lastIP }
-  const [saveUserErr, Ret] = await Store$('put', UserLastLogin)
+  const [saveUserErr, Ret] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: UserLastLogin })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
