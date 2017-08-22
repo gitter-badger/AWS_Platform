@@ -163,7 +163,6 @@ const userAuth = async (e, c, cb) => {
  * 变更用户状态
  */
 const userChangeStatus = async (e, c, cb) => {
-  const errRes = { m: 'userChangeStatus error'/*, input: e*/ }
   const res = { m: 'userChangeStatus' }
   // 入参转换和校验
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -176,23 +175,27 @@ const userChangeStatus = async (e, c, cb) => {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
-  // 获取身份令牌
-  const [tokenErr, token] = await Model.currentToken(e)
-  if (tokenErr) {
-    return ResErr(cb, tokenErr)
-  }
-  //创建用户账号的只能是管理员或线路商
-  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Manager']) {
-    return [BizErr.TokenErr('must admin/manager token'), 0]
-  }
   // 查询用户
   let [userErr, user] = await new UserModel().queryUserById(inparam.userId)
   if (userErr) {
     return [userErr, 0]
   }
+  // 获取身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 平台用户只能平台管理员/直属下级操作
+  if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isChild(token, user)) {
+    return ResErr(cb, [BizErr.TokenErr('平台用户只能平台管理员/直属下级操作'), 0])
+  }
+  // 代理用户只能代理管理员/父辈操作
+  if (Model.isAgent(user) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, user)) {
+    return ResErr(cb, [BizErr.TokenErr('代理用户只能代理管理员/父辈操作'), 0])
+  }
   // 更新用户
   user.status = inparam.status
-  if (inparam.contractPeriod == 0) {
+  if (inparam.contractPeriod == 0 || !inparam.contractPeriod) {
     user.contractPeriod = 0
   } else if (inparam.contractPeriod) {
     user.contractPeriod = inparam.contractPeriod
@@ -205,7 +208,7 @@ const userChangeStatus = async (e, c, cb) => {
   new LogModel().addOperate(inparam, err, ret)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     return ResOK(cb, { ...res, payload: ret })
   }
@@ -230,9 +233,12 @@ const checkUserExist = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  //创建用户账号的只能是管理员或线路商
-  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Agent']) {
-    return [BizErr.TokenErr('must admin/agent token'), 0]
+  //创建用户账号的只能是平台管理员或代理
+  if (!Model.isAgent(inparam) && !Model.isPlatformAdmin(token)) {
+    return [BizErr.TokenErr('只有平台管理员有权限'), 0]
+  }
+  if (Model.isAgent(token) && !Model.isAgent(token)) {
+    return [BizErr.TokenErr('只有代理有权限'), 0]
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
@@ -263,9 +269,12 @@ const checkSuffixExist = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  //创建用户账号的只能是管理员或线路商
-  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Agent']) {
-    return [BizErr.TokenErr('must admin/agent token'), 0]
+  //创建用户账号的只能是平台管理员或代理
+  if (!Model.isAgent(inparam) && !Model.isPlatformAdmin(token)) {
+    return [BizErr.TokenErr('只有平台管理员有权限'), 0]
+  }
+  if (Model.isAgent(token) && !Model.isAgent(token)) {
+    return [BizErr.TokenErr('只有代理有权限'), 0]
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, null)
@@ -296,9 +305,12 @@ const checkNickExist = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  //创建用户账号的只能是管理员或线路商
-  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Agent']) {
-    return [BizErr.TokenErr('must admin/agent token'), 0]
+  //创建用户账号的只能是平台管理员或代理
+  if (!Model.isAgent(inparam) && !Model.isPlatformAdmin(token)) {
+    return [BizErr.TokenErr('只有平台管理员有权限'), 0]
+  }
+  if (Model.isAgent(token) && !Model.isAgent(token)) {
+    return [BizErr.TokenErr('只有代理有权限'), 0]
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkNickExist(inparam.role, inparam.displayName)

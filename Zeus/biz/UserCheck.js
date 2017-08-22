@@ -41,10 +41,6 @@ export class UserCheck {
         if (passwordLevel(inparam.password) < 3) {
             return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
-        // 代理默认前缀
-        if (inparam.role == RoleCodeEnum['Agent']) {
-            inparam.suffix = 'Agent'
-        }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 10, max: 100 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
@@ -66,9 +62,6 @@ export class UserCheck {
 
             // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-
-            // 代理
-            // { name: "agentEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
@@ -127,9 +120,6 @@ export class UserCheck {
 
             // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-
-            // 代理
-            // { name: "agentEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
