@@ -158,10 +158,6 @@ const agentList = async (e, c, cb) => {
 const agentUpdate = async (e, c, cb) => {
     // 入参校验
     const res = { m: 'agentUpdate' }
-    const [paramsErr, params] = Model.pathParams(e)
-    if (paramsErr || !params.id) {
-        return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
-    }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     if (jsonParseErr) {
         return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
@@ -178,7 +174,7 @@ const agentUpdate = async (e, c, cb) => {
         return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
     }
     // 业务操作
-    const [err, ret] = await new UserModel().getUser(params.id, RoleCodeEnum['Agent'])
+    const [err, ret] = await new UserModel().getUser(inparam.userId, RoleCodeEnum['Agent'])
     if (err) {
         return ResFail(cb, { ...res, err: err }, err.code)
     }
@@ -190,9 +186,9 @@ const agentUpdate = async (e, c, cb) => {
     // 业务操作
     const [updateErr, updateRet] = await new UserModel().userUpdate(Agent)
     // 操作日志记录
-    params.operateAction = '更新代理信息'
-    params.operateToken = token
-    new LogModel().addOperate(params, updateErr, updateRet)
+    inparam.operateAction = '更新代理信息'
+    inparam.operateToken = token
+    new LogModel().addOperate(inparam, updateErr, updateRet)
     // 结果返回
     if (updateErr) {
         return ResFail(cb, { ...res, err: updateErr }, updateErr.code)
