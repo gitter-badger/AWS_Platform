@@ -7,16 +7,14 @@ import { BillModel } from './model/BillModel'
 import { UserCheck } from './biz/UserCheck'
 
 /**
- * 接口编号：0
  * 生成第一个管理员
  */
 const eva = async (e, c, cb) => {
-  // 数据输入，转换，校验
-  const errRes = { m: 'eva error' }
+  // 入参数据
   const res = { m: 'eva' }
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
   }
   //检查参数是否合法
   let [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
@@ -25,11 +23,10 @@ const eva = async (e, c, cb) => {
     return ResErr(cb, checkAttError)
   }
   // 生成第一个管理员业务
-  const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
-  const [registerUserErr, resgisterUserRet] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
+  const [registerUserErr, resgisterUserRet] = await RegisterAdmin(Model.addSourceIP(e, userInfo))
   // 结果返回
   if (registerUserErr) {
-    return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
+    return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code)
   }
   return ResOK(cb, { ...res, payload: resgisterUserRet })
 }
@@ -55,7 +52,7 @@ const adminNew = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [registAdminErr, adminUser] = await RegisterAdmin(token, Model.addSourceIP(e, userInfo))
+  const [registAdminErr, adminUser] = await RegisterAdmin(Model.addSourceIP(e, userInfo))
   // 操作日志记录
   userInfo.operateAction = '创建管理员帐号'
   userInfo.operateToken = token
