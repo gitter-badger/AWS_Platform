@@ -1,23 +1,8 @@
-import {
-  Success,
-  Fail,
-  Codes,
-  JSONParser,
-  Model,
-  Tables,
-  RoleCodeEnum,
-  RoleEditProps,
-  Trim,
-  Pick,
-  JwtVerify,
-  GeneratePolicyDocument,
-  BizErr
-} from './lib/all'
+import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { LogModel } from './model/LogModel'
 import { CompanyModel } from './model/CompanyModel'
 
 import { CompanyCheck } from './biz/CompanyCheck'
-
 
 const ResOK = (callback, res) => callback(null, Success(res))
 const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))

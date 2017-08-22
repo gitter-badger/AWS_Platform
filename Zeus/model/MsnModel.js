@@ -1,18 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    MSNStatusEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, MSNStatusEnum, RoleModels } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
 

@@ -1,17 +1,4 @@
-import {
-  Success,
-  Fail,
-  Codes,
-  JSONParser,
-  Model,
-  Trim,
-  Pick,
-  JwtVerify,
-  GeneratePolicyDocument,
-  BizErr,
-  RoleCodeEnum,
-  RoleEditProps
-} from './lib/all'
+import { Success, Fail, Codes, JSONParser, Model, Trim, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { LogModel } from './model/LogModel'
@@ -120,11 +107,10 @@ const msnRandom = async (e, c, cb) => {
  */
 const lockmsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'lockmsn err'/*, input: e*/ }
   const res = { m: 'lockmsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
-    return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
+    return ResFail(cb, { ...res, err: paramErr }, paramErr.code)
   }
   //检查参数是否合法
   let [checkAttError, errorParams] = new MsnCheck().checkMsnLock(params)
@@ -159,13 +145,13 @@ const lockmsn = async (e, c, cb) => {
       new LogModel().addOperate(params, err, ret)
 
       if (err) {
-        return ResFail(cb, { ...errRes, err: err }, err.code)
+        return ResFail(cb, { ...res, err: err }, err.code)
       } else {
         return ResOK(cb, { ...res, payload: msn })
       }
     }
     else {
-      return ResFail(cb, { ...errRes, err: BizErr.MsnUsedError() }, BizErr.MsnUsedError().code)
+      return ResFail(cb, { ...res, err: BizErr.MsnUsedError() }, BizErr.MsnUsedError().code)
     }
   }
   // 解锁
@@ -184,13 +170,13 @@ const lockmsn = async (e, c, cb) => {
       new LogModel().addOperate(params, err, ret)
 
       if (err) {
-        return ResFail(cb, { ...errRes, err: err }, err.code)
+        return ResFail(cb, { ...res, err: err }, err.code)
       } else {
         return ResOK(cb, { ...res, payload: params.msn })
       }
     }
     else {
-      return ResFail(cb, { ...errRes, err: BizErr.MsnNotExistError() }, BizErr.MsnNotExistError().code)
+      return ResFail(cb, { ...res, err: BizErr.MsnNotExistError() }, BizErr.MsnNotExistError().code)
     }
   }
 }

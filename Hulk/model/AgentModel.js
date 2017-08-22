@@ -95,6 +95,10 @@ export class AgentModel extends BaseModel {
         if (queryParentErr) {
             return [queryParentErr, 0]
         }
+        // 检查下级洗码比
+        if (parentUser.level != 0 && (userInfo.vedioMix >= parentUser.vedioMix || userInfo.liveMix >= parentUser.liveMix)) {
+            return [BizErr.InparamErr('洗码比不能高于上级'), 0]
+        }
         // 初始点数
         const initPoints = CheckUser.points
         // 检查余额
