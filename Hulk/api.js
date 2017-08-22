@@ -31,8 +31,15 @@ const billOne = async (e, c, cb) => {
   if (queryErr) {
     return ResErr(cb, queryErr)
   }
+  // 操作权限
+  if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isChild(token, user) && user.userId != token.userId) {
+    return [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能查看'), 0]
+  }
+  if (Model.isAgent(user) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, user) && user.userId != token.userId) {
+    return [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能查看'), 0]
+  }
   // 查询余额
-  const [balanceErr, balance] = await new BillModel().checkBalance(token, user)
+  const [balanceErr, balance] = await new BillModel().checkUserBalance(user)
   if (balanceErr) {
     return ResErr(cb, balanceErr)
   }
@@ -52,39 +59,41 @@ const billOne = async (e, c, cb) => {
 }
 
 /**
- * 账单列表
+ * 用户账单列表
  */
 const billList = async (e, c, cb) => {
-  // 查询出当前详情页面的所属用户的交易记录列表
-  // 根据其长度 进行n次
-  const [paramsErr, params] = Model.pathParams(e)
-  if (paramsErr || !params.userId) {
+  // 入参处理
+  const [paramsErr, inparam] = Model.pathParams(e)
+  if (paramsErr || !inparam.userId) {
     return ResErr(cb, paramsErr)
   }
-  // 身份令牌校验
+  // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
+  // 查询用户信息
+  const [queryUserErr, user] = await new UserModel().queryUserById(inparam.userId)
+  if (queryUserErr) {
+    return [queryUserErr, 0]
+  }
+  // 操作权限
+  if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isChild(token, user) && user.userId != token.userId) {
+    return [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能查看'), 0]
+  }
+  if (Model.isAgent(user) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, user) && user.userId != token.userId) {
+    return [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能查看'), 0]
+  }
   // 业务查询
-  const [queryErr, bills] = await new BillModel().computeWaterfall(token, params.userId)
+  const [queryErr, bills] = await new BillModel().computeWaterfall(user.points, inparam.userId)
   if (queryErr) {
     return ResErr(cb, queryErr)
   }
   return ResOK(cb, { payload: bills })
 }
 
-/*
-  提点 注：fromUserId是转账源，toUser是转账终点
-  转点 操作
-  1 fromUser是toUser的parent (非管理员)
-  2.fromUser是管理员 因为管理员是所有用户的parent
-  3. 管理员指定fromUser 和 toUser 此时也需要满足约束 1
-  4. 当前的非管理员用户也可以代表自己的下级进行转点操作
-*/
-
 /**
- * 转账
+ * 转账，从一个账户到另一个账户
  */
 const billTransfer = async (e, c, cb) => {
   const res = { m: 'billTransfer' }
@@ -105,9 +114,17 @@ const billTransfer = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 获取转账账户
-  const [queryErr, fromUser] = await new BillModel().queryBillUser(token, transferInfo.fromUserId)
+  const fromUserId = transferInfo.fromUserId || token.userId
+  const [queryErr, fromUser] = await new UserModel().queryUserById(fromUserId)
   if (queryErr) {
     return ResFail(cb, queryErr)
+  }
+  // 操作权限
+  if (!Model.isAgent(fromUser) && !Model.isPlatformAdmin(token) && !Model.isChild(token, fromUser) && fromUser.userId != token.userId) {
+    return [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能操作'), 0]
+  }
+  if (Model.isAgent(fromUser) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, fromUser) && fromUser.userId != token.userId) {
+    return [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能操作'), 0]
   }
   // 获取目的账户
   const [queryErr2, toUser] = await new UserModel().getUserByName(transferInfo.toRole, transferInfo.toUser)
@@ -138,12 +155,11 @@ const billTransfer = async (e, c, cb) => {
  * 日志列表，接口编号：
  */
 const logList = async (e, c, cb) => {
-  // 数据输入，转换，校验
-  const errRes = { m: 'logList error' }
+  // 入参数据
   const res = { m: 'logList' }
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
   }
   //检查参数是否合法
   let [checkAttError, errorParams] = new LogCheck().checkPage(inparam)
@@ -156,20 +172,27 @@ const logList = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  //只能是管理员或线路商
-  if (token.role == RoleCodeEnum['PlatformAdmin']) {
+  // 平台管理员或代理管理员
+  if (Model.isPlatformAdmin(token) || Model.isAgentAdmin(token)) {
     inparam.parent = null
-  } else if (token.role == RoleCodeEnum['Manager']) {
+  }
+  // 线路商 
+  else if (Model.isManager(token)) {
     inparam.parent = token.userId
-  } else {
-    return [BizErr.TokenErr('must admin/manager token'), 0]
+  }
+  // 代理
+  else if (Model.isAgent(token)) {
+    inparam.parent = token.userId
+  }
+  else {
+    return [BizErr.TokenErr('身份权限错误'), 0]
   }
 
   // 业务操作
   let [err, ret] = await new LogModel().logPage(inparam)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     return ResOK(cb, { ...res, payload: ret })
   }

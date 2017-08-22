@@ -55,7 +55,7 @@ export class LogModel extends BaseModel {
                 }
             }, inparam)
         }
-        // 线路商查询 
+        // 线路商/代理查询
         else {
             return await this.page({
                 IndexName: 'LogRoleIndex',

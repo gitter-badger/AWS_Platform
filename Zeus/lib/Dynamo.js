@@ -174,6 +174,20 @@ export const Model = {
     }
     return false
   },
+  // 判断用户是否为线路商
+  isManager(user) {
+    if (user.role == RoleCodeEnum['Manager']) {
+      return true
+    }
+    return false
+  },
+  // 判断用户是否为商户
+  isMerchant(user) {
+    if (user.role == RoleCodeEnum['Merchant']) {
+      return true
+    }
+    return false
+  },
   // 判断是否是代理管理员
   isAgentAdmin(token) {
     if (token.role == RoleCodeEnum['Agent'] && token.suffix == 'Agent') {

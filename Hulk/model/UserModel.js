@@ -1,19 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    StatusEnum,
-    RoleCodeEnum,
-    MSNStatusEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 export class UserModel extends BaseModel {
@@ -36,8 +21,8 @@ export class UserModel extends BaseModel {
      * @param {*} user 登录信息
      */
     async checkContractPeriod(user) {
-        // 不是平台管理员，需要检查有效期
-        if (!user.role != RoleCodeEnum['PlatformAdmin']) {
+        // 不是代理管理员，需要检查有效期
+        if (!Model.isAgentAdmin(user)) {
             // 如果存在有效期
             if (user.contractPeriod && user.contractPeriod.length == 2) {
                 const start = user.contractPeriod[0]
@@ -139,17 +124,20 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 查询管理员列表
+     * 查询代理管理员列表
      * @param {*} token 
      */
     async listAllAdmins(token) {
         const [queryErr, adminRet] = await this.query({
             KeyConditionExpression: '#role = :role',
+            FilterExpression: '#suffix = :suffix',
             ExpressionAttributeNames: {
-                '#role': 'role'
+                '#role': 'role',
+                '#suffix': 'suffix'
             },
             ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['PlatformAdmin']
+                ':role': RoleCodeEnum['Agent'],
+                ':suffix': 'Agent'
             }
         })
         if (queryErr) {
@@ -207,8 +195,8 @@ export class UserModel extends BaseModel {
     // 检查用户是否重复
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]
-        // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-        if (role === RoleCodeEnum['PlatformAdmin']) {
+        // 对于代理管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
+        if (role === RoleCodeEnum['Agent']) {
             [err, ret] = await this.queryUserBySuffix(role, suffix, username)
         } else {
             // 对于其他用户，角色和前缀具有联合唯一性
