@@ -324,7 +324,7 @@ export class UserModel extends BaseModel {
      * @param {*} roleCode 
      */
     async listChildUsers(token, roleCode) {
-        var query = {
+        let query = {
             IndexName: 'RoleParentIndex',
             KeyConditionExpression: '#role = :role and parent = :parent',
             ExpressionAttributeNames: {

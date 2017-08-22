@@ -133,12 +133,16 @@ const agentOne = async (e, c, cb) => {
 const agentList = async (e, c, cb) => {
     // 入参校验
     const res = { m: 'agentList' }
+    const [paramsErr, inparam] = Model.pathParams(e)
+    if (paramsErr) {
+        return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
+    }
     const [tokenErr, token] = await Model.currentToken(e)
     if (tokenErr) {
         return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
     }
     // 业务操作
-    const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Agent)
+    const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Agent, inparam)
     // 结果返回
     if (err) {
         return ResFail(cb, { ...res, err: err }, err.code)

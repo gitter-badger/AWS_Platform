@@ -280,11 +280,11 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 查看下级用户
+     * 查看所有下级用户
      * @param {*} token 
      * @param {*} roleCode 
      */
-    async listChildUsers(token, roleCode) {
+    async listChildUsers(token, roleCode, inparam) {
         // 查询用户的所有可用代理
         let query = {
             IndexName: 'RoleSuffixIndex',
@@ -299,7 +299,8 @@ export class UserModel extends BaseModel {
                 ':levelIndex': token.userId
             }
         }
-        if (RoleCodeEnum['Agent'] === token.role && token.suffix == 'Agent') {
+        // 代理管理员查询所有
+        if (Model.isAgentAdmin(token)) {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role',
@@ -310,6 +311,20 @@ export class UserModel extends BaseModel {
                 ExpressionAttributeValues: {
                     ':role': roleCode,
                     ':userId': token.userId
+                }
+            }
+        }
+        // 查询用户直属代理
+        else if (inparam.onlyChild) {
+            query = {
+                IndexName: 'RoleParentIndex',
+                KeyConditionExpression: '#role = :role and parent = :parent',
+                ExpressionAttributeNames: {
+                    '#role': 'role'
+                },
+                ExpressionAttributeValues: {
+                    ':parent': token.userId,
+                    ':role': roleCode
                 }
             }
         }
