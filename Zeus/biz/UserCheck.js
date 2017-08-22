@@ -150,7 +150,9 @@ export class UserCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "role", type: "N", min: 1, max: 100 }
+            { name: "suffix", type: "NREG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            { name: "role", type: "N", min: 1, max: 100 },
+            { name: "captcha", type: "N", min: 1000, max: 9999 }
         ], inparam)
 
         if (checkAttError) {
