@@ -1,4 +1,4 @@
-import { Success, Fail, Codes, JSONParser, Model, Trim, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
+import { Success, Fail, Codes, JSONParser, Model, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { LogModel } from './model/LogModel'

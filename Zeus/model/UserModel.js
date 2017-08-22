@@ -1,4 +1,4 @@
-import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 export class UserModel extends BaseModel {

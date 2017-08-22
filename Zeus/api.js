@@ -1,4 +1,4 @@
-import { Success, Fail, Codes, JSONParser, Model, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { Success, Fail, Codes, JSONParser, Model, Pick, JwtVerify, GeneratePolicyDocument, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'

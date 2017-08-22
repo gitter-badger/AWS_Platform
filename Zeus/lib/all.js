@@ -1,4 +1,4 @@
-export { JSONParser, Trim, Empty, Pick, Omit, Keys } from './JSONParser'
+export { JSONParser, Empty, Pick, Omit, Keys } from './JSONParser'
 export { Success, Fail, JwtVerify, GeneratePolicyDocument } from './Response'
 export { Codes, BizErr } from './Codes'
 export { Stream$ } from './Rx5'
