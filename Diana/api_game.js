@@ -1,13 +1,9 @@
-import { Success, Fail, Codes, JSONParser, Model, GameTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, GameTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { GameModel } from './model/GameModel'
 import { LogModel } from './model/LogModel'
 import { UserModel } from './model/UserModel'
 
 import { GameCheck } from './biz/GameCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 创建游戏

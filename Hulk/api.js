@@ -1,14 +1,10 @@
-import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 import { UserModel } from './model/UserModel'
 
 import { LogCheck } from './biz/LogCheck'
 import { BillCheck } from './biz/BillCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 用户余额
@@ -228,9 +224,7 @@ const jwtverify = async (e, c, cb) => {
   // 结果返回
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }
-/**
-  api export
-**/
+
 export {
   jwtverify,                    // 用于进行token验证的方法
 

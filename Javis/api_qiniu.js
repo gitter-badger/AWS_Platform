@@ -1,14 +1,10 @@
-import { Success, Fail, Codes, JSONParser, Model, Tables, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Tables, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 // 七牛上传工具
 const qiniu = require('qiniu')
 const QINIU_ACCESS_KEY = 'J-aTOnu1qNxJgP5Sm9HsvksPXZ4URjD8nVhEjRmr'
 const QINIU_SECRET_KEY = 'sC7cw2O0hEVVPfhwHjE5A8C4F-7rvq_kpmjxxaIc'
 const QINIU_BUCKET = 'rotta-file'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 七牛云TOKEN
@@ -34,9 +30,6 @@ const upToken = async (e, c, cb) => {
 
 // ==================== 以下为内部方法 ====================
 
-/**
-  api export
-**/
 export {
   upToken                     // 七牛云上传token
 }

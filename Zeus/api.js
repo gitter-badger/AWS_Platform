@@ -1,14 +1,10 @@
-import { Success, Fail, Codes, JSONParser, Model, Pick, JwtVerify, GeneratePolicyDocument, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { ResOK, ResFail, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, JwtVerify, GeneratePolicyDocument } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 接口编号：0

@@ -1,13 +1,9 @@
-import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { PackageModel } from './model/PackageModel'
 
 import { PackageCheck } from './biz/PackageCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 创建道具包
@@ -188,9 +184,6 @@ const packageDelete = async (e, c, cb) => {
 
 // ==================== 以下为内部方法 ====================
 
-/**
-  api export
-**/
 export {
     packageNew,                      // 创建道具包
     packageList,                     // 道具包列表

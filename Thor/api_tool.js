@@ -1,13 +1,9 @@
-import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { ToolModel } from './model/ToolModel'
 
 import { ToolCheck } from './biz/ToolCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 创建道具
@@ -193,9 +189,6 @@ const toolDelete = async (e, c, cb) => {
 
 // ==================== 以下为内部方法 ====================
 
-/**
-  api export
-**/
 export {
   toolNew,                      // 创建道具
   toolList,                     // 道具列表

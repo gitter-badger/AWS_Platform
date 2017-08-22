@@ -1,12 +1,8 @@
-import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { LogModel } from './model/LogModel'
 import { CompanyModel } from './model/CompanyModel'
 
 import { CompanyCheck } from './biz/CompanyCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 创建厂商
@@ -130,9 +126,6 @@ const companyChangeStatus = async (e, c, cb) => {
 
 // ==================== 以下为内部方法 ====================
 
-/**
-  api export
-**/
 export {
   companyNew,                   // 新建厂商
   companyList,                  // 游戏厂商

@@ -1,8 +1,4 @@
-import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
 
 // ==================== 以下为内部方法 ====================
 
@@ -34,9 +30,7 @@ const jwtverify = async (e, c, cb) => {
   // 结果返回
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }
-/**
-  api export
-**/
+
 export {
   jwtverify                    // 用于进行token验证的方法
 }

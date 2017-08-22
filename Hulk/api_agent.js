@@ -1,14 +1,10 @@
-import {Success,Fail,Codes,JSONParser,Model,Trim,Pick,BizErr,RoleCodeEnum,RoleEditProps} from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Trim, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { AgentModel } from './model/AgentModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { AgentCheck } from './biz/AgentCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 代理管理员注册
@@ -229,9 +225,6 @@ const availableAgents = async (e, c, cb) => {
 
 // ==================== 以下为内部方法 ====================
 
-/**
- * api export
- */
 export {
     agentLogin,                // 代理登录
     agentAdminNew,             // 代理管理员注册

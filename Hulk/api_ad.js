@@ -1,13 +1,9 @@
-import {Success,Fail,Codes,JSONParser,Model,RoleCodeEnum,Trim,Pick,BizErr} from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { AdModel } from './model/AdModel'
 
 import { AdCheck } from './biz/AdCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 创建
@@ -153,43 +149,40 @@ const adUpdate = async (e, c, cb) => {
  * 删除
  */
 const adDelete = async (e, c, cb) => {
-    // 数据输入，转换，校验
-    const res = { m: 'adDelete' }
-    const [jsonParseErr, inparam] = JSONParser(e && e.body)
-    if (jsonParseErr) {
-        return ResErr(cb, jsonParseErr)
-    }
-    //检查参数是否合法
-    let [checkAttError, errorParams] = new AdCheck().checkDelete(inparam)
-    if (checkAttError) {
-        Object.assign(checkAttError, { params: errorParams })
-        return ResErr(cb, checkAttError)
-    }
-    // 获取令牌，只有管理员有权限
-    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-    if (tokenErr) {
-        return ResErr(cb, tokenErr)
-    }
-    // 业务操作
-    const [err, ret] = await new AdModel().delete(inparam)
+  // 数据输入，转换，校验
+  const res = { m: 'adDelete' }
+  const [jsonParseErr, inparam] = JSONParser(e && e.body)
+  if (jsonParseErr) {
+    return ResErr(cb, jsonParseErr)
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = new AdCheck().checkDelete(inparam)
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams })
+    return ResErr(cb, checkAttError)
+  }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
+  // 业务操作
+  const [err, ret] = await new AdModel().delete(inparam)
 
-    // 操作日志记录
-    inparam.operateAction = '公告删除'
-    inparam.operateToken = token
-    new LogModel().addOperate(inparam, err, ret)
+  // 操作日志记录
+  inparam.operateAction = '公告删除'
+  inparam.operateToken = token
+  new LogModel().addOperate(inparam, err, ret)
 
-    if (err) {
-        return ResFail(cb, { ...res, err: err }, err.code)
-    } else {
-        return ResOK(cb, { ...res, payload: ret })
-    }
+  if (err) {
+    return ResFail(cb, { ...res, err: err }, err.code)
+  } else {
+    return ResOK(cb, { ...res, payload: ret })
+  }
 }
 
 // ==================== 以下为内部方法 ====================
 
-/**
-  api export
-**/
 export {
   adNew,                      // 创建
   adList,                     // 列表

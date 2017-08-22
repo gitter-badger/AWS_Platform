@@ -1,14 +1,10 @@
-import { Success, Fail, Codes, JSONParser, Model, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { LogModel } from './model/LogModel'
 
 import { CaptchaCheck } from './biz/CaptchaCheck'
 import { MsnCheck } from './biz/MsnCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 /**
  * 获取线路号列表
