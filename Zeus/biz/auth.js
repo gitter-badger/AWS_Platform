@@ -23,7 +23,7 @@ import { PushModel } from '../model/PushModel'
  * 管理员注册
  * @param {*} userInfo 输入用户信息
  */
-export const RegisterAdmin = async (userInfo = {}) => {
+export const RegisterAdmin = async (userInfo) => {
   // 默认值设置
   const adminRole = RoleModels[RoleCodeEnum['PlatformAdmin']]()
   const userInput = Pick({

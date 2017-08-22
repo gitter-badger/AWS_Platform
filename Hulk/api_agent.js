@@ -11,7 +11,7 @@ import { AgentCheck } from './biz/AgentCheck'
  */
 const agentAdminNew = async (e, c, cb) => {
     const res = { m: 'agentAdminNew' }
-    // 从POST 的body中获取提交数据
+    // 入参数据
     const [jsonParseErr, userInfo] = JSONParser(e && e.body)
     if (jsonParseErr) {
         return ResErr(cb, jsonParseErr)
@@ -29,7 +29,7 @@ const agentAdminNew = async (e, c, cb) => {
     // }
     // 业务操作
     const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
-    const [registerUserErr, resgisterUserRet] = await new AgentModel().registerAdmin(token, Model.addSourceIP(e, userInfo))
+    const [registerUserErr, resgisterUserRet] = await new AgentModel().registerAdmin(Model.addSourceIP(e, userInfo))
     // 操作日志记录
     userInfo.operateAction = '创建代理管理员'
     userInfo.operateToken = token
@@ -47,7 +47,7 @@ const agentAdminNew = async (e, c, cb) => {
  */
 const agentNew = async (e, c, cb) => {
     const res = { m: 'agentNew' }
-    // 从POST 的body中获取提交数据
+    // 入参数据
     const [jsonParseErr, userInfo] = JSONParser(e && e.body)
     if (jsonParseErr) {
         return ResErr(cb, jsonParseErr)
