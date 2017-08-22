@@ -92,46 +92,19 @@ functions:
           path: /game/player/record
           method: post
           cors: true
+  agentMix:  #代理洗码点
+    handler: agentApi.agentMix
+    events:
+      - http:
+          path: /agent/mix
+          method: post
+          cors: true
+          authorizer: tokenVerify
   joinGame:  #玩家进入游戏
     handler: openApi.joinGame
     events:
       - http:
           path: /game/player/join
-          method: post
-          cors: true
-  toolList:  #道具列表
-    handler: openApi_tool.toolList
-    events:
-      - http:
-          path: /game/tool/list
-          method: get
-          cors: true
-  seatList:  #席位列表列表
-    handler: openApi_tool.seatList
-    events:
-      - http:
-          path: /game/seat/list
-          method: get
-          cors: true
-  packageList:  #道具包列表
-    handler: openApi_tool.packageList
-    events:
-      - http:
-          path: /game/package/list
-          method: get
-          cors: true
-  buy:  #购买道具
-    handler: openApi_tool.playerBuyProp
-    events:
-      - http:
-          path: /game/prop/buy
-          method: post
-          cors: true
-  buyDiamonds:  #购买钻石
-    handler: openApi_tool.playerBuyDiamonds
-    events:
-      - http:
-          path: /game/diamonds/buy
           method: post
           cors: true
   playerRecord:  #获取玩家记录验证
@@ -140,6 +113,13 @@ functions:
       - http:
           path: /game/bill/verify
           method: post
+          cors: true
+  getGameRecord:  #获取玩家游戏记录
+    handler: openApi.getPlayerGameRecord
+    events:
+      - http:
+          path: /game/player/record
+          method: get
           cors: true
   gamePlayerList:  #获取玩家列表
     handler: managerApi.gamePlayerList
@@ -257,6 +237,12 @@ resources:
           -
             AttributeName: betId
             AttributeType: S
+          -
+            AttributeName: msn
+            AttributeType: S
+          -
+            AttributeName: betTime
+            AttributeType: N
         KeySchema:
           -
             AttributeName: userName
@@ -267,3 +253,19 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: msnIndex
+            KeySchema:
+              -
+                AttributeName: msn
+                KeyType: HASH
+              -
+                AttributeName: betTime
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+         
+              WriteCapacityUnits: 1

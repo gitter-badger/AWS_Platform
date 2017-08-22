@@ -1,6 +1,7 @@
 let {RoleCodeEnum} = require("../lib/Consts");
 
 import {Util} from "../lib/Util"
+import {CODES, CHeraErr} from "../lib/Codes";
 
 
 import {BaseModel} from "../lib/athena"
@@ -68,36 +69,135 @@ import {
 
 
 export class GameRecordModel extends BaseModel{
-    constructor({record, userId, userName,betTime, betId} = {}) {
+    constructor({record, userId, userName,betTime, betId, gameId, msn} = {}) {
         super(Tables.HeraGameRecord);
         this.userId = userId; //用户ID
         this.userName = userName; //用户名
+        this.gameId = gameId;
         this.betId = betId;  //投注编号
         this.betTime = betTime;  //投注时间
+        this.msn = msn;
         this.record = record; //记录，包含所有的详情
     }
     async batchWrite(records) {
-        let batch = {
-            "RequestItems":{
-                "HeraGameRecord" : []
-            } 
-        }
-        let saveArray = records.map((item) => {
-            return {
-                PutRequest : {
-                    Item : item
-                }
+        let sumBatch= [];
+        for(let i =0; i < records.length; i+=25) {
+            let batch = {
+                "RequestItems":{
+                    "HeraGameRecord" : []
+                } 
             }
-        })
-        batch.RequestItems.HeraGameRecord = saveArray;
+            let saveArray = [];
+            for(let j = i; j< i+25;j ++){
+                let item = records[j]
+                if(item) {
+                    saveArray.push({
+                        PutRequest : {
+                            Item : item
+                        }
+                    })
+                }
+                
+            }
+            batch.RequestItems.HeraGameRecord = saveArray;
+            sumBatch.push(batch);
+        }
+
+        let promises = sumBatch.map((b)  => this.db$("batchWrite", b));
+
         return new Promise((resolve, reject) => {
-            this.db$("batchWrite", batch).then((result) => {
+            Promise.all(promises).then((result) => {
                 resolve([null, result])
             }).catch((err) => {
-                console.log(err);
-                resolve([null,null]);
+                resolve([new CHeraErr(CODES.SystemError), null])
             });
         })
-        
     }
+    async page(keyConditions, conditions, returnValues = []) {
+        let opts = {
+            IndexName : "msnIndex",
+            Limit : pageSize,
+            ScanIndexForward : true,
+            FilterExpression : "msn=:msn and betTime>=:startTime and betTime<=:endTime and userName=:userName",
+            ExpressionAttributeValues : {
+                ":msn" : "5",
+                ":startTime" :0,
+                ":endTime" :0,
+                ":userName" : "zhangsan"
+            }
+        }
+    }
+    async page(currPage, pageSize, msn, userName, startTime, endTime, lastTime) {
+        //找到总数
+        let opts = {
+            IndexName : "msnIndex",
+            ScanIndexForward :false,
+            KeyConditionExpression : "betTime between :startTime and :endTime and msn=:msn",
+            ProjectionExpression : "betTime",
+            ExpressionAttributeValues : {
+                ":startTime":startTime,
+                ":endTime" :endTime,
+                ":msn" :msn
+            }
+        }
+        if(userName) {
+            opts.FilterExpression = "userName=:userName",
+            opts.ExpressionAttributeValues[":userName"] = userName;
+        }
+        let [countErr, count] = await this.count(opts);
+        if(countErr) {
+            return [countErr, null]
+        }
+        let page = {
+            total : count,
+            currPage: currPage,
+            pageSize : pageSize,
+            list : []
+        }
+        opts.Limit = pageSize;
+        let [pageErr, records] = await this.findRecords(opts, page);
+        page.pageSize = page.list.length;
+        if(pageErr){
+            return [pageErr, records];
+        }
+        return [pageErr, page];
+    }
+    async findRecords(opts, page) {
+        console.log(22);
+        console.log(opts.ExpressionAttributeValues[":endTime"]);
+        return new Promise((reslove, reject) => {
+            this.db$("query", opts).then((result) => {
+                console.log(result);
+                let lastRecord = result.LastEvaluatedKey;
+                page.list = page.list.concat(page.list, result.Items);
+                if(page.list.length >= page.pageSize) {
+                    page.list = page.list.slice(0, page.pageSize)
+                    reslove([null, page]);
+                } else if(lastRecord) {
+                    opts.ExpressionAttributeValues[":endTime"] = lastRecord.betTime;
+                    return this.findRecords(opts, page);
+                } else {
+                    reslove([null, page]);
+                }
+            }).catch((err) => {
+                console.log(err);
+                reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
+            });
+        })
+    }
+    async count(opts){
+        console.log("11111111111111");
+        console.log(opts);
+        opts.Select = "COUNT";
+        return new Promise((reslove, reject) => {
+            this.db$("query", opts).then((result) => {
+                delete opts.Select
+                reslove([null, result.Count])
+            }).catch((err) => {
+                delete opts.Select
+                reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
+            });
+        })
+    }
+       
 }

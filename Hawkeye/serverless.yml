@@ -122,7 +122,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  toolList :  #道具列表
+  gameToolList :  #道具列表
     handler: emailApi.toolList
     events:
       - http:
@@ -130,14 +130,41 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  agentMix:  #代理洗码点
-    handler: agentApi.agentMix
+  toolList:  #道具列表
+    handler: openApi_tool.toolList
     events:
       - http:
-          path: /agent/mix
+          path: /game/tool/list
+          method: get
+          cors: true
+  seatList:  #席位列表
+    handler: openApi_tool.seatList
+    events:
+      - http:
+          path: /game/seat/list
+          method: get
+          cors: true
+  packageList:  #道具包列表
+    handler: openApi_tool.packageList
+    events:
+      - http:
+          path: /game/package/list
+          method: get
+          cors: true
+  buy:  #购买道具
+    handler: openApi_tool.playerBuyProp
+    events:
+      - http:
+          path: /game/prop/buy
           method: post
           cors: true
-          authorizer: tokenVerify
+  buyDiamonds:  #购买钻石
+    handler: openApi_tool.playerBuyDiamonds
+    events:
+      - http:
+          path: /game/diamonds/buy
+          method: post
+          cors: true
 resources:
   Resources:
     HawkeyePlayerEmailRecord: #玩家接收邮件记录

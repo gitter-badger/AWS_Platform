@@ -28,9 +28,10 @@ import {ToolPackageModel} from "./model/ToolPackageModel";
 
 import {Util} from "./lib/Util"
 
-
-const gamePlatform = "NA"
-
+/**
+ * 购买前处理
+ * @param {*} event 
+ */
 async function playerBufBefore(event) {
   //json转换
   console.log(event);
@@ -60,8 +61,6 @@ async function playerBufBefore(event) {
   //获取展位
   let toolSeatModel = new ToolSeatModel();
   let [toolErr, seatInfo] = await toolSeatModel.get({seatId});
-  console.log("abc:");
-  console.log(seatInfo);
   if(toolErr) {
     return [toolErr, null];
   }
@@ -109,7 +108,7 @@ async function playerBuyProp(event, context, callback) {
     return callback(null, ReHandler.fail(beforeErr));
   }
   if(seatInfo.seatType != SeatTypeEnum.tool) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.notDiamonds)));
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.notPros)));
   }
  
   let {userId, userName} = userInfo;
@@ -289,13 +288,9 @@ async function toolList(event, context, callback) {
       return callback(null, ReHandler.fail(toolErr));
   }
   let returnArr = [];
-  console.log(toolList);
-  toolList.forEach(function(element) {
-      let {toolId,  toolName,  order, icon, toolStatus, desc} = element;
-      returnArr.push({toolId,  toolName,  order, icon, toolStatus, desc});
-  }, this);
-  returnArr.sort((a, b) =>  b.order - a.order)
-  callback(null, ReHandler.success({list : returnArr}));
+  
+  toolList.sort((a, b) =>  b.order - a.order)
+  callback(null, ReHandler.success({list : toolList}));
 }
 
 /**
@@ -337,9 +332,9 @@ async function seatList(event, context, callback) {
  */
 async function packageList(event, context, callback) {
   let packageModel = new PackageModel();
-  let [scanErr, list] = await seatModel.scan();
-  if(scanErr) {
-    return callback(null, ReHandler.fail(scanErr));
+  let [packageErr, list] = await packageModel.scan();
+  if(packageErr) {
+    return callback(null, ReHandler.fail(packageErr));
   }
   list.sort((a, b) =>  b.order - a.order);
   callback(null, ReHandler.success({list}));

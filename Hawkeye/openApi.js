@@ -26,7 +26,7 @@ import {Util} from "./lib/Util"
 const info = async(e, c, cb) => {
   console.log(e);
   //json转换
-  let [parserErr, requestParams] = athena.Util.parseJSON(e.body);
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
 
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
     //检查参数是否合法
@@ -48,8 +48,9 @@ const info = async(e, c, cb) => {
   }
   cb(null, ReHandler.success({data:noticeInfo}));
 }
+
 /**
- * 根据ID获取公告信息
+ * 根据ID获取邮件信息
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
@@ -57,7 +58,7 @@ const info = async(e, c, cb) => {
 const emailInfo = async(e, c, cb) => {
   console.log(e);
   //json转换
-  let [parserErr, requestParams] = athena.Util.parseJSON(e.body);
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
 
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
     //检查参数是否合法
@@ -88,7 +89,7 @@ const emailInfo = async(e, c, cb) => {
  */
 const acceptMail = async(e, c, cb) => {
   //json转换
-  let [parserErr, requestParams] = athena.Util.parseJSON(e.body);
+  let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
     //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([

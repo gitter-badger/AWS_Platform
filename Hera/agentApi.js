@@ -51,18 +51,27 @@ export async function agentPlayerList(event, context, cb) {
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
+    let userId = requestParams.fromUserId || tokenInfo.userId
     let err, userList;
     //如果是平台管理员，可以查看所有的玩家信息
 
     if(role == RoleCodeEnum.Agent) {
         //找到所有下级
-        let [childrenError, childrenList] = await new MerchantModel().agentChildListByUids([tokenInfo.userId]);
-        if(childrenError) return ResFail(cb, childrenError)
-        let buIds = childrenList.map((item) => +item.displayId);
-        buIds.push(+displayId);
+        // let [childrenError, childrenList] = await new MerchantModel().agentChildListByUids([tokenInfo.userId]);
+        // if(childrenError) return ResFail(cb, childrenError)
+        // let buIds = childrenList.map((item) => +item.displayId);
+        // buIds.push(+displayId);
+        // let userModel = new UserModel();
+        // //找到代理所有用户
+        // [err, userList] = await userModel.findByBuIds(buIds);
+        let [agentErr, agentInfo] = await new MerchantModel().findByUserId(userId);
+        if(agentErr) return ResFail(cb, childrenError);
+        if(!agentInfo){
+            return ResFail(cb, new CHeraErr(CODES.AgentNotExist))
+        }
         let userModel = new UserModel();
         //找到代理所有用户
-        [err, userList] = await userModel.findByBuIds(buIds);
+        [err, userList] = await userModel.findByBuIds([+agentInfo.displayId]);
     }else {
         return ResOK(cb, { list: []})
     }
@@ -110,7 +119,8 @@ export async function agentPlayerCudian(event, context, cb){
     if(!userInfo) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
     }
-    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(tokenInfo.userId);
+    let userId = requestParams.fromUserId || tokenInfo.userId;
+    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId();
 
     if(queryMerchantError) {
         return ResFail(cb, queryMerchantError); 
@@ -163,7 +173,8 @@ export async function agentPlayerQudian(event, context, cb){
     if(!userInfo) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
     }
-    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(tokenInfo.userId);
+    let userId = requestParams.fromUserId || tokenInfo.userId; //如果传了userID，则扣除userId账户的点数
+    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(userId);
 
     if(queryMerchantError) {
         return ResFail(cb, queryMerchantError); 
@@ -374,7 +385,7 @@ export async function createPlayer(event, context, cb) {
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
-        {name : "userName", type:"S", min:6, max:12},
+        {name : "userName", type:"S", min:6, max:16},
         {name : "userPwd", type:"S", min:6, max :16},
         {name : "points", type:"N"},
         {name : "liveMix", type:"N",min:0}, //真人洗码比
@@ -552,6 +563,38 @@ export async function updatePassword(event, context, cb) {
     }
     ResOK(cb, {data : {
         password
+    }});
+}
+
+/**
+ * 代理洗码比
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+export async function agentMix(event, context, cb) {
+    const [tokenErr, token] = await Model.currentToken(event);
+    if (tokenErr) {
+        return ResFail(cb, tokenErr)
+    }
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    if(e) {
+        return ResFail(cb, e)
+    }
+    let {userId} = tokenInfo;
+    //获取商家信息
+    const merchant = new MerchantModel();
+    const [queryMerchantError, merchantInfo] = await merchant.findByUserId(userId);
+    if(queryMerchantError) {
+        return ResFail(cb, queryMerchantError)
+    }
+    if(!merchantInfo) {
+        return ResFail(cb, new CHeraErr(CODES.AgentNotExist)); 
+    }
+    let {liveMix, vedioMix} = merchantInfo;
+    ResOK(cb, {data : {
+        liveMix,
+        vedioMix
     }});
 }
 

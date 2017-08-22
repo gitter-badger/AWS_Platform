@@ -36,7 +36,7 @@ const gamePlatform = "NA"
 
 function validateIp(event, merchant) {
   let loginWhiteStr = merchant.loginWhiteList;
-  let whiteList = loginWhiteStr.split(",");
+  let whiteList = loginWhiteStr.split(";");
   whiteList.forEach(function(element) {
     element.trim();
   }, this);
@@ -746,16 +746,16 @@ async function playerGameRecord(event, context, callback) {
     return callback(null, ReHandler.fail(parseRecordErr));
   }
   records = list;
+  console.log(records.length)
   let batchSaveArr = [];
-  records = records.slice(0,2);
-  console.log(records);
   for(let i = 0; i <records.length; i++) {
     let record = records[i];
-    let {userId, userName, betId, betTime} = record;
+    let {userId, userName, betId, betTime, msn} = record;
     batchSaveArr.push({
       userId,
       userName, 
       betId : betId+"",
+      msn:msn+"",
       betTime : new Date(betTime).getTime(),
       record
     })
@@ -786,6 +786,54 @@ async function validateGame(event, params = []){
   return [null, [], userInfo, requestParams]
 }
 
+/**
+ * 获取玩家游戏记录
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function getPlayerGameRecord(event, context, callback) {
+  //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+  //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "apiKey", type:"S", min:1},
+      {name : "curPage", type:"N"},
+      {name : "pageSize", type:"N"},
+      {name : "startTime", type:"N"},
+      {name : "lastTime", type:"N"}, //最后一条数据的记录
+      {name : "endTime", type:"N"},
+      {name : "buId", type:"N"}
+  ], requestParams);
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return callback(null, ReHandler.fail(checkAttError));
+  } 
+  let {buId, apiKey, curPage, pageSize, startTime, endTime, userName, lastTime} = requestParams;
+
+  //检查商户信息是否正确
+  const merchant = new MerchantModel();
+  const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);
+  if(queryMerchantError) return callback(null, ReHandler.fail(queryMerchantError));
+  if(!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)){
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
+  } 
+  // let msn = merchantInfo.msn;
+  let msn = "000";
+  //验证白名单
+  // let white = validateIp(event, merchantInfo);
+  // if(!white) {
+  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  // }
+  let gameRecordModel = new GameRecordModel();
+  let [pageErr, page] = await gameRecordModel.page(curPage, pageSize, msn, userName, startTime, endTime, lastTime);
+  if(pageErr) {
+    return callback(null, ReHandler.fail(pageErr));
+  }
+  callback(null, ReHandler.success({page}));
+}
+
 
 export{
   gamePlayerRegister, //玩家注册
@@ -799,4 +847,5 @@ export{
   updatePassword, //修改密码
   updateUserInfo,  //修改用户基本信息
   playerGameRecord, //玩家记录
+  getPlayerGameRecord, //获取玩家游戏记录
 }
