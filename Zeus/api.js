@@ -67,27 +67,22 @@ const adminNew = async (e, c, cb) => {
  * 用户注册
  */
 const userNew = async (e, c, cb) => {
-  const errRes = { m: 'userNew error', /*input: e*/ }
   const res = { m: 'userNew' }
   // 从POST 的body中获取提交数据
   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
-  //检查参数是否合法
+  // 检查参数是否合法
   let [checkAttError, errorParams] = new UserCheck().checkUser(userInfo)
   if (checkAttError) {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
-  // 获取身份令牌
-  const [tokenErr, token] = await Model.currentToken(e)
+  // 要求管理员角色
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
   if (tokenErr) {
     return ResErr(cb, tokenErr)
-  }
-  //创建用户账号的只能是管理员或线路商
-  if (token.role != RoleCodeEnum['PlatformAdmin'] && token.role != RoleCodeEnum['Manager']) {
-    return [BizErr.TokenErr('must admin/manager token'), 0]
   }
   // 业务操作
   const [registerUserErr, resgisterUserRet] = await RegisterUser(token, Model.addSourceIP(e, userInfo))
@@ -97,7 +92,7 @@ const userNew = async (e, c, cb) => {
   new LogModel().addOperate(Model.addSourceIP(e, userInfo), registerUserErr, resgisterUserRet)
   // 结果返回
   if (registerUserErr) {
-    return ResFail(cb, { ...errRes, err: registerUserErr }, registerUserErr.code)
+    return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code)
   }
 
   return ResOK(cb, { ...res, payload: resgisterUserRet })
@@ -107,7 +102,6 @@ const userNew = async (e, c, cb) => {
  * 用户登录
  */
 const userAuth = async (e, c, cb) => {
-  const errRes = { m: 'userAuth error'/*, input: e*/ }
   const res = { m: 'userAuth' }
   // 输入参数转换与校验
   const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
@@ -126,7 +120,7 @@ const userAuth = async (e, c, cb) => {
   new LogModel().addLogin(Model.addSourceIP(e, userLoginInfo), loginUserErr, Model.addSourceIP(e, loginUserRet))
   // 结果返回
   if (loginUserErr) {
-    return ResFail(cb, { ...errRes, err: loginUserErr }, loginUserErr.code)
+    return ResFail(cb, { ...res, err: loginUserErr }, loginUserErr.code)
   }
   return ResOK(cb, { ...res, payload: loginUserRet })
 }
@@ -211,7 +205,6 @@ const userChangeStatus = async (e, c, cb) => {
  * 检查用户是否被占用
  */
 const checkUserExist = async (e, c, cb) => {
-  const errRes = { m: 'checkUserExist error'/*, input: e*/ }
   const res = { m: 'checkUserExist' }
   // 入参转换和校验
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -219,7 +212,7 @@ const checkUserExist = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   if (!inparam.role || !inparam.suffix || !inparam.username) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+    return ResFail(cb, { ...res, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
   // 获取身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
@@ -237,7 +230,7 @@ const checkUserExist = async (e, c, cb) => {
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     return ResOK(cb, { ...res, payload: ret })
   }
@@ -247,7 +240,6 @@ const checkUserExist = async (e, c, cb) => {
  * 检查前缀是否被占用
  */
 const checkSuffixExist = async (e, c, cb) => {
-  const errRes = { m: 'checkSuffixExist error'/*, input: e*/ }
   const res = { m: 'checkSuffixExist' }
   // 入参转换和校验
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -255,7 +247,7 @@ const checkSuffixExist = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   if (!inparam.role || !inparam.suffix) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+    return ResFail(cb, { ...res, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
   // 获取身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
@@ -273,7 +265,7 @@ const checkSuffixExist = async (e, c, cb) => {
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, null)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     return ResOK(cb, { ...res, payload: ret })
   }
@@ -283,7 +275,6 @@ const checkSuffixExist = async (e, c, cb) => {
  * 检查昵称是否被占用
  */
 const checkNickExist = async (e, c, cb) => {
-  const errRes = { m: 'checkNickExist error'/*, input: e*/ }
   const res = { m: 'checkNickExist' }
   // 入参转换和校验
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -291,7 +282,7 @@ const checkNickExist = async (e, c, cb) => {
     return ResErr(cb, jsonParseErr)
   }
   if (!inparam.role || !inparam.displayName) {
-    return ResFail(cb, { ...errRes, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
+    return ResFail(cb, { ...res, err: BizErr.InparamErr() }, BizErr.InparamErr().code)
   }
   // 获取身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
@@ -309,7 +300,7 @@ const checkNickExist = async (e, c, cb) => {
   let [err, ret] = await new UserModel().checkNickExist(inparam.role, inparam.displayName)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     return ResOK(cb, { ...res, payload: ret })
   }
@@ -356,7 +347,6 @@ const adminCenter = async (e, c, cb) => {
  */
 const childList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'childList err'/*, input: e*/ }
   const res = { m: 'childList' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr) {
@@ -372,13 +362,13 @@ const childList = async (e, c, cb) => {
   }
   // 只能查看自己下级
   if (parseInt(token.role) > parseInt(params.childRole)) {
-    return ResErr(cb, BizErr.InparamErr('no right'))
+    return ResErr(cb, BizErr.InparamErr('只能查看下级用户'))
   }
   // 业务操作
   const [err, ret] = await new UserModel().listChildUsers(params, params.childRole)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   }
   // 查询每个用户余额
   for (let user of ret) {
@@ -393,7 +383,6 @@ const childList = async (e, c, cb) => {
  * 更新密码
  */
 const updatePassword = async (e, c, cb) => {
-  const errRes = { m: 'updatePassword error'/*, input: e*/ }
   const res = { m: 'updatePassword' }
   // 入参转换和校验
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -411,14 +400,14 @@ const updatePassword = async (e, c, cb) => {
   if (tokenErr) {
     return ResErr(cb, tokenErr)
   }
-  // 只有管理员有权限
-  if (token.role != RoleCodeEnum['PlatformAdmin'] && (token.userId != inparam.userId)) {
-    return [BizErr.TokenErr('no right!'), 0]
+  // 只有管理员/自己有权限
+  if (!Model.isPlatformAdmin(token) && !Model.isSelf(token, inparam)) {
+    return [BizErr.TokenErr('只有管理员/自己可以操作'), 0]
   }
   // 查询用户
   const [queryErr, user] = await new UserModel().queryUserById(inparam.userId)
   if (queryErr) {
-    return ResFail(cb, { ...errRes, err: queryErr }, err.code)
+    return ResFail(cb, { ...res, err: queryErr }, err.code)
   }
   // 更新用户密码
   user.password = inparam.password
@@ -430,7 +419,7 @@ const updatePassword = async (e, c, cb) => {
   new LogModel().addOperate(inparam, err, ret)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     return ResOK(cb, { ...res, payload: ret })
   }

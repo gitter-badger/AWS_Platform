@@ -215,6 +215,13 @@ export const Model = {
     }
     return false
   },
+  // 判断是否是自己
+  isSelf(token, user) {
+    if (token.userId == user.userId) {
+      return true
+    }
+    return false
+  },
   // 判断是否是下级
   isChild(token, user) {
     let parent = token.userId
