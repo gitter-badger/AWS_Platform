@@ -87,15 +87,18 @@ export class BaseModel{
     async scan(conditions){
         let filterExpression = "";
         let expressionAttributeValues = {};
+        let expressionAttributeNames = {};
         for(let key in conditions){
-            filterExpression += `${key}=:${key} and `;
+            filterExpression += `#${key}=:${key} and `;
             expressionAttributeValues[`:${key}`] = conditions[key];
+            expressionAttributeNames[`#${key}`]  = key;
         }
         let scanOpts = {};
         if(filterExpression.length!=0){
             filterExpression = filterExpression.substr(0, filterExpression.length-4);
             scanOpts = {
                 FilterExpression : filterExpression,
+                ExpressionAttributeNames : expressionAttributeNames,
                 ExpressionAttributeValues:expressionAttributeValues
             }
         }

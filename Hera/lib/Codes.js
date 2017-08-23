@@ -37,6 +37,7 @@ export const CODES = {
     AgentBalanceIns : 14002, //代理点数不足
     nicknameAlreadyExist : 14003,  //昵称已存在
     mixError : 14004,//洗码比有误
+    merchantForzen : 14005,  //商户已冻结
 
 }
 
@@ -71,7 +72,8 @@ const errorMessage = {
   "14001" : "你没有权限",
   "14002" : "你的点数不足",
   "14003" : "昵称已存在",
-  "14004" : "洗码比有误"
+  "14004" : "洗码比有误",
+  "14005" : "商户已冻结"
 }
 
 

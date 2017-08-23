@@ -165,6 +165,13 @@ functions:
           path: /game/diamonds/buy
           method: post
           cors: true
+  advertList:  #广告列表
+    handler: openApi_ad.advertList
+    events:
+      - http:
+          path: /game/advert/list
+          method: get
+          cors: true
 resources:
   Resources:
     HawkeyePlayerEmailRecord: #玩家接收邮件记录

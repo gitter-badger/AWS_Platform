@@ -114,7 +114,7 @@ const gameEmail = async(e, c, cb) => {
     console.log(record);
     let emid = record.emid.S;
     let pushModel = new PushModel();
-    let [er] = await pushModel.pushGameNotice(emid);
+    let [er] = await pushModel.pushGameEamil(emid);
     if(er) {
         console.info("广播推送失败");
         console.info(er);
@@ -122,9 +122,21 @@ const gameEmail = async(e, c, cb) => {
         console.info("广播推送成功");
     }
 }
+const gameAdvert = async(e, c, cb) => {
+    let pushModel = new PushModel();
+    let [er] = await pushModel.pushGameAdvert(1+"");
+    if(er) {
+        console.info("广告推送失败");
+        console.info(er);
+    }else {
+        console.info("广告推送成功");
+    }
+}
+
 export {
     userTrigger,                     // 用户表触发器
     playerBalanceTrigger,
     gameNotice,
-    gameEmail
+    gameEmail,
+    gameAdvert //广告
 }

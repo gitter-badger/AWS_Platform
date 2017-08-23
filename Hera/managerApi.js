@@ -55,11 +55,23 @@ export async function gamePlayerList(event, context, cb) {
     let err, userList;
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
+        console.log("guangliyuan");
         [err, userList] = await userModel.scan(requestParams);
-    }else if(role == RoleCodeEnum.Merchant) { //如果是商家或者代理
+    }else if(role == RoleCodeEnum.Merchant) { //如果是商家
         requestParams = requestParams || {};
         requestParams.buId = displayId;
         [err, userList] = await userModel.scan(requestParams);
+    }else if(role == RoleCodeEnum.Manager){  //如果是线路商
+        console.log("这是线路商");
+        //找到所有下级商户
+        let merchantModel = new MerchantModel();
+        let [merListErr, merchantList] = await merchantModel.agentChildListByUids([tokenInfo.userId]);
+        if(merListErr) {
+            return ResFail(cb, merListErr)
+        }
+        let merchantIds = merchantList.map((merchant) => merchant.displayId);
+        console.log(merchantIds);
+        [err, userList] = await userModel.findByBuIds(merchantIds);
     }else {
         return ResOK(cb, { list: [] })
     }
@@ -76,8 +88,7 @@ export async function gamePlayerList(event, context, cb) {
     userList = userList || [];
     userList.forEach(function(element) {
             delete element.userPwd
-        }, this);
-    
+    }, this);
     ResOK(cb, {list: userList});
 }
 

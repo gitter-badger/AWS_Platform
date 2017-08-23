@@ -153,6 +153,14 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  childrenAgent:  #下级代理
+    handler: agentApi.childrenAgent
+    events:
+      - http:
+          path: /agent/children/list
+          method: post
+          cors: true
+          authorizer: tokenVerify
   agentPlayerList:  #代理玩家列表
     handler: agentApi.agentPlayerList
     events:
@@ -238,7 +246,7 @@ resources:
             AttributeName: betId
             AttributeType: S
           -
-            AttributeName: msn
+            AttributeName: parentId
             AttributeType: S
           -
             AttributeName: betTime
@@ -255,10 +263,10 @@ resources:
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
-            IndexName: msnIndex
+            IndexName: parentIdIndex
             KeySchema:
               -
-                AttributeName: msn
+                AttributeName: parentId
                 KeyType: HASH
               -
                 AttributeName: betTime

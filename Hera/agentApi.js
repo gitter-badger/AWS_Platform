@@ -38,7 +38,7 @@ const ResFail = (callback, res) => {
 export async function agentPlayerList(event, context, cb) {
     console.log(event);
     //json转换
-    let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
     if(parserErr) return cb(null, ReHandler.fail(parserErr));
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
@@ -49,12 +49,13 @@ export async function agentPlayerList(event, context, cb) {
         return ResFail(cb, e)
     }
     let role = tokenInfo.role;
+    let parent = tokenInfo.parent;
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
+    let flag  = false;
+    if(requestParams.fromUserId) flag = true;
     let userId = requestParams.fromUserId || tokenInfo.userId
     let err, userList;
-    //如果是平台管理员，可以查看所有的玩家信息
-
     if(role == RoleCodeEnum.Agent) {
         //找到所有下级
         // let [childrenError, childrenList] = await new MerchantModel().agentChildListByUids([tokenInfo.userId]);
@@ -64,14 +65,18 @@ export async function agentPlayerList(event, context, cb) {
         // let userModel = new UserModel();
         // //找到代理所有用户
         // [err, userList] = await userModel.findByBuIds(buIds);
-        let [agentErr, agentInfo] = await new MerchantModel().findByUserId(userId);
-        if(agentErr) return ResFail(cb, childrenError);
-        if(!agentInfo){
-            return ResFail(cb, new CHeraErr(CODES.AgentNotExist))
+        if(parent == "00" && !flag) {
+            [err, userList] = await userModel.scan({msn:"000"});
+        }else {
+            let [agentErr, agentInfo] = await new MerchantModel().findByUserId(userId);
+            if(agentErr) return ResFail(cb, childrenError);
+            if(!agentInfo){
+                return ResFail(cb, new CHeraErr(CODES.AgentNotExist))
+            }
+            let userModel = new UserModel();
+            //找到代理所有用户
+            [err, userList] = await userModel.findByBuIds([+agentInfo.displayId]);
         }
-        let userModel = new UserModel();
-        //找到代理所有用户
-        [err, userList] = await userModel.findByBuIds([+agentInfo.displayId]);
     }else {
         return ResOK(cb, { list: []})
     }
@@ -85,6 +90,7 @@ export async function agentPlayerList(event, context, cb) {
     
     ResOK(cb, {list: userList});
 }
+
 /**
  * 玩家存点
  * @param {*} event 
@@ -120,7 +126,7 @@ export async function agentPlayerCudian(event, context, cb){
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
     }
     let userId = requestParams.fromUserId || tokenInfo.userId;
-    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId();
+    const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(userId);
 
     if(queryMerchantError) {
         return ResFail(cb, queryMerchantError); 
@@ -128,6 +134,7 @@ export async function agentPlayerCudian(event, context, cb){
     if(!merchantInfo) {
         return ResFail(cb, new CHeraErr(CODES.AgentNotExist)); 
     }
+    
     let [cudianErr] = await cudian(userInfo, merchantInfo, requestParams);
     if(cudianErr) {
         return ResFail(cb, cudianErr);
@@ -360,7 +367,62 @@ export async function gamePlayerInfo(event, context, cb) {
     delete user.token;
     return ResOK(cb, user);
 }
-
+/**
+ * 下级代理
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+export async function childrenAgent(event, context, cb) {
+    const [tokenErr, token] = await Model.currentToken(event);
+    if (tokenErr) {
+        return ResFail(cb, tokenErr)
+    }
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    if(e) {
+        return ResFail(cb, e)
+    }
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+    if(parserErr) {
+        return ResFail(cb, parserErr);
+    }
+    //创建者信息
+    let {userId,username, role, parent, liveMix, vedioMix} = tokenInfo;
+    //获取所有下级代理
+    let merchant = new MerchantModel();
+    let queryMerchantError, agentList;
+    if(parent == "00") {
+        [queryMerchantError, agentList] = await merchant.scan({role:RoleCodeEnum.Agent});
+        for(let i = 0; i < agentList.length; i++) {
+            let agent = agentList[i];
+            if(agent.parent == '00') {
+                agentList.splice(i, 1);
+                break;
+            }
+        }
+    }else {
+        [queryMerchantError, agentList] = await merchant.agentChildListByUids([userId]);
+        if(!queryMerchantError) agentList.unshift({
+            userId,
+            username,
+            liveMix,
+            vedioMix
+        })
+    }
+    
+    if(queryMerchantError) {
+        return cb(null, ReHandler.fail(queryMerchantError));
+    }
+    let returnArr = agentList.map((item) => {
+        return {
+            userId : item.userId,
+            username : item.username,
+            liveMix : item.liveMix,
+            vedioMix : item.vedioMix
+        }
+    })
+    ResOK(cb, {list : returnArr});
+}   
 
 /**
  * 创建玩家
@@ -385,22 +447,25 @@ export async function createPlayer(event, context, cb) {
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
+        {name : "parentId", type:"S"},
         {name : "userName", type:"S", min:6, max:16},
         {name : "userPwd", type:"S", min:6, max :16},
         {name : "points", type:"N"},
         {name : "liveMix", type:"N",min:0}, //真人洗码比
         {name : "vedioMix", type:"N",min:0}, //电子游戏洗码比
-        {name : "remark", type:"S", min:1, max:200},
     ], requestParams);
     if(checkAttError){
         Object.assign(checkAttError, {params: errorParams});
         return cb(null, ReHandler.fail(checkAttError));
     } 
     //创建者信息
-    let {userId,username} = tokenInfo;
+    let {userId,username, role} = tokenInfo;
+    if(role != RoleCodeEnum.Agent) {
+        return ResFail(cb, new CHeraErr(CODES.NotAuth)); 
+    }
     //获取商家信息
     const merchant = new MerchantModel();
-    const [queryMerchantError, merchantInfo] = await merchant.findByUserId(userId);
+    const [queryMerchantError, merchantInfo] = await merchant.findByUserId(requestParams.parentId);
 
     if(queryMerchantError) {
         return ResFail(cb, queryMerchantError); 
@@ -436,7 +501,7 @@ export async function createPlayer(event, context, cb) {
     userModel.cryptoPassword();
     
     //代理余额
-    let [agentBError, agentBalance] = await new MerchantBillModel({userId}).getBlance();
+    let [agentBError, agentBalance] = await new MerchantBillModel({userId:requestParams.parentId}).getBlance();
     agentBalance += +merchantInfo.points;  //需要加上初始点数
     if(agentBError)return ResFail(cb, agentBError);
     if(agentBalance < requestParams.points) {

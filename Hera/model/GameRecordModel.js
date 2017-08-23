@@ -69,14 +69,14 @@ import {
 
 
 export class GameRecordModel extends BaseModel{
-    constructor({record, userId, userName,betTime, betId, gameId, msn} = {}) {
+    constructor({record, userId, userName,betTime, betId, gameId, parentId} = {}) {
         super(Tables.HeraGameRecord);
         this.userId = userId; //用户ID
         this.userName = userName; //用户名
         this.gameId = gameId;
         this.betId = betId;  //投注编号
         this.betTime = betTime;  //投注时间
-        this.msn = msn;
+        this.parentId = parentId; //上一级ID
         this.record = record; //记录，包含所有的详情
     }
     async batchWrite(records) {
@@ -97,7 +97,6 @@ export class GameRecordModel extends BaseModel{
                         }
                     })
                 }
-                
             }
             batch.RequestItems.HeraGameRecord = saveArray;
             sumBatch.push(batch);
@@ -113,31 +112,16 @@ export class GameRecordModel extends BaseModel{
             });
         })
     }
-    async page(keyConditions, conditions, returnValues = []) {
-        let opts = {
-            IndexName : "msnIndex",
-            Limit : pageSize,
-            ScanIndexForward : true,
-            FilterExpression : "msn=:msn and betTime>=:startTime and betTime<=:endTime and userName=:userName",
-            ExpressionAttributeValues : {
-                ":msn" : "5",
-                ":startTime" :0,
-                ":endTime" :0,
-                ":userName" : "zhangsan"
-            }
-        }
-    }
-    async page(currPage, pageSize, msn, userName, startTime, endTime, lastTime) {
+    async page(currPage, pageSize, parentId, userName, startTime, endTime, lastTime) {
         //找到总数
         let opts = {
-            IndexName : "msnIndex",
+            IndexName : "parentIdIndex",
             ScanIndexForward :false,
-            KeyConditionExpression : "betTime between :startTime and :endTime and msn=:msn",
-            ProjectionExpression : "betTime",
+            KeyConditionExpression : "betTime between :startTime and :endTime and parentId=:parentId",
             ExpressionAttributeValues : {
                 ":startTime":startTime,
                 ":endTime" :endTime,
-                ":msn" :msn
+                ":parentId" :parentId
             }
         }
         if(userName) {
@@ -155,45 +139,51 @@ export class GameRecordModel extends BaseModel{
             list : []
         }
         opts.Limit = pageSize;
-        let [pageErr, records] = await this.findRecords(opts, page);
+        let [pageErr] = await this.findRecords(opts, page);
         page.pageSize = page.list.length;
+        page.list.forEach((item, index) => {
+            page.list[index] = page.list[index].record;
+        })
         if(pageErr){
             return [pageErr, records];
         }
         return [pageErr, page];
     }
     async findRecords(opts, page) {
-        console.log(22);
-        console.log(opts.ExpressionAttributeValues[":endTime"]);
+        let [dbErr, result] = await this.db(opts);
+        if(dbErr) {
+            console.log(dbErr);
+            return [dbErr, null];
+        }
+        let lastRecord = result.LastEvaluatedKey;
+        page.list = page.list.concat(page.list, result.Items);
+        if(page.list.length >= page.pageSize) {
+            page.list = page.list.slice(0, page.pageSize)
+            return [null, page]
+        } else if(lastRecord) {
+            opts.ExpressionAttributeValues[":startTime"] = lastRecord.betTime+1;
+            return this.findRecords(opts, page);
+        } else {
+            return [null, page];
+        }
+    }
+    async db(opts) {
         return new Promise((reslove, reject) => {
             this.db$("query", opts).then((result) => {
-                console.log(result);
-                let lastRecord = result.LastEvaluatedKey;
-                page.list = page.list.concat(page.list, result.Items);
-                if(page.list.length >= page.pageSize) {
-                    page.list = page.list.slice(0, page.pageSize)
-                    reslove([null, page]);
-                } else if(lastRecord) {
-                    opts.ExpressionAttributeValues[":endTime"] = lastRecord.betTime;
-                    return this.findRecords(opts, page);
-                } else {
-                    reslove([null, page]);
-                }
+                reslove([null, result]);
             }).catch((err) => {
-                console.log(err);
                 reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
             });
         })
     }
     async count(opts){
-        console.log("11111111111111");
-        console.log(opts);
         opts.Select = "COUNT";
         return new Promise((reslove, reject) => {
             this.db$("query", opts).then((result) => {
                 delete opts.Select
                 reslove([null, result.Count])
             }).catch((err) => {
+                console.log(err);
                 delete opts.Select
                 reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
             });
