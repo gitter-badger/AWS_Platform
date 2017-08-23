@@ -114,9 +114,10 @@ const agentOne = async (e, c, cb) => {
     if (paramsErr || !params.id) {
         return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
     }
-    const [tokenErr, token] = await Model.currentToken(e)
+    // 获取令牌，只有代理有权限
+    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
     if (tokenErr) {
-        return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+        return ResErr(cb, tokenErr)
     }
     // 业务操作
     const [err, ret] = await new UserModel().getUser(params.id, RoleCodeEnum['Agent'])
@@ -137,9 +138,10 @@ const agentList = async (e, c, cb) => {
     if (paramsErr) {
         return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
     }
-    const [tokenErr, token] = await Model.currentToken(e)
+    // 获取令牌，只有代理有权限
+    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
     if (tokenErr) {
-        return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+        return ResErr(cb, tokenErr)
     }
     // 业务操作
     const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Agent, inparam)
@@ -172,10 +174,10 @@ const agentUpdate = async (e, c, cb) => {
         Object.assign(checkAttError, { params: errorParams })
         return ResErr(cb, checkAttError)
     }
-    // 身份令牌校验
-    const [tokenErr, token] = await Model.currentToken(e)
+    // 获取令牌，只有代理有权限
+    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
     if (tokenErr) {
-        return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+        return ResErr(cb, tokenErr)
     }
     // 业务操作
     const [err, ret] = await new UserModel().getUser(inparam.userId, RoleCodeEnum['Agent'])
@@ -210,10 +212,10 @@ const availableAgents = async (e, c, cb) => {
     if (jsonParseErr) {
         return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
     }
-    // 身份令牌校验
-    const [tokenErr, token] = await Model.currentToken(e)
+    // 获取令牌，只有代理有权限
+    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
     if (tokenErr) {
-        return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+        return ResErr(cb, tokenErr)
     }
     // 业务操作
     const [err, ret] = await new UserModel().listAvailableAgents(token, inparam)

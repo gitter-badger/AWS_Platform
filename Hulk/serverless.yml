@@ -102,7 +102,7 @@ functions:
     events:
       -
         http:
-          path: agentList/{onlyChild}
+          path: agentList/{parent}
           method: get
           cors: true
           authorizer: tokenAuth

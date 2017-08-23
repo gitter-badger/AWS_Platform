@@ -49,6 +49,11 @@ const adList = async (e, c, cb) => {
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
   }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
   // 业务操作
   let [err, ret] = await new AdModel().list(inparam)
   // 结果返回
@@ -62,10 +67,16 @@ const adList = async (e, c, cb) => {
  * 单个
  */
 const adOne = async (e, c, cb) => {
+  // 入参数据
   const res = { m: 'adOne' }
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
   if (jsonParseErr) {
     return ResErr(cb, jsonParseErr)
+  }
+  // 获取令牌，只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
   }
   let [err, ret] = await new AdModel().getOne(inparam)
   if (err) {
