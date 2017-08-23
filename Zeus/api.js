@@ -343,7 +343,7 @@ const adminCenter = async (e, c, cb) => {
     return ResErr(cb, tokenErr)
   }
   // 业务操作
-  const [err, admin] = await new UserModel().theAdmin(token)
+  const [err, admin] = await new UserModel().getUser(token.userId, token.role)
   // 结果返回
   if (err) {
     return ResErr(cb, err)
