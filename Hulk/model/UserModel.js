@@ -52,7 +52,7 @@ export class UserModel extends BaseModel {
             }
         }
         // 查询用户直属代理
-        if (inparam.parent) {
+        if (inparam.parent && inparam.parent != '0' && inparam.parent && 'false') {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role and parent = :parent',
