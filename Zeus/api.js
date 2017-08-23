@@ -188,11 +188,18 @@ const userChangeStatus = async (e, c, cb) => {
     user.contractPeriod = inparam.contractPeriod
   }
   const [err, ret] = await new UserModel().userUpdate(user)
-
   // 操作日志记录
   inparam.operateAction = '变更用户状态'
   inparam.operateToken = token
   new LogModel().addOperate(inparam, err, ret)
+
+  // 更新所有子用户状态
+  const [allChildErr, allChildRet] = await new UserModel().listAllChildUsers(user)
+  for (let child of allChildRet) {
+    child.status = inparam.status
+    new UserModel().userUpdate(child)
+  }
+
   // 结果返回
   if (err) {
     return ResFail(cb, { ...res, err: err }, err.code)

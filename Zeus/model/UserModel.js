@@ -222,6 +222,27 @@ export class UserModel extends BaseModel {
     }
 
     /**
+     * 查看所有下级用户
+     * @param {*} token 
+     */
+    async listAllChildUsers(token) {
+        let query = {
+            FilterExpression: 'contains(#levelIndex,:levelIndex)',
+            ExpressionAttributeNames: {
+                '#levelIndex': 'levelIndex'
+            },
+            ExpressionAttributeValues: {
+                ':levelIndex': token.userId
+            }
+        }
+        const [queryErr, queryRet] = await this.scan(query)
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        return [0, queryRet.Items]
+    }
+
+    /**
      * 检查用户是否重复
      * @param {*} role 
      * @param {*} suffix 
