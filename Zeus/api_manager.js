@@ -18,7 +18,7 @@ const managerList = async (e, c, cb) => {
   }
   // 只有管理员/线路商有权限
   if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
-    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有管理员/线路商有权限'))
   }
   // 业务操作
   const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Manager)
@@ -58,7 +58,7 @@ const managerOne = async (e, c, cb) => {
   }
   // 只有管理员/线路商有权限
   if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
-    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有管理员/线路商有权限'))
   }
   // 业务操作
   const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
@@ -105,7 +105,7 @@ const managerUpdate = async (e, c, cb) => {
   }
   // 只有管理员/线路商有权限
   if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
-    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有管理员/线路商有权限'))
   }
   // 业务操作
   const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
@@ -143,7 +143,7 @@ const avalibleManagers = async (e, c, cb) => {
   }
   // 只有管理员/线路商有权限
   if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
-    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有管理员/线路商有权限'))
   }
   const [err, ret] = await new UserModel().listAvalibleManagers()
   if (err) {

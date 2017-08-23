@@ -174,11 +174,11 @@ const userChangeStatus = async (e, c, cb) => {
   }
   // 平台用户只能平台管理员/父辈操作
   if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isSubChild(token, user)) {
-    return ResErr(cb, [BizErr.TokenErr('平台用户只能平台管理员/父辈操作'), 0])
+    return ResErr(cb, BizErr.TokenErr('平台用户只能平台管理员/父辈操作'))
   }
   // 代理用户只能代理管理员/父辈操作
   if (Model.isAgent(user) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, user)) {
-    return ResErr(cb, [BizErr.TokenErr('代理用户只能代理管理员/父辈操作'), 0])
+    return ResErr(cb, BizErr.TokenErr('代理用户只能代理管理员/父辈操作'))
   }
   // 更新用户
   user.status = inparam.status
@@ -221,10 +221,10 @@ const checkUserExist = async (e, c, cb) => {
   }
   //创建用户账号的只能是平台管理员或代理
   if (!Model.isAgent(inparam) && !Model.isPlatformAdmin(token)) {
-    return ResErr(cb,[BizErr.TokenErr('只有平台管理员有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有平台管理员有权限'))
   }
   if (Model.isAgent(token) && !Model.isAgent(token)) {
-    return ResErr(cb,[BizErr.TokenErr('只有代理有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有代理有权限'))
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
@@ -256,10 +256,10 @@ const checkSuffixExist = async (e, c, cb) => {
   }
   //创建用户账号的只能是平台管理员或代理
   if (!Model.isAgent(inparam) && !Model.isPlatformAdmin(token)) {
-    return ResErr(cb,[BizErr.TokenErr('只有平台管理员有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有平台管理员有权限'))
   }
   if (Model.isAgent(token) && !Model.isAgent(token)) {
-    return ResErr(cb,[BizErr.TokenErr('只有代理有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有代理有权限'))
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, null)
@@ -291,10 +291,10 @@ const checkNickExist = async (e, c, cb) => {
   }
   //创建用户账号的只能是平台管理员或代理
   if (!Model.isAgent(inparam) && !Model.isPlatformAdmin(token)) {
-    return ResErr(cb,[BizErr.TokenErr('只有平台管理员有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有平台管理员有权限'))
   }
   if (Model.isAgent(token) && !Model.isAgent(token)) {
-    return ResErr(cb,[BizErr.TokenErr('只有代理有权限'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有代理有权限'))
   }
   // 业务操作
   let [err, ret] = await new UserModel().checkNickExist(inparam.role, inparam.displayName)
@@ -402,7 +402,7 @@ const updatePassword = async (e, c, cb) => {
   }
   // 只有管理员/自己有权限
   if (!Model.isPlatformAdmin(token) && !Model.isSelf(token, inparam)) {
-    return ResErr(cb,[BizErr.TokenErr('只有管理员/自己可以操作'), 0])
+    return ResErr(cb, BizErr.TokenErr('只有管理员/自己可以操作'))
   }
   // 查询用户
   const [queryErr, user] = await new UserModel().queryUserById(inparam.userId)
