@@ -108,11 +108,11 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   // 初始点数
   const initPoints = CheckUser.points
   // 检查余额
-  const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
+  const [queryBalanceErr, queryBalanceRet] = await new BillModel().checkUserBalance(parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
-  if (initPoints > balance) {
+  if (initPoints > queryBalanceRet.lastBalance) {
     return [BizErr.BalanceErr(), 0]
   }
 

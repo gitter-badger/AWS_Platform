@@ -126,7 +126,7 @@ export class BillModel extends BaseModel {
      * @param {*} billInfo 
      */
     async billTransfer(from, billInfo) {
-        // move out user input sn
+        // 输入数据处理
         billInfo = Omit(billInfo, ['sn', 'fromRole', 'fromUser', 'action'])
         const [toUserErr, to] = await new UserModel().getUserByName(billInfo.toRole, billInfo.toUser)
         if (toUserErr) {
@@ -140,13 +140,9 @@ export class BillModel extends BaseModel {
             ...Role,
             ...from
         }, Keys(Role))
-        if (!fromInparam.role || !fromInparam.username) {
-            return [BizErr.ParamErr('Param error,invalid transfer. from** null')]
-        }
         if (fromInparam.username == billInfo.toUser) {
-            return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
+            return [BizErr.ParamErr('不允许自我转账')]
         }
-
         // 存储账单流水
         const Bill = {
             ...Model.baseModel(),
