@@ -28,11 +28,11 @@ const billOne = async (e, c, cb) => {
     return ResErr(cb, queryErr)
   }
   // 操作权限
-  if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isChild(token, user) && user.userId != token.userId) {
-    return [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能查看'), 0]
+  if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isSubChild(token, user) && user.userId != token.userId) {
+    return ResErr(cb, [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能查看'), 0])
   }
   if (Model.isAgent(user) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, user) && user.userId != token.userId) {
-    return [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能查看'), 0]
+    return ResErr(cb, [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能查看'), 0])
   }
   // 查询余额
   const [balanceErr, balance] = await new BillModel().checkUserBalance(user)
@@ -71,14 +71,14 @@ const billList = async (e, c, cb) => {
   // 查询用户信息
   const [queryUserErr, user] = await new UserModel().queryUserById(inparam.userId)
   if (queryUserErr) {
-    return [queryUserErr, 0]
+    return ResErr(cb, [queryUserErr, 0])
   }
   // 操作权限
-  if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isChild(token, user) && user.userId != token.userId) {
-    return [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能查看'), 0]
+  if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isSubChild(token, user) && user.userId != token.userId) {
+    return ResErr(cb,[BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能查看'), 0])
   }
   if (Model.isAgent(user) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, user) && user.userId != token.userId) {
-    return [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能查看'), 0]
+    return ResErr(cb,[BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能查看'), 0])
   }
   // 业务查询
   const [queryErr, bills] = await new BillModel().computeWaterfall(user.points, inparam.userId)
@@ -116,11 +116,11 @@ const billTransfer = async (e, c, cb) => {
     return ResFail(cb, queryErr)
   }
   // 操作权限
-  if (!Model.isAgent(fromUser) && !Model.isPlatformAdmin(token) && !Model.isChild(token, fromUser) && fromUser.userId != token.userId) {
-    return [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能操作'), 0]
+  if (!Model.isAgent(fromUser) && !Model.isPlatformAdmin(token) && !Model.isSubChild(token, fromUser) && fromUser.userId != token.userId) {
+    return ResErr(cb, [BizErr.TokenErr('平台用户只有平台管理员/直属上级/自己能操作'), 0])
   }
   if (Model.isAgent(fromUser) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, fromUser) && fromUser.userId != token.userId) {
-    return [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能操作'), 0]
+    return ResErr(cb, [BizErr.TokenErr('代理用户只有代理管理员/父辈/自己能操作'), 0])
   }
   // 获取目的账户
   const [queryErr2, toUser] = await new UserModel().getUserByName(transferInfo.toRole, transferInfo.toUser)
@@ -181,7 +181,7 @@ const logList = async (e, c, cb) => {
     inparam.parent = token.userId
   }
   else {
-    return [BizErr.TokenErr('身份权限错误'), 0]
+    return ResErr(cb,[BizErr.TokenErr('身份权限错误'), 0])
   }
 
   // 业务操作

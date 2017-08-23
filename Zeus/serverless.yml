@@ -244,6 +244,7 @@ functions:
           path: check_msn/{msn}
           method: get
           cors: true
+          authorizer: tokenAuth
   lockmsn: #锁定/解锁线路号，接口编号：
     handler: api_msn.lockmsn
     events:
