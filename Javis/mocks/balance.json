@@ -1,0 +1,18 @@
+{"Records":[
+     { 
+        "eventID": "6f0291c4bdfbe4aab4dd2ac74eb9d9c4",
+        "eventName": "MODIFY",
+        "eventVersion": "1.1",
+        "eventSource": "aws:dynamodb",
+        "awsRegion": "ap-southeast-1",
+        "dynamodb": { 
+            "ApproximateCreationDateTime": 1502074740,
+            "Keys" : 
+                {
+                    "userId": { "N": "631944" },
+                    "userName": { "S": "CN_test02" } 
+                }
+        }
+    }
+ ]
+}

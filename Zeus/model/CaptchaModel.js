@@ -1,17 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import {Tables,Store$,Codes,BizErr,Empty,Model,Keys,Pick,Omit,RoleCodeEnum,RoleModels} from '../lib/all'
 
 import { BaseModel } from './BaseModel'
 
@@ -34,12 +21,6 @@ export class CaptchaModel extends BaseModel {
      * @param {*} userLoginInfo 登录信息
      */
     async checkCaptcha(userLoginInfo) {
-        // 数据类型转换
-        userLoginInfo.captcha = parseInt(userLoginInfo.captcha)
-        // 数据校验
-        if (!userLoginInfo.captcha) {
-            return [BizErr.CaptchaErr(), 0]
-        }
         // 完整用户名处理
         let suffix = 'Platform'
         if (userLoginInfo.suffix) {
@@ -64,6 +45,9 @@ export class CaptchaModel extends BaseModel {
         } else if (ret.Items.length == 0) {
             return [BizErr.CaptchaErr(), 0]
         } else {
+            if(Model.timeStamp() - ret.Items[0].updatedAt > 30000){
+                return [BizErr.CaptchaErr('验证码超时'), 0]
+            }
             return [0, ret]
         }
     }

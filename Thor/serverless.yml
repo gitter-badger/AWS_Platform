@@ -1,0 +1,209 @@
+
+service: Thor
+plugins:
+  - serverless-webpack
+custom:
+  webpackIncludeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  iamRoleStatements:
+      -
+        Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:Scan
+        Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
+          
+functions:
+  tokenAuth:
+    handler: api.jwtverify
+    integration: lambda
+  # ==================== 以下是道具管理接口服务 ====================
+  toolNew: #创建道具
+    handler: api_tool.toolNew
+    events:
+      -
+        http:
+          path: toolNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolList: #道具列表
+    handler: api_tool.toolList
+    events:
+      -
+        http:
+          path: toolList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolOne: #单个道具
+    handler: api_tool.toolOne
+    events:
+      -
+        http:
+          path: toolOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolChangeStatus: #变更道具状态
+    handler: api_tool.toolChangeStatus
+    events:
+      -
+        http:
+          path: toolChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolUpdate: #道具更新
+    handler: api_tool.toolUpdate
+    events:
+      -
+        http:
+          path: toolUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  toolDelete: #道具删除
+    handler: api_tool.toolDelete
+    events:
+      -
+        http:
+          path: toolDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是道具包管理接口服务 ====================
+  packageNew: #创建道具包
+    handler: api_package.packageNew
+    events:
+      -
+        http:
+          path: packageNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageList: #道具包列表
+    handler: api_package.packageList
+    events:
+      -
+        http:
+          path: packageList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageOne: #单个道具包
+    handler: api_package.packageOne
+    events:
+      -
+        http:
+          path: packageOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageChangeStatus: #变更道具包状态
+    handler: api_package.packageChangeStatus
+    events:
+      -
+        http:
+          path: packageChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageUpdate: #道具包更新
+    handler: api_package.packageUpdate
+    events:
+      -
+        http:
+          path: packageUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  packageDelete: #道具包删除
+    handler: api_package.packageDelete
+    events:
+      -
+        http:
+          path: packageDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是席位管理接口服务 ====================
+  seatNew: #创建席位
+    handler: api_seat.seatNew
+    events:
+      -
+        http:
+          path: seatNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatList: #席位列表
+    handler: api_seat.seatList
+    events:
+      -
+        http:
+          path: seatList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatOne: #单个席位
+    handler: api_seat.seatOne
+    events:
+      -
+        http:
+          path: seatOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatChangeStatus: #变更席位状态
+    handler: api_seat.seatChangeStatus
+    events:
+      -
+        http:
+          path: seatChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatUpdate: #席位更新
+    handler: api_seat.seatUpdate
+    events:
+      -
+        http:
+          path: seatUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatDelete: #席位删除
+    handler: api_seat.seatDelete
+    events:
+      -
+        http:
+          path: seatDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatType: #展位列表
+    handler: api_seat.seatType
+    events:
+      -
+        http:
+          path: seatType
+          method: get
+          cors: true
+          authorizer: tokenAuth

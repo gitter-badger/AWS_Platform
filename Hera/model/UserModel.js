@@ -1,17 +1,24 @@
 let  athena  = require("../lib/athena");
 let {RoleCodeEnum} = require("../lib/Consts");
+import {Model} from "../lib/Dynamo"
 import {TABLE_NAMES} from "../config";
 import {Util} from "../lib/Util"
 
-const State = {
+export const State = {
     normal : 1,  //正常,
-    forzen : 2 //冻结
+    forzen : 0 //冻结
 }
-
+const SexEnum = {
+    man : 1,
+    woman : 2
+}
+export const PaymentState = {  //是否可以进行转账操作
+    allow :1 ,//允许
+    forbid : 2 //禁止（正在游戏中不能转账）
+}
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic} = {}) {
         super(TABLE_NAMES.TABLE_USER);
-        this.userId = Util.uuid();
         this.userName = userName;
         this.userPwd = userPwd;
         this.buId = +buId;
@@ -22,6 +29,10 @@ export class UserModel extends athena.BaseModel {
         this.merchantName = merchantName;
         this.balance = 0;
         this.msn = msn;
+        this.sex = sex || 0;
+        this.nickname = nickname || Model.StringValue;
+        this.headPic = headPic || Model.StringValue;
+        this.payState = paymentState || PaymentState.allow;
     }
 
 
@@ -32,8 +43,31 @@ export class UserModel extends athena.BaseModel {
     isExist(userName) {
         return super.isExist({userName});
     }
+    isGames(user) {
+        return user.payState == PaymentState.forbid;
+    }
     cryptoPassword(){
         this.userPwd = Util.sha256(this.userPwd);
+    }
+    updateGameState(userName, state){
+        return this.update({userName}, {payState: state})
+    }
+    async save(len, num){
+        len = len || 6;
+        num = num || -1;
+        this.userId = Util.userId(len);
+        let [err, userInfo] = await this.get({userId:this.userId},[], "userIdIndex");
+        num ++;
+        if(err) return [err, 0];
+        if(userInfo) { //重新找
+            if(num%2 ==0) {
+                num = 0;
+                len ++;
+            }
+            return this.save(len, num);
+        }else {
+            return super.save();
+        }
     }
     list(buId){
         let scanParams = {

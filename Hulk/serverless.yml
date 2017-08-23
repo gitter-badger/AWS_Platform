@@ -1,0 +1,218 @@
+
+service: Hulk
+plugins:
+  - serverless-webpack
+custom:
+  webpackIncludeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  iamRoleStatements:
+      -
+        Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:Scan
+        Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
+          
+functions:
+  tokenAuth:
+    handler: api.jwtverify
+    integration: lambda
+  # ==================== 以下是账单和日志接口服务 ====================
+  billTransfer: # 转账
+    handler: api.billTransfer
+    events:
+      -
+        http:
+          path: billTransfer
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  billOne: # 单个账单
+    handler: api.billOne
+    events:
+      -
+        http:
+          path: bills/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  billList: # 账单列表
+    handler: api.billList
+    events:
+      -
+        http:
+          path: waterfall/{userId}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  logList: #日志列表
+    handler: api.logList
+    events:
+      -
+        http:
+          path: logList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是代理接口服务 ====================
+  agentAdminNew: # 代理管理员注册
+    handler: api_agent.agentAdminNew
+    events:
+      -
+        http:
+          path: agentAdminNew
+          method: post
+          cors: true
+          # authorizer: tokenAuth
+  agentNew: # 代理注册
+    handler: api_agent.agentNew
+    events:
+      -
+        http:
+          path: agentNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  agentLogin: # 代理登录
+    handler: api_agent.agentLogin
+    events:
+      -
+        http:
+          path: agentLogin
+          method: post
+          cors: true
+  agentList: # 代理列表
+    handler: api_agent.agentList
+    events:
+      -
+        http:
+          path: agentList/{parent}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  agentOne: # 单个代理
+    handler: api_agent.agentOne
+    events:
+      -
+        http:
+          path: agentOne/{id}
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  availableAgents: # 可用代理列表
+    handler: api_agent.availableAgents
+    events:
+      -
+        http:
+          path: availableAgents
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  agentUpdate: # 代理更新
+    handler: api_agent.agentUpdate
+    events:
+      -
+        http:
+          path: agentUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是公告管理接口服务 ====================
+  adNew: #创建公告
+    handler: api_ad.adNew
+    events:
+      -
+        http:
+          path: adNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adList: #公告列表
+    handler: api_ad.adList
+    events:
+      -
+        http:
+          path: adList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adOne: #单个公告
+    handler: api_ad.adOne
+    events:
+      -
+        http:
+          path: adOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adChangeStatus: #变更公告状态
+    handler: api_ad.adChangeStatus
+    events:
+      -
+        http:
+          path: adChangeStatus
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adUpdate: #公告更新
+    handler: api_ad.adUpdate
+    events:
+      -
+        http:
+          path: adUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adDelete: #公告删除
+    handler: api_ad.adDelete
+    events:
+      -
+        http:
+          path: adDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  # ==================== 以下是帮助中心接口服务 ====================
+  helpGenreList: 
+    handler: api_help.helpGenreList
+    events:
+      -
+        http:
+          path: /help/genres
+          method: get
+          cors: true
+          authorizer: tokenAuth
+  helpCreateGenre: 
+    handler: api_help.createHelpGenre
+    events:
+      -
+        http:
+          path: /help/genre/create
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  createHelp: 
+    handler: api_help.createHelp
+    events:
+      -
+        http:
+          path: /help/create
+          method: post
+          cors: true
+          authorizer: tokenAuth

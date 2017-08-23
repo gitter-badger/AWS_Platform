@@ -5,31 +5,46 @@ import {Util} from "../lib/Util"
 
 import {CODES, CHeraErr} from "../lib/Codes";
 
+import {Model} from "../lib/Dynamo"
+
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser} = {}) {
+    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
-        this.userId = userId
+        this.userId = +userId
         this.action = +action;
         this.userName = userName;
         this.msn = msn;
-        this.type = type;
         this.fromRole = fromRole;
-        this.toRole = toRole;
+        this.toRole = toRole || Model.StringValue;
         this.fromUser = fromUser;
-        this.toUser = toUser;
-        this.merchantName = merchantName;
+        this.toUser = toUser || Model.StringValue;
+        this.merchantName = merchantName || Model.StringValue;
         this.originalAmount = 0;
         this.operator = operator;
         this.createAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
-        if(this.action == Action.reflect) this.amount = -this.amount;
-        this.type = this.action == Action.recharge ? Type.recharge : Type.withdrawals
+        this.seatInfo = seatInfo;
+        this.kindId = kindId || -1;  //-1表示中心钱包的
+        this.toolId = toolId || -1;
+        this.toolName = toolName || Model.StringValue;
+        this.type = type;
+        this.remark = remark || Model.StringValue;
+        this.setAmount(amount);
+        this.typeName = typeName;
+        this.gameType = gameType;
     }
-
+    setAmount(amount){
+        if(this.action ==-1) {
+            if(amount > 0)  this.amount = -amount;
+        }
+        if(this.action == 1){
+            if(amount < 0) this.amount = -amount;
+        }
+    }
     async getBalance(){
         let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], "userNameIndex", true);
         if(err) return [err, 0];
@@ -40,14 +55,20 @@ export class UserBillModel extends athena.BaseModel {
         });
         return [null, sumMount];
     }
-    async list(userName){
+    
+    async list(userName, gameId){
         let scanParams = {
             TableName : this.tableName,
-            FilterExpression : "userName=:userName",
+            FilterExpression : "userName=:userName ",
             ExpressionAttributeValues : {
                 ":userName" : userName
             }
         }
+        if(gameId) {
+            scanParams.FilterExpression +="and gameId=:gameId";
+            scanParams.ExpressionAttributeValues[":gameId"] = gameId;
+        }
+        
         return new Promise((reslove, reject) => {
             this.db$("scan", scanParams).then((result)=>{
                 return reslove([null, result.Items]);
@@ -56,7 +77,16 @@ export class UserBillModel extends athena.BaseModel {
             })
         })
     }
-
+    async getBalanceByUid(userId){
+        let [err, records] = await this.get({userId}, ["userName","amount","userId"], "userIdIndex", true);
+        if(err) return [err, 0];
+        records = records || [];
+        let sumMount = 0;
+        records.forEach(function(element) {
+            sumMount += element.amount;
+        });
+        return [null, sumMount];
+    }
     carryPoint(){
         return this.save();
     }
@@ -85,5 +115,7 @@ export const Action = {
 //账单类型
 export const Type = {
     recharge : 1, //中心钱包转入平台钱包
-    withdrawals : 2 //平台转入中心钱包
+    withdrawals : 2, //平台转入中心钱包
+    gameSettlement : 3, //游戏结算
+    buyTool : 4,  //购买游戏道具
 }

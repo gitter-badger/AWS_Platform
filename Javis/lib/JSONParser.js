@@ -9,11 +9,20 @@ export const JSONParser = (data) => {
     : (_.isObject(data)
       ? JSON.stringify(data)
       : '')
-  const [err,ret] = JSONParse(parsed)
+  const [err, ret] = JSONParse(parsed)
   if (err) {
-    return [BizErr.JSONParseErr(),0]
+    return [BizErr.JSONParseErr(), 0]
   }
-  return [0,ret]
+  // 统一输入数据trim处理
+  for (let i in ret) {
+    if (typeof (ret[i]) == 'string') {
+      ret[i] = ret[i].trim()
+      if (ret[i] == 'NULL!' || ret[i] == '') {
+        ret[i] = null
+      }
+    }
+  }
+  return [0, ret]
 }
 export const Trim = _.trim
 export const Empty = _.isEmpty

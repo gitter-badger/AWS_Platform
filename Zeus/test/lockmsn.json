@@ -8,11 +8,10 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "cheney",
-      "userId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783",
+      "username": "Platform_NAtest",
+      "userId": "1507fbca-605d-43b2-ba09-3def94880eba",
       "parent": "00",
-      "role": "1",
-      "principalId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783"
+      "role": "1"
     },
     "identity": {
       "sourceIp": "127.0.0.1"

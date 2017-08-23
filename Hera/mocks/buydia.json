@@ -1,0 +1,6 @@
+{
+    "body": "{\"userId\":\"188444\",\"seatId\":\"80ea2649-94cd-4527-94a5-a95c69952b8d\", \"num\":\"1\",  \"amount\":\"12\", \"kindId\":\"10\"}",
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BODhBX2RheTAwMiIsInN1ZmZpeCI6Ik5BODhBIiwidXNlcklkIjoxODg0NDQsImlhdCI6MTUwMjg1NjUzM30.xthLmbQx6vX-nj17zfCW4uzEx5iCGnvoPWP3gFt8MSU"
+    }
+}

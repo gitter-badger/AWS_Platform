@@ -19,6 +19,10 @@ export const MSNStatusEnum ={
   Locked:2,
   Free: 0
 }
+export const ToolIdEnum = {
+  diamonds : "165353"
+}
+
 export const BillModel = {
   sn: Model.uuid(),
   fromRole: Model.StringValue,
@@ -41,6 +45,15 @@ export const GameTypeEnum = {
   '0':'TableGame',
   '1':'VideoGame',
   '2':'LiveGame'
+}
+// 展位类型枚举
+export const SeatTypeEnum = {
+  diamonds : "1",
+  tool : "2"
+}
+export const SeatContentEnum = {
+  package : "2",
+  tool : "1"
 }
 const UserRole = {
   userId:Model.uuid(),

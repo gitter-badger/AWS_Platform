@@ -4,11 +4,13 @@ import { BizErr,Codes } from './lib/Codes'
 
 import {Success, Fail} from "./lib/Response";
 
+import athena from "./lib/athena"
+
 import {PlatformUserModel} from "./model/PlatformUserModel"
 
 import {PlatformBillModel} from "./model/PlatformBillModel"
 
-import {RoleCodeEnum} from "./lib/Consts";
+import {RoleCodeEnum} from "./lib/all";
 
 const Utils = {
     getweekFirstTime : function(date){
@@ -161,7 +163,7 @@ const salePointsInfo = async (event, context, cb) => {
 const statisticsDetail = async (event, context, cb) => {
   //json转换
   event = event || {};
-  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters);
+  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters || {});
   if(parserErr){
        return callback(null, Fail(parserErr));
   }
@@ -195,18 +197,25 @@ const statisticsDetail = async (event, context, cb) => {
 const statisticsListByDay = async(event, context ,cb) => {
 
   //json转换
-  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters);
+  let [parserErr, requestParams] = Util.parseJSON(event.queryStringParameters || {});
   if(parserErr){
        return callback(null, Fail(parserErr));
   }
+    //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+    {name : "date", type:"N"},
+  ], requestParams);
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return callback(null, ReHandler.fail(checkAttError));
+  } 
+
   let firstTime = Utils.setFirst(new Date(requestParams.date)).getTime();
   let endTime = Utils.setEnd(new Date(requestParams.date)).getTime();
   let billModel = new PlatformBillModel();
   let userModel = new PlatformUserModel();
 
   let [error, list] = await billModel.statistics(5, firstTime, endTime); 
-  console.log("111111111111111");
-  console.log(list); 
   if(error){
       return callback(null, Fail(error));
   }

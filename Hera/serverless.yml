@@ -26,7 +26,7 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
-  tokenAuth:
+  tokenVerify:
     handler: managerApi.jwtverify
     integration: lambda
   gamePlayerRegister: #玩家注册
@@ -43,6 +43,27 @@ functions:
           path: /player
           method: post
           cors: true
+  updatePassword:     #玩家修改密码
+    handler: openApi.updatePassword
+    events:
+      - http:
+          path: /{userName}/password
+          method: post
+          cors: true
+  updateInfo:     #玩家修改基本信息
+    handler: openApi.updateUserInfo
+    events:
+      - http:
+          path: /game/player/info
+          method: post
+          cors: true
+  A3Login:     #玩家A3游戏登陆
+    handler: openApi.gamePlayerA3Login
+    events:
+      - http:
+          path: /game/login
+          method: post
+          cors: true
   gamePlayerBalance:    #玩家充值/提现
     handler: openApi.gamePlayerBalance
     events:
@@ -57,6 +78,62 @@ functions:
           path: /player/{userName}/balance
           method: get
           cors: true
+  A3Balance:  #获取A3余额
+    handler: openApi.getA3GamePlayerBalance
+    events:
+      - http:
+          path: /game/player/balance
+          method: get
+          cors: true
+  joinGame:  #玩家进入游戏
+    handler: openApi.joinGame
+    events:
+      - http:
+          path: /game/player/join
+          method: post
+          cors: true
+  toolList:  #道具列表
+    handler: openApi_tool.toolList
+    events:
+      - http:
+          path: /game/tool/list
+          method: get
+          cors: true
+  seatList:  #席位列表列表
+    handler: openApi_tool.seatList
+    events:
+      - http:
+          path: /game/seat/list
+          method: get
+          cors: true
+  packageList:  #道具包列表
+    handler: openApi_tool.packageList
+    events:
+      - http:
+          path: /game/package/list
+          method: get
+          cors: true
+  buy:  #购买道具
+    handler: openApi_tool.playerBuyProp
+    events:
+      - http:
+          path: /game/prop/buy
+          method: post
+          cors: true
+  buyDiamonds:  #购买钻石
+    handler: openApi_tool.playerBuyDiamonds
+    events:
+      - http:
+          path: /game/diamonds/buy
+          method: post
+          cors: true
+  playerRecord:  #获取玩家记录验证
+    handler: openApi.playerRecordValidate
+    events:
+      - http:
+          path: /game/bill/verify
+          method: post
+          cors: true
   gamePlayerList:  #获取玩家列表
     handler: managerApi.gamePlayerList
     events:
@@ -64,23 +141,31 @@ functions:
           path: /player/list
           method: get
           cors: true
-          authorizer: tokenAuth
+          authorizer: tokenVerify
   gamePlayerInfo:  #玩家详情页面
     handler: managerApi.gamePlayerInfo
     events:
       - http:
-          path: /player/bill/{userName}
+          path: /player/bill/info
           method: get
           cors: true
-          authorizer: tokenAuth
+          authorizer: tokenVerify
   gamePlayerForzen:  #冻结/解冻玩家 1解冻,2,冻结
     handler: managerApi.gamePlayerForzen
     events:
       - http:
-          path: /player/forzen/{userName}
-          method: get
+          path: /player/forzen
+          method: post
           cors: true
-          authorizer: tokenAuth
+          authorizer: tokenVerify
+  batchForzen:  #批量冻结/解冻玩家 1解冻,2,冻结
+    handler: managerApi.batchForzen
+    events:
+      - http:
+          path: /player/batch/forzen
+          method: post
+          cors: true
+          authorizer: tokenVerify
 resources:
   Resources:
     HeraGamePlayer:
@@ -91,43 +176,40 @@ resources:
           -
             AttributeName: userName
             AttributeType: S
-        KeySchema:
           -
-            AttributeName: userName
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    HeraGamePlayerBill:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGamePlayerBill
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: createAt
+            AttributeName: userId
             AttributeType: N
         KeySchema:
           -
             AttributeName: userName
             KeyType: HASH
-          -
-            AttributeName: createAt
-            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
-            IndexName: userNameIndex
+            IndexName: userIdIndex
             KeySchema:
               -
-                AttributeName: userName
+                AttributeName: userId
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+    HeraGameRecord:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGameRecord
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

@@ -243,9 +243,20 @@ class Page {
 }
 
 export const RegEnum = {
-    NUMBER: /^[0-9]+$/,
+    SUFFIX: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}$/,
+
+    DISPLAYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{4,10}$/,
+    USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    USERNAME_UPDATE: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}_[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    PASSWORD: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    HOSTNAME: /^[\u4E00-\u9FA5A-Za-z]{2,16}$/,
+
+    EMAIL: /^([a-zA-Z0-9_-]){1,16}@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/,
+
+    RATE: /^(\d{1,2}(\.\d{1,2})?|100(\.0{1,2})?)$/,
     PRICE: /^[0-9]+([.]{1}[0-9]{1,2})?$/,
-    EMAIL: /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+
+    NUMBER: /^[0-9]+$/
 }
 
 export class Util {
@@ -271,7 +282,7 @@ export class Util {
                 return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0];
             }
             case "N": {
-                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
+                if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];
                 let [e, v] = this.parseNumber(value);
                 if (e) return [e, 0];
                 let error = false;
@@ -285,8 +296,8 @@ export class Util {
                 return this.parseJSON(value);
             }
             case "REG": {
-                if (!value) return [new AError(CODES.INPARAM_ERROR), null];
-                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+                if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];
+                return !equal.test(value.toString()) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
             }
             case "NS": {
                 if (!value) {
@@ -314,7 +325,7 @@ export class Util {
                 if (!value) {
                     return [null, 0]
                 }
-                return !equal.test(value) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
+                return !equal.test(value.toString()) ? [new AError(CODES.INPARAM_ERROR), null] : [null, 0]
             }
             default: {
                 return [new AError(CODES.INPARAM_ERROR), null]

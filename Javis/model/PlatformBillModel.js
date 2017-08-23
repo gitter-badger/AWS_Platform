@@ -1,7 +1,7 @@
 let  athena  = require("../lib/athena");
 
 import {Tables} from "../lib/Dynamo"
-import {RoleCodeEnum, BillActionEnum} from "../lib/Consts";
+import {RoleCodeEnum, BillActionEnum} from "../lib/all";
 
 import {CODES, CHeraErr} from "../lib/Codes";
 
@@ -23,14 +23,16 @@ export class PlatformBillModel extends athena.BaseModel {
         // 售出， 成交量，累计收益
         let methods = [null,null, sale, volume, profit, list]
         let opts = {
-            FilterExpression : "(formRole=:role or formRole=:role2) and toRole=:toRole and #action = :action ",
+            FilterExpression : "(formRole=:role or formRole=:role2) and (toRole=:toRole or toRole=:toRole2) and #action = :action ",
             ExpressionAttributeNames : {
                 "#action" : "action"
             },
+            Select : "amount",
             ExpressionAttributeValues : {
                 ":role" : RoleCodeEnum.SuperAdmin,
                 ":role2" : RoleCodeEnum.Manager,
                 ":toRole" : RoleCodeEnum.Agent,
+                ":toRole2" : RoleCodeEnum.Merchant,
                 ":action" : -1
             },
             // AttributesToGet : ["amount","createdAt"],    
@@ -46,10 +48,14 @@ export class PlatformBillModel extends athena.BaseModel {
         return new Promise((reslove, reject) => {
             this.db$("scan",opts).then((result) => {
                 let records = result.Items || [];
+                if(!methods[type]) {
+                    return reslove(null, records);
+                }
                 //排序
                 records.sort((a, b) => {
                     return a.createdAt > b.createdAt
                 })
+                
                 return reslove( methods[type](records));
             }).catch((err) => {
                 return reslove([err, []]);

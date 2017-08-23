@@ -1,0 +1,38 @@
+
+{
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfdGVzdDAwMSIsInN1ZmZpeCI6IkNaU1kiLCJ1c2VySWQiOjk4NTg2NiwiaWF0IjoxNTAyMzM1ODY0fQ.sa5vv6HAQAgLSUNsvnxIygNW4OivplF5JHT11WUcinE"
+    },
+    "body":{
+        "userId" : "985866",
+        "gameId" : "30001",
+        "checkOutBalance" :21,
+
+    "records" : [
+        {
+            "amount" : 1,
+            "userId" : "397685",
+            "id":335369526361194500,
+            "gameId" : 21212,
+            "time":1499999926000,
+            "type":3
+        },
+        {
+            "amount" : 1,
+            "userId" : "397685",
+            "id":335369526361194500,
+            "gameId" : 21212,
+            "time":1499999926000,
+            "type":3
+        },
+        {
+            "amount" : 5,
+            "userId" : "397685",
+            "id":335369526361194500,
+            "gameId" : 21212,
+            "time":1499999926000,
+            "type":3
+        }
+    ]
+}
+}

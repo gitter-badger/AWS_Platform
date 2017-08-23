@@ -11,19 +11,17 @@ import {
     Omit,
     RoleCodeEnum,
     GameTypeEnum,
-    GameStatusEnum,
     RoleModels
 } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
-const tableName = "ZeusPlatformGame"
 export class GameModel extends BaseModel {
     constructor() {
         super()
         // 设置表名
         this.params = {
-            TableName: Tables.ZeusPlatformGame,
+            TableName: Tables.DianaPlatformGame,
         }
         // 设置对象属性
         this.item = {
@@ -38,16 +36,8 @@ export class GameModel extends BaseModel {
      * @param {*} gameInfo 
      */
     async addGame(gameInfo) {
-        // 数据类型处理
-        gameInfo.gameType = gameInfo.gameType.toString()
-        gameInfo.gameStatus = GameStatusEnum.Online;
-        gameInfo.gameRecommend = gameInfo.gameRecommend || Model.StringValue
-        gameInfo.gameImg = gameInfo.gameImg || Model.StringValue
-        gameInfo.company = gameInfo.company || Model.StringValue
-        gameInfo.ip = gameInfo.ip || Model.StringValue
-        gameInfo.port = gameInfo.port || Model.StringValue
         // 判断是否重复
-        const [existErr, exist] = await this.isExist({
+        let [existErr, exist] = await this.isExist({
             IndexName: 'GameNameIndex',
             KeyConditionExpression: 'gameType = :gameType and gameName = :gameName',
             ExpressionAttributeValues: {
@@ -60,6 +50,20 @@ export class GameModel extends BaseModel {
         }
         if (exist) {
             return [BizErr.ItemExistErr(), 0]
+        }
+        // 判断kindId是否重复
+        [existErr, exist] = await this.isExist({
+            IndexName: 'KindIdIndex',
+            KeyConditionExpression: 'kindId = :kindId',
+            ExpressionAttributeValues: {
+                ':kindId': gameInfo.kindId,
+            }
+        })
+        if (existErr) {
+            return [existErr, 0]
+        }
+        if (exist) {
+            return [BizErr.ItemExistErr('KindId已存在'), 0]
         }
         // 保存
         const item = {
@@ -75,29 +79,37 @@ export class GameModel extends BaseModel {
 
     /**
      * 游戏列表
-     * @param {*} pathParams 
+     * @param {*} inparam 
      */
-    async listGames(pathParams) {
-        if (Empty(pathParams)) {
-            return [BizErr.ParamMissErr(), 0]
-        }
-        const inputTypes = pathParams.gameType.split(',')
+    async listGames(inparam) {
+        // 分割类型
+        const inputTypes = inparam.gameType.split(',')
         const gameTypes = _.filter(inputTypes, (type) => {
-            return !!GameTypeEnum[type]
+            return !!GameTypeEnum[type].code
         })
         if (gameTypes.length === 0) {
             return [BizErr.ParamErr('game type is missing'), 0]
         }
-        // 组装条件
+
+        // 1、组装条件
         let ranges = _.map(gameTypes, (t, index) => {
             return `gameType = :t${index}`
         }).join(' OR ')
-        ranges += ' AND gameStatus <> :gameStatus'
+        ranges = '(' + ranges + ')'
+        // 添加查询条件
+        inparam.keyword ? ranges += ' AND contains(gameName,:gameName)' : 0
+        // ranges += ' AND gameStatus <> :gameStatus'
+
+        // 2、组装条件值
         const values = _.reduce(gameTypes, (result, t, index) => {
             result[`:t${index}`] = t
             return result
         }, {})
-        values[':gameStatus'] = 0
+        // 添加查询条件值
+        inparam.keyword ? values[':gameName'] = inparam.keyword : 0
+        // values[':gameStatus'] = 0
+
+        // 3、开始查询
         const [err, ret] = await this.scan({
             IndexName: 'GameTypeIndex',
             FilterExpression: ranges,
@@ -116,52 +128,58 @@ export class GameModel extends BaseModel {
      * @param {游戏ID} gameId 
      * @param {需要变更的状态} status 
      */
-    changeStatus(gameType, gameId, status) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                Key: {
-                    'gameType': gameType,
-                    'gameId': gameId
-                },
-                UpdateExpression: "SET gameStatus = :status",
-                ExpressionAttributeValues: {
-                    ':status': parseInt(status)
-                }
+    async changeStatus(gameType, gameId, status) {
+        const [err, ret] = await this.updateItem({
+            ...this.params,
+            Key: {
+                'gameType': gameType,
+                'gameId': gameId
+            },
+            UpdateExpression: "SET gameStatus = :status",
+            ExpressionAttributeValues: {
+                ':status': status
             }
-            this.db$('update', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), 0])
-                })
         })
+        return [err, ret]
     }
     /**
      * 查询单个游戏
      * @param {*} gameType 
      * @param {*} gameId 
      */
-    getOne(gameType, gameId) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                KeyConditionExpression: 'gameType = :gameType and gameId = :gameId',
-                ExpressionAttributeValues: {
-                    ':gameType': gameType,
-                    ':gameId': gameId
-                }
+    async getOne(gameType, gameId) {
+        const [err, ret] = await this.query({
+            KeyConditionExpression: 'gameType = :gameType and gameId = :gameId',
+            ExpressionAttributeValues: {
+                ':gameType': gameType,
+                ':gameId': gameId
             }
-            this.db$('query', params)
-                .then((res) => {
-                    if (res.Items.length > 0) {
-                        res = res.Items[0]
-                    }
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
         })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, ret.Items[0]]
+        } else {
+            return [0, 0]
+        }
+    }
+
+    /**
+     * 查询游戏的厂商对应的游戏
+     * @param {*} inparam 
+     */
+    async getByCompanyId(inparam) {
+        const [err, ret] = await this.scan({
+            FilterExpression: 'company.companyId = :companyId',
+            ExpressionAttributeValues: {
+                ':companyId': inparam.companyId,
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
     }
 }
 

@@ -1,21 +1,37 @@
 var net = require('net');
 
-const HOST = '192.168.3.98';
-const PORT = 20003;
-const proId = 9;  //协议
+import {
+  BizErr,
+  Codes
+} from '../lib/all'
 
-
-export const pushUserInfo =  (body) => {
+export const pushUserInfo =  (body, host, port, proId) => {
     let client = new net.Socket();
     let buffer = buildPayload(proId, JSON.stringify(body));
-    client.connect(PORT, HOST, function() {
-        client.write(JSON.stringify(body));
-    });
-    client.on('data', function(data) {
-        console.log('DATA: ' + data);
-        // 完全关闭连接
-        client.destroy();
-    });
+    return new Promise((reslove, reject) => {
+        console.log("请求连接");
+        console.log(port, host, proId);
+        client.connect(port, host, function() {
+            client.write(buffer);
+        });
+        client.on('data', function(data) {
+            // console.log(data.readUInt32LE(0,4).toString(10));
+            // console.log(data.readUInt32LE(4,8).toString(10));
+            let code = +data.readUInt32LE(8,12).toString(10);
+            // 完全关闭连接
+            client.destroy();
+            console.log("code:"+ code);
+            if(code != Codes.OK) {
+                reslove([BizErr.PushMerchantError(), {code:code}]);
+            }else {
+                reslove([null, 0]);
+            }
+        });
+        client.on("error", function(err){
+            reslove([BizErr.TcpErr(), 0]);
+        })
+    })
+    
     
 }
 

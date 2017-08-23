@@ -1,14 +1,9 @@
 
-service: Diana # NOTE: update this with your service name
-
-# Use the serverless-webpack plugin to transpile ES6
+service: Diana
 plugins:
   - serverless-webpack
-
-# Enable auto-packing of external modules
 custom:
   webpackIncludeModules: true
-
 
 provider:
   name: aws
@@ -32,16 +27,15 @@ provider:
             - Ref: AWS::Region
             - ":"
             - Ref: AWS::AccountId
-            - ":table/Zeus*"
+            - ":table/*"
           
-
 functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
-
-  gameNew:
-    handler: api.gameNew
+  # ==================== 以下是游戏管理接口服务 ====================
+  gameNew: #创建游戏
+    handler: api_game.gameNew
     events:
       -
         http:
@@ -49,8 +43,8 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  gameList:
-    handler: api.gameList
+  gameList: #游戏列表
+    handler: api_game.gameList
     events:
       -
         http:
@@ -58,8 +52,8 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  gameOne:
-    handler: api.gameOne
+  gameOne: #单个游戏
+    handler: api_game.gameOne
     events:
       -
         http:
@@ -67,8 +61,8 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  gameChangeStatus: 
-    handler: api.gameChangeStatus
+  gameChangeStatus: #变更游戏状态
+    handler: api_game.gameChangeStatus
     events:
       -
         http:
@@ -76,44 +70,18 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  billTransfer:
-    handler: api.billTransfer
+  gameType: #游戏类别
+    handler: api_game.gameType
     events:
       -
         http:
-          path: billTransfer
+          path: gameType
           method: post
           cors: true
           authorizer: tokenAuth
-  billOne:
-    handler: api.billOne
-    events:
-      -
-        http:
-          path: bills/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  billList:
-    handler: api.billList
-    events:
-      -
-        http:
-          path: waterfall/{userId}
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  logList: #日志列表，接口编号：
-    handler: api.logList
-    events:
-      -
-        http:
-          path: logList
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  companyNew:
-    handler: api.companyNew
+  # ==================== 以下是游戏厂商接口服务 ====================
+  companyNew: #创建游戏厂商
+    handler: api_company.companyNew
     events:
       -
         http:
@@ -121,8 +89,8 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  companyList:
-    handler: api.companyList
+  companyList: #游戏厂商列表
+    handler: api_company.companyList
     events:
       -
         http:
@@ -130,8 +98,8 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  companyOne:
-    handler: api.companyOne
+  companyOne: #单个厂商
+    handler: api_company.companyOne
     events:
       -
         http:
@@ -139,8 +107,8 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  companyChangeStatus:
-    handler: api.companyChangeStatus
+  companyChangeStatus: #变更厂商状态
+    handler: api_company.companyChangeStatus
     events:
       -
         http:
@@ -148,48 +116,3 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  helpGenreList: 
-    handler: api_server.helpGenreList
-    events:
-      -
-        http:
-          path: /help/genres
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  helpCreateGenre: 
-    handler: api_server.createHelpGenre
-    events:
-      -
-        http:
-          path: /help/genre/create
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  createHelp: 
-    handler: api_server.createHelp
-    events:
-      -
-        http:
-          path: /help/create
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  # depositPoints:
-  #   handler: api.depositPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: deposit_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
-  # withdrawPoints:
-  #   handler: api.withdrawPoints
-  #   events:
-  #     -
-  #       http:
-  #         path: withdraw_points
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth

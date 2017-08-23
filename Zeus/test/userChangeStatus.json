@@ -4,19 +4,19 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_cheney",
+      "username": "Platform_NAtest",
       "parent": "00",
       "role": "1",
-      "userId": "6028eec6-96ec-492d-a36b-fd8d6981b76f",
-      "principalId": "6028eec6-96ec-492d-a36b-fd8d6981b76f"
+      "userId": "1507fbca-605d-43b2-ba09-3def94880eba",
+      "suffix": "Platfrom"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "role": "100",
-    "userId": "25f76130-e04b-4b9f-9a20-1836a75fe419",
-    "status": 1
+    "userId": "1070d03e-1652-428f-9a55-81b77ef4e8ed",
+    "status": 1,
+    "contractPeriod": null
   }
 }

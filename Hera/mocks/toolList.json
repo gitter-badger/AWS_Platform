@@ -1,0 +1,9 @@
+{
+    "body": "{\"userId\":\"771062\"}",
+    "pathParameters" : {
+            "userName" : "day003"
+        },
+    "headers":{
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZMzhfZGF5MDAzIiwic3VmZml4IjoiQ1kzOCIsInVzZXJJZCI6NzcxMDYyLCJpYXQiOjE1MDE4Mjc4NDZ9.6NomVv-rSeZxu1AIdDXV3FIPxe-jT6hRQr7oARb5Ryg"
+    }
+}

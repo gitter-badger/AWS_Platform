@@ -1,18 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    StatusEnum,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
 
@@ -60,8 +46,14 @@ export class LogModel extends BaseModel {
             if (loginUserErr.code == Codes.PasswordError) {
                 detail = '密码输入错误'
             }
-            if (loginUserErr.code == Codes.MerchantPeriodErr) {
-                detail = '帐号过期'
+            if (loginUserErr.code == Codes.MerchantPeriodStartErr) {
+                detail = '帐号尚未生效'
+            }
+            if (loginUserErr.code == Codes.UserIPError) {
+                detail = 'IP不合法'
+            }
+            if (loginUserErr.code == Codes.MerchantPeriodEndErr) {
+                detail = '帐号已过期'
                 userStatus = StatusEnum.Disable
             }
             if (loginUserErr.code == Codes.UserLocked) {

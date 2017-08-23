@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk'
 import { Stream$ } from './Rx5'
-import { BizErr } from './Codes'
+import { CHeraErr, CODES } from './Codes'
 import { JwtVerify,JwtSign } from './Response'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
@@ -12,22 +12,13 @@ const dbClient = new AWS.DynamoDB.DocumentClient()
 const db$ = (action,params)=>{
   return dbClient[action](params).promise()
 }
-export const Store$ = async(action,params) =>{
-  console.log(action,params);
-  try{
-    const result = await db$(action,params)
-    return [0,result]
-  }catch(e){
-    return [BizErr.DBErr(e.toString()),0]
-  }
-}
 
 // table names
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformRole = 'ZeusPlatformRole'
 const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
-const ZeusPlatformGame = 'ZeusPlatformGame'
+const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 
 export const Tables = {
@@ -42,9 +33,10 @@ export const Tables = {
 
 
 export const Model = {
+  StringValue: 'NULL!',
   USERNAME_LIMIT: [6,16], // 用户名长度限制
   PASSWORD_PATTERN: [3,16],
-  StringValue: '0',
+  StringValue: 'NULL!',
   NumberValue: 0.0,
   DefaultParent: '01', // 平台
   DefaultParentName: 'PlatformAdmin',
@@ -55,10 +47,17 @@ export const Model = {
   displayId: () => (new Date()).getTime() % 1000000 + 100000,
   timeStamp: () => (new Date()).getTime(),
   currentToken: async (e) =>{
-    if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(),0]
+    e.headers = e.headers || {};
+    e.headers.Authorization = e.headers.Authorization;
+    e.requestContext = e.requestContext || {};
+    if (!e || (!e.requestContext.authorizer && !e.headers.Authorization)) {
+      return [new CHeraErr(CODES.TokenError),0]
     }
-    return [0,e.requestContext.authorizer]
+    if(!e.headers.Authorization) {
+      return [0, e.requestContext.authorizer]
+    }else {
+      return [0,e.headers.Authorization.split(" ")]
+    }
   },
   token: (userInfo)=>{
     return JwtSign({

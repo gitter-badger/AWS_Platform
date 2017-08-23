@@ -1,15 +1,9 @@
 
-service: Javis # NOTE: update this with your service name
-
-# Use the serverless-webpack plugin to transpile ES6
+service: Javis
 plugins:
   - serverless-webpack
-
-# Enable auto-packing of external modules
 custom:
   webpackIncludeModules: true
-
-
 provider:
   name: aws
   runtime: nodejs6.10
@@ -24,27 +18,43 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
       Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
 functions:
-  initData:
-    handler: api.initData
-    events:
-      -
-        http:
-          path: /initData
-          method: get
-          cors: true
-  jwtverify:
+  # initData:
+  #   handler: api.initData
+  #   events:
+  #     -
+  #       http:
+  #         path: /initData
+  #         method: get
+  #         cors: true
+  # jwtverify:
+  #   handler: api.jwtverify
+  #   integration: lambda
+  # generateToken:
+  #   handler: api.generateToken
+  #   events:
+  #     -
+  #       http:
+  #         path: /generate_token
+  #         method: post
+  #         cors: true
+  tokenAuth: #TOKEN验证
     handler: api.jwtverify
     integration: lambda
-  generateToken:
-    handler: api.generateToken
+  upToken: #七牛云上传TOKEN
+    handler: api_qiniu.upToken
     events:
       -
         http:
-          path: /generate_token
+          path: /upToken
           method: post
           cors: true
+          authorizer: tokenAuth
   #统计开始
   overview: #统计总览
     handler: api_sta.overview
@@ -78,9 +88,46 @@ functions:
           path: /statistics/day/list
           method: get
           cors: true
+  # 触发器开始
+  userTrigger: #用户表触发器
+    handler: api_trigger.userTrigger
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - ZeusPlatformUser
+              - StreamArn
+  palyerBillTrigger: #玩家账单表触发器
+      handler: api_trigger.playerBalanceTrigger
+      events:
+        - stream:
+            type: dynamodb
+            arn:
+              Fn::GetAtt:
+                - HeraGamePlayerBill
+                - StreamArn
+  gameNotice: #游戏公告触发器
+      handler: api_trigger.gameNotice
+      events:
+        - stream:
+            type: dynamodb
+            arn:
+              Fn::GetAtt:
+                - HawkeyeGameNotice
+                - StreamArn
+  gameEmail: #游戏邮件触发器
+      handler: api_trigger.gameEmail
+      events:
+        - stream:
+            type: dynamodb
+            arn:
+              Fn::GetAtt:
+                - HawkeyeGameEmail
+                - StreamArn
 resources:
   Resources:
-    ZeusPlatformUser:
+    ZeusPlatformUser: #用户表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformUser
@@ -110,7 +157,6 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
-
         GlobalSecondaryIndexes:
           -
             IndexName: RoleSuffixIndex
@@ -179,21 +225,25 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
 
-    ZeusPlatformGame:
+    DianaPlatformGame: #游戏表
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ZeusPlatformGame
+        TableName: DianaPlatformGame
         AttributeDefinitions:
           -
             AttributeName: gameType
             AttributeType: S
           -
             AttributeName: gameId
+            AttributeType: S
+          -
+            AttributeName: kindId
             AttributeType: S
           -
             AttributeName: gameName
@@ -237,12 +287,33 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-
+          -
+            IndexName: GameIdIndex
+            KeySchema:
+              -
+                AttributeName: gameId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: KindIdIndex
+            KeySchema:
+              -
+                AttributeName: kindId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    ZeusPlatformBill:
+    ZeusPlatformBill: #账单表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformBill
@@ -254,9 +325,11 @@ resources:
             AttributeName: userId
             AttributeType: S
           -
+            AttributeName: action
+            AttributeType: N
+          -
             AttributeName: createdAt
             AttributeType: N
-
         KeySchema:
           -
             AttributeName: sn
@@ -264,7 +337,6 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
-
         GlobalSecondaryIndexes:
           -
             IndexName: UserIdIndex
@@ -305,10 +377,25 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+          -
+            IndexName: ActionIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+              -
+                AttributeName: action
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ZeusPlatformMSN:
+
+    ZeusPlatformMSN: #线路号表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformMSN
@@ -319,7 +406,6 @@ resources:
           -
             AttributeName: userId
             AttributeType: S
-
         KeySchema:
           -
             AttributeName: msn
@@ -327,12 +413,45 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
-
+        GlobalSecondaryIndexes:
+          -
+            IndexName: UserIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    ZeusPlatformCaptcha:
+    ZeusPlatformCode: #编码池表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ZeusPlatformCode
+        AttributeDefinitions:
+          -
+            AttributeName: type
+            AttributeType: S
+          -
+            AttributeName: code
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: type
+            KeyType: HASH
+          -
+            AttributeName: code
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    ZeusPlatformCaptcha: #验证码表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformCaptcha
@@ -343,7 +462,6 @@ resources:
           -
             AttributeName: usage
             AttributeType: S
-          
         KeySchema:
           -
             AttributeName: relKey
@@ -351,11 +469,11 @@ resources:
           -
             AttributeName: usage
             KeyType: RANGE
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ZeusPlatformLog:
+
+    ZeusPlatformLog: #日志表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ZeusPlatformLog
@@ -372,7 +490,6 @@ resources:
           -
             AttributeName: createdAt
             AttributeType: N
-
         KeySchema:
           -
             AttributeName: sn
@@ -380,7 +497,6 @@ resources:
           -
             AttributeName: userId
             KeyType: RANGE
-        
         GlobalSecondaryIndexes:
           -
             IndexName: LogRoleIndex
@@ -399,10 +515,11 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ZeusPlatformCompany:
+
+    DianaPlatformCompany: #游戏厂商表
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ZeusPlatformCompany
+        TableName: DianaPlatformCompany
         AttributeDefinitions:
           -
             AttributeName: companyName
@@ -410,7 +527,6 @@ resources:
           -
             AttributeName: companyId
             AttributeType: S
-
         KeySchema:
           -
             AttributeName: companyName
@@ -418,7 +534,257 @@ resources:
           -
             AttributeName: companyId
             KeyType: RANGE
-
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
+    DianaPlatformTool: #道具表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: DianaPlatformTool
+        AttributeDefinitions:
+          -
+            AttributeName: toolName
+            AttributeType: S
+          -
+            AttributeName: toolId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: toolName
+            KeyType: HASH
+          -
+            AttributeName: toolId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: toolIdIndex
+            KeySchema:
+              -
+                AttributeName: toolId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    DianaPlatformPackage: #道具包表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: DianaPlatformPackage
+        AttributeDefinitions:
+          -
+            AttributeName: packageName
+            AttributeType: S
+          -
+            AttributeName: packageId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: packageName
+            KeyType: HASH
+          -
+            AttributeName: packageId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: packageIdIndex
+            KeySchema:
+              -
+                AttributeName: packageId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    DianaPlatformSeat: #席位表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: DianaPlatformSeat
+        AttributeDefinitions:
+          -
+            AttributeName: seatId
+            AttributeType: S
+          -
+            AttributeName: seatType
+            AttributeType: S
+          -
+            AttributeName: order
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: seatId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: SeatTypeIndex
+            KeySchema:
+              -
+                AttributeName: seatType
+                KeyType: HASH
+              -
+                AttributeName: order
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+    HeraGamePlayerBill: #玩家账单表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGamePlayerBill
+        AttributeDefinitions:
+          -
+            AttributeName: userName
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: N
+          -
+            AttributeName: createAt
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: userName
+            KeyType: HASH
+          -
+            AttributeName: createAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        GlobalSecondaryIndexes:
+          -
+            IndexName: userNameIndex
+            KeySchema:
+              -
+                AttributeName: userName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: userIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    HawkeyeGameNotice:  #游戏通知表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyeGameNotice
+        AttributeDefinitions:
+          -
+            AttributeName: noid
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: noid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+    HawkeyeGameEmail:  #游戏邮件
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyeGameEmail
+        AttributeDefinitions:
+          -
+            AttributeName: emid
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: emid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+    HeraGameDiamondBill:  #钻石账单
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGameDiamondBill
+        AttributeDefinitions:
+          -
+            AttributeName: userName
+            AttributeType: S
+          -
+            AttributeName: billId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: billId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: UserNameIndex
+            KeySchema:
+              -
+                AttributeName: userName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+              
+    HulkPlatformAd: #广告表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HulkPlatformAd
+        AttributeDefinitions:
+          -
+            AttributeName: adId
+            AttributeType: S
+          -
+            AttributeName: adName
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: adId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: AdNameIndex
+            KeySchema:
+              -
+                AttributeName: adName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1

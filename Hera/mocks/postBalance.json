@@ -1,9 +1,9 @@
 {
-    "body": "{\"userName\":\"lisichen\",\"userPwd\":\"zhangsan\", \"apiKey\":\"a\", \"buId\":\"123\",  \"gamePlatform\":\"NA\", \"amount\":\"10\",  \"action\":\"1\"}",
+    "body": "{ \"amount\":\"20000\",  \"action\":\"1\", \"buId\":\"708642\"}",
     "pathParameters" : {
-            "userName" : "lisichen"
+            "userName" : "day003"
         },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BX2xpc2ljaGVuIiwic3VmZml4IjoiTkEiLCJpYXQiOjE1MDEwNzcwMTF9.yl-GBqQTUeOWj9v5A_bX-nsOSdK9jHeyW1Y0bstGyic"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNZX2RheTAwMyIsInN1ZmZpeCI6IkNZIiwidXNlcklkIjo2ODEyNzksImlhdCI6MTUwMjE4Njk1N30.nq95xxzx7OXv4k1IxDW5m8SLdnStMYoCOryeLjM8kZE"
     }
 }

@@ -17,6 +17,7 @@
     "body": {
         "companyName": "111",
         "companyDesc": "111",
+        "companyContact": "联系人一号",
         "companyContactWay": "111",
         "companyEmail": "sda@qq.com",
         "companyRegion": "1",

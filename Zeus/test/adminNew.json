@@ -15,11 +15,11 @@
     }
   },
   "body": {
-    "username": "NAtest003",
-    "password": "111111",
+    "username": "NAtest001",
+    "password": "chnewenGG886",
     "role": "1",
     "adminName": "ceshi",
-    "adminEmail": "1@q.com",
-    "adminContact": "联系人测试"
+    "adminEmail": "test@test.com",
+    "adminContact": "联系人"
   }
 }

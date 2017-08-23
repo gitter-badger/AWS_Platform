@@ -5,7 +5,7 @@ var https = require('https');
 var post_data={};//请求数据
 var reqdata = JSON.stringify(post_data);
 var options = {
-    hostname: 'gjmkw5lw5g.execute-api.ap-southeast-1.amazonaws.com',
+    hostname: 'z9ncfx0q9d.execute-api.ap-southeast-1.amazonaws.com',
     port: '443',
     path: '/dev/player/list',
     method: 'GET',

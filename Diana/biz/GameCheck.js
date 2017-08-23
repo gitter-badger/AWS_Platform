@@ -1,3 +1,4 @@
+import { Codes, Model, RoleCodeEnum, GameTypeEnum, GameStatusEnum } from '../lib/all'
 const athena = require("../lib/athena")
 export class GameCheck {
     /**
@@ -5,18 +6,39 @@ export class GameCheck {
      */
     checkGame(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "gameName", type: "S", min: 1, max: 20 },
-            { name: "gameRecommend", type: "NS", min: 1, max: 200 },
-            { name: "gameType", type: "N", min: 0, max: 2 },
-            { name: "gameImg", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL },
+            { name: "gameName", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYNAME },
+            { name: "gameRecommend", type: "S", min: 2, max: 200 },
+            { name: "gameType", type: "N", min: 10000, max: 90000 },
             { name: "ip", type: "REG", min: null, max: null, equal: athena.RegEnum.IP },
-            { name: "port", type: "N", min: 1, max: 65535 }
-        ], inparam)
-        return [checkAttError, errorParams]
+            { name: "port", type: "N", min: 1, max: 65535 },
+            { name: "kindId", type: "N", min: 10000, max: 99999 },
 
-        // if (!_.isNumber(kindId)) {
-        //     return [BizErr.ParamErr('kindId should provided and kindId cant parse to number')]
-        // }
+            { name: "gameImg", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL }
+        ], inparam)
+
+        if (checkAttError) {
+            return [checkAttError, errorParams]
+        }
+
+        // 检查子对象
+        if (!inparam.company || !inparam.company.companyName || !inparam.company.companyId) {
+            return [{ "code": -1, "msg": "游戏厂商数据不合法", "params": ["company"] }, 'company']
+        }
+
+        // 数据类型处理
+        inparam.gameType = inparam.gameType.toString()
+        inparam.kindId = inparam.kindId.toString()
+
+        inparam.gameStatus = GameStatusEnum.Online
+        inparam.gameImg = inparam.gameImg || Model.StringValue
+        inparam.company = inparam.company || Model.StringValue
+
+        // 精细检查
+        if (!GameTypeEnum[inparam.gameType]) {
+            return [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+        }
+
+        return [checkAttError, errorParams]
     }
 
     /**
@@ -25,10 +47,51 @@ export class GameCheck {
      */
     checkStatus(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "gameType", type: "N", min: 0, max: 2 },
+            { name: "gameType", type: "N", min: 10000, max: 90000 },
             { name: "gameId", type: "S", min: 36, max: 36 },
             { name: "status", type: "N", min: 0, max: 4 }]
             , inparam)
+
+        if (checkAttError) {
+            return [checkAttError, errorParams]
+        }
+
+        // 数据类型处理
+        inparam.status = parseInt(inparam.status)
+
+        // 精细检查
+        if (!GameTypeEnum[inparam.gameType]) {
+            return [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+        }
+
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查查询
+     * @param {*} inparam 
+     */
+    checkQuery(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "gameType", type: "NS", min: 5, max: 17 }]
+            , inparam)
+
+        if (checkAttError) {
+            return [checkAttError, errorParams]
+        }
+
+        // 如果类型参数为空，默认查询所有类型
+        if (!inparam.gameType) {
+            inparam.gameType = ''
+            for (let item in GameTypeEnum) {
+                inparam.gameType += (item + ',')
+            }
+            inparam.gameType = inparam.gameType.substr(0, inparam.gameType.length - 1)
+        }
+
+        // 数据类型处理
+        inparam.gameType = inparam.gameType.toString()
+        inparam.keyword = inparam.keyword || null
         return [checkAttError, errorParams]
     }
 }
