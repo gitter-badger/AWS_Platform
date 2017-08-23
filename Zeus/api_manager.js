@@ -10,17 +10,21 @@ import { UserCheck } from './biz/UserCheck'
  */
 const managerList = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerList error'/*, input: e*/ }
   const res = { m: 'managerList' }
+  // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
     return ResErr(cb, tokenErr)
+  }
+  // 只有管理员/线路商有权限
+  if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
+    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
   }
   // 业务操作
   const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Manager)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   }
   // 查询每个用户余额
   for (let user of ret) {
@@ -42,15 +46,19 @@ const managerList = async (e, c, cb) => {
  */
 const managerOne = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerOne err'/*, input: e*/ }
   const res = { m: 'managerOne' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
+    return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
   }
+  // 身份令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
+    return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+  }
+  // 只有管理员/线路商有权限
+  if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
+    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
   }
   // 业务操作
   const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
@@ -65,7 +73,7 @@ const managerOne = async (e, c, cb) => {
 
   // 结果返回
   if (managerErr) {
-    return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
+    return ResFail(cb, { ...res, err: managerErr }, managerErr.code)
   }
   return ResOK(cb, { ...res, payload: manager })
 }
@@ -74,16 +82,15 @@ const managerOne = async (e, c, cb) => {
  */
 const managerUpdate = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'managerUpdate err'/*, input: e*/ }
   const res = { m: 'managerUpdate' }
   const [paramsErr, params] = Model.pathParams(e)
   if (paramsErr || !params.id) {
-    return ResFail(cb, { ...errRes, err: paramsErr }, paramsErr.code)
+    return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
   }
   // 入参转化
   const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
   }
   //检查参数是否合法
   let [checkAttError, errorParams] = new UserCheck().checkUserUpdate(managerInfo)
@@ -94,12 +101,16 @@ const managerUpdate = async (e, c, cb) => {
   // 获取令牌
   const [tokenErr, token] = await Model.currentToken(e)
   if (tokenErr) {
-    return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
+    return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+  }
+  // 只有管理员/线路商有权限
+  if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
+    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
   }
   // 业务操作
   const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
   if (managerErr) {
-    return ResFail(cb, { ...errRes, err: managerErr }, managerErr.code)
+    return ResFail(cb, { ...res, err: managerErr }, managerErr.code)
   }
   // 获取更新属性和新密码HASH
   const Manager = {
@@ -115,7 +126,7 @@ const managerUpdate = async (e, c, cb) => {
   new LogModel().addOperate(params, updateErr, updateRet)
   // 结果返回
   if (updateErr) {
-    return ResFail(cb, { ...errRes, err: updateErr }, updateErr.code)
+    return ResFail(cb, { ...res, err: updateErr }, updateErr.code)
   }
   return ResOK(cb, { ...res, payload: updateRet })
 }
@@ -124,11 +135,19 @@ const managerUpdate = async (e, c, cb) => {
  * 可用线路商
  */
 const avalibleManagers = async (e, c, cb) => {
-  const errRes = { m: 'avalibleManagers err'/*, input: e*/ }
   const res = { m: 'avalibleManagers' }
+  // 获取令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResFail(cb, { ...res, err: tokenErr }, tokenErr.code)
+  }
+  // 只有管理员/线路商有权限
+  if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
+    return ResErr(cb, [BizErr.TokenErr('只有管理员/线路商有权限'), 0])
+  }
   const [err, ret] = await new UserModel().listAvalibleManagers()
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   }
   return ResOK(cb, { ...res, payload: ret })
 }

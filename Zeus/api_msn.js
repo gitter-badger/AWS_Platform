@@ -11,18 +11,22 @@ import { MsnCheck } from './biz/MsnCheck'
  */
 const msnList = async (e, c, cb) => {
   // 数据输入，转换，校验
-  const errRes = { m: 'msnList error' }
   const res = { m: 'msnList' }
-  if (!e) { e = {} }
-  if (!e.body) { e.body = {} }
+  e = e || {}
+  e.body = e.body || {}
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
+  }
+  // 获取令牌,只有管理员有权限
+  const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
   }
   // 业务操作
   const [err, ret] = await new MsnModel().scan()
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     let arr = new Array()
     let flag = true
@@ -47,11 +51,10 @@ const msnList = async (e, c, cb) => {
  */
 const checkMsn = async (e, c, cb) => {
   // 入参校验
-  const errRes = { m: 'checkMsn err'/*, input: e*/ }
   const res = { m: 'checkMsn' }
   const [paramErr, params] = Model.pathParams(e)
   if (paramErr) {
-    return ResFail(cb, { ...errRes, err: paramErr }, paramErr.code)
+    return ResFail(cb, { ...res, err: paramErr }, paramErr.code)
   }
   //检查参数是否合法
   let [checkAttError, errorParams] = new MsnCheck().check(params)
@@ -59,10 +62,15 @@ const checkMsn = async (e, c, cb) => {
     Object.assign(checkAttError, { params: errorParams })
     return ResErr(cb, checkAttError)
   }
+  // 获取身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
   // 业务操作
   const [checkErr, checkRet] = await new MsnModel().checkMSN(params)
   if (checkErr) {
-    return ResFail(cb, { ...errRes, err: checkErr }, checkErr.code)
+    return ResFail(cb, { ...res, err: checkErr }, checkErr.code)
   }
   // 结果返回
   return ResOK(cb, { ...res, payload: { avalible: Boolean(checkRet) } })
@@ -72,16 +80,20 @@ const checkMsn = async (e, c, cb) => {
  */
 const msnRandom = async (e, c, cb) => {
   // 数据输入，转换，校验
-  const errRes = { m: 'msnRandom error' }
   const res = { m: 'msnRandom' }
+  // 获取身份令牌
+  const [tokenErr, token] = await Model.currentToken(e)
+  if (tokenErr) {
+    return ResErr(cb, tokenErr)
+  }
   // 业务操作
   const [err, ret] = await new MsnModel().scan()
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     // 所有线路号都被占用
     if (ret.Items.length >= 999) {
-      return ResFail(cb, { ...errRes, err: BizErr.MsnFullError() }, BizErr.MsnFullError().code)
+      return ResFail(cb, { ...res, err: BizErr.MsnFullError() }, BizErr.MsnFullError().code)
     }
     // 所有占用线路号组成数组
     let msnArr = new Array()
@@ -182,11 +194,10 @@ const lockmsn = async (e, c, cb) => {
  */
 const captcha = async (e, c, cb) => {
   // 数据输入，转换，校验
-  const errRes = { m: 'captcha error' }
   const res = { m: 'captcha' }
   const [jsonParseErr, inparam] = JSONParser(e && e.body)
   if (jsonParseErr) {
-    return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+    return ResFail(cb, { ...res, err: jsonParseErr }, jsonParseErr.code)
   }
   //检查参数是否合法
   let [checkAttError, errorParams] = new CaptchaCheck().checkCaptcha(inparam)
@@ -199,7 +210,7 @@ const captcha = async (e, c, cb) => {
   const [err, ret] = await new CaptchaModel().putItem(inparam)
   // 结果返回
   if (err) {
-    return ResFail(cb, { ...errRes, err: err }, err.code)
+    return ResFail(cb, { ...res, err: err }, err.code)
   } else {
     return ResOK(cb, { ...res, payload: inparam })
   }
