@@ -108,7 +108,7 @@ export const Model = {
   timeStamp: () => (new Date()).getTime(),
   currentToken: async (e) => {
     if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
+      throw [BizErr.TokenErr(), 0]
     }
     return [0, e.requestContext.authorizer]
   },
