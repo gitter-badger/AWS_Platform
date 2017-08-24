@@ -97,6 +97,8 @@ export class AgentCheck {
         inparam.rate = inparam.rate.toString()
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
+        inparam.vedioMix = parseFloat(inparam.vedioMix)
+        inparam.liveMix = parseFloat(inparam.liveMix)
         
         return [checkAttError, errorParams]
     }
@@ -141,6 +143,8 @@ export class AgentCheck {
         inparam.rate = inparam.rate.toString()
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
+        inparam.vedioMix = parseFloat(inparam.vedioMix)
+        inparam.liveMix = parseFloat(inparam.liveMix)
 
         return [checkAttError, errorParams]
     }
