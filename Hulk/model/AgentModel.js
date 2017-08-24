@@ -131,6 +131,8 @@ export class AgentModel extends BaseModel {
         const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
             toUser: saveUserRet.username,
             toRole: saveUserRet.role,
+            toLevel: saveUserRet.level,
+            toDisplayName: saveUserRet.displayName,
             amount: initPoints,
             operator: token.username,
             remark: '初始点数'
