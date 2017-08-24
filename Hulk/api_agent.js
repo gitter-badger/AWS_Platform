@@ -184,6 +184,26 @@ const availableAgents = async (e, c, cb) => {
     }
 }
 
+/**
+ * 管理员列表
+ */
+const agentAdminList = async (e, c, cb) => {
+    try {
+        // 只有代理管理员角色可操作
+        const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
+        if (!Model.isPlatformAdmin(token)) {
+            return ResErr(cb, BizErr.TokenErr('只有代理管理员有权限'))
+        }
+        // 业务操作
+        const [err, admins] = await new UserModel().listAllAdmins(token)
+        // 结果返回
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: admins })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
 // ==================== 以下为内部方法 ====================
 
 export {
@@ -193,5 +213,6 @@ export {
     agentList,                 // 代理列表
     agentOne,                  // 代理
     agentUpdate,               // 代理更新
-    availableAgents            // 可用代理列表
+    availableAgents,           // 可用代理列表
+    agentAdminList             // 代理管理员列表
 }

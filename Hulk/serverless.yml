@@ -133,6 +133,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  agentAdminList: # 代理更新
+    handler: api_agent.agentAdminList
+    events:
+      -
+        http:
+          path: agentAdminList
+          method: get
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是公告管理接口服务 ====================
   adNew: #创建公告
     handler: api_ad.adNew

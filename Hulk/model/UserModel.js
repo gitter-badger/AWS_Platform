@@ -127,6 +127,31 @@ export class UserModel extends BaseModel {
         return [0, queryRet.Items]
     }
 
+    /**
+     * 查询代理管理员列表
+     * @param {*} token 
+     */
+    async listAllAdmins(token) {
+        const [queryErr, adminRet] = await this.query({
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#suffix = :suffix',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#suffix': 'suffix'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['Agent'],
+                ':suffix': 'Agent'
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
+        adminRet.Items = sortResult
+        return [0, adminRet.Items]
+    }
+
     // 检查用户是否重复
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]
