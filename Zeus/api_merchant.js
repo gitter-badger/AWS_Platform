@@ -44,7 +44,7 @@ const merchantList = async (e, c, cb) => {
 
     // 查询每个用户余额
     for (let user of ret) {
-      let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+      const [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
       user.balance = lastBill.lastBalance
       user.lastBill = lastBill
     }

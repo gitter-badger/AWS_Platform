@@ -34,7 +34,7 @@ const adminNew = async (e, c, cb) => {
     // 入参转换
     const [jsonParseErr, userInfo] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
+    const [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
     // 要求管理员角色
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 业务操作
@@ -59,7 +59,7 @@ const userNew = async (e, c, cb) => {
     // 从POST 的body中获取提交数据
     const [jsonParseErr, userInfo] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkUser(userInfo)
+    const [checkAttError, errorParams] = new UserCheck().checkUser(userInfo)
     // 要求管理员角色
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 业务操作
@@ -85,7 +85,7 @@ const userAuth = async (e, c, cb) => {
     // 入参转换
     const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkLogin(userLoginInfo)
+    const [checkAttError, errorParams] = new UserCheck().checkLogin(userLoginInfo)
     // 用户登录
     const [loginUserErr, loginUserRet] = await LoginUser(Model.addSourceIP(e, userLoginInfo))
     // 登录日志
@@ -129,9 +129,9 @@ const userChangeStatus = async (e, c, cb) => {
     // 入参转换和校验
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkStatus(inparam)
+    const [checkAttError, errorParams] = new UserCheck().checkStatus(inparam)
     // 查询用户
-    let [userErr, user] = await new UserModel().queryUserById(inparam.userId)
+    const [userErr, user] = await new UserModel().queryUserById(inparam.userId)
     if (userErr) { return ResErr(cb, [userErr, 0]) }
     // 获取身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
@@ -191,7 +191,7 @@ const checkUserExist = async (e, c, cb) => {
       return ResErr(cb, BizErr.TokenErr('只有代理有权限'))
     }
     // 业务操作
-    let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
+    const [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, inparam.username)
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
     return ResOK(cb, { ...res, payload: ret })
@@ -222,7 +222,7 @@ const checkSuffixExist = async (e, c, cb) => {
       return ResErr(cb, BizErr.TokenErr('只有代理有权限'))
     }
     // 业务操作
-    let [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, null)
+    const [err, ret] = await new UserModel().checkUserBySuffix(inparam.role, inparam.suffix, null)
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
     return ResOK(cb, { ...res, payload: ret })
@@ -252,7 +252,7 @@ const checkNickExist = async (e, c, cb) => {
       return ResErr(cb, BizErr.TokenErr('只有代理有权限'))
     }
     // 业务操作
-    let [err, ret] = await new UserModel().checkNickExist(inparam.role, inparam.displayName)
+    const [err, ret] = await new UserModel().checkNickExist(inparam.role, inparam.displayName)
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
     return ResOK(cb, { ...res, payload: ret })
@@ -321,7 +321,7 @@ const childList = async (e, c, cb) => {
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
     // 查询每个用户余额
     for (let user of ret) {
-      let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+      const [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
       user.balance = lastBill.lastBalance
       user.lastBill = lastBill
     }
@@ -340,7 +340,7 @@ const updatePassword = async (e, c, cb) => {
     // 入参转换和校验
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkPassword(inparam)
+    const [checkAttError, errorParams] = new UserCheck().checkPassword(inparam)
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 只有管理员/自己有权限

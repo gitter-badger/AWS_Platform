@@ -57,7 +57,7 @@ const checkMsn = async (e, c, cb) => {
       return ResFail(cb, { ...res, err: paramErr }, paramErr.code)
     }
     //检查参数是否合法
-    let [checkAttError, errorParams] = new MsnCheck().check(params)
+    const [checkAttError, errorParams] = new MsnCheck().check(params)
     // 获取身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 业务操作
@@ -117,7 +117,7 @@ const lockmsn = async (e, c, cb) => {
       return ResFail(cb, { ...res, err: paramErr }, paramErr.code)
     }
     //检查参数是否合法
-    let [checkAttError, errorParams] = new MsnCheck().checkMsnLock(params)
+    const [checkAttError, errorParams] = new MsnCheck().checkMsnLock(params)
     // 获取令牌,只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 查询msn
@@ -181,7 +181,7 @@ const captcha = async (e, c, cb) => {
     const res = { m: 'captcha' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new CaptchaCheck().checkCaptcha(inparam)
+    const [checkAttError, errorParams] = new CaptchaCheck().checkCaptcha(inparam)
     // 业务操作
     inparam.code = randomNum(1000, 9999)
     const [err, ret] = await new CaptchaModel().putItem(inparam)

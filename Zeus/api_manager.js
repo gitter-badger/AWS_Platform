@@ -24,7 +24,7 @@ const managerList = async (e, c, cb) => {
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
     // 查询每个用户余额
     for (let user of ret) {
-      let [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+      const [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
       user.balance = lastBill.lastBalance
       user.lastBill = lastBill
       // 查询已用商户已用数量
@@ -89,7 +89,7 @@ const managerUpdate = async (e, c, cb) => {
     // 入参转化
     const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new UserCheck().checkUserUpdate(managerInfo)
+    const [checkAttError, errorParams] = new UserCheck().checkUserUpdate(managerInfo)
     // 获取令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 只有管理员/线路商有权限
