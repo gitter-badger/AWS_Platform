@@ -6,7 +6,7 @@ export class AgentCheck {
      */
     checkAdmin(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
@@ -31,7 +31,7 @@ export class AgentCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
         // 数据类型处理
         // inparam.rate = inparam.rate.toString()
@@ -52,7 +52,7 @@ export class AgentCheck {
      */
     check(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
@@ -80,14 +80,14 @@ export class AgentCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         if (inparam.suffix == 'Agent') {
-            throw [{ "code": -1, "msg": "该前缀已系统保留", "params": ["suffix"] }, 'suffix']
+            throw { "code": -1, "msg": "该前缀已系统保留", "params": ["suffix"] }
         }
         if ((!inparam.contractPeriod && inparam.contractPeriod != 0) || (inparam.isforever !== true && inparam.isforever !== false)) {
-            throw [{ "code": -1, "msg": "有效期不能为空", "params": ["contractPeriod"] }, 'contractPeriod']
+            throw { "code": -1, "msg": "有效期不能为空", "params": ["contractPeriod"] }
         }
 
         // 数据类型处理
@@ -103,7 +103,7 @@ export class AgentCheck {
      */
     checkUpdate(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
@@ -131,7 +131,7 @@ export class AgentCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -157,7 +157,7 @@ export class AgentCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -179,7 +179,7 @@ export class AgentCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -194,7 +194,7 @@ export class AgentCheck {
      */
     checkPassword(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "userId", type: "S", min: 36, max: 36 },
@@ -203,7 +203,7 @@ export class AgentCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         return [checkAttError, errorParams]

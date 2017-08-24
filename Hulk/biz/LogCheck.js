@@ -12,7 +12,7 @@ export class LogCheck {
 
         if(checkAttError){
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         // 数据类型处理
