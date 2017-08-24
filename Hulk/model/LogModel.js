@@ -37,27 +37,25 @@ export class LogModel extends BaseModel {
      */
     async logPage(inparam) {
         // 管理员查询
-        if (!inparam.parent) {
-            return await this.page({
-                IndexName: 'LogRoleIndex',
-                Limit: inparam.pageSize,
-                ExclusiveStartKey: inparam.startKey,
-                ScanIndexForward: false,
-                KeyConditionExpression: "#role = :role",
-                FilterExpression: "#type = :type",
-                ExpressionAttributeNames: {
-                    '#role': 'role',
-                    '#type': 'type'
-                },
-                ExpressionAttributeValues: {
-                    ':role': inparam.role.toString(),
-                    ':type': inparam.type
-                }
-            }, inparam)
+        let query = {
+            IndexName: 'LogRoleIndex',
+            Limit: inparam.pageSize,
+            ExclusiveStartKey: inparam.startKey,
+            ScanIndexForward: false,
+            KeyConditionExpression: "#role = :role",
+            FilterExpression: "#type = :type",
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#type': 'type'
+            },
+            ExpressionAttributeValues: {
+                ':role': inparam.role.toString(),
+                ':type': inparam.type
+            }
         }
         // 线路商/代理查询
-        else {
-            return await this.page({
+        if (inparam.parent) {
+            query = {
                 IndexName: 'LogRoleIndex',
                 Limit: inparam.pageSize,
                 ExclusiveStartKey: inparam.startKey,
@@ -75,11 +73,11 @@ export class LogModel extends BaseModel {
                     ':type': inparam.type,
                     ':parent': inparam.parent
                 }
-            }, inparam)
+            }
         }
         // 代理管理员
         if (!inparam.parent && inparam.level === 0) {
-            return await this.page({
+            query = {
                 IndexName: 'LogRoleIndex',
                 Limit: inparam.pageSize,
                 ExclusiveStartKey: inparam.startKey,
@@ -96,11 +94,11 @@ export class LogModel extends BaseModel {
                     ':type': inparam.type,
                     ':level': inparam.level
                 }
-            }, inparam)
+            }
         }
         // 其余代理
         else if (!inparam.parent && inparam.level === -1) {
-            return await this.page({
+            query = {
                 IndexName: 'LogRoleIndex',
                 Limit: inparam.pageSize,
                 ExclusiveStartKey: inparam.startKey,
@@ -117,8 +115,10 @@ export class LogModel extends BaseModel {
                     ':type': inparam.type,
                     ':level': 0
                 }
-            }, inparam)
+            }
         }
+        return await this.page(query, inparam)
+
         // let log = { Items: [], LastEvaluatedKey: {} }
         // let [err, ret] = [0, 0]
         // while (log.Items.length < inparam.pageSize && log.LastEvaluatedKey) {
