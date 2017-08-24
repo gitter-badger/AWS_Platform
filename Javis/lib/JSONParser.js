@@ -11,7 +11,7 @@ export const JSONParser = (data) => {
       : '')
   const [err, ret] = JSONParse(parsed)
   if (err) {
-    thr [BizErr.JSONParseErr(), 0]
+    throw [BizErr.JSONParseErr(), 0]
   }
   // 统一输入数据trim处理
   for (let i in ret) {
