@@ -41,13 +41,13 @@ export class UserModel extends BaseModel {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role',
-                FilterExpression: 'userId <> :userId',
+                FilterExpression: 'suffix <> :suffix',
                 ExpressionAttributeNames: {
                     '#role': 'role',
                 },
                 ExpressionAttributeValues: {
                     ':role': roleCode,
-                    ':userId': token.userId
+                    ':suffix': 'Agent'
                 }
             }
         }
