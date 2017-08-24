@@ -191,7 +191,7 @@ const agentAdminList = async (e, c, cb) => {
     try {
         // 只有代理管理员角色可操作
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
-        if (!Model.isPlatformAdmin(token)) {
+        if (!Model.isAgentAdmin(token)) {
             return ResErr(cb, BizErr.TokenErr('只有代理管理员有权限'))
         }
         // 业务操作
