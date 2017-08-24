@@ -137,11 +137,11 @@ const userChangeStatus = async (e, c, cb) => {
     const [tokenErr, token] = await Model.currentToken(e)
     // 平台用户只能平台管理员/父辈操作
     if (!Model.isAgent(user) && !Model.isPlatformAdmin(token) && !Model.isSubChild(token, user)) {
-      return ResErr(cb, BizErr.TokenErr('平台用户只能平台管理员/父辈操作'))
+      return ResErr(cb, BizErr.TokenErr('平台用户只能平台管理员/上级操作'))
     }
     // 代理用户只能代理管理员/父辈操作
     if (Model.isAgent(user) && !Model.isAgentAdmin(token) && !Model.isSubChild(token, user)) {
-      return ResErr(cb, BizErr.TokenErr('代理用户只能代理管理员/父辈操作'))
+      return ResErr(cb, BizErr.TokenErr('代理用户只能代理管理员/上级操作'))
     }
     // 更新用户
     user.status = inparam.status
