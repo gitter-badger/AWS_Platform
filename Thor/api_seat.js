@@ -20,7 +20,6 @@ const seatNew = async (e, c, cb) => {
 
         // 业务操作
         const [addInfoErr, addRet] = await new SeatModel().add(inparam)
-
         // 操作日志记录
         inparam.operateAction = '创建展位'
         inparam.operateToken = token

@@ -15,19 +15,19 @@ export class SeatCheck {
             { name: "icon", type: "NS", min: 1, max: 20 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
-
+        
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
             throw [checkAttError, errorParams]
         }
-
+        
         if (!inparam.content || inparam.content.length < 1) {
             throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
-        }s
+        }
         if ((!inparam.content.toolId && !inparam.content.packageId)) {
             throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
-
+        
         // 数据类型处理
         inparam.seatStatus = parseInt(inparam.seatStatus)
         inparam.order = parseInt(inparam.order)
