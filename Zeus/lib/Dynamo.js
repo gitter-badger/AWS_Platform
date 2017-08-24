@@ -2,6 +2,8 @@ import AWS from 'aws-sdk'
 import { Stream$ } from './Rx5'
 import { BizErr } from './Codes'
 import { JwtVerify, JwtSign } from './Response'
+import { RoleCodeEnum } from './UserConsts'
+
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
 const generatePassword = require('password-generator')
@@ -50,8 +52,32 @@ export const Model = {
   NoParent: '00', // 没有
   NoParentName: 'SuperAdmin',
   /**
+   * 所有实体基类
+   */
+  baseModel: function () {
+    return {
+      createdAt: (new Date()).getTime(),
+      updatedAt: (new Date()).getTime()
+    }
+  },
+  /**
+   * 获取路径参数
+   */
+  pathParams: (e) => {
+    try {
+      const params = e.pathParameters
+      if (Object.keys(params).length) {
+        return [0, params]
+      }
+    } catch (err) {
+      return [BizErr.ParamErr(err.toString()), 0]
+    }
+  },
+  /**
    * 生成唯一编号
    */
+  uuid: () => uid(),
+  timeStamp: () => (new Date()).getTime(),
   uucode: async (type, size) => {
     const ret = await db$('query', {
       TableName: Tables.ZeusPlatformCode,
@@ -79,65 +105,44 @@ export const Model = {
       randomCode = Math.floor((Math.random() + Math.floor(Math.random() * 9 + 1)) * Math.pow(10, size - 1))
     }
     // 编号插入
-    // await db$('put', {
-    //   TableName: Tables.ZeusPlatformCode,
-    //   Item: {
-    //     type: type,
-    //     code: randomCode.toString()
-    //   }
-    // })
+    // await db$('put', {TableName: Tables.ZeusPlatformCode,Item: {type: type,code: randomCode.toString()}})
     // 返回编号
     return [0, randomCode.toString()]
   },
-  uuid: () => uid(),
-  timeStamp: () => (new Date()).getTime(),
-  currentToken: async (e) => {
-    if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
-    }
-    return [0, e.requestContext.authorizer]
-  },
-  currentRoleToken: async (e, roleCode) => {
-    if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
-    } else {
-      if (e.requestContext.authorizer.role != roleCode) {
-        return [BizErr.RoleTokenErr(), 0]
-      }
-    }
-    return [0, e.requestContext.authorizer]
-  },
+  /**
+   * token处理
+   */
   token: (userInfo) => {
     return JwtSign({
       ...userInfo,
       iat: Math.floor(Date.now() / 1000) - 30
     })
   },
-  baseModel: function () { // the db base model
-    return {
-      createdAt: (new Date()).getTime(),
-      updatedAt: (new Date()).getTime()
+  currentToken: async (e) => {
+    if (!e || !e.requestContext.authorizer) {
+      throw [BizErr.TokenErr(), 0]
     }
+    return [0, e.requestContext.authorizer]
   },
+  currentRoleToken: async (e, roleCode) => {
+    if (!e || !e.requestContext.authorizer) {
+      throw [BizErr.TokenErr(), 0]
+    } else {
+      if (e.requestContext.authorizer.role != roleCode) {
+        throw [BizErr.RoleTokenErr(), 0]
+      }
+    }
+    return [0, e.requestContext.authorizer]
+  },
+  /**
+   * 密码处理
+   */
   hashGen: (pass) => {
     return bcrypt.hashSync(pass, 10)
   },
   hashValidate: async (pass, hash) => {
     const result = await bcrypt.compare(pass, hash)
     return result
-  },
-  sourceIP: (e) => {
-    return e && e.requestContext.identity.sourceIp
-  },
-  pathParams: (e) => {
-    try {
-      const params = e.pathParameters
-      if (Object.keys(params).length) {
-        return [0, params]
-      }
-    } catch (err) {
-      return [BizErr.ParamErr(err.toString()), 0]
-    }
   },
   genPassword: () => {
     const minLength = 6
@@ -149,12 +154,82 @@ export const Model = {
     }
     return password
   },
+  /**
+   * IP处理
+   */
+  sourceIP: (e) => {
+    return e && e.requestContext.identity.sourceIp
+  },
   addSourceIP: (e, info) => {
     const sourceIP = e && e.requestContext && e.requestContext.identity.sourceIp || '-100'
     return {
       ...info,
       lastIP: sourceIP
     }
+  },
+  // 判断用户是否为代理
+  isAgent(user) {
+    if (user.role == RoleCodeEnum['Agent']) {
+      return true
+    }
+    return false
+  },
+  // 判断用户是否为线路商
+  isManager(user) {
+    if (user.role == RoleCodeEnum['Manager']) {
+      return true
+    }
+    return false
+  },
+  // 判断用户是否为商户
+  isMerchant(user) {
+    if (user.role == RoleCodeEnum['Merchant']) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是代理管理员
+  isAgentAdmin(token) {
+    if (token.role == RoleCodeEnum['Agent'] && token.suffix == 'Agent') {
+      return true
+    }
+    return false
+  },
+  // 判断是否是平台管理员
+  isPlatformAdmin(token) {
+    if (token.role == RoleCodeEnum['PlatformAdmin']) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是自己
+  isSelf(token, user) {
+    if (token.userId == user.userId) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是下级
+  isChild(token, user) {
+    let parent = token.userId
+    if (token.role == RoleCodeEnum['PlatformAdmin'] || this.isAgentAdmin(token)) {
+      parent = this.DefaultParent
+    }
+    if (parent == user.parent) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是祖孙
+  isSubChild(token, user) {
+    let parent = token.userId
+    if (token.role == RoleCodeEnum['PlatformAdmin'] || this.isAgentAdmin(token)) {
+      parent = this.DefaultParent
+    }
+    if (user.levelIndex.indexOf(parent) > 0) {
+      return true
+    }
+    return false
   }
 }
 

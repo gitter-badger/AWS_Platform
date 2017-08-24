@@ -41,7 +41,10 @@ export class ToolModel extends BaseModel {
         // Start:从编号池获取新编号
         if (inparam.toolName == '钻石') {
             inparam.toolId = '100000'
-        } else {
+        } else if (inparam.toolName == '房卡') {
+            inparam.toolId = '200000'
+        }
+        else {
             const [uucodeErr, uucodeRet] = await Model.uucode('tool', 6)
             if (uucodeErr) { return [uucodeErr, 0] }
             inparam.toolId = uucodeRet

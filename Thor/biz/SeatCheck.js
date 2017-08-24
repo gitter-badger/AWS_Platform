@@ -9,7 +9,7 @@ export class SeatCheck {
             { name: "seatType", type: "N", min: 1, max: 2 },
             { name: "order", type: "N", min: 1, max: 99999 },
             { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
-            { name: "sum", type: "N", min: 1, max: 100000000 },
+            { name: "sum", type: "N", min: 1, max: 9999999999 },
             { name: "seatStatus", type: "N", min: 1, max: 2 },
             { name: "contentType", type: "N", min: 1, max: 2 },
             { name: "icon", type: "NS", min: 1, max: 20 },
@@ -17,14 +17,15 @@ export class SeatCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         if (!inparam.content || inparam.content.length < 1) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
-        }
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+        }s
         if ((!inparam.content.toolId && !inparam.content.packageId)) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
 
         // 数据类型处理
@@ -49,7 +50,8 @@ export class SeatCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -68,7 +70,8 @@ export class SeatCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -87,7 +90,7 @@ export class SeatCheck {
             { name: "seatType", type: "N", min: 1, max: 2 },
             { name: "order", type: "N", min: 1, max: 99999 },
             { name: "price", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
-            { name: "sum", type: "N", min: 1, max: 100000000 },
+            { name: "sum", type: "N", min: 1, max: 9999999999 },
             { name: "seatStatus", type: "N", min: 1, max: 2 },
             { name: "contentType", type: "N", min: 1, max: 2 },
             { name: "icon", type: "NS", min: 1, max: 20 },
@@ -95,14 +98,15 @@ export class SeatCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         if (!inparam.content || inparam.content.length < 1) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
         if ((!inparam.content.toolId && !inparam.content.packageId)) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
 
         // 数据类型处理
@@ -128,7 +132,8 @@ export class SeatCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理

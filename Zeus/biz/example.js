@@ -5,7 +5,6 @@ import {
     BizErr,
     RoleCodeEnum,
     RoleModels,
-    Trim,
     Empty,
     Model,
     BillModel,

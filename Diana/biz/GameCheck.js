@@ -17,12 +17,13 @@ export class GameCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 检查子对象
         if (!inparam.company || !inparam.company.companyName || !inparam.company.companyId) {
-            return [{ "code": -1, "msg": "游戏厂商数据不合法", "params": ["company"] }, 'company']
+            throw [{ "code": -1, "msg": "游戏厂商数据不合法", "params": ["company"] }, 'company']
         }
 
         // 数据类型处理
@@ -35,7 +36,7 @@ export class GameCheck {
 
         // 精细检查
         if (!GameTypeEnum[inparam.gameType]) {
-            return [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+            throw [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
         }
 
         return [checkAttError, errorParams]
@@ -53,7 +54,8 @@ export class GameCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -61,7 +63,7 @@ export class GameCheck {
 
         // 精细检查
         if (!GameTypeEnum[inparam.gameType]) {
-            return [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+            throw [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
         }
 
         return [checkAttError, errorParams]
@@ -77,7 +79,8 @@ export class GameCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 如果类型参数为空，默认查询所有类型
@@ -92,6 +95,7 @@ export class GameCheck {
         // 数据类型处理
         inparam.gameType = inparam.gameType.toString()
         inparam.keyword = inparam.keyword || null
+        
         return [checkAttError, errorParams]
     }
 }

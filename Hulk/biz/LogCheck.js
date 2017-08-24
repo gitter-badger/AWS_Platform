@@ -11,7 +11,8 @@ export class LogCheck {
         ], inparam)
 
         if(checkAttError){
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理

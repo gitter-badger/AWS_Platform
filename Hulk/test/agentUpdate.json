@@ -1,0 +1,54 @@
+{
+    "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX2NoZW5leSIsInBhc3N3b3JkIjoiMTIzNDU2Iiwic3VmZml4IjoiUGxhdGZvcm0iLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJTdXBlckFkbWluIiwidXNlcklkIjoiNjAyOGVlYzYtOTZlYy00OTJkLWEzNmItZmQ4ZDY5ODFiNzZmIiwicm9sZSI6IjEiLCJkaXNwbGF5TmFtZSI6IuW5s-WPsOeuoeeQhuWRmCIsImlhdCI6MTUwMDk3Mzg5OX0.2TQMNV3yBDYoBKaUtU0bwTNuAPeaGGAovZ8JN-DZ5pE"
+    },
+    "requestContext": {
+        "authorizer": {
+            "username": "Agent_NAagent",
+            "parent": "00",
+            "role": "1000",
+            "userId": "cbfaa49d-6bb2-40c8-bc8f-3d768f6f3a04"
+        },
+        "identity": {
+            "sourceIp": "127.0.0.1"
+        }
+    },
+    "body": {
+        "lastIP": "47.52.103.58",
+        "isforever": true,
+        "hostName": "李俊军君啊",
+        "uname": "asdfasdfd",
+        "status": 1,
+        "contractPeriod": 0,
+        "adminName": "NULL!",
+        "enabledAt": 1503312789349,
+        "displayName": "asd的下级",
+        "password": "-t1+:&jUK)uC@c",
+        "loginAt": 1503312789665,
+        "suffix": "asd",
+        "userId": "03e28e5c-e0a1-44b2-aee5-5e795c0da00f",
+        "displayId": 439933,
+        "parentName": "SAA_asdfsadfsdaf",
+        "hostContact": "asdfasdf",
+        "rate": "1",
+        "adminContact": "NULL!",
+        "vedioMix": "1",
+        "passhash": "$2a$10$P6sb.TF2u2b7H/ioXs7AfuKYpy2vFXeq3sQD6oI0gF.OBOy9ZpHTK",
+        "createdAt": 1503312789665,
+        "levelIndex": "01,af25fa17-12a0-41c9-aecd-88655980db4c,93d7a4e1-d95b-473d-9255-155ca375b742",
+        "gender": 0,
+        "agentEmail": "dasfads@fasd.asdf",
+        "children": 0,
+        "remark": "asd的下级",
+        "parentSuffix": "SAA",
+        "liveMix": "1",
+        "role": "1000",
+        "level": 3,
+        "points": 0,
+        "updatedAt": 1503370756581,
+        "adminEmail": "NULL!",
+        "parent": "93d7a4e1-d95b-473d-9255-155ca375b742",
+        "username": "asd_asdfasdfd",
+        "parentDisplayName": "李君的一级代理"
+    }
+}

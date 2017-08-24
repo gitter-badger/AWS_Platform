@@ -4,21 +4,28 @@
     },
     "requestContext": {
         "authorizer": {
-            "username": "Platform_cheney",
-            "parent": "00",
-            "role": "1",
-            "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
-            "principalId": "de1fb483-5307-4ff9-8009-9a04cffee142"
+            "userId": "1070d03e-1652-428f-9a55-81b77ef4e8ed",
+            "role": "10",
+            "suffix": "YongA1",
+            "username": "YongA1_一二三四五六七八九十一二三四五六",
+            "parent": "01",
+            "parentName": "Platform_Yongtest001",
+            "displayName": "直属XLS01",
+            "level": 1,
+            "displayId": 156735,
+            "contractPeriod": 0,
+            "isforever": true,
+            "updatedAt": 1503304378954
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "fromUserId": "f1e6f996-0b74-4a2c-a240-853b59074da3",
+        "fromUserId": "f2b57bd5-8be2-49ad-8ce7-5eca7ade5e5c",
         "toRole": "10",
-        "toUser": "Platform_TGXtest002",
-        "amount": "1111",
+        "toUser": "FZSA01_FZStest001",
+        "amount": "1",
         "remark": ""
     }
 }

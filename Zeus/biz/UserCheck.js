@@ -6,7 +6,7 @@ export class UserCheck {
      */
     checkAdmin(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1, max: 1 },
@@ -24,7 +24,8 @@ export class UserCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -39,11 +40,7 @@ export class UserCheck {
      */
     checkUser(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
-        }
-        // 代理默认前缀
-        if (inparam.role == RoleCodeEnum['Agent']) {
-            inparam.suffix = 'Agent'
+            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 10, max: 100 },
@@ -67,20 +64,18 @@ export class UserCheck {
             // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
-            // 代理
-            // { name: "agentEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 线路号处理
         if (inparam.role == RoleCodeEnum['Merchant']) {
             if (!inparam.msn) {
-                return [{ "code": -1, "msg": "入参商户线路号不存在", "params": ["msn"] }, 'msn']
+                throw [{ "code": -1, "msg": "入参商户线路号不存在", "params": ["msn"] }, 'msn']
             }
             inparam.msn = parseInt(inparam.msn).toString()
         }
@@ -104,7 +99,7 @@ export class UserCheck {
      */
     checkUserUpdate(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 10, max: 100 },
@@ -128,14 +123,12 @@ export class UserCheck {
             // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
 
-            // 代理
-            // { name: "agentEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -160,11 +153,14 @@ export class UserCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "role", type: "N", min: 1, max: 100 }
+            { name: "suffix", type: "NREG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            { name: "role", type: "N", min: 1, max: 100 },
+            { name: "captcha", type: "N", min: 1000, max: 9999 }
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -185,7 +181,8 @@ export class UserCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -200,12 +197,18 @@ export class UserCheck {
      */
     checkPassword(inparam) {
         if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+            throw [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "password", type: "S", min: 6, max: 16 }]
             , inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
+        }
+
         return [checkAttError, errorParams]
     }
 }

@@ -4,7 +4,6 @@ import {
   Codes,
   BizErr,
   Model,
-  Trim,
   Pick,
   Keys,
   Omit,
@@ -22,10 +21,9 @@ import { PushModel } from '../model/PushModel'
 
 /**
  * 管理员注册
- * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息
  */
-export const RegisterAdmin = async (token = {}, userInfo = {}) => {
+export const RegisterAdmin = async (userInfo) => {
   // 默认值设置
   const adminRole = RoleModels[RoleCodeEnum['PlatformAdmin']]()
   const userInput = Pick({
@@ -110,11 +108,11 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   // 初始点数
   const initPoints = CheckUser.points
   // 检查余额
-  const [queryBalanceErr, balance] = await new BillModel().checkBalance(token, parentUser)
+  const [queryBalanceErr, queryBalanceRet] = await new BillModel().checkUserBalance(parentUser)
   if (queryBalanceErr) {
     return [queryBalanceErr, 0]
   }
-  if (initPoints > balance) {
+  if (initPoints > queryBalanceRet.lastBalance) {
     return [BizErr.BalanceErr(), 0]
   }
 
@@ -328,7 +326,7 @@ const queryParent = async (token, parent) => {
 const saveUser = async (userInfo) => {
   // 线路商或商户，从编码池获取新编码
   let [uucodeErr, uucodeRet] = [0, 0]
-  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role || RoleCodeEnum['Agent'] == userInfo.role) {
+  if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role) {
     [uucodeErr, uucodeRet] = await Model.uucode('displayId', 6)
     if (uucodeErr) {
       return [uucodeErr, 0]

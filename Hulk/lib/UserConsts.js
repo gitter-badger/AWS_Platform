@@ -1,14 +1,15 @@
-// ==================== 以下是全系统用户实体 ====================
 import { Model } from './Dynamo'
-export const GenderEnum = {
-  Male: 1,
-  Female: 2,
-  Trans: 0
-}
+// ==================== 以下是全系统用户实体 ====================
 // 普通状态枚举
 export const StatusEnum = {
   Enable: 1,
   Disable: 0
+}
+// 性别枚举
+export const GenderEnum = {
+  Male: 1,
+  Female: 0,
+  Trans: 2
 }
 // 角色编码枚举
 export const RoleCodeEnum = {
@@ -134,7 +135,8 @@ export const RoleDisplay = {
     // 'password',
     'parent',
     'parentName',
-    'displayName'
+    'displayName',
+    'level'
   ],
   '10': [// 线路商
     'userId',
@@ -145,6 +147,7 @@ export const RoleDisplay = {
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'displayId',        // 显示ID
     'contractPeriod',   // 有效期
@@ -161,6 +164,7 @@ export const RoleDisplay = {
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'msn',            // 商户线路号
     'apiKey',         // 商户APIKEY
@@ -180,6 +184,7 @@ export const RoleDisplay = {
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'vedioMix',       // 电子游戏洗码比
     'liveMix',        // 真人视讯洗码比

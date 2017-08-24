@@ -1,18 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels,
-    BillMo
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels, BillMo } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 import { UserModel } from './UserModel'
@@ -33,18 +19,11 @@ export class BillModel extends BaseModel {
     }
 
     /**
-     * 商户的账单流水
-     * @param {*} token 身份令牌
+     * 用户的账单流水
+     * @param {*} initPoint 初始分
      * @param {*} userId 用户ID
      */
-    async computeWaterfall(token, userId) {
-        const [queryUserErr, user] = await new UserModel().queryUserById(userId)
-        if (queryUserErr) {
-            return [queryUserErr, 0]
-        }
-        if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
-            return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
-        }
+    async computeWaterfall(initPoint, userId) {
         const [queryErr, bills] = await this.query({
             IndexName: 'UserIdIndex',
             KeyConditionExpression: 'userId = :userId',
@@ -59,7 +38,7 @@ export class BillModel extends BaseModel {
         const waterfall = _.map(bills.Items, (item, index) => {
             let balance = _.reduce(_.slice(bills.Items, 0, index + 1), (sum, item) => {
                 return sum + item.amount
-            }, 0.0) + user.points
+            }, 0.0) + initPoint
             return {
                 ...bills.Items[index],
                 oldBalance: balance - bills.Items[index].amount,
@@ -67,28 +46,6 @@ export class BillModel extends BaseModel {
             }
         })
         return [0, waterfall.reverse()]
-    }
-
-    /**
-     * 获取转账用户
-     * @param {*} token 
-     * @param {*} fromUserId 
-     */
-    async queryBillUser(token, fromUserId) {
-        if (!fromUserId) {
-            fromUserId = token.userId
-        }
-        const [err, user] = await new UserModel().queryUserById(fromUserId)
-        if (err) {
-            return [err, 0]
-        }
-        if (token.role == RoleCodeEnum['PlatformAdmin']) {
-            return [0, user]
-        }
-        if (!(user.userId == token.userId || user.parent == token.userId)) {
-            return [BizErr.TokenErr('current token user cant operate this user'), 0]
-        }
-        return [0, user]
     }
 
     /**
@@ -164,27 +121,12 @@ export class BillModel extends BaseModel {
     }
 
     /**
-     * 返回某个账户下的余额
-     * @param {*} token 
-     * @param {*} user 
-     */
-    async checkBalance(token, user) {
-        // 因为所有的转账操作都是管理员完成的 所以 token必须是管理员.
-        // 当前登录用户只能查询自己的余额
-        // 上级可以查询下级余额
-        if (!(token.role == RoleCodeEnum['PlatformAdmin'] || user.userId === token.userId || user.parent === token.userId)) {
-            return [BizErr.TokenErr('only admin or user himself can check users balance'), 0]
-        }
-        return await this.checkUserBalance(user)
-    }
-
-    /**
      * 转账
      * @param {*} from 
      * @param {*} billInfo 
      */
     async billTransfer(from, billInfo) {
-        // move out user input sn
+        // 输入数据处理
         billInfo = Omit(billInfo, ['sn', 'fromRole', 'fromUser', 'action'])
         const [toUserErr, to] = await new UserModel().getUserByName(billInfo.toRole, billInfo.toUser)
         if (toUserErr) {
@@ -198,13 +140,9 @@ export class BillModel extends BaseModel {
             ...Role,
             ...from
         }, Keys(Role))
-        if (!fromInparam.role || !fromInparam.username) {
-            return [BizErr.ParamErr('Param error,invalid transfer. from** null')]
-        }
         if (fromInparam.username == billInfo.toUser) {
-            return [BizErr.ParamErr('Param error,invalid transfer. self transfer not allowed')]
+            return [BizErr.ParamErr('不允许自我转账')]
         }
-
         // 存储账单流水
         const Bill = {
             ...Model.baseModel(),
@@ -251,72 +189,4 @@ export class BillModel extends BaseModel {
         }
         return [0, Bill]
     }
-
-    // async batchSave() {
-    //     const batch = {
-    //         RequestItems: {
-    //             'ZeusPlatformBill': [
-    //                 {
-    //                     PutRequest: {
-    //                         Item: {
-    //                             sn: '1',
-    //                             userId: 'a'
-    //                         }
-    //                     }
-    //                 },
-    //                 {
-    //                     PutRequest: {
-    //                         Item: {
-    //                             sn: '2',
-    //                             userId: 'b'
-    //                         }
-    //                     }
-    //                 }
-    //             ]
-    //         }
-    //     }
-    //     return await this.batchWrite(batch)
-    // }
-
-    // async updateDate() {
-    //     const params = {
-    //         Key: {
-    //             'sn': '1',
-    //             'userId': 'a'
-    //         },
-    //         UpdateExpression: "set testv = :testv",
-    //         ExpressionAttributeValues: {
-    //             ":testv": 'asd',
-    //         },
-    //         ReturnValues: "UPDATED_NEW"
-    //     }
-    //     return await this.updateItem(params)
-    // }
-
-    // async deleteData() {
-    //     const params = {
-    //         Key: {
-    //             'sn': '1',
-    //             'userId': 'a'
-    //         },
-    //         ConditionExpression: "testv = :testv",
-    //         ExpressionAttributeValues: {
-    //             ":testv": 'asd',
-    //         },
-    //     }
-    //     return await this.deleteItem(params)
-    // }
-
-    // async queryPage() {
-    //     const params = {
-    //         KeyConditionExpression: 'sn = :sn',
-    //         // FilterExpression: 'adminName = :adminName',
-    //         Limit: 2,   // 分页大小
-    //         ExclusiveStartKey: {"sn":"2","userId":"b"},// 起始KEY
-    //         ExpressionAttributeValues: {
-    //             ':sn': '2'
-    //         }
-    //     }
-    //     return await this.query(params)
-    // }
 }

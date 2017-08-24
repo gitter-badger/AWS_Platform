@@ -37,10 +37,9 @@ export class AgentModel extends BaseModel {
 
     /**
      * 注册代理管理员
-     * @param {*} token 身份令牌
      * @param {*} userInfo 输入用户信息
      */
-    async registerAdmin(token = {}, userInfo = {}) {
+    async registerAdmin(userInfo) {
         // 默认值设置
         const adminRole = RoleModels[RoleCodeEnum['Agent']]()
         const CheckUser = { ...adminRole, ...userInfo, passhash: Model.hashGen(userInfo.password) }
@@ -132,6 +131,8 @@ export class AgentModel extends BaseModel {
         const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
             toUser: saveUserRet.username,
             toRole: saveUserRet.role,
+            toLevel: saveUserRet.level,
+            toDisplayName: saveUserRet.displayName,
             amount: initPoints,
             operator: token.username,
             remark: '初始点数'

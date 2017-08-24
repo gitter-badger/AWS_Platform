@@ -1,11 +1,5 @@
-import { Success, Fail, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
 // import { LogModel } from './model/LogModel'
-
-// import { LogCheck } from './biz/LogCheck'
-
-const ResOK = (callback, res) => callback(null, Success(res))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
-const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 // ==================== 以下为内部方法 ====================
 
@@ -14,13 +8,13 @@ const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken
   const token = e.authorizationToken.split(' ')
   if (token[0] !== 'Bearer') {
-    return c.fail('Unauthorized: wrong token type')
+    return c.fail('授权类型错误')
   }
   // verify it and return the policy statements
   const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
     console.error(JSON.stringify(err), JSON.stringify(userInfo))
-    return c.fail('Unauthorized')
+    return c.fail('未授权')
   }
   // 有效期校验
   console.info('解密')
@@ -37,9 +31,7 @@ const jwtverify = async (e, c, cb) => {
   // 结果返回
   return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }
-/**
-  api export
-**/
+
 export {
   jwtverify                    // 用于进行token验证的方法
 }
