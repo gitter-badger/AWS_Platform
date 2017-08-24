@@ -8,13 +8,13 @@ const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken
   const token = e.authorizationToken.split(' ')
   if (token[0] !== 'Bearer') {
-    return c.fail('认证类型错误')
+    return c.fail('授权类型错误')
   }
   // verify it and return the policy statements
   const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
     console.error(JSON.stringify(err), JSON.stringify(userInfo))
-    return c.fail('未认证')
+    return c.fail('未授权')
   }
   // 有效期校验
   console.info('解密')
