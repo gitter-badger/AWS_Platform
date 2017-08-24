@@ -77,6 +77,48 @@ export class LogModel extends BaseModel {
                 }
             }, inparam)
         }
+        // 代理管理员
+        if (!inparam.parent && inparam.level === 0) {
+            return await this.page({
+                IndexName: 'LogRoleIndex',
+                Limit: inparam.pageSize,
+                ExclusiveStartKey: inparam.startKey,
+                ScanIndexForward: false,
+                KeyConditionExpression: "#role = :role",
+                FilterExpression: "#type = :type AND #level = :level",
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#type': 'type',
+                    '#level': 'level'
+                },
+                ExpressionAttributeValues: {
+                    ':role': inparam.role.toString(),
+                    ':type': inparam.type,
+                    ':level': inparam.level
+                }
+            }, inparam)
+        }
+        // 其余代理
+        else if (!inparam.parent && inparam.level === -1) {
+            return await this.page({
+                IndexName: 'LogRoleIndex',
+                Limit: inparam.pageSize,
+                ExclusiveStartKey: inparam.startKey,
+                ScanIndexForward: false,
+                KeyConditionExpression: "#role = :role",
+                FilterExpression: "#type = :type AND #level <> :level",
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#type': 'type',
+                    '#level': 'level'
+                },
+                ExpressionAttributeValues: {
+                    ':role': inparam.role.toString(),
+                    ':type': inparam.type,
+                    ':level': 0
+                }
+            }, inparam)
+        }
         // let log = { Items: [], LastEvaluatedKey: {} }
         // let [err, ret] = [0, 0]
         // while (log.Items.length < inparam.pageSize && log.LastEvaluatedKey) {
@@ -128,6 +170,8 @@ export class LogModel extends BaseModel {
         let inparams = inparam
         let ret = 'Y'
         let detail = result
+        let level = inparam.operateToken.level
+        let levelIndex = inparam.operateToken.levelIndex
         if (error) {
             ret = 'N'
             detail = error
@@ -137,6 +181,8 @@ export class LogModel extends BaseModel {
             userId: userId,
             role: role,
             suffix: suffix,
+            level: level,
+            levelIndex: levelIndex,
             username: username,
             lastIP: lastIP,
             type: type,
@@ -164,6 +210,15 @@ export class LogModel extends BaseModel {
         let lastLogin = new Date().getTime()
         let userStatus = StatusEnum.Enable
         let parent = loginUserRet.parent ? loginUserRet.parent : '0'
+        let level = loginUserRet.level
+        if (!level && level != 0) {
+            level = '-1'
+        }
+        let levelIndex = loginUserRet.levelIndex
+        if (!levelIndex && levelIndex != 0) {
+            levelIndex = '-1'
+        }
+
         if (loginUserErr) {
             detail = '登录失败'
             role = userLoginInfo.role
@@ -201,6 +256,8 @@ export class LogModel extends BaseModel {
             userId: userId,
             role: role,
             suffix: suffix,
+            level: level,
+            levelIndex: levelIndex,
             username: username,
             displayName: loginUserRet.displayName,
             type: 'login',
