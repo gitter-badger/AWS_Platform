@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, JwtVerify, GeneratePolicyDocument } from './lib/all'
+import { ResOK, ResFail, ResErr, JSONParser, BizErr, RoleCodeEnum, StatusEnum, Model, Codes, Pick, JwtVerify, GeneratePolicyDocument } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
@@ -145,10 +145,15 @@ const userChangeStatus = async (e, c, cb) => {
     }
     // 更新用户
     user.status = inparam.status
-    if (inparam.contractPeriod == 0 || !inparam.contractPeriod) {
-      user.contractPeriod = 0
-    } else if (inparam.contractPeriod) {
-      user.contractPeriod = inparam.contractPeriod
+    // 解锁需要更新有效期
+    if (inparam.status == StatusEnum.Enable) {
+      if (inparam.contractPeriod == 0 || !inparam.contractPeriod) {
+        user.contractPeriod = 0
+        user.isforever = true
+      } else if (inparam.contractPeriod) {
+        user.contractPeriod = inparam.contractPeriod
+        user.isforever = false
+      }
     }
     const [err, ret] = await new UserModel().userUpdate(user)
     // 操作日志记录
