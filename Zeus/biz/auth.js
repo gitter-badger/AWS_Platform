@@ -325,7 +325,7 @@ const queryParent = async (token, parent) => {
 // 保存用户
 const saveUser = async (userInfo) => {
   // 线路商或商户，从编码池获取新编码
-  const [uucodeErr, uucodeRet] = [0, 0]
+  let [uucodeErr, uucodeRet] = [0, 0]
   if (RoleCodeEnum['Manager'] == userInfo.role || RoleCodeEnum['Merchant'] == userInfo.role) {
     [uucodeErr, uucodeRet] = await Model.uucode('displayId', 6)
     if (uucodeErr) {
