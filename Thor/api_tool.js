@@ -14,7 +14,7 @@ const toolNew = async (e, c, cb) => {
     const res = { m: 'toolNew' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new ToolCheck().check(inparam)
+    const [checkAttError, errorParams] = new ToolCheck().check(inparam)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -45,7 +45,7 @@ const toolList = async (e, c, cb) => {
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
     // 业务操作
-    let [err, ret] = await new ToolModel().list(inparam)
+    const [err, ret] = await new ToolModel().list(inparam)
 
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
@@ -68,7 +68,7 @@ const toolOne = async (e, c, cb) => {
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
     // 业务操作
-    let [err, ret] = await new ToolModel().getOne(inparam)
+    const [err, ret] = await new ToolModel().getOne(inparam)
 
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
@@ -88,7 +88,7 @@ const toolChangeStatus = async (e, c, cb) => {
     const res = { m: 'toolChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new ToolCheck().checkStatus(inparam)
+    const [checkAttError, errorParams] = new ToolCheck().checkStatus(inparam)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -116,7 +116,7 @@ const toolUpdate = async (e, c, cb) => {
     const res = { m: 'toolUpdate' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new ToolCheck().checkUpdate(inparam)
+    const [checkAttError, errorParams] = new ToolCheck().checkUpdate(inparam)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -144,7 +144,7 @@ const toolDelete = async (e, c, cb) => {
     const res = { m: 'toolDelete' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new ToolCheck().checkDelete(inparam)
+    const [checkAttError, errorParams] = new ToolCheck().checkDelete(inparam)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 

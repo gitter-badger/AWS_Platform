@@ -80,7 +80,7 @@ const billTransfer = async (e, c, cb) => {
     // 入参数据转换
     const [jsonParseErr, transferInfo] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new BillCheck().checkBill(transferInfo)
+    const [checkAttError, errorParams] = new BillCheck().checkBill(transferInfo)
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 获取转账账户
@@ -126,7 +126,7 @@ const logList = async (e, c, cb) => {
     const res = { m: 'logList' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
-    let [checkAttError, errorParams] = new LogCheck().checkPage(inparam)
+    const [checkAttError, errorParams] = new LogCheck().checkPage(inparam)
     // 获取身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 平台管理员或代理管理员
@@ -150,7 +150,7 @@ const logList = async (e, c, cb) => {
     }
 
     // 业务操作
-    let [err, ret] = await new LogModel().logPage(inparam)
+    const [err, ret] = await new LogModel().logPage(inparam)
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
     return ResOK(cb, { ...res, payload: ret })

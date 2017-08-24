@@ -15,7 +15,7 @@ const agentAdminNew = async (e, c, cb) => {
         // 入参数据
         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
         //检查参数是否合法
-        let [checkAttError, errorParams] = new AgentCheck().checkAdmin(userInfo)
+        const [checkAttError, errorParams] = new AgentCheck().checkAdmin(userInfo)
         // 获取令牌，只有代理管理员有权限
         // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作
@@ -42,7 +42,7 @@ const agentNew = async (e, c, cb) => {
         // 入参数据
         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
         //检查参数是否合法
-        let [checkAttError, errorParams] = new AgentCheck().check(userInfo)
+        const [checkAttError, errorParams] = new AgentCheck().check(userInfo)
         // 获取令牌，只有代理有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作
@@ -68,7 +68,7 @@ const agentLogin = async (e, c, cb) => {
         // 输入参数转换与校验
         const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
         //检查参数是否合法
-        let [checkAttError, errorParams] = new AgentCheck().checkLogin(userLoginInfo)
+        const [checkAttError, errorParams] = new AgentCheck().checkLogin(userLoginInfo)
         // 用户登录
         const [loginUserErr, loginUserRet] = await new AgentModel().login(Model.addSourceIP(e, userLoginInfo))
         // 登录日志
@@ -122,7 +122,7 @@ const agentList = async (e, c, cb) => {
         if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
         // 查询每个用户余额
         for (let user of ret) {
-            let [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
+            const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
         }
@@ -142,7 +142,7 @@ const agentUpdate = async (e, c, cb) => {
         const res = { m: 'agentUpdate' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         //检查参数是否合法
-        let [checkAttError, errorParams] = new AgentCheck().checkUpdate(inparam)
+        const [checkAttError, errorParams] = new AgentCheck().checkUpdate(inparam)
         // 获取令牌，只有代理有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作

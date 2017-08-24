@@ -14,7 +14,7 @@ const seatNew = async (e, c, cb) => {
         const res = { m: 'seatNew' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
-        let [checkAttError, errorParams] = new SeatCheck().check(inparam)
+        const [checkAttError, errorParams] = new SeatCheck().check(inparam)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -42,12 +42,12 @@ const seatList = async (e, c, cb) => {
         const res = { m: 'seatList' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
-        let [checkAttError, errorParams] = new SeatCheck().checkQuery(inparam)
+        const [checkAttError, errorParams] = new SeatCheck().checkQuery(inparam)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
         // 业务操作
-        let [err, ret] = await new SeatModel().list(inparam)
+        const [err, ret] = await new SeatModel().list(inparam)
 
         // 结果返回
         if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
@@ -69,7 +69,7 @@ const seatOne = async (e, c, cb) => {
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
         // 业务操作
-        let [err, ret] = await new SeatModel().getOne(inparam)
+        const [err, ret] = await new SeatModel().getOne(inparam)
 
         // 结果返回
         if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
@@ -88,7 +88,7 @@ const seatChangeStatus = async (e, c, cb) => {
         const res = { m: 'seatChangeStatus' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
-        let [checkAttError, errorParams] = new SeatCheck().checkStatus(inparam)
+        const [checkAttError, errorParams] = new SeatCheck().checkStatus(inparam)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -116,7 +116,7 @@ const seatUpdate = async (e, c, cb) => {
         const res = { m: 'seatUpdate' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
-        let [checkAttError, errorParams] = new SeatCheck().checkUpdate(inparam)
+        const [checkAttError, errorParams] = new SeatCheck().checkUpdate(inparam)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -144,7 +144,7 @@ const seatDelete = async (e, c, cb) => {
         const res = { m: 'seatDelete' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         //检查参数是否合法
-        let [checkAttError, errorParams] = new SeatCheck().checkDelete(inparam)
+        const [checkAttError, errorParams] = new SeatCheck().checkDelete(inparam)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 

@@ -14,7 +14,7 @@ const gameNew = async (e, c, cb) => {
     const res = { m: 'gameNew' }
     const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new GameCheck().checkGame(gameInfo)
+    const [checkAttError, errorParams] = new GameCheck().checkGame(gameInfo)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -45,7 +45,7 @@ const gameList = async (e, c, cb) => {
     // }
     const [jsonParseErr, gameParams] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new GameCheck().checkQuery(gameParams)
+    const [checkAttError, errorParams] = new GameCheck().checkQuery(gameParams)
     let [err, ret] = [1, 1]
     // 普通游戏列表
     // if (!gameParams.parent || gameParams.parent == RoleCodeEnum['PlatformAdmin'] || gameParams.parent == '01') {
@@ -77,7 +77,7 @@ const gameOne = async (e, c, cb) => {
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 业务操作
-    let [err, ret] = await new GameModel().getOne(gameParams.gameType, gameParams.gameId)
+    const [err, ret] = await new GameModel().getOne(gameParams.gameType, gameParams.gameId)
     ret.gameType = GameTypeEnum[ret.gameType].name
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
@@ -96,7 +96,7 @@ const gameChangeStatus = async (e, c, cb) => {
     const res = { m: 'gameChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new GameCheck().checkStatus(inparam)
+    cosnt [checkAttError, errorParams] = new GameCheck().checkStatus(inparam)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
