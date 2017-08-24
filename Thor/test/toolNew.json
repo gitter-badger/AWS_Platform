@@ -6,7 +6,7 @@
         "authorizer": {
             "username": "Platform_cheney",
             "parent": "00",
-            "role": "1",
+            "role": "2",
             "userId": "6028eec6-96ec-492d-a36b-fd8d6981b76f",
             "principalId": "6028eec6-96ec-492d-a36b-fd8d6981b76f"
         },

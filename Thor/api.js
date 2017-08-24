@@ -1,4 +1,4 @@
-import {ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
+import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
 // import { LogModel } from './model/LogModel'
 
 // ==================== 以下为内部方法 ====================
@@ -8,13 +8,13 @@ const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken
   const token = e.authorizationToken.split(' ')
   if (token[0] !== 'Bearer') {
-    return c.fail('Unauthorized: wrong token type')
+    return c.fail('认证类型错误')
   }
   // verify it and return the policy statements
   const [err, userInfo] = await JwtVerify(token[1])
   if (err || !userInfo) {
     console.error(JSON.stringify(err), JSON.stringify(userInfo))
-    return c.fail('Unauthorized')
+    return c.fail('未认证')
   }
   // 有效期校验
   console.info('解密')

@@ -17,14 +17,15 @@ export class SeatCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         if (!inparam.content || inparam.content.length < 1) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
-        }
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+        }s
         if ((!inparam.content.toolId && !inparam.content.packageId)) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
 
         // 数据类型处理
@@ -49,7 +50,8 @@ export class SeatCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -68,7 +70,8 @@ export class SeatCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
@@ -95,14 +98,15 @@ export class SeatCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         if (!inparam.content || inparam.content.length < 1) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
         if ((!inparam.content.toolId && !inparam.content.packageId)) {
-            return [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
+            throw [{ "code": -1, "msg": "内容数据不合法", "params": ["content"] }, 'content']
         }
 
         // 数据类型处理
@@ -128,7 +132,8 @@ export class SeatCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw [checkAttError, errorParams]
         }
 
         // 数据类型处理
