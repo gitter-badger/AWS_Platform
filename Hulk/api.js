@@ -35,7 +35,7 @@ const billOne = async (e, c, cb) => {
     const [outErr, out] = await new BillModel().checkUserOut(user)
     // 结果返回
     if (outErr) { return ResErr(cb, outErr) }
-    return ResOK(cb, { payload: { balance: balance, out: out, vedioMix: user.vedioMix, liveMix: user.liveMix, userId: params.userId } })
+    return ResOK(cb, { payload: { balance: balance, out: out, rate: user.rate, vedioMix: user.vedioMix, liveMix: user.liveMix, userId: params.userId } })
   } catch (error) {
     return ResErr(cb, error)
   }
