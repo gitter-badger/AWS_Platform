@@ -180,6 +180,10 @@ const logList = async (e, c, cb) => {
   else if (Model.isAgent(token)) {
     inparam.parent = token.userId
   }
+  // 商户
+  else if (Model.isMerchant(token)) {
+    inparam.parent = token.userId
+  }
   else {
     return ResErr(cb,BizErr.TokenErr('身份权限错误'))
   }
