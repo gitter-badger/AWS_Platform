@@ -35,8 +35,7 @@ export class BaseModel{
             })
         })
     }
-    update(key){
-        let updates = this.setProperties();
+    update(key, updates){
         let keys = Object.keys(updates);
         let values = Object.values(updates);
         let opts = {

@@ -36,7 +36,6 @@ export class UserModel extends athena.BaseModel {
         this.password = userPwd || Model.StringValue;
     }
 
-
     /**
      * 判断用户是否存在
      * @param {*} userName 

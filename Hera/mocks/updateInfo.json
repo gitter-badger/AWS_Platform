@@ -1,11 +1,12 @@
 
 {
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNIQV9kYXkwMDEiLCJzdWZmaXgiOiJTSEEiLCJ1c2VySWQiOjEyNzIzOSwiaWF0IjoxNTAzMDQxMjk0fQ.md7aXDksZJ61i0rLkuqiDOsbB6E2mRkR7ghlwau2TL8"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlpTWExTMV9kYXkwMDEiLCJzdWZmaXgiOiJaU1hMUzEiLCJ1c2VySWQiOjI2NTg0MiwiaWF0IjoxNTAzNTQ0MTk1fQ.Qx-FlNv01f4wwYRGwTQHnoZ_jWxgtF_UnIYrqRaF_MY"
     },
     "body":{
-        "userId" : "127239",
-        "nickname" : "小白",
+        "userId" : "265842",
+        "nickname" : "小不点44444",
+        "sex" :1,
         "headPic" :"https://baidu.com"
     }
 }

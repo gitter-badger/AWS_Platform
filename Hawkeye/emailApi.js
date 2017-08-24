@@ -167,7 +167,7 @@ const update = async(e, c, cb) => {
   let emailModel = new EmailModel(requestParams);
   emailModel.setTools(toolList, tools);
   delete emailModel.emid;
-  let [updateErr] = await emailModel.update({emid:requestParams.emid});
+  let [updateErr] = await emailModel.update({emid:requestParams.emid}, emailModel);
   if(updateErr) {
     return errorHandle(cb, updateErr);
   }

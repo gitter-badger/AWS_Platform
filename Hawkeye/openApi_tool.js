@@ -73,13 +73,10 @@ async function playerBufBefore(event) {
   
   //实际消耗的金额
   let actualAmount = +(price*num).toFixed(2);
-  console.log(actualAmount);
-  console.log(amount);
   //如果实际消耗的金额和前端传入的金额不匹配，视为无效
   if(actualAmount != amount) {
     return [new CHeraErr(CODES.amountError), null];
   }
-
   //展位内容的类型
   let seatType = seatInfo.contentType;
   //如果展位是道具包

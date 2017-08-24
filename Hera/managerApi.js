@@ -52,7 +52,7 @@ export async function gamePlayerList(event, context, cb) {
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
-    let err, userList;
+    let err, userList=[];
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
         console.log("guangliyuan");
@@ -71,7 +71,9 @@ export async function gamePlayerList(event, context, cb) {
         }
         let merchantIds = merchantList.map((merchant) => merchant.displayId);
         console.log(merchantIds);
-        [err, userList] = await userModel.findByBuIds(merchantIds);
+        if(merchantIds.length> 0) {
+            [err, userList] = await userModel.findByBuIds(merchantIds);
+        }
     }else {
         return ResOK(cb, { list: [] })
     }
