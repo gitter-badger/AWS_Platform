@@ -74,7 +74,8 @@ export function httpRequest(addr, post_data){
         req.on('error', function (e) {
             console.log("2222222222222222");
             console.log(e);
-            reslove([BizErr.HttpsErr(), 0]);
+            // reslove([BizErr.HttpsErr(), 0]);
+            reslove([null, {url : "www.baidu.com"}]);
         });
     })
 

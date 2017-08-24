@@ -20,6 +20,7 @@ const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
+const HeraGameRecord = "HeraGameRecord"
 
 export const Tables = {
   ZeusPlatformUser,
@@ -27,7 +28,8 @@ export const Tables = {
   ZeusPlatformPlayer,
   ZeusPlatformBill,
   ZeusPlatformGame,
-  ZeusPlatformMSN
+  ZeusPlatformMSN,
+  HeraGameRecord
 }
 
 

@@ -19,6 +19,11 @@ export class MerchantModel extends athena.BaseModel {
             displayId
         }, [], "merchantIdIndex");
     }
+    findByUserId(userId) {
+        return this.get({
+            userId
+        }, [], "UserIdIndex");
+    }
     all(){
         return this.scan({role:RoleCodeEnum.Merchant});
     }

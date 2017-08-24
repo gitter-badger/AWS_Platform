@@ -19,6 +19,20 @@ export const MSNStatusEnum ={
   Locked:2,
   Free: 0
 }
+export const ToolIdEnum  = {
+  diamonds : "100000"
+}
+// 展位类型枚举
+export const SeatTypeEnum = {
+  diamonds : "1",
+  tool : "2"
+}
+//展位内容枚举
+export const SeatContentEnum = {
+  package : "2",
+  tool : "1"
+}
+
 export const BillModel = {
   sn: Model.uuid(),
   fromRole: Model.StringValue,

@@ -16,6 +16,8 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantModel} from "./model/MerchantModel";
 
+import {GameModel} from "./model/GameModel";
+
 import {PackageModel} from "./model/PackageModel";
 
 import {ToolSeatModel} from "./model/ToolSeatModel";
@@ -26,9 +28,10 @@ import {ToolPackageModel} from "./model/ToolPackageModel";
 
 import {Util} from "./lib/Util"
 
-
-const gamePlatform = "NA"
-
+/**
+ * 购买前处理
+ * @param {*} event 
+ */
 async function playerBufBefore(event) {
   //json转换
   console.log(event);
@@ -58,8 +61,6 @@ async function playerBufBefore(event) {
   //获取展位
   let toolSeatModel = new ToolSeatModel();
   let [toolErr, seatInfo] = await toolSeatModel.get({seatId});
-  console.log("abc:");
-  console.log(seatInfo);
   if(toolErr) {
     return [toolErr, null];
   }
@@ -72,13 +73,10 @@ async function playerBufBefore(event) {
   
   //实际消耗的金额
   let actualAmount = +(price*num).toFixed(2);
-  console.log(actualAmount);
-  console.log(amount);
   //如果实际消耗的金额和前端传入的金额不匹配，视为无效
   if(actualAmount != amount) {
     return [new CHeraErr(CODES.amountError), null];
   }
-
   //展位内容的类型
   let seatType = seatInfo.contentType;
   //如果展位是道具包
@@ -107,7 +105,7 @@ async function playerBuyProp(event, context, callback) {
     return callback(null, ReHandler.fail(beforeErr));
   }
   if(seatInfo.seatType != SeatTypeEnum.tool) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.notDiamonds)));
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.notPros)));
   }
  
   let {userId, userName} = userInfo;
@@ -187,7 +185,18 @@ async function playerBuyDiamonds(event, context, callback){
   if(!merchantModel) {
       return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
-
+  //获取游戏
+  let gameType = -1;
+  if(requestParams.kindId!= -1) {
+    let [gameError, gameModel] = new GameModel().findByKindId(requestParams.kindId);
+    if(gameError) {
+      return callback(null, ReHandler.fail(new CHeraErr(gameError)));
+    }
+    if(!gameModel) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
+    }
+    gameType = gameModel.gameType;
+  }
   //获取玩家余额
   let userBillModel = new UserBillModel({
     userId : +userId,
@@ -201,6 +210,7 @@ async function playerBuyDiamonds(event, context, callback){
     operator : userModel.userName,
     amount : actualAmount,
     kindId : requestParams.kindId,
+    gameType : gameType,
     tool : toolContent,
     seatInfo : seatInfo,
     type : Type.buyTool,
@@ -235,7 +245,7 @@ async function playerBuyDiamonds(event, context, callback){
     userId : userId,
     action :1,
     userName : userModel.userName,
-    msn : merchantModel.msn,
+    msn : merchantModel.msn || "000",
     diamonds : +diamonds,
     toolId : 1,
     kindId : requestParams.kindId
@@ -275,13 +285,9 @@ async function toolList(event, context, callback) {
       return callback(null, ReHandler.fail(toolErr));
   }
   let returnArr = [];
-  console.log(toolList);
-  toolList.forEach(function(element) {
-      let {toolId,  toolName,  order, icon, toolStatus, desc} = element;
-      returnArr.push({toolId,  toolName,  order, icon, toolStatus, desc});
-  }, this);
-  returnArr.sort((a, b) =>  b.order - a.order)
-  callback(null, ReHandler.success({list : returnArr}));
+  
+  toolList.sort((a, b) =>  b.order - a.order)
+  callback(null, ReHandler.success({list : toolList}));
 }
 
 /**
@@ -323,9 +329,9 @@ async function seatList(event, context, callback) {
  */
 async function packageList(event, context, callback) {
   let packageModel = new PackageModel();
-  let [scanErr, list] = await seatModel.scan();
-  if(scanErr) {
-    return callback(null, ReHandler.fail(scanErr));
+  let [packageErr, list] = await packageModel.scan();
+  if(packageErr) {
+    return callback(null, ReHandler.fail(packageErr));
   }
   list.sort((a, b) =>  b.order - a.order);
   callback(null, ReHandler.success({list}));

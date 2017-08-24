@@ -107,6 +107,13 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  acceptMail:  #接收邮件
+    handler: openApi.acceptMail
+    events:
+      - http:
+          path: /email/accept
+          method: post
+          cors: true
   listEmail:  #邮件列表
     handler: emailApi.list
     events:
@@ -115,7 +122,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  toolList :  #道具列表
+  gameToolList :  #道具列表
     handler: emailApi.toolList
     events:
       - http:
@@ -123,3 +130,68 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  toolList:  #道具列表
+    handler: openApi_tool.toolList
+    events:
+      - http:
+          path: /game/tool/list
+          method: get
+          cors: true
+  seatList:  #席位列表
+    handler: openApi_tool.seatList
+    events:
+      - http:
+          path: /game/seat/list
+          method: get
+          cors: true
+  packageList:  #道具包列表
+    handler: openApi_tool.packageList
+    events:
+      - http:
+          path: /game/package/list
+          method: get
+          cors: true
+  buy:  #购买道具
+    handler: openApi_tool.playerBuyProp
+    events:
+      - http:
+          path: /game/prop/buy
+          method: post
+          cors: true
+  buyDiamonds:  #购买钻石
+    handler: openApi_tool.playerBuyDiamonds
+    events:
+      - http:
+          path: /game/diamonds/buy
+          method: post
+          cors: true
+  advertList:  #广告列表
+    handler: openApi_ad.advertList
+    events:
+      - http:
+          path: /game/advert/list
+          method: get
+          cors: true
+resources:
+  Resources:
+    HawkeyePlayerEmailRecord: #玩家接收邮件记录
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyePlayerEmailRecord
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: N
+          -
+            AttributeName: emid
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+          -
+            AttributeName: emid
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

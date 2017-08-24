@@ -87,21 +87,23 @@ export class BaseModel{
     async scan(conditions){
         let filterExpression = "";
         let expressionAttributeValues = {};
+        let expressionAttributeNames = {};
         for(let key in conditions){
-            filterExpression += `${key}=:${key} and `;
+            filterExpression += `#${key}=:${key} and `;
             expressionAttributeValues[`:${key}`] = conditions[key];
+            expressionAttributeNames[`#${key}`]  = key;
         }
         let scanOpts = {};
         if(filterExpression.length!=0){
             filterExpression = filterExpression.substr(0, filterExpression.length-4);
             scanOpts = {
                 FilterExpression : filterExpression,
+                ExpressionAttributeNames : expressionAttributeNames,
                 ExpressionAttributeValues:expressionAttributeValues
             }
         }
         return new Promise((reslove, reject) => {
             this.db$("scan", scanOpts).then((result) => {
-                console.log(result);
                 result = result || {};
                 result.Items = result.Items || [];
                 return reslove([null, result.Items || []]);
@@ -112,19 +114,17 @@ export class BaseModel{
             });
         })
     }
-    async page({pageNumber, pageSize, conditions = {}, returnValues= [], scanIndexForward, indexName}){
-        let page = new Page(pageNumber, pageSize);
+    async page({curPage, pageSize, conditions = {}, returnValues= [], scanIndexForward, indexName}){
+        let page = new Page(curPage, pageSize);
         let opts = {
             IndexName : indexName,
             Limit : pageSize, 
             ScanIndexForward : scanIndexForward,
             ProjectionExpression : Object.is(returnValues.length, 0) ? "" : 
                 returnValues.join(", "),
-            KeyConditionExpression :"",
+            FilterExpression :"",
             ExpressionAttributeValues : {}
         }
-        let countKeyConditionExpression = "",
-            conuntExpressionAttributeValues = {}
         let keys = Object.keys(conditions);
         keys.forEach((k, index) => {
             let equalMode = " = ",
@@ -133,34 +133,52 @@ export class BaseModel{
                 let pro = conditions[k];
                 for(let key in pro) {
                     switch (key) {
-                        case "$gt": equalMode = ">";
-                        case "$lt" : equalMode = "<";
-                        case "$gte" : equalMode = ">=";
-                        case "$lte" : equalMode = "<=";
+                        case "$gt": {
+                            equalMode = ">";
+                            break;
+                        }
+                        case "$lt" : {
+                            equalMode = "<";
+                            break;
+                        }
+                        case "$gte" :{
+                            equalMode = ">=";
+                            break;
+                        } 
+                        case "$lte" :{
+                             equalMode = "<=";
+                        }
                         default:
                             break;
                     }
+                    console.log(33);
+                    console.log(key);
+                    console.log(equalMode);
                     value = pro[key];
-                    break;
+                    opts.FilterExpression += `${k}${equalMode}:${k} and `;
+                    opts.ExpressionAttributeValues[`:${k}`] = value;
                 }
-            }else{
-                countKeyConditionExpression = `${k}${equalMode}:${k}`;
-                conuntExpressionAttributeValues[`:${k}`] = value;
+            }else {
+                if(value) {
+                    opts.FilterExpression += `${k}=:${k} and`;
+                    opts.ExpressionAttributeValues[`:${k}`] = value;
+                }
             }
-            opts.KeyConditionExpression += `${k}${equalMode}:${k}`;
-            opts.ExpressionAttributeValues[`:${k}`] = value;
-            if(index != keys.length -1) opts.KeyConditionExpression += " and ";
+            console.log(opts.FilterExpression);
+            opts.FilterExpression = opts.FilterExpression.substring(0, opts.FilterExpression.length-4);
         });
-
-        let [countError, count ]= await this.count(countKeyConditionExpression, conuntExpressionAttributeValues);
+        console.log(opts)
+        let [countError, count]= await this.count(opts.KeyConditionExpression, opts.ExpressionAttributeValues);
+        console.log("lengthErr:"+countError);
+        console.log(count);
         if(countError) return [countError, page];
         page.setTotal(count);
         return new Promise((reslove, reject)=>{
-            this.db$("query", opts).then((result) => {
+            this.db$("scan", opts).then((result) => {
                 page.setData(result.Items);
                 reslove([null, page])
             }).catch((err) => {
-                console.log(err);
+                // console.log(err);
                 reslove([new AError(CODES.DB_ERROR, err.stack)], page);
             })
         })
@@ -201,7 +219,7 @@ export class BaseModel{
             this.db$("query", {
                 KeyConditionExpression : filterExpression,
                 ExpressionAttributeValues : expressionAttributeValues,
-                ReturnValues : "username"
+                Select : "COUNT",
             }).then((result) => {
                 reslove([null, result.Count])
             }).catch((err) => {
@@ -230,8 +248,8 @@ export class BaseModel{
 }
 
 class Page{
-    constructor(pageNumber, pageSize){
-        this.pageNumber = pageNumber;
+    constructor(curPage, pageSize){
+        this.curPage = curPage;
         this.pageSize = pageSize;
         this.total = 0;
         this.data = [];

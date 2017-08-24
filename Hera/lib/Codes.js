@@ -12,6 +12,7 @@ export const CODES = {
     Frozen : 10006,
     merBalIns : 10007,
     palyerIns : 10008,
+    ipError : 10009,  //ip不正确
     TokenError : 11000,
     gameingError : 11001, //正在游戏中，不能转账
 
@@ -30,6 +31,14 @@ export const CODES = {
     notDiamonds : 13005,   //不是钻石包
     DiamondsIns : 13006,   //钻石不足
     notPros : 13007,   //不是道具包
+
+    AgentNotExist : 14000,  //代理不存在
+    NotAuth : 14001,  //没有权限
+    AgentBalanceIns : 14002, //代理点数不足
+    nicknameAlreadyExist : 14003,  //昵称已存在
+    mixError : 14004,//洗码比有误
+    merchantForzen : 14005,  //商户已冻结
+
 }
 
 const errorMessage = {
@@ -44,6 +53,7 @@ const errorMessage = {
   "11000" : "token错误",
   "10007" : "商家点数不足",
   "10008" : "玩家点数不足",
+  "10009" : "无效的请求IP",
   "11001" : "玩家正在游戏中",
   "12000" : "存点不正确",
   "12001" : "取点不正确",
@@ -57,7 +67,13 @@ const errorMessage = {
   "13004" : "道具包不存在",
   "13005" : "购买的不是钻石",
   "13006" : "钻石不足",
-  "13007" : "购买的不是道具"
+  "13007" : "购买的不是道具",
+  "14000" : "代理不存在",
+  "14001" : "你没有权限",
+  "14002" : "你的点数不足",
+  "14003" : "昵称已存在",
+  "14004" : "洗码比有误",
+  "14005" : "商户已冻结"
 }
 
 

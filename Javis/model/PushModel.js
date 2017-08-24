@@ -7,8 +7,8 @@ const State = {
     normal : 1,  //正常,
     forzen : 2 //冻结
 }
-// const host = '192.168.3.98';
-const host = '47.88.192.69';
+const host = '192.168.3.11';
+// const host = '47.88.192.69';
 const port = 20003;
 export class PushModel{
     constructor({username, role, userId, displayName,  headPic, parent, msn, gameList} = {}) {
@@ -40,7 +40,12 @@ export class PushModel{
         const proId = 1;  //协议
         return pushId(noid, host, port, proId);
     }
-    //公告推送
+    //广告推送
+    pushGameAdvert(id) {
+        const proId = 11;  //协议
+        return pushId(noid, host, port, proId);
+    }
+    //邮件推送
     pushGameEamil(emid) {
         const proId = 2;  //协议
         return pushId(emid, host, port, proId);

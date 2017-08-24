@@ -25,6 +25,11 @@ export const CODES = {
     toolNotExist : 13000,  //道具不存在
     amountError : 13001,   //金额不正确
     gameNotExist : 13002,  //游戏不存在
+    seatNotExist : 13003, //展位不存在
+    packageNotExist : 13004, //道具包不存在
+    notDiamonds : 13005,   //不是钻石包
+    DiamondsIns : 13006,   //钻石不足
+    notPros : 13007,   //不是道具包
 
     noticeNotExist : 13100, //公告不存在
     notAuth : 13101,  //没有权限
@@ -32,6 +37,13 @@ export const CODES = {
     toolMoreThan : 13103,  //道具超过12个
     emailNotExist : 13104, //邮件不存在
     emailUpdateError:13105,  //邮件已经发送，不能修改
+    emailAlreadyAcceptError:13106,  //该邮件已经领取
+
+    AgentNotExist : 14000,  //代理不存在
+    NotAuth : 14001,  //没有权限
+    AgentBalanceIns : 14002, //代理点数不足
+    nicknameAlreadyExist : 14003,  //昵称已存在
+    mixError : 14004,//洗码比有误
 }
 
 const errorMessage = {
@@ -42,10 +54,11 @@ const errorMessage = {
   "10003" : "用户已注册",
   "10004" : "用户不存在",
   "10005" : "密码错误",
-  "10006" : "账号已被禁止",
+  "10006" : "账号已冻结",
   "11000" : "token错误",
   "10007" : "商家点数不足",
   "10008" : "玩家点数不足",
+  "10009" : "无效的请求IP",
   "11001" : "玩家正在游戏中",
   "12000" : "存点不正确",
   "12001" : "取点不正确",
@@ -55,18 +68,29 @@ const errorMessage = {
   "13000" : "道具不存在",
   "13001" : "金额不正确",
   "13002" : "游戏不存在",
+  "13003" : "展位不存在",
+  "13004" : "道具包不存在",
+  "13005" : "购买的不是钻石",
+  "13006" : "钻石不足",
+  "13007" : "购买的不是道具",
   "13100" : "公告不存在",
   "13101" : "没有权限",
   "13102" : "道具不存在",
   "13103" : "道具超过12个",
   "13104" : "邮件不存在",
-  "13105" : "邮件已经发送，不能修改"
+  "13105" : "邮件已经发送，不能修改",
+  "13106" : "该邮件已经领取",
+   "14000" : "代理不存在",
+  "14001" : "你没有权限",
+  "14002" : "你的点数不足",
+  "14003" : "昵称已存在",
+  "14004" : "洗码比有误"
 }
 
 
 export class CHeraErr{
   constructor(code){
-    this.code = code;
+    this.code = code || -1;
     this.msg = errorMessage[code.toString()];
   }
 }

@@ -5,10 +5,10 @@
     "body" : {
         "content" : "这是一条公告",
         "msn" : "2",
-        "kindId" : "10000",
         "showTime" : 60,
         "startTime" : 1,
         "endTime" :3600000,
-        "splitTime" : 36
+        "splitTime" : 36,
+        "count" :45
     }
 }

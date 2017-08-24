@@ -35,8 +35,7 @@ export class BaseModel{
             })
         })
     }
-    update(key){
-        let updates = this.setProperties();
+    update(key, updates){
         let keys = Object.keys(updates);
         let values = Object.values(updates);
         let opts = {
@@ -76,6 +75,7 @@ export class BaseModel{
         })
     }
     get(conditions, returnValues = [],indexName,all){
+        console.log(conditions);
         let keyConditionExpression = "";
         let expressionAttributeValues = {};
         for(let key in conditions){
@@ -199,7 +199,7 @@ export class Util{
                 if (min && strLength < min) error = true;
                 if (max && strLength > max) error = true;
                 if (equal) error = !Object.is(value, equal);
-                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, value];
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, value.toString().trim()];
             }
             case "N": {
                 if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];

@@ -12,7 +12,7 @@ import {MerchantModel} from "./model/MerchantModel";
 
 import {UserModel, State} from "./model/UserModel";
 
-import {UserBillModel} from "./model/UserBillModel";
+import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantBillModel} from "./model/MerchantBillModel";
 
@@ -52,25 +52,45 @@ export async function gamePlayerList(event, context, cb) {
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
-    let err, userList;
+    let err, userList=[];
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
+        console.log("guangliyuan");
         [err, userList] = await userModel.scan(requestParams);
     }else if(role == RoleCodeEnum.Merchant) { //如果是商家
         requestParams = requestParams || {};
         requestParams.buId = displayId;
         [err, userList] = await userModel.scan(requestParams);
+    }else if(role == RoleCodeEnum.Manager){  //如果是线路商
+        console.log("这是线路商");
+        //找到所有下级商户
+        let merchantModel = new MerchantModel();
+        let [merListErr, merchantList] = await merchantModel.agentChildListByUids([tokenInfo.userId]);
+        if(merListErr) {
+            return ResFail(cb, merListErr)
+        }
+        let merchantIds = merchantList.map((merchant) => merchant.displayId);
+        console.log(merchantIds);
+        if(merchantIds.length> 0) {
+            [err, userList] = await userModel.findByBuIds(merchantIds);
+        }
     }else {
         return ResOK(cb, { list: [] })
     }
     if (err) {
         return ResFail(cb, err)
     }
+    for(let i = 0; i < userList.length; i++) {
+        let element = userList[i];
+        if(element.msn == "000") {
+            userList.splice(i, 1);
+            i --;
+        }
+    }
     userList = userList || [];
     userList.forEach(function(element) {
             delete element.userPwd
-        }, this);
-    
+    }, this);
     ResOK(cb, {list: userList});
 }
 
@@ -109,7 +129,7 @@ export async function gamePlayerInfo(event, context, cb) {
     let userBillModel = new UserBillModel();
     let [err, user] = await userModel.get({userName});
     if(err){
-        return ResFail(cb, billError)
+        return ResFail(cb, err)
     }
     if(!user) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
