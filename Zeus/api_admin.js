@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, JSONParser, BizErr, RoleCodeEnum, SubRoleEnum, StatusEnum, Model, Codes, Pick } from './lib/all'
+import { ResOK, ResFail, ResErr, JSONParser, BizErr, RoleCodeEnum, SubRoleEnum, SubRoleNameEnum, StatusEnum, Model, Codes, Pick } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
@@ -394,7 +394,7 @@ const subRoleList = async (e, c, cb) => {
         // 业务操作
         let subRoleArr = []
         for (let item in SubRoleEnum) {
-            subRoleArr.push(item)
+            subRoleArr.push(SubRoleNameEnum[item])
         }
         return ResOK(cb, { ...res, payload: subRoleArr })
     } catch (error) {

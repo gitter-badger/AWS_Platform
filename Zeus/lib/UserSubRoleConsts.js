@@ -1,4 +1,16 @@
-// 功能角色枚举
+/**
+ * 角色名称枚举
+ */
+export const SubRoleNameEnum = {
+    'admin': { role: 'admin', name: '管理员' },
+    'president': { role: 'president', name: '总裁' },
+    'marketing': { role: 'marketing', name: '市场部' },
+    'operation': { role: 'operation', name: '运营部' },
+    'finance': { role: 'finance', name: '财务部' }
+}
+/**
+ * 角色权限Y
+ */
 export const SubRolePermissionY = {
     'merchant': true,
     'player': true,
@@ -10,6 +22,9 @@ export const SubRolePermissionY = {
     'service': true,
     'system': true
 }
+/**
+ * 角色权限N
+ */
 export const SubRolePermissionN = {
     'merchant': false,
     'player': false,
@@ -21,6 +36,9 @@ export const SubRolePermissionN = {
     'service': false,
     'system': false
 }
+/**
+ * 角色权限枚举
+ */
 export const SubRoleEnum = {
     // 管理员，所有权限
     'admin': {
