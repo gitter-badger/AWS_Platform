@@ -12,7 +12,7 @@ const companyNew = async (e, c, cb) => {
     const res = { m: 'companyNew' }
     const [jsonParseErr, companyInfo] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new CompanyCheck().checkCompany(companyInfo)
+    const [checkAttError, errorParams] = new CompanyCheck().checkCompany(companyInfo)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
@@ -73,7 +73,7 @@ const companyOne = async (e, c, cb) => {
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
     // 业务操作
-    let [err, ret] = await new CompanyModel().getOne(companyParams.companyName, companyParams.companyId)
+    const [err, ret] = await new CompanyModel().getOne(companyParams.companyName, companyParams.companyId)
 
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
@@ -92,7 +92,7 @@ const companyChangeStatus = async (e, c, cb) => {
     const res = { m: 'companyChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
-    let [checkAttError, errorParams] = new CompanyCheck().checkStatus(inparam)
+    const [checkAttError, errorParams] = new CompanyCheck().checkStatus(inparam)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 

@@ -12,7 +12,7 @@ export class CaptchaCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         return [checkAttError, errorParams]

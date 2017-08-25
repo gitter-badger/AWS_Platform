@@ -162,14 +162,14 @@ export class ToolModel extends BaseModel {
      */
     async updateTool(inparam) {
         // 检查是否可以更新
-        let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
-        if (ret) {
-            return [BizErr.ItemUsed('道具在礼包中，不可变更'), 0]
-        }
-        [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
-        if (ret) {
-            return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
-        }
+        // let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
+        // if (ret) {
+        //     return [BizErr.ItemUsed('道具在礼包中，不可变更'), 0]
+        // }
+        // [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
+        // if (ret) {
+        //     return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
+        // }
         // 更新
         [err, ret] = await this.getOne(inparam)
         if (err) {

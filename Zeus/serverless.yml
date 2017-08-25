@@ -40,7 +40,7 @@ functions:
     integration: lambda
   #==================== 以下是管理员接口 ====================
   eva: #创建第一个管理员，接口编号0
-    handler: api.eva
+    handler: api_admin.eva
     events:
       -
         http:
@@ -48,7 +48,7 @@ functions:
           method: post
           cors: true
   adminList: #管理员列表
-    handler: api.adminList
+    handler: api_admin.adminList
     events:
       -
         http:
@@ -57,7 +57,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   adminCenter: #管理员个人中心
-    handler: api.adminCenter
+    handler: api_admin.adminCenter
     events:
       -
         http:
@@ -66,7 +66,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   adminNew: #创建管理员
-    handler: api.adminNew
+    handler: api_admin.adminNew
     events:
       -
         http:
@@ -75,7 +75,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   userNew: #注册新用户
-    handler: api.userNew
+    handler: api_admin.userNew
     events:
       -
         http:
@@ -84,7 +84,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   userAuth: #用户登录
-    handler: api.userAuth
+    handler: api_admin.userAuth
     events:
       -
         http:
@@ -92,7 +92,7 @@ functions:
           method: post
           cors: true
   # userGrabToken: #获取用户TOKEN
-  #   handler: api.userGrabToken
+  #   handler: api_admin.userGrabToken
   #   events:
   #     -
   #       http:
@@ -100,7 +100,7 @@ functions:
   #         method: post
   #         cors: true
   checkUserExist: #检查用户是否被占用
-    handler: api.checkUserExist
+    handler: api_admin.checkUserExist
     events:
       -
         http:
@@ -109,7 +109,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   checkSuffixExist: #检查前缀是否被占用
-    handler: api.checkSuffixExist
+    handler: api_admin.checkSuffixExist
     events:
       -
         http:
@@ -118,7 +118,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   checkNickExist: #检查昵称是否被占用
-    handler: api.checkNickExist
+    handler: api_admin.checkNickExist
     events:
       -
         http:
@@ -127,7 +127,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   userChangeStatus: #变更用户状态
-    handler: api.userChangeStatus
+    handler: api_admin.userChangeStatus
     events:
       -
         http:
@@ -136,7 +136,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   childList: #下级列表
-    handler: api.childList
+    handler: api_admin.childList
     events:
       -
         http:
@@ -145,7 +145,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   randomPassword: #随机密码
-    handler: api.randomPassword
+    handler: api_admin.randomPassword
     events:
       -
         http:
@@ -153,7 +153,7 @@ functions:
           method: post
           cors: true
   updatePassword: #重置密码
-    handler: api.updatePassword
+    handler: api_admin.updatePassword
     events:
       -
         http:

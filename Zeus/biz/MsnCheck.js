@@ -7,7 +7,7 @@ export class MsnCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         inparam.msn = parseInt(inparam.msn).toString()
@@ -25,7 +25,7 @@ export class MsnCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         inparam.msn = parseInt(inparam.msn).toString()

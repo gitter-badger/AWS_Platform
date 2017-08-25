@@ -41,13 +41,13 @@ export class UserModel extends BaseModel {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role',
-                FilterExpression: 'userId <> :userId',
+                FilterExpression: 'suffix <> :suffix',
                 ExpressionAttributeNames: {
                     '#role': 'role',
                 },
                 ExpressionAttributeValues: {
                     ':role': roleCode,
-                    ':userId': token.userId
+                    ':suffix': 'Agent'
                 }
             }
         }
@@ -125,6 +125,31 @@ export class UserModel extends BaseModel {
             return [queryErr, 0]
         }
         return [0, queryRet.Items]
+    }
+
+    /**
+     * 查询代理管理员列表
+     * @param {*} token 
+     */
+    async listAllAdmins(token) {
+        const [queryErr, adminRet] = await this.query({
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#suffix = :suffix',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#suffix': 'suffix'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['Agent'],
+                ':suffix': 'Agent'
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
+        adminRet.Items = sortResult
+        return [0, adminRet.Items]
     }
 
     // 检查用户是否重复

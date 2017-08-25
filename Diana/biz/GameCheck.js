@@ -18,12 +18,12 @@ export class GameCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         // 检查子对象
         if (!inparam.company || !inparam.company.companyName || !inparam.company.companyId) {
-            throw [{ "code": -1, "msg": "游戏厂商数据不合法", "params": ["company"] }, 'company']
+            throw { "code": -1, "msg": "游戏厂商数据不合法", "params": ["company"] }
         }
 
         // 数据类型处理
@@ -36,7 +36,7 @@ export class GameCheck {
 
         // 精细检查
         if (!GameTypeEnum[inparam.gameType]) {
-            throw [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+            throw { "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }
         }
 
         return [checkAttError, errorParams]
@@ -55,7 +55,7 @@ export class GameCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -63,7 +63,7 @@ export class GameCheck {
 
         // 精细检查
         if (!GameTypeEnum[inparam.gameType]) {
-            throw [{ "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }, 'gameType']
+            throw { "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }
         }
 
         return [checkAttError, errorParams]
@@ -80,7 +80,7 @@ export class GameCheck {
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
-            throw [checkAttError, errorParams]
+            throw checkAttError
         }
 
         // 如果类型参数为空，默认查询所有类型
