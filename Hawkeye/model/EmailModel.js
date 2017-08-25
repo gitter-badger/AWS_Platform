@@ -15,12 +15,12 @@ const EmailState = {
 
 
 export class EmailModel extends athena.BaseModel {
-    constructor({userId, content,  state, msn, sendTime,title,sendUser,nickname,tools, sendUserId} = {}) {
+    constructor({emid, userId, content,  state, msn, sendTime,title,sendUser,nickname,tools, sendUserId} = {}) {
         super(Tables.HawkeyeGameEmail);
         this.userId = userId || -1;    //创建者
         this.title = title;
         this.nickname = nickname || Model.StringValue;
-        this.emid = Util.uuid();
+        this.emid = emid || Util.uuid();
         this.content = content;
         this.createdAt = Date.now();
         this.msn = msn;  //线路号
@@ -58,5 +58,25 @@ export class EmailModel extends athena.BaseModel {
             return [null, true]
         }
         return [null, false]
+    }
+    async findByIds(emids) {
+        let filterExpression = "",
+            expressionAttributeValues = {};
+        for(var i =0; i < emids.length; i++){
+            filterExpression += `emid=:emid${i} or `;
+            expressionAttributeValues[`:emid${i}`] = emids[i];
+        }
+        filterExpression = filterExpression.substring(0, filterExpression.length -3);
+        return new Promise((reslove, reject) => {
+            this.db$("scan", {
+                TableName : this.tableName,
+                FilterExpression : filterExpression,
+                ExpressionAttributeValues : expressionAttributeValues
+            }).then((result) => {
+                reslove([null, result.Items]);
+            }).catch((err) => {
+                reslove([err, 0]);
+            })
+        })
     }
 }

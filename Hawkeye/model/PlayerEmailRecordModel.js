@@ -14,15 +14,11 @@ const EmailState = {
 
 
 export class PlayerEmailRecordModel extends athena.BaseModel {
-    constructor({userId, emid,emailInfo} = {}) {
-        super(Tables.HawkeyePlayerEamilRecord);
+    constructor({userId, emid} = {}) {
+        super(Tables.HawkeyePlayerEmailRecord);
         this.userId = userId;    //创建者
         this.createdAt = Date.now();
         this.emid = emid;
-        this.emailInfo = emailInfo;
-    }
-    findOne({userId, emid}) {
-
     }
     
 }

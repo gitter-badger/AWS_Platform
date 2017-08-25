@@ -18,7 +18,7 @@ import crypto from "crypto";
 import { httpRequest } from "./lib/HttpsUtil";
 
 const ResOK = (callback, res, code) => callback(null, Success(res, code))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail({err:res}))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 async function gameLoginSign(event, context, callback) {
@@ -44,10 +44,10 @@ async function gameLoginSign(event, context, callback) {
         let gameModel = new GameModel();
         let [error, game] = await gameModel.findSingleByType(requestParams.gameType);
         if (error) {
-            return ResFail(callback, error);
+            return ResErr(callback, error);
         }
         if (!game) {
-            return ResFail(callback, BizErr.CompanyNotExistError());
+            return ResErr(callback, BizErr.CompanyNotExistError());
         }
         let company = game.company || {};
 
@@ -60,7 +60,7 @@ async function gameLoginSign(event, context, callback) {
         }
         ResOK(callback, data, data.code);
     } catch (error) {
-        return ResFail(callback, error);
+        return ResErr(callback, error);
     }
 }
 

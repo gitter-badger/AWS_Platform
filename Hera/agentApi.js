@@ -237,6 +237,8 @@ async function qudian(userInfo, merchantInfo, requestParams) {
         action : 1,
         userId :merchantInfo.userId,
         username : merchantInfo.username,
+        fromLevel : merchantInfo.level,
+        toLevel : 10000,
     });
     let [mError] = await merchantBillModel.save();
 
@@ -267,8 +269,6 @@ async function cudian(userInfo, merchantInfo, requestParams){
     //代理余额
     let [agentBError, agentBalance] = await new MerchantBillModel({userId:merchantInfo.userId}).getBlance();
     agentBalance += +merchantInfo.points;  //需要加上初始点数
-    console.log("商家点数");
-    console.log(agentBalance);
     if(agentBError)return ResFail(cb, agentBError);
     if(agentBalance < requestParams.points) {
         return [new CHeraErr(CODES.AgentBalanceIns), null];
@@ -301,6 +301,8 @@ async function cudian(userInfo, merchantInfo, requestParams){
     let merchantBillModel = new MerchantBillModel({
         ...baseBillModel,
         action : -1,
+        fromLevel : merchantInfo.level,
+        toLevel : 10000,
         userId :merchantInfo.userId,
         username : merchantInfo.username,
     });
@@ -489,6 +491,8 @@ export async function createPlayer(event, context, cb) {
         ...requestParams,
         buId : merchantInfo.displayId,
         userName : userName,
+        parent : merchantInfo.userId,
+        parentName : merchantInfo.username,
         merchantName : merchantInfo.displayName,
         msn : "000",
         balance : +requestParams.points
@@ -543,6 +547,8 @@ export async function createPlayer(event, context, cb) {
         action : -1,
         userId :merchantInfo.userId,
         username : merchantInfo.username,
+        fromLevel : merchantInfo.level,
+        toLevel : 10000,
     });
     let [mError] = await merchantBillModel.save();
     if(mError) return callback(null, ReHandler.fail(mError));

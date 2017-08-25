@@ -396,6 +396,8 @@ async function gamePlayerBalance(event, context, callback) {
       ...baseModel,
       username : merchantInfo.username,
       userId : merchantInfo.userId,
+      fromLevel : merchantInfo.level,
+      toLevel : 10000,
       action : -action,
     };
     Object.assign(merchantObj, baseModel)

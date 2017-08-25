@@ -215,6 +215,7 @@ async function playerBuyDiamonds(event, context, callback){
     seatInfo : seatInfo,
     type : Type.buyTool,
     toolName : toolContent.prop,
+    typeName : "购买钻石",
     remark : `购买${seatInfo.prop}`
   })
 
