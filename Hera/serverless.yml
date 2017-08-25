@@ -119,7 +119,7 @@ functions:
     events:
       - http:
           path: /game/player/record
-          method: get
+          method: post
           cors: true
   gamePlayerList:  #获取玩家列表
     handler: managerApi.gamePlayerList

@@ -59,6 +59,7 @@ export class UserBillModel extends athena.BaseModel {
     async list(userName, gameId){
         let scanParams = {
             TableName : this.tableName,
+            ScanIndexForward : false,
             FilterExpression : "userName=:userName ",
             ExpressionAttributeValues : {
                 ":userName" : userName

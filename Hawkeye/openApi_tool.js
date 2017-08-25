@@ -188,7 +188,7 @@ async function playerBuyDiamonds(event, context, callback){
   //获取游戏
   let gameType = -1;
   if(requestParams.kindId!= -1) {
-    let [gameError, gameModel] = new GameModel().findByKindId(requestParams.kindId);
+    let [gameError, gameModel] = await new GameModel().findByKindId(requestParams.kindId);
     if(gameError) {
       return callback(null, ReHandler.fail(new CHeraErr(gameError)));
     }
@@ -209,7 +209,7 @@ async function playerBuyDiamonds(event, context, callback){
     msn : merchantModel.msn,
     operator : userModel.userName,
     amount : actualAmount,
-    kindId : requestParams.kindId,
+    kindId : -3,
     gameType : gameType,
     tool : toolContent,
     seatInfo : seatInfo,
@@ -218,7 +218,6 @@ async function playerBuyDiamonds(event, context, callback){
     typeName : "购买钻石",
     remark : `购买${seatInfo.prop}`
   })
-
   let [bErr, balance] = await userBillModel.getBalanceByUid(userId);
 
   if(bErr) {
@@ -313,7 +312,6 @@ async function seatList(event, context, callback) {
   let {type} = requestParams
   let seatModel = new ToolSeatModel();
   let [scanErr, list] = await seatModel.scan({seatType:type});
-  console.log(list[0].content);
   if(scanErr) {
     return callback(null, ReHandler.fail(scanErr));
   }

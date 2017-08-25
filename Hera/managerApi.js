@@ -139,6 +139,7 @@ export async function gamePlayerInfo(event, context, cb) {
     if(billError) {
         return ResFail(cb, billError)
     }
+    bilList.sort((a, b) => a.createAt < b.createAt);
     user.list = bilList;
     delete user.token;
     return ResOK(cb, user);

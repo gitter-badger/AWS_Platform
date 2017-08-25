@@ -1,8 +1,8 @@
 
 {
     "body" : {
-        "userName" : "zhangsan4",
-        "userPwd" : "123456",
-        "msn": "000"
-    }
+	"userName":"day001",
+	"userPwd":"123456",
+	"msn":"555"
+}
 }

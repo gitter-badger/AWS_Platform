@@ -472,13 +472,10 @@ async function gamePlayerA3Login(event, context, callback) {
   if(msnError) {
     return callback(null, ReHandler.fail(msnError));
   }
-  if(!merchantInfo) {
+  if(!merchantInfo && msn!="000") {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
-  //商户是否被锁定
-  if(merchantInfo.status == "0") {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantForzen)));
-  }
+  
   if(msn != "000") {
     userName = `${merchantInfo.suffix}_${userName}`; 
   }
@@ -489,6 +486,21 @@ async function gamePlayerA3Login(event, context, callback) {
   if(!userInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   //账号已冻结
   if(userInfo.state == State.forzen) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
+  //代理用户登录
+  if(!merchantInfo) {
+    let [merchantErr, merchant] = await new MerchantModel().findById(userInfo.buId);
+    if(merchantErr) {
+      return callback(null, ReHandler.fail(merchantErr));
+    }
+    if(!merchant) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantForzen)));
+    }
+    merchantInfo = merchant;
+  }
+  //商户是否被锁定
+  if(merchantInfo.status == "0") {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantForzen)));
+  }
   //验证密码
   let flag = user.vertifyPassword(userInfo.userPwd);
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
@@ -930,7 +942,7 @@ async function validateGame(event, params = []){
  */
 async function getPlayerGameRecord(event, context, callback) {
   //json转换
-  let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
