@@ -1,10 +1,10 @@
 {
     "body" : {
-        "userName" : "day0012",
-        "userPwd" : "1234567", 
-        "apiKey": "385b184a-048f-4210-9b30-3eb8d3045d4d", 
-        "buId" : "590867",
-        "userType":"1",
-        "gamePlatform":"NA"
-    }
+  "userName" : "day1003",
+  "userPwd" : "123456", 
+  "apiKey": "b6afa92f-8fb3-4740-9166-41050e943ba1", 
+  "buId" : "586542",
+  "userType":"1",
+  "gamePlatform":"NA"
+}
 }

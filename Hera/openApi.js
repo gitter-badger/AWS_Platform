@@ -171,6 +171,8 @@ async function gamePlayerRegister(event, context, callback) {
   Object.assign(requestParams, {
     msn : merchantInfo.msn,
     merchantName : merchantInfo.displayName,
+    parent : merchantInfo.userId,
+    parentName : merchantInfo.username,
     amount : 0
   })
   //判断用户是否存在

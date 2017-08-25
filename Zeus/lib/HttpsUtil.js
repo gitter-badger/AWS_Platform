@@ -65,7 +65,14 @@ export function httpRequest(addr, post_data){
             res.on("data", (chunk) => str += chunk);
             res.on("end", () => {
                 str = str.trim();
-                reslove(Util.parseJSON(str));
+                let [err, obj] = Util.parseJSON(str);
+                if(err) reslove([err,null]);
+                if(obj.code != 0) {
+                    reslove([obj,null]);
+                }else {
+                    reslove([null,obj]);
+                }
+                
             })
         });
         req.write(reqdata);

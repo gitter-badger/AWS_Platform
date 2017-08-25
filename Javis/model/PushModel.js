@@ -7,7 +7,7 @@ const State = {
     normal : 1,  //正常,
     forzen : 2 //冻结
 }
-const host = '192.168.3.11';
+const host = '192.168.3.131';
 // const host = '47.88.192.69';
 const port = 20003;
 export class PushModel{

@@ -18,16 +18,19 @@ import crypto from "crypto";
 import { httpRequest } from "./lib/HttpsUtil";
 
 const ResOK = (callback, res, code) => callback(null, Success(res, code))
-const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail({err:res}))
+const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
 const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 async function gameLoginSign(event, context, callback) {
     try {
-        const [tokenErr, token] = await Model.currentToken(event)
+        const [tokenErr, token] = await Model.currentToken(event);
+        if(tokenErr) {
+            return ResErr(callback, tokenErr);
+        }
         //json转换
         event = event || {};
         let [parserErr, requestParams] = Util.parseJSON(event.body);
-        if (parserErr) return callback(null, ResFail(callback, parserErr));
+        if (parserErr) ResErr(callback, parserErr);
 
         //检查参数是否合法
         let [checkAttError, errorParams] = Util.checkProperties([
@@ -35,14 +38,14 @@ async function gameLoginSign(event, context, callback) {
         ], requestParams);
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams });
-            return callback(null, ResFail(callback, checkAttError));
+            return ResErr(callback, checkAttError);
         }
         let timestamp = Date.now();
         requestParams.id = token.userId;
         requestParams.timestamp = timestamp;
         //找到游戏厂商的gameKey
         let gameModel = new GameModel();
-        let [error, game] = await gameModel.findSingleByType(requestParams.gameType);
+        let [error, game] = await gameModel.findSingleByType(requestParams.gameType+"");
         if (error) {
             return ResErr(callback, error);
         }
@@ -56,7 +59,7 @@ async function gameLoginSign(event, context, callback) {
         let [httpError, data] = await httpRequest((GameTypeEnum[requestParams.gameType] || {}).url,
             { sign: sign, id: token.userId, timestamp });
         if (httpError) {
-            return ResFail(callback, httpError);
+            return ResErr(callback, httpError);
         }
         ResOK(callback, data, data.code);
     } catch (error) {
