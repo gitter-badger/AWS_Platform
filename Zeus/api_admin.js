@@ -390,7 +390,7 @@ const subRoleList = async (e, c, cb) => {
     try {
         const res = { m: 'subRoleList' }
         // 要求管理员角色
-        // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+        const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
         // 业务操作
         let subRoleArr = []
         for (let item in SubRoleEnum) {
