@@ -90,50 +90,96 @@ const emailInfo = async(e, c, cb) => {
 const acceptMail = async(e, c, cb) => {
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
-  if(parserErr) return callback(null, ReHandler.fail(parserErr));
+  if(parserErr) return cb(null, ReHandler.fail(parserErr));
     //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "emid", type:"S"},
+      {name : "emids", type:"J"},
       {name : "userId", type:"N"},
   ], requestParams);
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
-    return callback(null, ReHandler.fail(checkAttError));
+    return cb(null, ReHandler.fail(checkAttError));
   }
   //验证token
-  let {userId,emid} = requestParams;
+  let {emids, userId} = requestParams;
   let [err, userInfo] = await Util.jwtVerify(e.headers.Authorization);
   if(err ||  !userInfo || !Object.is(+userId, +userInfo.userId)){
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
+    return cb(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
-
+  
   //找到邮件
-  console.log("找到邮件");
+  console.log("找到邮件列表");
   let emailModel = new EmailModel();
-  let [emailError, emailInfo] = await emailModel.get({emid});
-  emailModel = new EmailModel(emailInfo);
+  let [emailError, emailInfoList] = await emailModel.findByIds(emids);
   if(emailError) {
     return errorHandle(cb, emailError);
   }
-  if(!emailInfo) {
-    return errorHandle(cb, new CHeraErr(CODES.emailNotExist));
+  let sumDiamonds = 0;
+  let errEmIds = [];
+  for(let i = 0; i < emailInfoList.length; i++) {
+    let emailModel = new EmailModel(emailInfoList[i]);
+    let [handlerErr, diamonds] = await handlerEmail(emailModel, userId);
+    if(handlerErr) {
+      errEmIds.push(emailModel.emid);
+    }
+    sumDiamonds += diamonds;
+    if(!handlerErr) {
+       //玩家接收邮件记录
+      let emailRecord = new PlayerEmailRecordModel({
+        userId,
+        emid:emailModel.emid,
+      });
+      let [recordSaveErr] = await emailRecord.save();
+      if(recordSaveErr) {
+        return errorHandle(cb, recordSaveErr);
+      }
+    }
   }
+  //玩家账单
+  if(sumDiamonds!=0) {
+    //用户钻石发生变化
+    let userDiamondBillModel = new UserDiamondBillModel({
+      userId : userId,
+      action :1,
+      userName : userInfo.userName,
+      msn : "000",
+      diamonds : sumDiamonds,
+      kindId : requestParams.kindId
+    })
+    let [userDiamondsSaveErr] = await userDiamondBillModel.save();
+    if(userDiamondsSaveErr) {
+      return errorHandle(cb, userDiamondsSaveErr);
+    }
+  }
+  //获取用户钻石
+  let [diamondsError, userDiamonds] = await new UserDiamondBillModel({userName:userInfo.userName}).getBalance();
+  if(diamondsError) {
+    return cb(null, ReHandler.fail(diamondsError));
+  }
+  cb(null, ReHandler.success({data:{diamonds:userDiamonds, acceptDiamonds:sumDiamonds, errEmIds:errEmIds}}));
+}
+
+/**
+ * 邮件处理
+ * @param {*} emailModel 
+ */
+async function handlerEmail(emailModel, userId) {
   //检查邮件的归属
   let [userErr, flag] =  await emailModel.isUser(userId);
   if(userErr) {
-    return errorHandle(cb, userErr);
+    return [userErr, 0];
   }
   if(!flag) {
-    return errorHandle(cb, new CHeraErr(CODES.emailNotExist));
+    return [new CHeraErr(CODES.emailNotExist), 0];
   }
   //查找该用户是否已接收该邮件
-  let [recordErr, emailRecordInfo] = await new PlayerEmailRecordModel().get({userId, emid:emailInfo.emid});
+  let [recordErr, emailRecordInfo] = await new PlayerEmailRecordModel().get({userId, emid:emailModel.emid});
   if(recordErr) {
-    return errorHandle(cb, recordErr);
+    return [recordErr, 0];
   }
   // 表示已经接收该邮件
   if(emailRecordInfo) {
-    return errorHandle(cb, new CHeraErr(CODES.emailAlreadyAcceptError));
+    return [new CHeraErr(CODES.emailAlreadyAcceptError), 0];
   }
   //接收邮件
   let tools = emailModel.tools || [];
@@ -155,39 +201,7 @@ const acceptMail = async(e, c, cb) => {
       }
     })
   }, this);
-  console.log("邮件钻石数量:"+diamonds);
-  //玩家账单
-  if(diamonds!=0) {
-    //用户钻石发生变化
-    let userDiamondBillModel = new UserDiamondBillModel({
-      userId : userId,
-      action :1,
-      userName : userInfo.userName,
-      msn : "000",
-      diamonds : diamonds,
-      kindId : requestParams.kindId
-    })
-    let [userDiamondsSaveErr] = await userDiamondBillModel.save();
-    if(userDiamondsSaveErr) {
-      return errorHandle(cb, userDiamondsSaveErr);
-    }
-  }
-  //玩家接收邮件记录
-  let emailRecord = new PlayerEmailRecordModel({
-    userId,
-    emid,
-    emailInfo
-  });
-  let [recordSaveErr] = await emailRecord.save();
-  if(recordSaveErr) {
-    return errorHandle(cb, recordSaveErr);
-  }
-  //获取用户钻石
-  let [diamondsError, userDiamonds] = await new UserDiamondBillModel({userName:userInfo.userName}).getBalance();
-  if(diamondsError) {
-    return cb(null, ReHandler.fail(diamondsError));
-  }
-  cb(null, ReHandler.success({data:{diamonds:userDiamonds}}));
+  return [null, diamonds]
 }
 /**
  * 错误处理

@@ -1,0 +1,16 @@
+{
+    "requestContext": {
+    "authorizer": {
+      "username": "Platform_NAtest",
+      "userId": "1507fbca-605d-43b2-ba09-3def94880eba",
+      "parent": "00",
+      "role": "1"
+    },
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    }
+  },
+    "body" : {
+        "gameType" : 10000
+    }
+}

@@ -171,6 +171,8 @@ async function gamePlayerRegister(event, context, callback) {
   Object.assign(requestParams, {
     msn : merchantInfo.msn,
     merchantName : merchantInfo.displayName,
+    parent : merchantInfo.userId,
+    parentName : merchantInfo.username,
     amount : 0
   })
   //判断用户是否存在
@@ -396,6 +398,8 @@ async function gamePlayerBalance(event, context, callback) {
       ...baseModel,
       username : merchantInfo.username,
       userId : merchantInfo.userId,
+      fromLevel : merchantInfo.level,
+      toLevel : 10000,
       action : -action,
     };
     Object.assign(merchantObj, baseModel)

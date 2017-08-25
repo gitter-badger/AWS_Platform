@@ -1,9 +1,9 @@
 {
     "headers" : {
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNIQV9kYXkwMDEiLCJzdWZmaXgiOiJTSEEiLCJ1c2VySWQiOjEyNzIzOSwiaWF0IjoxNTAzMDI4OTUzfQ.x4vFO95YdclaQF6jiuqfg4ND-favPkgtLAW3igD1YOQ"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfZGF5MDAxIiwic3VmZml4IjoiQ1pTWSIsInVzZXJJZCI6NTIzNjUxLCJpYXQiOjE1MDM1NjI2NDJ9.g4HMSKRpEwJcJaghpK6UEk1EFfd7ocFXfaN9RxmwzsM"
     },
     "body" : {
-        "emid" : "6a2d5ef5-27de-4119-80c2-9d556b0a9d41",
-        "userId" : "127239"
+        "emids" : ["4286d757-2050-4b64-8914-2e1a09393c6d", "12980f66-0c63-41c1-bfdd-51737ef2bb27"],
+        "userId" : "523651"
     }
 }
