@@ -1,4 +1,4 @@
-import {Codes,Model,RoleCodeEnum,CompanyStatusEnum} from '../lib/all'
+import { Codes, Model, RoleCodeEnum, CompanyStatusEnum } from '../lib/all'
 const athena = require("../lib/athena")
 export class CompanyCheck {
     /**
@@ -13,18 +13,18 @@ export class CompanyCheck {
             { name: "companyRegion", type: "NS", min: 1, max: 20 },
 
             { name: "companyDesc", type: "NS", min: 2, max: 200 },
-            { name: "companyContract", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL},
-            { name: "license", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL},
+            { name: "companyContract", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL },
+            { name: "license", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL },
             { name: "remark", type: "NS", min: 2, max: 200 }
         ], inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
             throw checkAttError
         }
 
         // 数据类型处理
-        inparam.companyRegion = inparam.companyRegion.toString()
+        inparam.companyRegion = inparam.companyRegion ? inparam.companyRegion.toString() : Model.StringValue
 
         inparam.companyStatus = CompanyStatusEnum.Enable
         inparam.companyDesc = inparam.companyDesc || Model.StringValue
@@ -46,14 +46,14 @@ export class CompanyCheck {
             { name: "status", type: "N", min: 0, max: 1 }]
             , inparam)
 
-        if(checkAttError){
+        if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
             throw checkAttError
         }
-        
+
         // 数据类型处理
         inparam.status = parseInt(inparam.status)
-        
+
         return [checkAttError, errorParams]
     }
 }

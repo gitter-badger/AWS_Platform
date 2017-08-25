@@ -1,9 +1,10 @@
 {
     "body": {
         "username": "cheney",
-        "password": "123456",
+        "password": "Ab123456",
         "role": "1",
-        "adminName": "帅",
+        "subRole":"admin",
+        "adminName": "帅shuaishua",
         "adminContact": "18780004427",
         "adminEmail": "cheney@test.com"
     }
