@@ -35,7 +35,7 @@ functions:
     integration: lambda
   # ==================== 以下是账单和日志接口服务 ====================
   billTransfer: # 转账
-    handler: api.billTransfer
+    handler: api_bill.billTransfer
     events:
       -
         http:
@@ -44,7 +44,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   billOne: # 单个账单
-    handler: api.billOne
+    handler: api_bill.billOne
     events:
       -
         http:
@@ -53,7 +53,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   billList: # 账单列表
-    handler: api.billList
+    handler: api_bill.billList
     events:
       -
         http:
@@ -62,7 +62,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   logList: #日志列表
-    handler: api.logList
+    handler: api_bill.logList
     events:
       -
         http:
