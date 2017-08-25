@@ -10,7 +10,7 @@ export class CompanyCheck {
             { name: "companyContact", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYCONTACT },
             { name: "companyContactWay", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYCONTACTWAY },
             { name: "companyEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "companyRegion", type: "S", min: 1, max: 20 },
+            { name: "companyRegion", type: "NS", min: 1, max: 20 },
 
             { name: "companyDesc", type: "NS", min: 2, max: 200 },
             { name: "companyContract", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL},
