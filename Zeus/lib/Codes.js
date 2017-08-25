@@ -58,12 +58,6 @@ export const BizErr = {
   DBErr: (errMsg = 'DBError') => {
     return { code: Codes.DBError, msg: errMsg }
   },
-  UsernameTooShortErr: (errMsg = '用户名太短') => {
-    return { code: Codes.UsernameTooShort, msg: errMsg }
-  },
-  UsernameTooLongErr: (errMsg = '用户名太长') => {
-    return { code: Codes.UsernameTooLong, msg: errMsg }
-  },
   UserExistErr: (errMsg = '用户已存在') => {
     return { code: Codes.DuplicateUser, msg: errMsg }
   },
