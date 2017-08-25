@@ -10,6 +10,7 @@ export {
   RoleDisplay,
   RoleEditProps
 } from './UserConsts'
+export { SubRoleEnum } from './UserSubRoleConsts'
 export {
   GameTypeEnum,
   MSNStatusEnum,

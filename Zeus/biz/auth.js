@@ -1,18 +1,4 @@
-import {
-  Store$,
-  Tables,
-  Codes,
-  BizErr,
-  Model,
-  Pick,
-  Keys,
-  Omit,
-  StatusEnum,
-  RoleCodeEnum,
-  RoleModels,
-  RoleDisplay,
-  MSNStatusEnum
-} from '../lib/all'
+import { Store$, Tables, Codes, BizErr, Model, Pick, Keys, Omit, StatusEnum, RoleCodeEnum, SubRoleEnum, RoleModels, RoleDisplay, MSNStatusEnum } from '../lib/all'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
@@ -239,6 +225,8 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // if (saveUserErr) {
   //   return [saveUserErr, User]
   // }
+  // 获取二级权限
+  User.subRolePermission = SubRoleEnum[User.subRole]
   // 返回用户身份令牌
   return [0, { ...User, token: Model.token(Pick(User, RoleDisplay[User.role])) }]
 }
