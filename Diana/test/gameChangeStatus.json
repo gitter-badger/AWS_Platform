@@ -4,19 +4,18 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_cheney",
+      "username": "Platform_NAtest",
       "parent": "00",
       "role": "1",
-      "userId": "6028eec6-96ec-492d-a36b-fd8d6981b76f",
-      "principalId": "6028eec6-96ec-492d-a36b-fd8d6981b76f"
+      "userId": "a0ebec9a-ee90-4075-a39d-d41ca8607030"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "gameType": "1",
-    "gameId": "7c0072ad-fbea-438b-a3cc-1b5eab220c39",
+    "gameType": "30000",
+    "gameId": "8f2fa1a2-45c0-4663-a128-e5c857e8245a",
     "status": "2"
   }
 }
