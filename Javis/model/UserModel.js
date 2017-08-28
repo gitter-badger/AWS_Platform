@@ -70,23 +70,17 @@ export class UserModel extends BaseModel {
         for (let item of queryRet.Items) {
             // 第一层
             if (item.level == 1) {
-                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], size: 8192 }
+                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], role: item.role, level: item.level }
                 organizeTree.push(treeNode)
             }
             // 剩余节点
-            else if (item.level == 2) {
-                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], size: 4096 }
-                childTree.push(treeNode)
-            } else if (item.level == 3) {
-                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], size: 2048 }
-                childTree.push(treeNode)
-            } else {
-                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], size: 1024 }
+            else {
+                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], role: item.role, level: item.level }
                 childTree.push(treeNode)
             }
         }
         tree(organizeTree, childTree)
-        return [0, { name: 'root', children: organizeTree }]
+        return [0, { name: '组织架构', children: organizeTree }]
     }
 }
 /**
