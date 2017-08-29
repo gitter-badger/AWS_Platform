@@ -55,6 +55,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  organize: #组织架构
+    handler: api_organize.organize
+    events:
+      -
+        http:
+          path: organize
+          method: post
+          cors: true
+          authorizer: tokenAuth
   #统计开始
   overview: #统计总览
     handler: api_sta.overview

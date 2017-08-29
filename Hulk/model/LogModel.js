@@ -211,6 +211,7 @@ export class LogModel extends BaseModel {
         let userStatus = StatusEnum.Enable
         let parent = loginUserRet.parent ? loginUserRet.parent : '0'
         let level = loginUserRet.level
+        let ret = 'Y'
         if (!level && level != 0) {
             level = '-1'
         }
@@ -220,6 +221,7 @@ export class LogModel extends BaseModel {
         }
 
         if (loginUserErr) {
+            ret = 'N'
             detail = '登录失败'
             role = userLoginInfo.role
             suffix = userLoginInfo.suffix ? userLoginInfo.suffix : 'Platform'
@@ -264,7 +266,8 @@ export class LogModel extends BaseModel {
             lastIP: lastIP,
             lastLogin: lastLogin,
             userStatus: userStatus,
-            detail: detail
+            detail: detail,
+            ret: ret
         }).then((res) => {
         }).catch((err) => {
             console.error(err)

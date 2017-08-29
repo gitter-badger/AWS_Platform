@@ -96,7 +96,7 @@ const gameChangeStatus = async (e, c, cb) => {
     const res = { m: 'gameChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
-    cosnt [checkAttError, errorParams] = new GameCheck().checkStatus(inparam)
+    const [checkAttError, errorParams] = new GameCheck().checkStatus(inparam)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 

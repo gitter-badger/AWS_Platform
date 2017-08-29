@@ -52,7 +52,7 @@ export class UserModel extends BaseModel {
         const viewList = _.map(userArr, (item) => {
             return {
                 value: item.userId,
-                label: item.suffix
+                label: item.displayName
             }
         })
         return [0, viewList]
