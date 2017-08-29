@@ -72,8 +72,8 @@ export class UserModel extends BaseModel {
         const users = _.map(queryRet.Items, (item) => {
             return Omit(item, ['passhash'])
         })
-        // 按照时间排序
-        const sortResult = _.sortBy(users, ['createdAt']).reverse()
+        // 按照层级排序
+        const sortResult = _.sortBy(users, ['level'])
         return [0, sortResult]
     }
 
@@ -124,7 +124,10 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-        return [0, queryRet.Items]
+
+        // 按照层级排序
+        const sortResult = _.sortBy(queryRet.Items, ['level'])
+        return [0, sortResult]
     }
 
     /**
@@ -147,6 +150,7 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 按照时间排序
         const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
         adminRet.Items = sortResult
         return [0, adminRet.Items]
