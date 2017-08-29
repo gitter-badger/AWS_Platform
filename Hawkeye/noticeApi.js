@@ -104,6 +104,7 @@ const update = async(e, c, cb) => {
   }
   let noticeModel = new NoticeModel(requestParams);
   delete noticeModel.noid;
+  console.log("1111111111111111");
   let [updateErr] = await noticeModel.update({noid:requestParams.noid}, noticeModel);
   if(updateErr) {
     return errorHandle(cb, updateErr);

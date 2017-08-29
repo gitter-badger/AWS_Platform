@@ -2,7 +2,7 @@
     "requestContext": {
     "authorizer": {
       "username": "Platform_NAtest",
-      "userId": "1507fbca-605d-43b2-ba09-3def94880eba",
+      "userId": "27d9ccea-b5be-4c52-b93f-23ad75b72325",
       "parent": "00",
       "role": "1"
     },

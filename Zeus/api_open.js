@@ -55,6 +55,9 @@ async function gameLoginSign(event, context, callback) {
         let company = game.company || {};
 
         let gameKey = company.companyKey;
+        console.log("1111111111111111");
+        console.log(gameKey);
+        console.log(requestParams.id);
         let sign = getSign(gameKey, ["id", "timestamp"], requestParams);
         let [httpError, data] = await httpRequest((GameTypeEnum[requestParams.gameType] || {}).url,
             { sign: sign, id: token.userId, timestamp });

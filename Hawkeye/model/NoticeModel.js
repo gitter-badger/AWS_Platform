@@ -23,4 +23,7 @@ export class NoticeModel extends athena.BaseModel {
         this.count = +count; //总播放次数
         // this.msn = +msn;  //商家线路号
     }
+    async update(conditions, updates) {
+        return super.update(conditions, this.setProperties(updates));
+    }
 }
