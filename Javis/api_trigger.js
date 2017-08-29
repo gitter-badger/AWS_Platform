@@ -45,8 +45,12 @@ const userTrigger = async (e, c, cb) => {
         parent : userInfo.parent,
         msn : msnInfo.msn,
         gameList : userInfo.gameList || [],
-        displayName : userInfo.displayName || ""
+        displayName : userInfo.displayName || "",
+        suffix : userInfo.suffix,
+        levelIndex : userInfo.levelIndex
     })
+    console.log("pushModel");
+    console.log(pushModel);
     let [er] = await pushModel.pushMerchant();
     if(er) {
         console.info("推送商户发生错误");

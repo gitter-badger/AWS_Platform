@@ -112,7 +112,7 @@ export class GameRecordModel extends BaseModel{
             });
         })
     }
-    async page(currPage, pageSize, parentId, userName, startTime, endTime, lastTime) {
+    async page(pageSize, parentId, userName, gameId, startTime, endTime, lastTime) {
         //找到总数
         let opts = {
             IndexName : "parentIdIndex",
@@ -124,9 +124,16 @@ export class GameRecordModel extends BaseModel{
                 ":parentId" :parentId
             }
         }
+        if(userName || gameId) {
+            opts.FilterExpression = "";
+        }
         if(userName) {
-            opts.FilterExpression = "userName=:userName",
+            opts.FilterExpression += "userName=:userName",
             opts.ExpressionAttributeValues[":userName"] = userName;
+        }
+        if(gameId) {
+            opts.FilterExpression += "gameId=:gameId",
+            opts.ExpressionAttributeValues[":gameId"] = gameId;
         }
         let [countErr, count] = await this.count(opts);
         if(countErr) {
@@ -134,19 +141,23 @@ export class GameRecordModel extends BaseModel{
         }
         let page = {
             total : count,
-            currPage: currPage,
             pageSize : pageSize,
             list : []
         }
-        opts.Limit = pageSize;
+        opts.Limit = 1000;
+        if(lastTime) {
+            opts.ExpressionAttributeValues[":endTime"] = lastTime-1;
+        }
         let [pageErr] = await this.findRecords(opts, page);
+        if(pageErr){
+            return [pageErr, page];
+        }
         page.pageSize = page.list.length;
+        page.lastTime = (page.list[0] || {}).betTime || 0;
         page.list.forEach((item, index) => {
             page.list[index] = page.list[index].record;
         })
-        if(pageErr){
-            return [pageErr, records];
-        }
+        
         return [pageErr, page];
     }
     async findRecords(opts, page) {
@@ -172,6 +183,7 @@ export class GameRecordModel extends BaseModel{
             this.db$("query", opts).then((result) => {
                 reslove([null, result]);
             }).catch((err) => {
+                console.log(err);
                 reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
             });
         })

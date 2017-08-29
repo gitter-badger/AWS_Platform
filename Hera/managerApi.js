@@ -135,14 +135,31 @@ export async function gamePlayerInfo(event, context, cb) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
     }
     //获取玩家的交易记录
-    let [billError, bilList] = await userBillModel.list(userName, gameId);
+    let [billError, billList] = await userBillModel.list(userName, gameId);
     if(billError) {
         return ResFail(cb, billError)
     }
-    bilList.sort((a, b) => a.createAt < b.createAt);
-    user.list = bilList;
+    // billList = billList.sort((a, b) => {
+    //     return +a.createAt - +b.createAt > 0
+    // });
+    sort(billList);
+    user.list = billList;
+
     delete user.token;
     return ResOK(cb, user);
+}
+
+function sort(array) {
+    for(let i = 0; i <array.length; i ++) {
+        for(let j = i+1; j <array.length; j ++) {
+            if(array[j].createAt > array[i].createAt) {
+                let item = array[j];
+                array[j] = array[i];
+                array[i] = item;
+            }
+        }
+        delete array[i].seatInfo;
+    }
 }
 
 /**

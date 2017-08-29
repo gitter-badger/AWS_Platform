@@ -10,7 +10,7 @@ const State = {
 }
 
 export class LogModel extends athena.BaseModel {
-    constructor({userId, detail, role, type, username, suffix, action, operUser} = {}) {
+    constructor({userId, detail, role, type, username, suffix, action, operUser, ret} = {}) {
         super(TABLE_NAMES.ZeusPlatformLog);
         this.sn = Util.uuid();
         this.createdAt = Date.now();
@@ -22,5 +22,6 @@ export class LogModel extends athena.BaseModel {
         this.operUser = operUser;
         this.suffix = suffix;
         this.action = action;
+        this.ret = ret || "N";
     }
 }

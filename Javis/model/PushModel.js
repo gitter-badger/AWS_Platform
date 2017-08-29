@@ -7,11 +7,11 @@ const State = {
     normal : 1,  //正常,
     forzen : 2 //冻结
 }
-const host = '192.168.3.131';
-// const host = '47.88.192.69';
+// const host = '192.168.3.11';
+const host = '47.88.192.69';
 const port = 20003;
 export class PushModel{
-    constructor({username, role, userId, displayName,  headPic, parent, msn, gameList} = {}) {
+    constructor({username, role, userId, displayName,  headPic, parent, msn, gameList, suffix, levelIndex} = {}) {
         this.username = username;
         this.role = role;
         this.id = userId,
@@ -19,6 +19,8 @@ export class PushModel{
         this.headPic = headPic || "";
         this.parentId = parent;
         this.msn = msn;
+        this.suffix = suffix;
+        this.levelIndex = levelIndex;
         this.gameList = this.setGameList(gameList)
     }
     pushMerchant(){

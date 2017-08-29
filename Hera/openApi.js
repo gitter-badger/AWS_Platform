@@ -56,32 +56,32 @@ const logEnum = {
   register : {
     type :"operate",
     action : "玩家注册",
-    detail : "注册成功"
+    detail : "注册成功",
   },
   login : {
     type :"login",
     action : "玩家登陆",
-    detail : "登录成功"
+    detail : "登录成功",
   },
   getBalance : {
     type :"operate",
     action : "玩家查询余额",
-    detail : "查询余额成功"
+    detail : "查询余额成功",
   },
   chongzhi : {
     type :"operate",
     action : "玩家充值",
-    detail : "充值成功"
+    detail : "充值成功",
   },
   tixian : {
     type :"operate",
     action : "玩家提现",
-    detail : "提现成功"
+    detail : "提现成功",
   },
   updatePassword : {
     type :"operate",
     action : "玩家修改密码",
-    detail : "修改密码成功"
+    detail : "修改密码成功",
   }
 }
 
@@ -228,6 +228,9 @@ async function gamePlayerLogin(event, context, callback) {
   if(!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   } 
+  if(!Object.is(+merchantInfo.role, +RoleCodeEnum.Merchant)) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.NotAuth)));
+  }
   //商户是否被锁定
   if(merchantInfo.status == "0") {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantForzen)));
@@ -370,9 +373,9 @@ async function gamePlayerBalance(event, context, callback) {
       toUser : merchantInfo.username,
       amount : +requestParams.amount,
       operator : userName,
-      remark : " ",
+      remark : action > 0 ? "中心钱包转入" : "中心钱包转出",
       gameType : -1,
-      typeName : action > 0 ? "中心钱包转入" : "中心钱包转出"
+      typeName : "中心钱包"
     }
     //检查玩家点数是否足够 如果是玩家提现才检查，充值不需要
     let userBillModel = new UserBillModel(requestParams);
@@ -527,7 +530,7 @@ async function gamePlayerA3Login(event, context, callback) {
       msn : userInfo.msn,
       createAt : userInfo.createAt,
       updateAt : userInfo.updateAt,
-      username : userName.split("_")[1],
+      username : userName.split("_")[1] || userName,
       userId : userInfo.userId,
       nickname : userInfo.nickname,
       headPic : userInfo.headPic,
@@ -894,16 +897,17 @@ async function playerGameRecord(event, context, callback) {
     return callback(null, ReHandler.fail(parseRecordErr));
   }
   records = list;
-  console.log(records.length)
   let batchSaveArr = [];
   for(let i = 0; i <records.length; i++) {
     let record = records[i];
-    let {userId, userName, betId, betTime, msn} = record;
+    let {userId, userName, betId, betTime, msn,parentId, gameId} = record;
     batchSaveArr.push({
       userId,
       userName, 
       betId : betId+"",
       msn:msn+"",
+      parentId : parentId,
+      gameId : gameId,
       betTime : new Date(betTime).getTime(),
       record
     })
@@ -941,13 +945,13 @@ async function validateGame(event, params = []){
  * @param {*} callback 
  */
 async function getPlayerGameRecord(event, context, callback) {
+  console.log(event);
   //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
       {name : "apiKey", type:"S", min:1},
-      {name : "curPage", type:"N"},
       {name : "pageSize", type:"N"},
       {name : "startTime", type:"N"},
       {name : "lastTime", type:"N"}, //最后一条数据的记录
@@ -958,7 +962,7 @@ async function getPlayerGameRecord(event, context, callback) {
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, ReHandler.fail(checkAttError));
   } 
-  let {buId, apiKey, curPage, pageSize, startTime, endTime, userName, lastTime} = requestParams;
+  let {buId, apiKey,  pageSize, startTime, endTime, userName, lastTime, gameId} = requestParams;
 
   //检查商户信息是否正确
   const merchant = new MerchantModel();
@@ -968,13 +972,14 @@ async function getPlayerGameRecord(event, context, callback) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   } 
   let parentId = merchantInfo.userId;
+  console.log(parentId);
   //验证白名单
   let white = validateIp(event, merchantInfo);
   if(!white) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
   }
   let gameRecordModel = new GameRecordModel();
-  let [pageErr, page] = await gameRecordModel.page(curPage, pageSize, parentId, userName, startTime, endTime, lastTime);
+  let [pageErr, page] = await gameRecordModel.page(pageSize, parentId, userName, gameId, startTime, endTime, lastTime);
   if(pageErr) {
     return callback(null, ReHandler.fail(pageErr));
   }

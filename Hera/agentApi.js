@@ -263,9 +263,6 @@ async function cudian(userInfo, merchantInfo, requestParams){
     //玩家余额
     let [playerBError, playerBalance] = await new UserBillModel({userName:userInfo.userName}).getBalance();
     if(playerBError)return ResFail(cb, agentBError);
-    if(playerBalance < requestParams.points) {
-        return [new CHeraErr(CODES.AgentBalanceIns), null];
-    }
     //代理余额
     let [agentBError, agentBalance] = await new MerchantBillModel({userId:merchantInfo.userId}).getBlance();
     agentBalance += +merchantInfo.points;  //需要加上初始点数

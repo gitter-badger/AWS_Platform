@@ -118,7 +118,7 @@ functions:
     handler: openApi.getPlayerGameRecord
     events:
       - http:
-          path: /game/player/record
+          path: /game/player/record/list
           method: post
           cors: true
   gamePlayerList:  #获取玩家列表
