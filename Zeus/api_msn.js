@@ -5,7 +5,7 @@ import { LogModel } from './model/LogModel'
 
 import { CaptchaCheck } from './biz/CaptchaCheck'
 import { MsnCheck } from './biz/MsnCheck'
-
+const captchapng = require('captchapng')
 /**
  * 获取线路号列表
  */
@@ -180,14 +180,18 @@ const captcha = async (e, c, cb) => {
     // 入参转换
     const res = { m: 'captcha' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
-    //检查参数是否合法
+    // 检查参数是否合法
     const [checkAttError, errorParams] = new CaptchaCheck().checkCaptcha(inparam)
     // 业务操作
     inparam.code = randomNum(1000, 9999)
     const [err, ret] = await new CaptchaModel().putItem(inparam)
+    // 生成验证码的base64返回
+    let p = new captchapng(80, 30, parseInt(inparam.code))
+    p.color(255, 255, 255, 0) // First color: background (red, green, blue, alpha)
+    p.color(80, 80, 80, 255)  // Second color: paint (red, green, blue, alpha)
     // 结果返回
     if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: inparam })
+    return ResOK(cb, { ...res, payload: p.getBase64() })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -197,9 +201,9 @@ const captcha = async (e, c, cb) => {
 
 // 随机数
 function randomNum(min, max) {
-  var range = max - min
-  var rand = Math.random()
-  var num = min + Math.round(rand * range)
+  let range = max - min
+  let rand = Math.random()
+  let num = min + Math.round(rand * range)
   return num
 }
 
