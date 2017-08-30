@@ -21,12 +21,7 @@ export class CaptchaModel extends BaseModel {
      * @param {*} userLoginInfo 登录信息
      */
     async checkCaptcha(userLoginInfo) {
-        // 完整用户名处理
-        let suffix = 'Platform'
-        if (userLoginInfo.suffix) {
-            suffix = userLoginInfo.suffix
-        }
-        const relKey = suffix + '_' + userLoginInfo.username
+        const relKey = userLoginInfo.username
         // 查询验证码
         const [err, ret] = await this.query({
             KeyConditionExpression: 'relKey = :relKey and #usage = :usage',

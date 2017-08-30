@@ -172,11 +172,11 @@ export class UserModel extends BaseModel {
         return [0, sortResult]
     }
 
-    // 检查用户是否重复
+    // 检查代理用户是否重复
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]
         // 对于代理管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-        if (role === RoleCodeEnum['Agent']) {
+        if (suffix == 'Agent') {
             [err, ret] = await this.queryUserBySuffix(role, suffix, username)
         } else {
             // 对于其他用户，角色和前缀具有联合唯一性
@@ -196,6 +196,22 @@ export class UserModel extends BaseModel {
         }
         if (err) {
             return [err, 0]
+        }
+        // 还需要校验角色和用户名的唯一性
+        if (suffix != 'Agent' && ret.Items.length == 0) {
+            [err, ret] = await this.query({
+                TableName: Tables.ZeusPlatformUser,
+                IndexName: 'RoleUsernameIndex',
+                KeyConditionExpression: '#username = :username and #role = :role',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':username': username,
+                    ':role': role
+                }
+            })
         }
         if (ret.Items.length > 0) {
             return [0, false]
