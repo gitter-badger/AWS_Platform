@@ -7,7 +7,7 @@ export class CaptchaCheck {
     checkCaptcha(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "usage", type: "S", min: 1, max: 20 },
-            { name: "relKey", type: "S", min: 6, max: 30 }]
+            { name: "relKey", type: "S", min: 1, max: 30 }]
             , inparam)
 
         if (checkAttError) {
