@@ -65,6 +65,7 @@ export function httpRequest(addr, post_data){
             res.on("data", (chunk) => str += chunk);
             res.on("end", () => {
                 str = str.trim();
+                console.log("-------------");
                 console.log(str);
                 let [err, obj] = Util.parseJSON(str);
                 if(err) reslove([err,null]);
