@@ -1,17 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
 
@@ -58,7 +45,7 @@ export class CaptchaModel extends BaseModel {
         } else if (ret.Items.length == 0) {
             return [BizErr.CaptchaErr(), 0]
         } else {
-            if(Model.timeStamp() - ret.Items[0].updatedAt > 30000){
+            if (Model.timeStamp() - ret.Items[0].updatedAt > 30000) {
                 return [BizErr.CaptchaErr('验证码超时'), 0]
             }
             return [0, ret]

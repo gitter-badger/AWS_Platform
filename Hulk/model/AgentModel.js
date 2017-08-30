@@ -1,19 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    StatusEnum,
-    RoleCodeEnum,
-    RoleDisplay,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleDisplay, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { BaseModel } from './BaseModel'
