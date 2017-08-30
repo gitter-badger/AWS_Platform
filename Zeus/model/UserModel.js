@@ -291,6 +291,24 @@ export class UserModel extends BaseModel {
                 }
             })
         }
+
+        // 代理还需要校验角色和用户名的唯一性
+        if (role == RoleCodeEnum['Agent'] && suffix != 'Agent' && ret.Items.length == 0) {
+            [err, ret] = await this.query({
+                TableName: Tables.ZeusPlatformUser,
+                IndexName: 'RoleUsernameIndex',
+                KeyConditionExpression: '#username = :username and #role = :role',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':username': username,
+                    ':role': role
+                }
+            })
+        }
+
         if (err) {
             return [err, 0]
         }
