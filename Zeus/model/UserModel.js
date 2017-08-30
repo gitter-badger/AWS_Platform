@@ -37,9 +37,12 @@ export class UserModel extends BaseModel {
             return [queryErr, 0]
         }
 
+        // 按照层级排序
+        const sortResult = _.sortBy(queryRet.Items, ['level'])
+
         // 查询已用商户已用数量
         let userArr = []
-        for (let user of queryRet.Items) {
+        for (let user of sortResult) {
             const [err, childs] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
             if (err) {
                 return [err, 0]
@@ -75,9 +78,9 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 按照时间排序
         const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
-        adminRet.Items = sortResult
-        return [0, adminRet.Items]
+        return [0, sortResult]
     }
 
     /**
@@ -216,8 +219,8 @@ export class UserModel extends BaseModel {
         const users = _.map(queryRet.Items, (item) => {
             return Omit(item, ['passhash'])
         })
-        // 按照时间排序
-        const sortResult = _.sortBy(users, ['createdAt']).reverse()
+        // 按照层级排序
+        const sortResult = _.sortBy(users, ['level'])
         return [0, sortResult]
     }
 
@@ -239,7 +242,9 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-        return [0, queryRet.Items]
+        // 按照层级排序
+        const sortResult = _.sortBy(queryRet.Items, ['level'])
+        return [0, sortResult]
     }
 
     /**

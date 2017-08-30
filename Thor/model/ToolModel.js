@@ -171,7 +171,7 @@ export class ToolModel extends BaseModel {
         //     return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
         // }
         // 更新
-        [err, ret] = await this.getOne(inparam)
+        let [err, ret] = await this.getOne(inparam)
         if (err) {
             return [err, 0]
         }
@@ -183,7 +183,6 @@ export class ToolModel extends BaseModel {
         ret.remark = inparam.remark
         // ret.toolStatus = inparam.toolStatus
         ret.updatedAt = Model.timeStamp()
-        console.info(ret)
         return await this.putItem(ret)
     }
 

@@ -78,6 +78,11 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [queryParentErr, 0]
   }
 
+  // 检查下级成数
+  if (parentUser.level != 0 && (CheckUser.rate > parentUser.rate)) {
+    return [BizErr.InparamErr('成数比不能高于上级'), 0]
+  }
+
   // 如果是线路商创建商户，检查可用余额
   // if (parentUser.role === RoleCodeEnum['Manager'] && CheckUser.role === RoleCodeEnum['Merchant']) {
   //   // 查询已用商户已用数量
