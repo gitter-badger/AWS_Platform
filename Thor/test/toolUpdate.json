@@ -4,24 +4,29 @@
     },
     "requestContext": {
         "authorizer": {
-            "username": "Platform_cheney",
-            "parent": "00",
+            "userId": "a0ebec9a-ee90-4075-a39d-d41ca8607030",
             "role": "1",
-            "userId": "6028eec6-96ec-492d-a36b-fd8d6981b76f",
-            "principalId": "6028eec6-96ec-492d-a36b-fd8d6981b76f"
+            "suffix": "Platform",
+            "username": "Platform_NAtest",
+            "parent": "00",
+            "parentName": "SuperAdmin",
+            "displayName": "平台管理员",
+            "level": 0,
+            "subRole": "admin",
+            "iat": 1504065432
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "remark": "这是道具测试03的备注_修改",
-        "icon": "icon03_修改",
-        "toolName": "道具测试03",
+        "remark": "这是钻石",
         "toolStatus": 1,
-        "updatedAt": 1502767019687,
-        "createdAt": 1502767019687,
-        "toolId": "961040",
-        "desc": "这是道具测试03的描述_修改"
+        "icon": "Diamond",
+        "toolName": "钻石",
+        "updatedAt": 1503548612609,
+        "createdAt": 1503548563105,
+        "toolId": "100000",
+        "desc": "这是钻石test"
     }
 }
