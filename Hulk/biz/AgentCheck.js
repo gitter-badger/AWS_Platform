@@ -12,10 +12,11 @@ export class AgentCheck {
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "hostContact", type: "S", min: 5, max: 40 },
-            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            
             // 代理
-            { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "hostContact", type: "S", min: 5, max: 40 },
+            // { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
 
             { name: "rate", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "vedioMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
@@ -65,13 +66,13 @@ export class AgentCheck {
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
-            { name: "hostContact", type: "S", min: 5, max: 40 },
-            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "vedioMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "liveMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
 
             // 代理
-            { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "hostContact", type: "S", min: 5, max: 40 },
+            // { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
 
             // 帐号管理员
             // { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
@@ -116,8 +117,6 @@ export class AgentCheck {
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
-            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "hostContact", type: "S", min: 5, max: 40 },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "vedioMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
@@ -129,7 +128,9 @@ export class AgentCheck {
             // { name: "adminContact", type: "S", min: 1, max: 40 },
 
             // 代理
-            { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // { name: "hostContact", type: "S", min: 5, max: 40 },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
