@@ -69,8 +69,13 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
-            return Omit(item, ['passhash'])
+            item.passhash = null
+            if (!Model.isAgentAdmin(token)) {
+                item.password = '********'
+            }
+            return item
         })
         // 按照层级排序
         const sortResult = _.sortBy(users, ['level'])
@@ -124,7 +129,14 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-
+        // 去除敏感数据
+        queryRet.Items = _.map(queryRet.Items, (item) => {
+            item.passhash = null
+            if (!inparam.parent) {
+                item.password = '********'
+            }
+            return item
+        })
         // 按照层级排序
         const sortResult = _.sortBy(queryRet.Items, ['level'])
         return [0, sortResult]
@@ -150,10 +162,14 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
+        adminRet.Items = _.map(adminRet.Items, (item) => {
+            item.passhash = null
+            return item
+        })
         // 按照时间排序
         const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
-        adminRet.Items = sortResult
-        return [0, adminRet.Items]
+        return [0, sortResult]
     }
 
     // 检查用户是否重复
