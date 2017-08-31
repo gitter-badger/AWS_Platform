@@ -80,7 +80,7 @@ export class UserModel extends BaseModel {
             }
         }
         tree(organizeTree, childTree)
-        return [0, { name: '组织架构', children: organizeTree }]
+        return [0, { name: 'NA集团', children: organizeTree }]
     }
 }
 /**
