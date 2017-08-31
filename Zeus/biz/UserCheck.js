@@ -81,7 +81,7 @@ export class UserCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
         if (inparam.limit) {
@@ -132,7 +132,7 @@ export class UserCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
         if (inparam.limit) {

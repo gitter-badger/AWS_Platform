@@ -1,15 +1,15 @@
-// ==================== 以下是全系统用户实体 ====================
 import { Model } from './Dynamo'
+// ==================== 以下是全系统用户实体 ====================
+// 普通状态枚举
+export const StatusEnum = {
+  Enable: 1,
+  Disable: 0
+}
 // 性别枚举
 export const GenderEnum = {
   Male: 1,
   Female: 0,
   Trans: 2
-}
-// 普通状态枚举
-export const StatusEnum = {
-  Enable: 1,
-  Disable: 0
 }
 // 角色编码枚举
 export const RoleCodeEnum = {
@@ -63,9 +63,7 @@ const PlatformBaseBizRole = function () {
     isforever: false,                     // 是否永久
     contractPeriod: Model.StringValue,    // 有效期
     remark: Model.StringValue,            // 备注
-    gender: GenderEnum.Trans,             // 性别
-    hostName: Model.StringValue,          // 负责人姓名
-    hostContact: Model.StringValue        // 负责人联系方式
+    gender: GenderEnum.Trans              // 性别
   }
 }
 /**
@@ -86,6 +84,7 @@ export const RoleModels = {
       ...UserRole(),
       parentName: Model.NoParentName,
       role: RoleCodeEnum['PlatformAdmin'],
+      subRole: 'admin',
       displayName: '平台管理员',
       suffix: 'Platform',
       points: Model.PlatformAdminDefaultPoints
@@ -96,7 +95,9 @@ export const RoleModels = {
       ...PlatformBaseBizRole(),
       gameList: [],                         // 游戏类型列表
       limit: Model.NumberValue,             // 可用名额
-      managerEmail: Model.StringValue       // 线路商邮箱
+      managerEmail: Model.StringValue,      // 线路商邮箱
+      hostName: Model.StringValue,          // 负责人姓名
+      hostContact: Model.StringValue        // 负责人联系方式
     }
   },
   '100': function () {
@@ -108,14 +109,15 @@ export const RoleModels = {
       frontURL: Model.StringValue,          // 商户站点
       loginWhiteList: '0.0.0.0',            // 登录白名单
       merchantEmail: Model.StringValue,     // 商户邮箱
+      hostName: Model.StringValue,          // 负责人姓名
+      hostContact: Model.StringValue        // 负责人联系方式
     }
   },
   '1000': function () {
     return {// 代理
       ...PlatformBaseBizRole(),
       vedioMix: Model.NumberValue,            // 电子游戏洗码比
-      liveMix: Model.NumberValue,             // 真人视讯洗码比
-      agentEmail: Model.StringValue           // 代理邮箱
+      liveMix: Model.NumberValue              // 真人视讯洗码比
     }
   },
   '10000': function () {
@@ -135,7 +137,9 @@ export const RoleDisplay = {
     // 'password',
     'parent',
     'parentName',
-    'displayName'
+    'displayName',
+    'level',
+    'subRole'           // 二级权限
   ],
   '10': [// 线路商
     'userId',
@@ -146,6 +150,7 @@ export const RoleDisplay = {
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'displayId',        // 显示ID
     'contractPeriod',   // 有效期
@@ -162,6 +167,7 @@ export const RoleDisplay = {
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'msn',            // 商户线路号
     'apiKey',         // 商户APIKEY
@@ -181,6 +187,7 @@ export const RoleDisplay = {
     'parent',
     'parentName',
     'displayName',
+    'level',
 
     'vedioMix',       // 电子游戏洗码比
     'liveMix',        // 真人视讯洗码比
@@ -234,9 +241,6 @@ export const RoleEditProps = {
     'isforever'
   ],
   '1000': [// 代理
-    'hostName',
-    'hostContact',
-    'agentEmail',
     'password',
     'rate',
     'contractPeriod',

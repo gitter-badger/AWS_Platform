@@ -35,7 +35,7 @@ export class AgentCheck {
             throw checkAttError
         }
         // 数据类型处理
-        // inparam.rate = inparam.rate.toString()
+        // inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(Model.PlatformAdminDefaultPoints)
         inparam.role = RoleCodeEnum.Agent
         inparam.suffix = 'Agent'
@@ -95,7 +95,7 @@ export class AgentCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
         inparam.vedioMix = parseFloat(inparam.vedioMix)
@@ -141,7 +141,7 @@ export class AgentCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
         inparam.vedioMix = parseFloat(inparam.vedioMix)
