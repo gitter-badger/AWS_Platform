@@ -74,7 +74,7 @@ export class BillModel extends BaseModel {
                 fromUser: fromInparam.username,
                 fromRole: fromInparam.role,
                 fromLevel: fromInparam.level,
-                fromDisplayName: fromInparam.fromDisplayName,
+                fromDisplayName: fromInparam.displayName,
                 action: 0,
                 operator: from.operatorToken.username
             }, Keys(BillMo()))
