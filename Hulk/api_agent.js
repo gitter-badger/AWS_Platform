@@ -16,10 +16,12 @@ const agentAdminNew = async (e, c, cb) => {
         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
         //检查参数是否合法
         const [checkAttError, errorParams] = new AgentCheck().checkAdmin(userInfo)
-        // 获取令牌，只有代理管理员有权限
-        // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
-        // 业务操作
-        const token = userInfo  // TODO 该接口不需要TOKEN，默认设置
+        // 获取令牌
+        const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
+        // 只能代理管理员操作
+        if (!Model.isAgentAdmin(token)) {
+            return ResErr(cb, BizErr.TokenErr('只能代理管理员操作'))
+        }
         const [registerUserErr, resgisterUserRet] = await new AgentModel().registerAdmin(Model.addSourceIP(e, userInfo))
         // 操作日志记录
         userInfo.operateAction = '创建代理管理员'
