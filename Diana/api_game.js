@@ -122,6 +122,8 @@ const gameType = async (e, c, cb) => {
   try {
     const res = { m: 'gameType' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
+    // 身份令牌
+    const [tokenErr, token] = await Model.currentToken(e)
     // 全部游戏类别
     if (!inparam.parent || inparam.parent == RoleCodeEnum['PlatformAdmin'] || inparam.parent == '01') {
       let gameTypeArr = []
