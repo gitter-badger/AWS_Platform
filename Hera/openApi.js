@@ -7,7 +7,7 @@ import {CODES, CHeraErr} from "./lib/Codes";
 
 import {ReHandler} from "./lib/Response";
 
-import {RoleCodeEnum} from "./lib/Consts"
+import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
 
 import {MerchantModel} from "./model/MerchantModel";
@@ -630,23 +630,23 @@ async function playerRecordValidate(event, context, callback){
     }));
   }
   //获取游戏
-  let [gError, gameInfo] = await new GameModel({gameId}).findByKindId(gameId);
-  if(gError) {
-    return callback(null, ReHandler.fail(gError));
-  }
+  let gameInfo = GameTypeEnum[gameId+""];
+  // let [gError, gameInfo] = await new GameModel({gameId}).findByKindId(gameId);
+  // if(gError) {
+  //   return callback(null, ReHandler.fail(gError));
+  // }
   if(!gameInfo) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
   }
-  let typeName = gameInfo.gameName;
+  let typeName = gameInfo.name;
   let userRecordModel = new UserRecordModel(requestParams);
-  userRecordModel.depositAmount = oriBalance;
+  // userRecordModel.depositAmount = oriBalance;
   let [validErr, income] = userRecordModel.validateRecords(records);
   if(validErr) {
     return callback(null, ReHandler.fail(err));
   }
-  
   //验证余额是否正确
-  if((oriBalance + income).toFixed(2) != userRecordModel.checkOutBalance.toFixed(2)) {
+  if((oriBalance + income).toFixed(2) != requestParams.checkOutBalance.toFixed(2)) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.billNotMatchErr)));
   }
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
@@ -660,11 +660,6 @@ async function playerRecordValidate(event, context, callback){
   if(!merchantModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
-  let [recordSError] = await userRecordModel.save();
-  
-  if(recordSError) {
-    return callback(null, ReHandler.fail(recordSError));
-  }
   let billBase = {
     fromRole : RoleCodeEnum.Player,
     toRole : RoleCodeEnum.Merchant,
@@ -672,9 +667,8 @@ async function playerRecordValidate(event, context, callback){
     toUser : merchantModel.username,
     operator : userModel.userName,
     merchantName : merchantModel.displayName,
-    kindId : gameInfo.gameType,
-    gameId : gameId,
-    gameType : gameInfo.gameType,
+    kindId : gameId,
+    gameType : gameId,
     msn : merchantModel.msn,
     type : Type.gameSettlement,
     typeName : typeName,
@@ -692,11 +686,10 @@ async function playerRecordValidate(event, context, callback){
   userBillModel.originalAmount = oriBalance;
   Object.assign(userBillModel, billBase);
 
-  let [recordErr] = await userRecordModel.save();
-  if(recordErr) {
-    return callback(null, ReHandler.fail(uSaveErr));
-  }
-
+  // let [recordErr] = await userRecordModel.save();
+  // if(recordErr) {
+  //   return callback(null, ReHandler.fail(uSaveErr));
+  // }
   let [uSaveErr] = await userBillModel.save();
   if(uSaveErr) {
     return callback(null, ReHandler.fail(uSaveErr));
