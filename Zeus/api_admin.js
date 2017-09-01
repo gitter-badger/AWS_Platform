@@ -96,29 +96,7 @@ const userAuth = async (e, c, cb) => {
     } catch (error) {
         return ResErr(cb, error)
     }
-
 }
-
-/**
- * 获取用户TOKEN
- */
-// const userGrabToken = async (e, c, cb) => {
-//   const errRes = { m: 'userGrabToken error'/*, input: e*/ }
-//   const res = { m: 'userGrabToken' }
-//   // username suffix role and apiKey
-//   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
-//   if (jsonParseErr) {
-//     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
-//   }
-//   // 业务操作
-//   const [tokenErr, userToken] = await UserGrabToken(Model.addSourceIP(e, userInfo))
-//   // 结果返回
-//   if (tokenErr) {
-//     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
-//   }
-//   return ResOK(cb, { ...res, payload: userToken })
-
-// }
 
 /**
  * 变更用户状态
@@ -370,18 +348,6 @@ const updatePassword = async (e, c, cb) => {
         return ResErr(cb, error)
     }
 }
-/**
- * 随机密码
- */
-const randomPassword = (e, c, cb) => {
-    try {
-        const res = { m: 'randomPassword' }
-        const passwd = Model.genPassword()
-        return ResOK(cb, { ...res, payload: { generatedPassword: passwd } })
-    } catch (error) {
-        return ResErr(cb, error)
-    }
-}
 
 /**
  * 二级权限列表
@@ -402,6 +368,26 @@ const subRoleList = async (e, c, cb) => {
     }
 }
 
+/**
+ * 获取用户TOKEN
+ */
+// const userGrabToken = async (e, c, cb) => {
+//   const errRes = { m: 'userGrabToken error'/*, input: e*/ }
+//   const res = { m: 'userGrabToken' }
+//   // username suffix role and apiKey
+//   const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+//   if (jsonParseErr) {
+//     return ResFail(cb, { ...errRes, err: jsonParseErr }, jsonParseErr.code)
+//   }
+//   // 业务操作
+//   const [tokenErr, userToken] = await UserGrabToken(Model.addSourceIP(e, userInfo))
+//   // 结果返回
+//   if (tokenErr) {
+//     return ResFail(cb, { ...errRes, err: tokenErr }, tokenErr.code)
+//   }
+//   return ResOK(cb, { ...res, payload: userToken })
+
+// }
 // ==================== 以下为内部方法 ====================
 
 export {
@@ -419,8 +405,5 @@ export {
     checkSuffixExist,             // 检查前缀是否被占用
     checkNickExist,               // 检查昵称是否被占用
 
-    updatePassword,               // 更新密码
-    randomPassword                // 随机密码
-
-    // userGrabToken,                // 使用apiKey登录获取用户信息
+    updatePassword                // 更新密码
 }
