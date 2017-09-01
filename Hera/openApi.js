@@ -93,19 +93,19 @@ const logEnum = {
 async function errorHandler(callback, error, type, merchantInfo, userInfo) {
   callback(null, ReHandler.fail(error));
   //写日志
-  delete userInfo.userId;
-  userInfo.operUser = userInfo.userName;
-  let suffixLength = (merchantInfo.suffix || "").length;
-  userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
-  Object.assign(merchantInfo, {
-    ...userInfo,
-    ...logEnum[type],
-    detail : error.msg,
-    ret : "N"
-  })
-  let logModel = new LogModel(merchantInfo);
-  console.log(logModel);
-  let [sErr] = await logModel.save();
+  // delete userInfo.userId;
+  // userInfo.operUser = userInfo.userName;
+  // let suffixLength = (merchantInfo.suffix || "").length;
+  // userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
+  // Object.assign(merchantInfo, {
+  //   ...userInfo,
+  //   ...logEnum[type],
+  //   detail : error.msg,
+  //   ret : "N"
+  // })
+  // let logModel = new LogModel(merchantInfo);
+  // console.log(logModel);
+  // let [sErr] = await logModel.save();
 }
 
 /**
@@ -117,18 +117,18 @@ async function successHandler(callback, data, type, merchantInfo, userInfo) {
   callback(null, ReHandler.success(data));
 
   //写日志
-  delete userInfo.userId;
-  userInfo.operUser = userInfo.userName;
-  let suffixLength = (merchantInfo.suffix || "").length;
-  userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
-  Object.assign(merchantInfo, {
-    ...userInfo,
-    ...logEnum[type],
-    ret : "Y"
-  })
-  let logModel = new LogModel(merchantInfo);
-  console.log(logModel);
-  let [sErr] = await logModel.save();
+  // delete userInfo.userId;
+  // userInfo.operUser = userInfo.userName;
+  // let suffixLength = (merchantInfo.suffix || "").length;
+  // userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
+  // Object.assign(merchantInfo, {
+  //   ...userInfo,
+  //   ...logEnum[type],
+  //   ret : "Y"
+  // })
+  // let logModel = new LogModel(merchantInfo);
+  // console.log(logModel);
+  // let [sErr] = await logModel.save();
 }
 
 /**
@@ -143,8 +143,8 @@ async function gamePlayerRegister(event, context, callback) {
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userName", type:"S", min:6, max :12},
-      {name : "userPwd", type:"S", min:6, max :16},
+      {name : "userName", type:"S"},
+      {name : "userPwd", type:"S"},
       {name : "buId", type:"N"},
       {name : "apiKey", type:"S", min:1},
       {name : "userType", type:"N", equal:1},
@@ -210,8 +210,8 @@ async function gamePlayerLogin(event, context, callback) {
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
     //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userName", type:"S", min:6, max :12},
-      {name : "userPwd", type:"S", min:6, max :16},
+      {name : "userName", type:"S"},
+      {name : "userPwd", type:"S"},
       {name : "buId", type:"N"},
       {name : "apiKey", type:"S", min:1},
       {name : "gamePlatform", type:"S", equal:gamePlatform}
@@ -220,7 +220,7 @@ async function gamePlayerLogin(event, context, callback) {
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, ReHandler.fail(checkAttError));
   } 
-  let {buId, userName, userPwd, apiKey, gamePlatform} = requestParams;
+  let {buId, userName,userPwd, apiKey, gamePlatform} = requestParams;
   //检查商户信息是否正确
   const merchant = new MerchantModel();
   const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);
@@ -530,7 +530,7 @@ async function gamePlayerA3Login(event, context, callback) {
       msn : userInfo.msn,
       createAt : userInfo.createAt,
       updateAt : userInfo.updateAt,
-      username : userName.split("_")[1] || userName,
+      username : userName,
       userId : userInfo.userId,
       nickname : userInfo.nickname,
       headPic : userInfo.headPic,
@@ -602,7 +602,7 @@ async function playerRecordValidate(event, context, callback){
      return callback(null, ReHandler.fail(validateError));
   }
   let userId = +userInfo.userId;
-  let gameId = requestParams.gameId;
+  let gameId = +requestParams.gameId;
   //获取用户数据
   let [uError, userModel] = await new UserModel().get({userId},[], "userIdIndex");
   if(uError) {
@@ -672,7 +672,8 @@ async function playerRecordValidate(event, context, callback){
     toUser : merchantModel.username,
     operator : userModel.userName,
     merchantName : merchantModel.displayName,
-    kindId : gameId,
+    kindId : gameInfo.gameType,
+    gameId : gameId,
     gameType : gameInfo.gameType,
     msn : merchantModel.msn,
     type : Type.gameSettlement,
