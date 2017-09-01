@@ -251,17 +251,17 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-        // 去除敏感数据
-        queryRet.Items = _.map(queryRet.Items, (item) => {
-            item.passhash = null
-            if (!Model.isPlatformAdmin(token)) {
-                item.password = '********'
-            }
-            return item
-        })
+        // 去除敏感数据（该方法不需要）
+        // queryRet.Items = _.map(queryRet.Items, (item) => {
+        //     item.passhash = null
+        //     if (!Model.isPlatformAdmin(token)) {
+        //         item.password = '********'
+        //     }
+        //     return item
+        // })
         // 按照层级排序
-        const sortResult = _.sortBy(queryRet.Items, ['level'])
-        return [0, sortResult]
+        // const sortResult = _.sortBy(queryRet.Items, ['level'])
+        return [0, queryRet.Items]
     }
 
     /**
