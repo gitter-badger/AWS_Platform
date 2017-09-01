@@ -90,16 +90,16 @@ export class UserModel extends BaseModel {
         const allAgent = {
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status AND #userId <> :userId',
+            FilterExpression: '#status = :status AND #level <> :level',
             ExpressionAttributeNames: {
                 '#role': 'role',
                 '#status': 'status',
-                '#userId': 'userId'
+                '#level': 'level'
             },
             ExpressionAttributeValues: {
                 ':role': RoleCodeEnum['Agent'],
                 ':status': StatusEnum.Enable,
-                ':userId': token.userId
+                ':level': 0
             }
         }
         // 查询用户的所有可用代理
