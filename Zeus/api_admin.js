@@ -14,7 +14,7 @@ const eva = async (e, c, cb) => {
         // 入参数据
         const res = { m: 'eva' }
         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
-        //检查参数是否合法
+        // 检查参数是否合法
         const [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
         // 生成第一个管理员业务
         const [registerUserErr, resgisterUserRet] = await RegisterAdmin(Model.addSourceIP(e, userInfo))
