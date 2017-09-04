@@ -121,6 +121,8 @@ export async function gamePlayerList(event, context, cb) {
     }
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
+    let sortKey = requestParams.sortKey || "createAt";
+    let sortMode = requestParams.sortKey || "asc";  //asc 升序  dsc 降序
     let userModel = new UserModel();
     let err, userList=[];
     //如果是平台管理员，可以查看所有的玩家信息
@@ -163,12 +165,15 @@ export async function gamePlayerList(event, context, cb) {
     }, this);
     for(let i = 0; i < userList.length; i++) {
         for(let j = i+1; j < userList.length;j++) {
-            if(userList[i].buId > userList[j].buId) {
+            if(isSort(userList[i], userList[j])){
                 let item = userList[i];
                 userList[i] = userList[j];
                 userList[j] = item;
             }
         }
+    }
+    function isSort(a, b){
+        return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
     }
     ResOK(cb, {list: userList});
 }

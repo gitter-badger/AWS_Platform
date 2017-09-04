@@ -115,6 +115,8 @@ export async function agentPlayerList(event, context, cb) {
     }
     let role = tokenInfo.role;
     let parent = tokenInfo.parent;
+    let sortKey = requestParams.sortKey || "createAt";
+    let sortMode = requestParams.sortKey || "asc";  //asc 升序  dsc 降序
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
     let flag  = false;
@@ -151,12 +153,15 @@ export async function agentPlayerList(event, context, cb) {
     userList = userList || [];
     for(let i = 0; i < userList.length; i++) {
         for(let j = i+1; j < userList.length;j++) {
-            if(userList[i].buId > userList[j].buId) {
+            if(isSort(userList[i], userList[j])){
                 let item = userList[i];
                 userList[i] = userList[j];
                 userList[j] = item;
             }
         }
+    }
+    function isSort(a, b){
+        return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
     }
     userList.forEach(function(element) {
         console.log(element.buId);
@@ -185,9 +190,11 @@ export async function agentPlayerCudian(event, context, cb){
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
-        {name : "userName", type:"S"},
-        {name : "points", type:"N",min:1},
+        {name : "toUser", type:"S"},
+        {name : "amount", type:"N",min:1},
     ], requestParams);
+    requestParams.userName = requestParams.toUser;
+    requestParams.points = requestParams.amount;
     if(checkAttError){
         Object.assign(checkAttError, {params: errorParams});
         return cb(null, ReHandler.fail(checkAttError));
@@ -241,9 +248,11 @@ export async function agentPlayerQudian(event, context, cb){
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
-        {name : "userName", type:"S"},
-        {name : "points", type:"N",min:1},
+        {name : "toUser", type:"S"},
+        {name : "amount", type:"N",min:1},
     ], requestParams);
+    requestParams.userName = requestParams.toUser;
+    requestParams.points = requestParams.amount;
     if(checkAttError){
         Object.assign(checkAttError, {params: errorParams});
         return cb(null, ReHandler.fail(checkAttError));
@@ -462,7 +471,7 @@ export async function childrenAgent(event, context, cb) {
         return ResFail(cb, parserErr);
     }
     //创建者信息
-    let {userId,username, role, parent, liveMix, vedioMix} = tokenInfo;
+    let {userId,username, role, parent, liveMix, vedioMix,displayName} = tokenInfo;
     let [agentErr, agentInfo] = await new MerchantModel().findByUserId(userId);
     if(agentErr) {
         return ResFail(cb, agentErr);
@@ -489,6 +498,7 @@ export async function childrenAgent(event, context, cb) {
             username,
             liveMix,
             vedioMix,
+            displayName,
             points : agentInfo.points
         })
     }
@@ -502,6 +512,7 @@ export async function childrenAgent(event, context, cb) {
             username : item.username,
             liveMix : item.liveMix,
             vedioMix : item.vedioMix,
+            displayName : item.displayName,
             points : item.points,
         }
     })
@@ -620,7 +631,7 @@ export async function createPlayer(event, context, cb) {
       remark : requestParams.remark,
       originalAmount : 0,
       gameType : -1,
-      typeName : "代理存点"
+      typeName : "代理分配初始点数"
     }
     let userBillModel = new UserBillModel({
         ...baseBillModel,
