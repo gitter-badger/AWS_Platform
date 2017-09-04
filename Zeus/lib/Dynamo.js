@@ -50,7 +50,6 @@ export const Model = {
   DefaultParentName: 'PlatformAdmin',
   NoParent: '00', // 没有
   NoParentName: 'SuperAdmin',
-  SuperAdminRole: '0',
   /**
    * 所有实体基类
    */
