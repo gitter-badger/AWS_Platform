@@ -1,4 +1,4 @@
-import { Success, Fail, Codes, Tables, JwtVerify, JSONParser } from './lib/all'
+import { Success, Fail, Codes, Tables, JwtVerify, JSONParser,RoleCodeEnum } from './lib/all'
 
 
 import {PlatformUserModel} from "./model/PlatformUserModel"
@@ -34,6 +34,7 @@ const userTrigger = async (e, c, cb) => {
         console.info("没有找到用户信息")
         return;
     }
+    console.log(userInfo);
     let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
     msnInfo = msnInfo || {msn:"-1"};
     msnInfo.msn = msnInfo.msn || "-1";
@@ -44,11 +45,14 @@ const userTrigger = async (e, c, cb) => {
         headPic : "",
         parent : userInfo.parent,
         msn : msnInfo.msn,
-        gameList : userInfo.gameList || [],
+        gameList : userInfo.gameList,
         displayName : userInfo.displayName || "",
         suffix : userInfo.suffix,
         levelIndex : userInfo.levelIndex
     })
+    if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Manager) {
+        pushModel.gameList = ["10000", "30000","40000"]
+    }
     console.log("pushModel");
     console.log(pushModel);
     let [er] = await pushModel.pushMerchant();
