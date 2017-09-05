@@ -19,8 +19,8 @@ const backup = async (e, c, cb) => {
             excludedTables: ['ZeusPlatformLog','HeraGameRecord','ZeusPlatformBill','HeraGamePlayerBill','HeraGameDiamondBill'],
             stopOnFailure: true,
             base64Binary: false,
-            awsAccessKey: 'AKIAJYJECZFXONHF7OEA',
-            awsSecretKey: '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',
+            awsAccessKey: process.env.ACCESS_KEY,
+            awsSecretKey: process.env.SECRET_KEY,
             awsRegion: 'ap-southeast-1'
         })
         backup.on('error', function (data) {
