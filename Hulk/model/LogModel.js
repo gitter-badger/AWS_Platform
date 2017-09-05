@@ -1,18 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    StatusEnum,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
 
@@ -170,7 +156,7 @@ export class LogModel extends BaseModel {
         let inparams = inparam
         let ret = 'Y'
         let detail = result
-        let level = inparam.operateToken.level
+        let level = parseInt(inparam.operateToken.level)
         let levelIndex = inparam.operateToken.levelIndex
         if (error) {
             ret = 'N'
@@ -210,7 +196,7 @@ export class LogModel extends BaseModel {
         let lastLogin = new Date().getTime()
         let userStatus = StatusEnum.Enable
         let parent = loginUserRet.parent ? loginUserRet.parent : '0'
-        let level = loginUserRet.level
+        let level = parseInt(loginUserRet.level)
         let ret = 'Y'
         if (!level && level != 0) {
             level = '-1'

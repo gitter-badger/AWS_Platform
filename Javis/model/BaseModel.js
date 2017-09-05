@@ -1,15 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit
-} from '../lib/all'
+import {Tables,Store$,Codes,BizErr,Trim,Empty,Model,Keys,Pick,Omit} from '../lib/all'
 
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })

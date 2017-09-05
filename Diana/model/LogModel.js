@@ -1,17 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
 
@@ -47,7 +34,7 @@ export class LogModel extends BaseModel {
         let inparams = inparam
         let ret = 'Y'
         let detail = result
-        let level = inparam.operateToken.level
+        let level = parseInt(inparam.operateToken.level)
         let levelIndex = inparam.operateToken.levelIndex
         if (error) {
             ret = 'N'

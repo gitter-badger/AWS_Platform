@@ -63,9 +63,7 @@ const PlatformBaseBizRole = function () {
     isforever: false,                     // 是否永久
     contractPeriod: Model.StringValue,    // 有效期
     remark: Model.StringValue,            // 备注
-    gender: GenderEnum.Trans,             // 性别
-    hostName: Model.StringValue,          // 负责人姓名
-    hostContact: Model.StringValue        // 负责人联系方式
+    gender: GenderEnum.Trans              // 性别
   }
 }
 /**
@@ -97,7 +95,9 @@ export const RoleModels = {
       ...PlatformBaseBizRole(),
       gameList: [],                         // 游戏类型列表
       limit: Model.NumberValue,             // 可用名额
-      managerEmail: Model.StringValue       // 线路商邮箱
+      managerEmail: Model.StringValue,      // 线路商邮箱
+      hostName: Model.StringValue,          // 负责人姓名
+      hostContact: Model.StringValue        // 负责人联系方式
     }
   },
   '100': function () {
@@ -109,14 +109,15 @@ export const RoleModels = {
       frontURL: Model.StringValue,          // 商户站点
       loginWhiteList: '0.0.0.0',            // 登录白名单
       merchantEmail: Model.StringValue,     // 商户邮箱
+      hostName: Model.StringValue,          // 负责人姓名
+      hostContact: Model.StringValue        // 负责人联系方式
     }
   },
   '1000': function () {
     return {// 代理
       ...PlatformBaseBizRole(),
       vedioMix: Model.NumberValue,            // 电子游戏洗码比
-      liveMix: Model.NumberValue,             // 真人视讯洗码比
-      agentEmail: Model.StringValue           // 代理邮箱
+      liveMix: Model.NumberValue              // 真人视讯洗码比
     }
   },
   '10000': function () {
@@ -240,9 +241,6 @@ export const RoleEditProps = {
     'isforever'
   ],
   '1000': [// 代理
-    'hostName',
-    'hostContact',
-    'agentEmail',
     'password',
     'rate',
     'contractPeriod',

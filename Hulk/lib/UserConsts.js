@@ -84,6 +84,7 @@ export const RoleModels = {
       ...UserRole(),
       parentName: Model.NoParentName,
       role: RoleCodeEnum['PlatformAdmin'],
+      subRole: 'admin',
       displayName: '平台管理员',
       suffix: 'Platform',
       points: Model.PlatformAdminDefaultPoints
@@ -137,7 +138,8 @@ export const RoleDisplay = {
     'parent',
     'parentName',
     'displayName',
-    'level'
+    'level',
+    'subRole'           // 二级权限
   ],
   '10': [// 线路商
     'userId',

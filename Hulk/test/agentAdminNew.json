@@ -2,30 +2,21 @@
     "headers": {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX2NoZW5leSIsInBhc3N3b3JkIjoiMTIzNDU2Iiwic3VmZml4IjoiUGxhdGZvcm0iLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJTdXBlckFkbWluIiwidXNlcklkIjoiNjAyOGVlYzYtOTZlYy00OTJkLWEzNmItZmQ4ZDY5ODFiNzZmIiwicm9sZSI6IjEiLCJkaXNwbGF5TmFtZSI6IuW5s-WPsOeuoeeQhuWRmCIsImlhdCI6MTUwMDk3Mzg5OX0.2TQMNV3yBDYoBKaUtU0bwTNuAPeaGGAovZ8JN-DZ5pE"
     },
-    "pathParameters": {
-        "parent": 0
-    },
     "requestContext": {
         "authorizer": {
-            "userId": "5668b822-0af4-4dc9-a253-4d595ebcf6b8",
-            "role": "1000",
-            "suffix": "Agent",
             "username": "NAagent",
             "parent": "00",
-            "parentName": "PlatformAdmin",
-            "displayName": "代理管理员",
-            "level": 0,
-            "vedioMix": 100,
-            "liveMix": 100,
-            "displayId": 533563,
-            "contractPeriod": 0,
-            "isforever": true,
-            "updatedAt": 1504166810726,
-            "remark": "NULL!",
-            "iat": 1504166780
-          },
+            "role": "1000",
+            "userId": "cbfaa49d-6bb2-40c8-bc8f-3d768f6f3a04",
+            "suffix": "Agent"
+        },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
+    },
+    "body": {
+        "role": "1000",
+        "username": "NAagent",
+        "password": "Ab123456"
     }
 }

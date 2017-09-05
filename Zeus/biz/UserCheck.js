@@ -5,7 +5,7 @@ export class UserCheck {
      * 检查管理员
      */
     checkAdmin(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -39,7 +39,7 @@ export class UserCheck {
      * 检查普通用户
      */
     checkUser(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -81,7 +81,7 @@ export class UserCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
         if (inparam.limit) {
@@ -98,7 +98,7 @@ export class UserCheck {
      * 检查普通用户更新
      */
     checkUserUpdate(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -132,7 +132,7 @@ export class UserCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
         if (inparam.limit) {
@@ -196,7 +196,7 @@ export class UserCheck {
      * @param {*} inparam 
      */
     checkPassword(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([

@@ -1,17 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
@@ -70,17 +57,17 @@ export class UserModel extends BaseModel {
         for (let item of queryRet.Items) {
             // 第一层
             if (item.level == 1) {
-                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], role: item.role, level: item.level }
+                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], role: item.role, level: item.level, status: item.status }
                 organizeTree.push(treeNode)
             }
             // 剩余节点
             else {
-                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], role: item.role, level: item.level }
+                let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], role: item.role, level: item.level, status: item.status }
                 childTree.push(treeNode)
             }
         }
         tree(organizeTree, childTree)
-        return [0, { name: '组织架构', children: organizeTree }]
+        return [0, { name: 'NA集团', children: organizeTree }]
     }
 }
 /**

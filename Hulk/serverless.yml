@@ -79,7 +79,7 @@ functions:
           path: agentAdminNew
           method: post
           cors: true
-          # authorizer: tokenAuth
+          authorizer: tokenAuth
   agentNew: # 代理注册
     handler: api_agent.agentNew
     events:

@@ -5,7 +5,6 @@ import { JwtVerify, JwtSign } from './Response'
 import _ from 'lodash'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
-const generatePassword = require('password-generator')
 AWS.config.update({ region: 'ap-southeast-1' })
 AWS.config.setPromisesDependency(require('bluebird'))
 
@@ -153,9 +152,6 @@ export const Model = {
     } catch (err) {
       return [BizErr.ParamErr(err.toString()), 0]
     }
-  },
-  genPassword: () => {
-    return generatePassword()
   },
   addSourceIP: (e, info) => {
     const sourceIP = e && e.requestContext && e.requestContext.identity.sourceIp || '-100'

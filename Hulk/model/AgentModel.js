@@ -1,19 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    StatusEnum,
-    RoleCodeEnum,
-    RoleDisplay,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleDisplay, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { BaseModel } from './BaseModel'
@@ -52,7 +37,7 @@ export class AgentModel extends BaseModel {
             return [BizErr.UserExistErr(), 0]
         }
         // 保存用户，处理用户名前缀
-        const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}` }
+        const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.username}` }
         const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
             return [saveUserErr, 0]
@@ -117,7 +102,7 @@ export class AgentModel extends BaseModel {
         const User = {
             ...CheckUser,
             uname: `${CheckUser.username}`,
-            username: `${CheckUser.suffix}_${CheckUser.username}`,
+            username: `${CheckUser.username}`,
             parentName: parentUser.username,
             parentDisplayName: parentUser.displayName,
             parentSuffix: parentUser.suffix,
@@ -166,19 +151,11 @@ export class AgentModel extends BaseModel {
             ...userLoginInfo
         }, Keys(Role))
         const username = UserLoginInfo.username
-        const suffix = UserLoginInfo.suffix
         // 查询用户信息
-        const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(userLoginInfo.role, suffix, username)
+        const [queryUserErr, User] = await new UserModel().getUserByName(userLoginInfo.role, username)
         if (queryUserErr) {
             return [queryUserErr, 0]
         }
-        if (queryUserRet.Items.length === 0) {
-            return [BizErr.UserNotFoundErr(), 0]
-        }
-        if (queryUserRet.Items.length > 1) {
-            return [BizErr.DBErr(), 0]
-        }
-        const User = queryUserRet.Items[0]
         // 校验用户密码
         const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
         if (!valid) {

@@ -69,8 +69,13 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
-            return Omit(item, ['passhash'])
+            item.passhash = null
+            if (!Model.isAgentAdmin(token)) {
+                item.password = '********'
+            }
+            return item
         })
         // 按照层级排序
         const sortResult = _.sortBy(users, ['level'])
@@ -85,16 +90,16 @@ export class UserModel extends BaseModel {
         const allAgent = {
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status AND #userId <> :userId',
+            FilterExpression: '#status = :status AND #level <> :level',
             ExpressionAttributeNames: {
                 '#role': 'role',
                 '#status': 'status',
-                '#userId': 'userId'
+                '#level': 'level'
             },
             ExpressionAttributeValues: {
                 ':role': RoleCodeEnum['Agent'],
                 ':status': StatusEnum.Enable,
-                ':userId': token.userId
+                ':level': 0
             }
         }
         // 查询用户的所有可用代理
@@ -124,7 +129,14 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-
+        // 去除敏感数据
+        queryRet.Items = _.map(queryRet.Items, (item) => {
+            item.passhash = null
+            if (!inparam.parent) {
+                item.password = '********'
+            }
+            return item
+        })
         // 按照层级排序
         const sortResult = _.sortBy(queryRet.Items, ['level'])
         return [0, sortResult]
@@ -150,17 +162,21 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
+        adminRet.Items = _.map(adminRet.Items, (item) => {
+            item.passhash = null
+            return item
+        })
         // 按照时间排序
         const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
-        adminRet.Items = sortResult
-        return [0, adminRet.Items]
+        return [0, sortResult]
     }
 
-    // 检查用户是否重复
+    // 检查代理用户是否重复
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]
         // 对于代理管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-        if (role === RoleCodeEnum['Agent']) {
+        if (suffix == 'Agent') {
             [err, ret] = await this.queryUserBySuffix(role, suffix, username)
         } else {
             // 对于其他用户，角色和前缀具有联合唯一性
@@ -180,6 +196,22 @@ export class UserModel extends BaseModel {
         }
         if (err) {
             return [err, 0]
+        }
+        // 还需要校验角色和用户名的唯一性
+        if (suffix != 'Agent' && ret.Items.length == 0) {
+            [err, ret] = await this.query({
+                TableName: Tables.ZeusPlatformUser,
+                IndexName: 'RoleUsernameIndex',
+                KeyConditionExpression: '#username = :username and #role = :role',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':username': username,
+                    ':role': role
+                }
+            })
         }
         if (ret.Items.length > 0) {
             return [0, false]

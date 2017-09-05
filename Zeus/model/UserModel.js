@@ -36,7 +36,6 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-
         // 按照层级排序
         const sortResult = _.sortBy(queryRet.Items, ['level'])
 
@@ -78,6 +77,11 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
+        adminRet.Items = _.map(adminRet.Items, (item) => {
+            item.passhash = null
+            return item
+        })
         // 按照时间排序
         const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
         return [0, sortResult]
@@ -200,7 +204,7 @@ export class UserModel extends BaseModel {
                 ':role': roleCode
             }
         }
-        if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+        if (Model.isPlatformAdmin(token)) {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role',
@@ -216,8 +220,13 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
-            return Omit(item, ['passhash'])
+            item.passhash = null
+            if (!Model.isPlatformAdmin(token)) {
+                item.password = '********'
+            }
+            return item
         })
         // 按照层级排序
         const sortResult = _.sortBy(users, ['level'])
@@ -242,9 +251,17 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据（该方法不需要）
+        // queryRet.Items = _.map(queryRet.Items, (item) => {
+        //     item.passhash = null
+        //     if (!Model.isPlatformAdmin(token)) {
+        //         item.password = '********'
+        //     }
+        //     return item
+        // })
         // 按照层级排序
-        const sortResult = _.sortBy(queryRet.Items, ['level'])
-        return [0, sortResult]
+        // const sortResult = _.sortBy(queryRet.Items, ['level'])
+        return [0, queryRet.Items]
     }
 
     /**
@@ -274,6 +291,24 @@ export class UserModel extends BaseModel {
                 }
             })
         }
+
+        // 代理还需要校验角色和用户名的唯一性
+        if (role == RoleCodeEnum['Agent'] && suffix != 'Agent' && ret.Items.length == 0) {
+            [err, ret] = await this.query({
+                TableName: Tables.ZeusPlatformUser,
+                IndexName: 'RoleUsernameIndex',
+                KeyConditionExpression: '#username = :username and #role = :role',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':username': username,
+                    ':role': role
+                }
+            })
+        }
+
         if (err) {
             return [err, 0]
         }

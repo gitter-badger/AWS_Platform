@@ -5,14 +5,14 @@ export class AgentCheck {
      * 检查代理管理员
      */
     checkAdmin(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            
+
             // 代理
             // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
             // { name: "hostContact", type: "S", min: 5, max: 40 },
@@ -35,7 +35,7 @@ export class AgentCheck {
             throw checkAttError
         }
         // 数据类型处理
-        // inparam.rate = inparam.rate.toString()
+        // inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(Model.PlatformAdminDefaultPoints)
         inparam.role = RoleCodeEnum.Agent
         inparam.suffix = 'Agent'
@@ -55,7 +55,7 @@ export class AgentCheck {
      * 检查代理
      */
     check(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -95,12 +95,12 @@ export class AgentCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
         inparam.vedioMix = parseFloat(inparam.vedioMix)
         inparam.liveMix = parseFloat(inparam.liveMix)
-        
+
         return [checkAttError, errorParams]
     }
 
@@ -108,12 +108,12 @@ export class AgentCheck {
      * 检查代理更新
      */
     checkUpdate(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
-            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME_UPDATE },
+            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
@@ -141,7 +141,7 @@ export class AgentCheck {
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
         inparam.vedioMix = parseFloat(inparam.vedioMix)
@@ -158,7 +158,7 @@ export class AgentCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "captcha", type: "N", min: 1000, max: 9999 }
         ], inparam)
@@ -201,7 +201,7 @@ export class AgentCheck {
      * @param {*} inparam 
      */
     checkPassword(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
