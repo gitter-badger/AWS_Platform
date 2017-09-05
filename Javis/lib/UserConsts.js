@@ -32,6 +32,7 @@ const UserRole = function () {
     password: Model.StringValue,          // 密码
     passhash: Model.StringValue,          // 密码hash
     parent: Model.NoParent,               // 默认没有上级
+    parentRole: Model.NoParent,           // 默认没有上级角色
 
     level: Model.NumberValue,             // 层级
     levelIndex: Model.StringValue,        // 层级索引
@@ -137,6 +138,7 @@ export const RoleDisplay = {
     // 'password',
     'parent',
     'parentName',
+    'parentRole',
     'displayName',
     'level',
     'subRole'           // 二级权限
@@ -149,6 +151,7 @@ export const RoleDisplay = {
     // 'password',
     'parent',
     'parentName',
+    'parentRole',
     'displayName',
     'level',
 
@@ -166,6 +169,7 @@ export const RoleDisplay = {
     // 'password',
     'parent',
     'parentName',
+    'parentRole',
     'displayName',
     'level',
 
@@ -186,6 +190,7 @@ export const RoleDisplay = {
     // 'password',
     'parent',
     'parentName',
+    'parentRole',
     'displayName',
     'level',
 
