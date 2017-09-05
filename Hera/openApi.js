@@ -873,9 +873,12 @@ async function updateUserInfo(event, context, callback) {
  * @param {*} callback 
  */
 async function playerGameRecord(event, context, callback) {
+  console.log(event);
    //json转换
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
-  if(parserErr) return [parserErr, [], null, requestParams];
+  if(parserErr) {
+    return callback(null, ReHandler.fail(parserErr));
+  }
   let [checkAttError, errorParams] = athena.Util.checkProperties([
     {name:"records", type:"S"}
   ], requestParams);
