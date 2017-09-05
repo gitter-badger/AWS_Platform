@@ -104,6 +104,7 @@ export class AgentModel extends BaseModel {
             uname: `${CheckUser.username}`,
             username: `${CheckUser.username}`,
             parentName: parentUser.username,
+            parentRole: parentUser.role,
             parentDisplayName: parentUser.displayName,
             parentSuffix: parentUser.suffix,
             points: Model.NumberValue,
