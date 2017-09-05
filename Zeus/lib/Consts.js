@@ -7,9 +7,9 @@ export const MSNStatusEnum = {
 }
 // 游戏类型枚举
 export const GameTypeEnum = {
-  '10000': { code: '10000', name: '棋牌游戏', url: 'http://root.rottagame.com/admin/api/checkLoginAccess' },
-  '40000': { code: '40000', name: '电子游戏', url: 'http://47.88.192.69/tigergame/public/admin/api/checkLoginAccess' },
-  '30000': { code: '30000', name: '真人视讯', url: 'http://user.ybvip789.com:8080/player/login' }
+  '10000': { code: '10000', name: '棋牌游戏', url: 'http://root.rottagame.com/admin/api/checkLoginAccess', desc: '', imgurl: '' },
+  '40000': { code: '40000', name: '电子游戏', url: 'http://47.88.192.69/tigergame/public/admin/api/checkLoginAccess', desc: '', imgurl: '' },
+  '30000': { code: '30000', name: '真人视讯', url: 'http://user.ybvip789.com:8080/player/login', desc: '', imgurl: '' }
 }
 /**
  * 账单实体
