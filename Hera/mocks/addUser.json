@@ -5,10 +5,11 @@
         "nickname" : "小白",
         "points" : 568,
         "remark" : "这是备注",
+        "parentId" : "f68e8240-db7b-466d-90ac-5fadeb777e4a",
         "liveMix" :0,
         "vedioMix" :0
     },
     "headers" : {
-        "Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0NTRiNmY1Mi05NmZiLTQ2NWQtODcxNi1lNzhlMDVkOTc1ZjMiLCJyb2xlIjoiMTAwMCIsInN1ZmZpeCI6IkFnZW50IiwidXNlcm5hbWUiOiJBZ2VudF9OQWFnZW50IiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiUGxhdGZvcm1BZG1pbiIsImRpc3BsYXlOYW1lIjoi5Luj55CG566h55CG5ZGYIiwidmVkaW9NaXgiOjAsImxpdmVNaXgiOjAsImRpc3BsYXlJZCI6NjkwMTEzLCJjb250cmFjdFBlcmlvZCI6MCwiaXNmb3JldmVyIjp0cnVlLCJ1cGRhdGVkQXQiOjE1MDMzMDcwMzIxMDQsInJlbWFyayI6Ik5VTEwhIiwiaWF0IjoxNTAzMzA3MDAyfQ.EEEquCzjDYfJCTO7AfSjqCqtbNGXqaNGdnIk5ytiECk"
+        "Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZTZiNTY5OS1mYTRiLTQ3ZTAtYWUzYi01YjNlNTAyNDFlZTMiLCJyb2xlIjoiMTAwMCIsInN1ZmZpeCI6IkFnZW50IiwidXNlcm5hbWUiOiJBZ2VudFkiLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJQbGF0Zm9ybUFkbWluIiwiZGlzcGxheU5hbWUiOiLku6PnkIbnrqHnkIblkZgiLCJsZXZlbCI6MCwidmVkaW9NaXgiOjEwMCwibGl2ZU1peCI6MTAwLCJkaXNwbGF5SWQiOjk0NzA2MywiY29udHJhY3RQZXJpb2QiOjAsImlzZm9yZXZlciI6dHJ1ZSwidXBkYXRlZEF0IjoxNTA0MTUyMjU2NDM2LCJyZW1hcmsiOiJOVUxMISIsImlhdCI6MTUwNDE1MjIyNn0.1nnqGesweQheLa1g_2Qh-KSjHDkFJ7zC_HP9lI4t1DM"
     }
 }

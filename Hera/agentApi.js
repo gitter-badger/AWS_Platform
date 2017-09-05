@@ -16,6 +16,8 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantBillModel} from "./model/MerchantBillModel";
 
+import {LogModel} from "./model/LogModel";
+
 import {Util} from "./lib/Util"
 
 import {RoleCodeEnum} from "./lib/Consts";
@@ -27,6 +29,69 @@ const ResFail = (callback, res) => {
     errObj.err = res;
     errObj.code = res.code;
     callback(null, ReHandler.fail(errObj))
+}
+
+const logEnum = {
+  "addPlayer" : {
+    type :"operate",
+    action : "创建玩家",
+    detail : "创建成功",
+  },
+  "cudian" : {
+    type :"operate",
+    action : "玩家存点",
+    detail : "成功",
+  },
+  "qudian" : {
+    type :"operate",
+    action : "玩家取点",
+    detail : "成功",
+  },
+  "updatePassword" : {
+      type :"operate",
+    action : "修改玩家密码",
+    detail : "成功",
+  }
+}
+
+/**
+ * 错误处理
+ * @param {*} callback 
+ * @param {*} error 
+ */
+async function errorHandler(callback, error, type, merchantInfo, userInfo) {
+  ResFail(callback, error);
+  //写日志
+  delete userInfo.userId;
+  delete userInfo.role;
+  Object.assign(merchantInfo, {
+    ...userInfo,
+    ...logEnum[type],
+    detail : error.msg,
+    ret : "N"
+  })
+  let logModel = new LogModel(merchantInfo);
+  console.log(logModel);
+  let [sErr] = await logModel.save();
+}
+
+/**
+ * 成功处理
+ * @param {*} callback 
+ * @param {*} data 
+ */
+async function successHandler(callback, data, type, merchantInfo, userInfo) {
+  ResOK(callback, data);
+  //写日志
+  delete userInfo.userId;
+  delete userInfo.role;
+  Object.assign(merchantInfo, {
+    ...userInfo,
+    ...logEnum[type],
+    ret : "Y"
+  })
+  let logModel = new LogModel(merchantInfo);
+  let [sErr] = await logModel.save();
 }
 
 /**
@@ -50,6 +115,8 @@ export async function agentPlayerList(event, context, cb) {
     }
     let role = tokenInfo.role;
     let parent = tokenInfo.parent;
+    let sortKey = requestParams.sortKey || "createAt";
+    let sortMode = requestParams.sortKey || "asc";  //asc 升序  dsc 降序
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
     let flag  = false;
@@ -84,10 +151,22 @@ export async function agentPlayerList(event, context, cb) {
         return ResFail(cb, err)
     }
     userList = userList || [];
+    for(let i = 0; i < userList.length; i++) {
+        for(let j = i+1; j < userList.length;j++) {
+            if(isSort(userList[i], userList[j])){
+                let item = userList[i];
+                userList[i] = userList[j];
+                userList[j] = item;
+            }
+        }
+    }
+    function isSort(a, b){
+        return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+    }
     userList.forEach(function(element) {
-            delete element.userPwd
-        }, this);
-    
+        console.log(element.buId);
+        delete element.userPwd
+    }, this);
     ResOK(cb, {list: userList});
 }
 
@@ -111,9 +190,11 @@ export async function agentPlayerCudian(event, context, cb){
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
-        {name : "userName", type:"S"},
-        {name : "points", type:"N",min:1},
+        {name : "toUser", type:"S"},
+        {name : "amount", type:"N",min:1},
     ], requestParams);
+    requestParams.userName = requestParams.toUser;
+    requestParams.points = requestParams.amount;
     if(checkAttError){
         Object.assign(checkAttError, {params: errorParams});
         return cb(null, ReHandler.fail(checkAttError));
@@ -143,7 +224,8 @@ export async function agentPlayerCudian(event, context, cb){
     if(userBErr) {
         return ResFail(cb, cudianErr);
     }
-    ResOK(cb, {data:{points}});
+    return successHandler(cb, {data:{points}}, "cudian", tokenInfo, userInfo);
+    // ResOK(cb, {data:{points}});
 }
 
 /**
@@ -166,9 +248,11 @@ export async function agentPlayerQudian(event, context, cb){
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
-        {name : "userName", type:"S"},
-        {name : "points", type:"N",min:1},
+        {name : "toUser", type:"S"},
+        {name : "amount", type:"N",min:1},
     ], requestParams);
+    requestParams.userName = requestParams.toUser;
+    requestParams.points = requestParams.amount;
     if(checkAttError){
         Object.assign(checkAttError, {params: errorParams});
         return cb(null, ReHandler.fail(checkAttError));
@@ -197,7 +281,8 @@ export async function agentPlayerQudian(event, context, cb){
     if(userBErr) {
         return ResFail(cb, cudianErr);
     }
-    ResOK(cb, {data:{points}});
+    return successHandler(cb, {data:{points}}, "qudian", tokenInfo, userInfo);
+    // ResOK(cb, {data:{points}});
 }
 
 async function qudian(userInfo, merchantInfo, requestParams) {
@@ -386,7 +471,14 @@ export async function childrenAgent(event, context, cb) {
         return ResFail(cb, parserErr);
     }
     //创建者信息
-    let {userId,username, role, parent, liveMix, vedioMix} = tokenInfo;
+    let {userId,username, role, parent, liveMix, vedioMix,displayName} = tokenInfo;
+    let [agentErr, agentInfo] = await new MerchantModel().findByUserId(userId);
+    if(agentErr) {
+        return ResFail(cb, agentErr);
+    }
+    if(!agentInfo) {
+        return ResFail(cb, new CHeraErr(CODES.AgentNotExist));
+    }
     //获取所有下级代理
     let merchant = new MerchantModel();
     let queryMerchantError, agentList;
@@ -405,7 +497,9 @@ export async function childrenAgent(event, context, cb) {
             userId,
             username,
             liveMix,
-            vedioMix
+            vedioMix,
+            displayName,
+            points : agentInfo.points
         })
     }
     
@@ -417,9 +511,19 @@ export async function childrenAgent(event, context, cb) {
             userId : item.userId,
             username : item.username,
             liveMix : item.liveMix,
-            vedioMix : item.vedioMix
+            vedioMix : item.vedioMix,
+            displayName : item.displayName,
+            points : item.points,
         }
     })
+    //获取代理点数
+    for(let i =0; i < returnArr.length; i ++) {
+        let [bErr, balance] = await new MerchantBillModel({userId:returnArr[i].userId}).getBlance();
+        if(bErr) {
+            return cb(null, ReHandler.fail(bErr));
+        }
+        returnArr[i].points += balance;
+    }
     ResOK(cb, {list : returnArr});
 }   
 
@@ -497,7 +601,9 @@ export async function createPlayer(event, context, cb) {
     let [existError, flag] = await userModel.isExist(userName);
     if(existError) return ResFail(cb, existError);
     //用户已经注册
-    if(flag) return ResFail(cb, new CHeraErr(CODES.userAlreadyRegister));
+    if(flag){
+         return ResFail(cb, new CHeraErr(CODES.userAlreadyRegister));
+    }
     //生成密码hash
     userModel.cryptoPassword();
     
@@ -525,7 +631,7 @@ export async function createPlayer(event, context, cb) {
       remark : requestParams.remark,
       originalAmount : 0,
       gameType : -1,
-      typeName : "代理存点"
+      typeName : "代理分配初始点数"
     }
     let userBillModel = new UserBillModel({
         ...baseBillModel,
@@ -555,7 +661,8 @@ export async function createPlayer(event, context, cb) {
     //更新余额
     let [updateBaError] = await new UserModel().update({userName},{balance : userSumAmount});
     if(updateBaError) return callback(null, ReHandler.fail(updateBaError));
-    ResOK(cb, {data : userInfo});
+    return successHandler(cb, {data : userInfo}, "addPlayer", tokenInfo, userInfo);
+    // ResOK(cb, {data : userInfo});
 }
 
 /**
@@ -610,15 +717,15 @@ export async function updatePassword(event, context, cb) {
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([
-        {name : "userName", type:"S"}
+        {name : "userName", type:"S"},
+        {name : "password", type:"S"}
     ], requestParams);
 
     if(checkAttError){
         Object.assign(checkAttError, {params: errorParams});
         return ResFail(cb, checkAttError);
     } 
-    let {userName} = requestParams;
-    let password = Util.generatorPassword();
+    let {userName, password} = requestParams;
     requestParams.userPwd = password;
     let user = new UserModel(requestParams);
     let [userExistError, userRecord] = await user.get({userName});
@@ -629,9 +736,12 @@ export async function updatePassword(event, context, cb) {
     if(updateError) {
       return callback(null, ReHandler.fail(updateError));
     }
-    ResOK(cb, {data : {
+    return successHandler(cb, {data : {
         password
-    }});
+    }}, "updatePassword", tokenInfo, {});
+    // ResOK(cb, {data : {
+    //     password
+    // }});
 }
 
 /**

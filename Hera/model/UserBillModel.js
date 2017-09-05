@@ -10,7 +10,7 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
+    constructor({gameId,originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
         this.userId = +userId
@@ -29,6 +29,7 @@ export class UserBillModel extends athena.BaseModel {
         this.amount = +amount;
         this.seatInfo = seatInfo;
         this.kindId = kindId || -1;  //-1表示中心钱包的 -2初始点数 -3商城的
+        this.gameId = gameId || -1;
         this.toolId = toolId || -1;
         this.toolName = toolName || Model.StringValue;
         this.type = type;

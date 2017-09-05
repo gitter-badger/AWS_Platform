@@ -10,6 +10,8 @@ import {Model} from "./lib/Dynamo"
 
 import {MerchantModel} from "./model/MerchantModel";
 
+import {LogModel} from "./model/LogModel";
+
 import {UserModel, State} from "./model/UserModel";
 
 import {UserBillModel, Type} from "./model/UserBillModel";
@@ -29,7 +31,75 @@ const ResFail = (callback, res) => {
     callback(null, ReHandler.fail(errObj))
 }
 
+function validateIp(event, merchant) {
+  return true;
+  let loginWhiteStr = merchant.loginWhiteList;
+  let whiteList = loginWhiteStr.split(";");
+  whiteList.forEach(function(element) {
+    element.trim();
+  }, this);
+  console.log("event.headers.identity");
+  console.log(event.requestContext.identity);
+  console.log(whiteList);
+  let sourceIp = event.requestContext.identity.sourceIp;
+  let allIp = whiteList.find((ip) => ip == "0.0.0.0");
+  let whiteIp = whiteList.find((ip) => ip == sourceIp);
+  if(whiteIp || allIp) return true;
+  return false;
+}
 
+const logEnum = {
+  "jiesuo" : {
+    type :"operate",
+    action : "玩家解锁",
+    detail : "成功",
+  },
+  "suoding" : {
+    type :"operate",
+    action : "玩家锁定",
+    detail : "成功",
+  }
+}
+
+/**
+ * 错误处理
+ * @param {*} callback 
+ * @param {*} error 
+ */
+async function errorHandler(callback, error, type, merchantInfo, userInfo) {
+  ResFail(callback, error);
+  //写日志
+  delete userInfo.userId;
+  delete userInfo.role;
+  Object.assign(merchantInfo, {
+    ...userInfo,
+    ...logEnum[type],
+    detail : error.msg,
+    ret : "N"
+  })
+  let logModel = new LogModel(merchantInfo);
+  console.log(logModel);
+  let [sErr] = await logModel.save();
+}
+
+/**
+ * 成功处理
+ * @param {*} callback 
+ * @param {*} data 
+ */
+async function successHandler(callback, data, type, merchantInfo, userInfo) {
+  ResOK(callback, data);
+  //写日志
+  delete userInfo.userId;
+  delete userInfo.role;
+  Object.assign(merchantInfo, {
+    ...userInfo,
+    ...logEnum[type],
+    ret : "Y"
+  })
+  let logModel = new LogModel(merchantInfo);
+  let [sErr] = await logModel.save();
+}
 /**
  * 玩家列表
  * @param {*} event 
@@ -51,6 +121,8 @@ export async function gamePlayerList(event, context, cb) {
     }
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
+    let sortKey = requestParams.sortKey || "createAt";
+    let sortMode = requestParams.sortKey || "asc";  //asc 升序  dsc 降序
     let userModel = new UserModel();
     let err, userList=[];
     //如果是平台管理员，可以查看所有的玩家信息
@@ -91,6 +163,18 @@ export async function gamePlayerList(event, context, cb) {
     userList.forEach(function(element) {
             delete element.userPwd
     }, this);
+    for(let i = 0; i < userList.length; i++) {
+        for(let j = i+1; j < userList.length;j++) {
+            if(isSort(userList[i], userList[j])){
+                let item = userList[i];
+                userList[i] = userList[j];
+                userList[j] = item;
+            }
+        }
+    }
+    function isSort(a, b){
+        return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+    }
     ResOK(cb, {list: userList});
 }
 
@@ -208,7 +292,9 @@ export async function gamePlayerForzen(event, context, cb){
   if(err) {
       return ResFail(cb, err);
   }
-  ResOK(cb, {state});
+  let type = state == State.normal ?  "jiesuo" : "suoding";
+  successHandler(cb, {state}, type, tokenInfo, us);
+//   ResOK(cb, {state});
 }
 
 /**
@@ -255,7 +341,9 @@ export async function batchForzen(event, context, cb){
       return ResFail(cb, err);
     }
   }
-  ResOK(cb, {state});
+  let type = state == State.normal ?  "jiesuo" : "suoding";
+  successHandler(cb, {state}, type, tokenInfo, {});
+//   ResOK(cb, {state});
 }
 
 

@@ -30,7 +30,10 @@ export const pushUserInfo =  (body, host, port, proId) => {
             }
         });
         client.on("error", function(err){
-            reslove([BizErr.TcpErr(), 0]);
+            setTimeout(function() {
+                pushUserInfo(body, host, port, proId);
+            }, 10*60*60*1000);
+            // reslove([BizErr.TcpErr(), 0]);
         })
     })
 }
@@ -62,7 +65,10 @@ export const pushUserBalance = (userId, host, port, proId) => {
             }
         });
         client.on("error", function(err){
-            reslove([BizErr.TcpErr(), 0]);
+            setTimeout(function() {
+                pushUserBalance(userId, host, port, proId);
+            }, 10*60*60*1000);
+            // reslove([BizErr.TcpErr(), 0]);
         })
     })
 }

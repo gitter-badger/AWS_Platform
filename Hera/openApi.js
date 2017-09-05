@@ -7,7 +7,7 @@ import {CODES, CHeraErr} from "./lib/Codes";
 
 import {ReHandler} from "./lib/Response";
 
-import {RoleCodeEnum} from "./lib/Consts"
+import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
 
 import {MerchantModel} from "./model/MerchantModel";
@@ -93,19 +93,19 @@ const logEnum = {
 async function errorHandler(callback, error, type, merchantInfo, userInfo) {
   callback(null, ReHandler.fail(error));
   //写日志
-  delete userInfo.userId;
-  userInfo.operUser = userInfo.userName;
-  let suffixLength = (merchantInfo.suffix || "").length;
-  userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
-  Object.assign(merchantInfo, {
-    ...userInfo,
-    ...logEnum[type],
-    detail : error.msg,
-    ret : "N"
-  })
-  let logModel = new LogModel(merchantInfo);
-  console.log(logModel);
-  let [sErr] = await logModel.save();
+  // delete userInfo.userId;
+  // userInfo.operUser = userInfo.userName;
+  // let suffixLength = (merchantInfo.suffix || "").length;
+  // userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
+  // Object.assign(merchantInfo, {
+  //   ...userInfo,
+  //   ...logEnum[type],
+  //   detail : error.msg,
+  //   ret : "N"
+  // })
+  // let logModel = new LogModel(merchantInfo);
+  // console.log(logModel);
+  // let [sErr] = await logModel.save();
 }
 
 /**
@@ -117,18 +117,18 @@ async function successHandler(callback, data, type, merchantInfo, userInfo) {
   callback(null, ReHandler.success(data));
 
   //写日志
-  delete userInfo.userId;
-  userInfo.operUser = userInfo.userName;
-  let suffixLength = (merchantInfo.suffix || "").length;
-  userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
-  Object.assign(merchantInfo, {
-    ...userInfo,
-    ...logEnum[type],
-    ret : "Y"
-  })
-  let logModel = new LogModel(merchantInfo);
-  console.log(logModel);
-  let [sErr] = await logModel.save();
+  // delete userInfo.userId;
+  // userInfo.operUser = userInfo.userName;
+  // let suffixLength = (merchantInfo.suffix || "").length;
+  // userInfo.userName = userInfo.userName.substring(suffixLength+1, userInfo.userName.length);
+  // Object.assign(merchantInfo, {
+  //   ...userInfo,
+  //   ...logEnum[type],
+  //   ret : "Y"
+  // })
+  // let logModel = new LogModel(merchantInfo);
+  // console.log(logModel);
+  // let [sErr] = await logModel.save();
 }
 
 /**
@@ -143,8 +143,8 @@ async function gamePlayerRegister(event, context, callback) {
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userName", type:"S", min:6, max :12},
-      {name : "userPwd", type:"S", min:6, max :16},
+      {name : "userName", type:"S"},
+      {name : "userPwd", type:"S"},
       {name : "buId", type:"N"},
       {name : "apiKey", type:"S", min:1},
       {name : "userType", type:"N", equal:1},
@@ -210,8 +210,8 @@ async function gamePlayerLogin(event, context, callback) {
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
     //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userName", type:"S", min:6, max :12},
-      {name : "userPwd", type:"S", min:6, max :16},
+      {name : "userName", type:"S"},
+      {name : "userPwd", type:"S"},
       {name : "buId", type:"N"},
       {name : "apiKey", type:"S", min:1},
       {name : "gamePlatform", type:"S", equal:gamePlatform}
@@ -220,7 +220,7 @@ async function gamePlayerLogin(event, context, callback) {
     Object.assign(checkAttError, {params: errorParams});
     return callback(null, ReHandler.fail(checkAttError));
   } 
-  let {buId, userName, userPwd, apiKey, gamePlatform} = requestParams;
+  let {buId, userName,userPwd, apiKey, gamePlatform} = requestParams;
   //检查商户信息是否正确
   const merchant = new MerchantModel();
   const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);
@@ -530,7 +530,7 @@ async function gamePlayerA3Login(event, context, callback) {
       msn : userInfo.msn,
       createAt : userInfo.createAt,
       updateAt : userInfo.updateAt,
-      username : userName.split("_")[1] || userName,
+      username : userName,
       userId : userInfo.userId,
       nickname : userInfo.nickname,
       headPic : userInfo.headPic,
@@ -602,7 +602,7 @@ async function playerRecordValidate(event, context, callback){
      return callback(null, ReHandler.fail(validateError));
   }
   let userId = +userInfo.userId;
-  let gameId = requestParams.gameId;
+  let gameId = +requestParams.gameId;
   //获取用户数据
   let [uError, userModel] = await new UserModel().get({userId},[], "userIdIndex");
   if(uError) {
@@ -630,23 +630,23 @@ async function playerRecordValidate(event, context, callback){
     }));
   }
   //获取游戏
-  let [gError, gameInfo] = await new GameModel({gameId}).findByKindId(gameId);
-  if(gError) {
-    return callback(null, ReHandler.fail(gError));
-  }
+  let gameInfo = GameTypeEnum[gameId+""];
+  // let [gError, gameInfo] = await new GameModel({gameId}).findByKindId(gameId);
+  // if(gError) {
+  //   return callback(null, ReHandler.fail(gError));
+  // }
   if(!gameInfo) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
   }
-  let typeName = gameInfo.gameName;
+  let typeName = gameInfo.name;
   let userRecordModel = new UserRecordModel(requestParams);
-  userRecordModel.depositAmount = oriBalance;
+  // userRecordModel.depositAmount = oriBalance;
   let [validErr, income] = userRecordModel.validateRecords(records);
   if(validErr) {
     return callback(null, ReHandler.fail(err));
   }
-  
   //验证余额是否正确
-  if((oriBalance + income).toFixed(2) != userRecordModel.checkOutBalance.toFixed(2)) {
+  if((oriBalance + income).toFixed(2) != requestParams.checkOutBalance.toFixed(2)) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.billNotMatchErr)));
   }
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
@@ -660,11 +660,6 @@ async function playerRecordValidate(event, context, callback){
   if(!merchantModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
-  let [recordSError] = await userRecordModel.save();
-  
-  if(recordSError) {
-    return callback(null, ReHandler.fail(recordSError));
-  }
   let billBase = {
     fromRole : RoleCodeEnum.Player,
     toRole : RoleCodeEnum.Merchant,
@@ -673,7 +668,7 @@ async function playerRecordValidate(event, context, callback){
     operator : userModel.userName,
     merchantName : merchantModel.displayName,
     kindId : gameId,
-    gameType : gameInfo.gameType,
+    gameType : gameId,
     msn : merchantModel.msn,
     type : Type.gameSettlement,
     typeName : typeName,
@@ -691,11 +686,10 @@ async function playerRecordValidate(event, context, callback){
   userBillModel.originalAmount = oriBalance;
   Object.assign(userBillModel, billBase);
 
-  let [recordErr] = await userRecordModel.save();
-  if(recordErr) {
-    return callback(null, ReHandler.fail(uSaveErr));
-  }
-
+  // let [recordErr] = await userRecordModel.save();
+  // if(recordErr) {
+  //   return callback(null, ReHandler.fail(uSaveErr));
+  // }
   let [uSaveErr] = await userBillModel.save();
   if(uSaveErr) {
     return callback(null, ReHandler.fail(uSaveErr));
