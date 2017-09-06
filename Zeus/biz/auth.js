@@ -26,7 +26,7 @@ export const RegisterAdmin = async (userInfo) => {
     return [BizErr.UserExistErr(), 0]
   }
   // 保存用户，处理用户名前缀
-  const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}` }
+  const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}`, rate: 100.00 }
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
