@@ -235,6 +235,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   User.subRolePermission = SubRoleEnum[User.subRole]
   // 返回用户身份令牌
   saveUserRet = Pick(User, RoleDisplay[User.role])
+  saveUserRet.subRolePermission = User.subRolePermission
   return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
 }
 
