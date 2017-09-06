@@ -12,6 +12,7 @@ const organize = async (e, c, cb) => {
         // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
         // 业务操作
+        inparam.token = token
         const [queryErr, queryRet] = await new UserModel().organize(inparam)
         // 结果返回
         if (queryErr) { return ResFail(cb, { ...res, err: queryErr }, queryErr.code) }

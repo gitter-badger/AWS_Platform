@@ -67,7 +67,22 @@ export class UserModel extends BaseModel {
             }
         }
         tree(organizeTree, childTree)
-        return [0, { name: 'NA集团', children: organizeTree }]
+        // 优化显示直属线路商和直属商户
+        organizeTree = { name: 'NA集团', children: organizeTree }
+        if (inparam.type == 'admin' && Model.isPlatformAdmin(inparam.token)) {
+            const directManagerNode = { name: '直属线路商', children: [] }
+            const directMerchantNode = { name: '直属商户', children: [] }
+            for (let directNode of organizeTree.children) {
+                console.info(directNode)
+                if (directNode.role == RoleCodeEnum.Manager) {
+                    directManagerNode.children.push(directNode)
+                } else if (directNode.role == RoleCodeEnum.Merchant) {
+                    directMerchantNode.children.push(directNode)
+                }
+            }
+            organizeTree.children = [directManagerNode, directMerchantNode]
+        }
+        return [0, organizeTree]
     }
 }
 /**
