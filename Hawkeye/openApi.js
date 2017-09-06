@@ -133,24 +133,38 @@ const acceptMail = async(e, c, cb) => {
       if(recordSaveErr) {
         return errorHandle(cb, recordSaveErr);
       }
+      //用户钻石发生变化
+      let userDiamondBillModel = new UserDiamondBillModel({
+          userId : userId,
+          action :1,
+          userName : userInfo.userName,
+          msn : "000",
+          diamonds : diamonds,
+          kindId : requestParams.kindId,
+          emid : emailModel.emid
+      })
+      let [userDiamondsSaveErr] = await userDiamondBillModel.save();
+      if(userDiamondsSaveErr) {
+        return errorHandle(cb, userDiamondsSaveErr);
+      }
     }
   }
-  //玩家账单
-  if(sumDiamonds!=0) {
-    //用户钻石发生变化
-    let userDiamondBillModel = new UserDiamondBillModel({
-      userId : userId,
-      action :1,
-      userName : userInfo.userName,
-      msn : "000",
-      diamonds : sumDiamonds,
-      kindId : requestParams.kindId
-    })
-    let [userDiamondsSaveErr] = await userDiamondBillModel.save();
-    if(userDiamondsSaveErr) {
-      return errorHandle(cb, userDiamondsSaveErr);
-    }
-  }
+  // //玩家账单
+  // if(sumDiamonds!=0) {
+  //   //用户钻石发生变化
+  //   let userDiamondBillModel = new UserDiamondBillModel({
+  //     userId : userId,
+  //     action :1,
+  //     userName : userInfo.userName,
+  //     msn : "000",
+  //     diamonds : sumDiamonds,
+  //     kindId : requestParams.kindId
+  //   })
+  //   let [userDiamondsSaveErr] = await userDiamondBillModel.save();
+  //   if(userDiamondsSaveErr) {
+  //     return errorHandle(cb, userDiamondsSaveErr);
+  //   }
+  // }
   //获取用户钻石
   let [diamondsError, userDiamonds] = await new UserDiamondBillModel({userName:userInfo.userName}).getBalance();
   if(diamondsError) {

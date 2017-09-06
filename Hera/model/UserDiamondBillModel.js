@@ -10,7 +10,7 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserDiamondBillModel extends athena.BaseModel {
-    constructor({seatId, userId, action, userName, msn, originalDiamonds,diamonds, toolId, kindId} = {}) {
+    constructor({seatId, userId, action, userName, msn, originalDiamonds,diamonds, toolId, kindId,emid} = {}) {
         super(TABLE_NAMES.BILL_DIAMOND_USER);
         this.seatId = seatId;
         this.billId = Util.uuid();
@@ -22,6 +22,7 @@ export class UserDiamondBillModel extends athena.BaseModel {
         this.createAt = Date.now();
         this.diamonds = +diamonds;
         this.toolId = toolId;
+        this.emid = emid;
         this.kindId = kindId || "0"; //游戏ID，如果是大厅，则为0
     }
     setAmount(amount){

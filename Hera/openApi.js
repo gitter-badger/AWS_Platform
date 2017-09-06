@@ -734,7 +734,7 @@ async function joinGame(event, context, callback){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
 
-  //更改状态
+  //获取玩家信息
   let userModel = new UserModel();
   let [usergetError, userObj] = await userModel.get({userId},[], "userIdIndex");
   if(usergetError) {
