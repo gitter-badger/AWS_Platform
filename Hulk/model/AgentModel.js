@@ -173,7 +173,11 @@ export class AgentModel extends BaseModel {
         }
         // 更新用户信息
         User.lastIP = UserLoginInfo.lastIP
-        const [saveUserErr, saveUserRet] = await saveUser(User)
+        const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
+        if (saveUserErr) {
+          return [saveUserErr, 0]
+        }
+        // const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
             return [saveUserErr, User]
         }
