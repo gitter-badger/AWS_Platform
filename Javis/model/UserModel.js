@@ -73,7 +73,6 @@ export class UserModel extends BaseModel {
             const directManagerNode = { name: '直属线路商', children: [] }
             const directMerchantNode = { name: '直属商户', children: [] }
             for (let directNode of organizeTree.children) {
-                console.info(directNode)
                 if (directNode.role == RoleCodeEnum.Manager) {
                     directManagerNode.children.push(directNode)
                 } else if (directNode.role == RoleCodeEnum.Merchant) {
