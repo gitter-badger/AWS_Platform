@@ -1,8 +1,8 @@
 import { BizErr, Codes } from './Codes'
-import { TOKEN_SECRET } from './secret/TokenSecret'
 const Bluebird = require('bluebird')
 const jwt = require('jsonwebtoken')
 const jwtVerify = Bluebird.promisify(jwt.verify)
+const TOKEN_SECRET = process.env.TOKEN_SECRET
 
 // 返回模板
 const responseTemplate = (statusCode, body, code, headers = {}) => {

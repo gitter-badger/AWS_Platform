@@ -2,8 +2,10 @@
 service: Javis
 plugins:
   - serverless-webpack
+  - serverless-secrets-plugin
 custom:
   webpackIncludeModules: true
+  secrets: ${file(secrets.${opt:stage, self:provider.stage}.yml)} #密钥文件
 provider:
   name: aws
   runtime: nodejs6.10
@@ -32,20 +34,23 @@ functions:
   #         path: /initData
   #         method: get
   #         cors: true
-  # jwtverify:
-  #   handler: api.jwtverify
-  #   integration: lambda
-  # generateToken:
-  #   handler: api.generateToken
-  #   events:
-  #     -
-  #       http:
-  #         path: /generate_token
-  #         method: post
-  #         cors: true
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
+    environment:
+      TOKEN_SECRET: ${self:custom.secrets.TOKEN_SECRET}
     integration: lambda
+  backup: #备份数据库
+    handler: api_backup.backup
+    environment:
+      ACCESS_KEY: ${self:custom.secrets.ACCESS_KEY}
+      SECRET_KEY: ${self:custom.secrets.SECRET_KEY}
+    events:
+      -
+        http:
+          path: /backup
+          method: post
+          cors: true
+          authorizer: tokenAuth
   upToken: #七牛云上传TOKEN
     handler: api_qiniu.upToken
     events:
