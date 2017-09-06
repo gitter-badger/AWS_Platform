@@ -37,7 +37,7 @@ export class AgentModel extends BaseModel {
             return [BizErr.UserExistErr(), 0]
         }
         // 保存用户，处理用户名前缀
-        const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.username}` }
+        const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.username}`, parentName: Model.NoParentName }
         const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
             return [saveUserErr, 0]
