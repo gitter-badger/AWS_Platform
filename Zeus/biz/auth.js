@@ -223,7 +223,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // }
   // 更新用户信息
   User.lastIP = LoginInfo.lastIP
-  const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
+  let [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -234,7 +234,8 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // 获取二级权限
   User.subRolePermission = SubRoleEnum[User.subRole]
   // 返回用户身份令牌
-  return [0, { ...User, token: Model.token(Pick(User, RoleDisplay[User.role])) }]
+  saveUserRet = Pick(User, RoleDisplay[User.role])
+  return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
 }
 
 /**
