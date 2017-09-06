@@ -26,7 +26,7 @@ export const RegisterAdmin = async (userInfo) => {
     return [BizErr.UserExistErr(), 0]
   }
   // 保存用户，处理用户名前缀
-  const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}` }
+  const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}`, rate: 100.00 }
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
@@ -223,7 +223,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // }
   // 更新用户信息
   User.lastIP = LoginInfo.lastIP
-  const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
+  let [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -234,7 +234,8 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // 获取二级权限
   User.subRolePermission = SubRoleEnum[User.subRole]
   // 返回用户身份令牌
-  return [0, { ...User, token: Model.token(Pick(User, RoleDisplay[User.role])) }]
+  saveUserRet = Pick(User, RoleDisplay[User.role])
+  return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
 }
 
 /**

@@ -41,11 +41,12 @@ export class AgentCheck {
         inparam.suffix = 'Agent'
         inparam.displayName = '代理管理员'
         inparam.parent = Model.NoParent
+        inparam.parentName = Model.NoParentName
         inparam.contractPeriod = 0
         inparam.isforever = true
         inparam.level = 0
         inparam.levelIndex = 0
-        inparam.rate = "100.00"
+        inparam.rate = 100.00
         inparam.vedioMix = 100.00
         inparam.liveMix = 100.00
 

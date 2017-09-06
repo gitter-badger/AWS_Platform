@@ -16,7 +16,7 @@ const backup = async (e, c, cb) => {
         // 初始化备份对象
         let backup = new DynamoBackup({
             bucket: 'backup-na',
-            excludedTables: ['ZeusPlatformLog','HeraGameRecord','ZeusPlatformBill','HeraGamePlayerBill','HeraGameDiamondBill'],
+            excludedTables: ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill', 'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord'],
             stopOnFailure: true,
             base64Binary: false,
             awsAccessKey: process.env.ACCESS_KEY,
