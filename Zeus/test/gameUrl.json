@@ -2,7 +2,7 @@
     "requestContext": {
     "authorizer": {
       "username": "Tgx001",
-      "userId": "1cb848e0-bf78-4909-9b6e-0613a080c651",
+      "userId": "27d9ccea-b5be-4c52-b93f-23ad75b72325",
       "parent": "00",
       "role": "1"
     },
@@ -11,6 +11,6 @@
     }
   },
     "body" : {
-        "gameType" : 30000
+        "gameType" : 40000
     }
 }
