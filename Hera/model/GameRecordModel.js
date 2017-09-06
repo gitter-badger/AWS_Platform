@@ -50,6 +50,7 @@ export class GameRecordModel extends BaseModel{
             Promise.all(promises).then((result) => {
                 resolve([null, result])
             }).catch((err) => {
+                console.log(err);
                 resolve([new CHeraErr(CODES.SystemError), null])
             });
         })

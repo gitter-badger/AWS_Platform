@@ -734,7 +734,7 @@ async function joinGame(event, context, callback){
     return callback(null, ReHandler.fail(new CHeraErr(CODES.TokenError)));
   }
 
-  //更改状态
+  //获取玩家信息
   let userModel = new UserModel();
   let [usergetError, userObj] = await userModel.get({userId},[], "userIdIndex");
   if(usergetError) {
@@ -897,12 +897,11 @@ async function playerGameRecord(event, context, callback) {
   let batchSaveArr = [];
   for(let i = 0; i <records.length; i++) {
     let record = records[i];
-    let {userId, userName, betId, betTime, msn,parentId, gameId} = record;
+    let {userId, userName, betId, betTime, parentId, gameId} = record;
     batchSaveArr.push({
       userId,
       userName, 
       betId : betId+"",
-      msn:msn+"",
       parentId : parentId,
       gameId : gameId,
       betTime : new Date(betTime).getTime(),
