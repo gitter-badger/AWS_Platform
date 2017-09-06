@@ -50,7 +50,7 @@ const userTrigger = async (e, c, cb) => {
         suffix : userInfo.suffix,
         levelIndex : userInfo.levelIndex
     })
-    if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Manager) {
+    if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Agent) {
         pushModel.gameList = ["10000", "30000","40000"]
     }
     console.log("pushModel");
