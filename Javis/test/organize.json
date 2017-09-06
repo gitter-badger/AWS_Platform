@@ -4,11 +4,24 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_NAtest",
-      "parent": "00",
-      "role": "1",
-      "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
-      "suffix": "Platform"
+      "userId": "270787db-7260-4653-b5af-cd53c6857585",
+      "role": "10",
+      "suffix": "Test53",
+      "username": "Test53_Test530",
+      "parent": "fb3aaa2a-84de-4de9-8797-3b346c26d973",
+      "parentName": "Tgxx01_Tgxx01",
+      "parentRole": "10",
+      "displayName": "Test53",
+      "level": 2,
+      "displayId": 474681,
+      "contractPeriod": [
+        1504627200000,
+        1506700800000
+      ],
+      "isforever": false,
+      "updatedAt": 1504681887490,
+      "remark": null,
+      "iat": 1504690051
     },
     "identity": {
       "sourceIp": "127.0.0.1"
