@@ -2,6 +2,7 @@ import AWS from 'aws-sdk'
 import { Stream$ } from './Rx5'
 import { BizErr } from './Codes'
 import { JwtVerify, JwtSign } from './Response'
+import { RoleCodeEnum } from './UserConsts'
 import _ from 'lodash'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
@@ -179,5 +180,69 @@ export const Model = {
       return result
     }, {})
     return values
+  },
+  // 判断用户是否为代理
+  isAgent(user) {
+    if (user.role == RoleCodeEnum['Agent']) {
+      return true
+    }
+    return false
+  },
+  // 判断用户是否为线路商
+  isManager(user) {
+    if (user.role == RoleCodeEnum['Manager']) {
+      return true
+    }
+    return false
+  },
+  // 判断用户是否为商户
+  isMerchant(user) {
+    if (user.role == RoleCodeEnum['Merchant']) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是代理管理员
+  isAgentAdmin(token) {
+    if (token.role == RoleCodeEnum['Agent'] && token.suffix == 'Agent') {
+      return true
+    }
+    return false
+  },
+  // 判断是否是平台管理员
+  isPlatformAdmin(token) {
+    if (token.role == RoleCodeEnum['PlatformAdmin']) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是自己
+  isSelf(token, user) {
+    if (token.userId == user.userId) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是下级
+  isChild(token, user) {
+    let parent = token.userId
+    if (token.role == RoleCodeEnum['PlatformAdmin'] || this.isAgentAdmin(token)) {
+      parent = this.DefaultParent
+    }
+    if (parent == user.parent) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是祖孙
+  isSubChild(token, user) {
+    let parent = token.userId
+    if (token.role == RoleCodeEnum['PlatformAdmin'] || this.isAgentAdmin(token)) {
+      parent = this.DefaultParent
+    }
+    if (user.levelIndex.indexOf(parent) > 0) {
+      return true
+    }
+    return false
   }
 }

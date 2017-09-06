@@ -21,21 +21,41 @@ export class UserModel extends BaseModel {
      * @param {*} inparam 
      */
     async organize(inparam) {
-        // 默认查询平台组织架构（排除平台管理员，代理）
-        let [queryErr, queryRet] = await this.scan({
-            FilterExpression: '#role <> :role AND #level <> :level',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#level': 'level'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Agent'],
-                ':level': 0,
+        let [queryErr, queryRet] = [0, 0]
+        if (inparam.type == 'admin') {
+            // 默认查询平台组织架构（排除平台管理员，代理）
+            let platfromQuery = {
+                FilterExpression: '#role <> :role AND #level <> :level',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#level': 'level'
+                },
+                ExpressionAttributeValues: {
+                    ':role': RoleCodeEnum['Agent'],
+                    ':level': 0,
+                }
             }
-        })
+            // 平台非管理员
+            if (!Model.isPlatformAdmin(inparam.token)) {
+                platfromQuery = {
+                    FilterExpression: '#role <> :role AND #level <> :level AND contains(#levelIndex,:levelIndex)',
+                    ExpressionAttributeNames: {
+                        '#role': 'role',
+                        '#level': 'level',
+                        '#levelIndex': 'levelIndex'
+                    },
+                    ExpressionAttributeValues: {
+                        ':role': RoleCodeEnum['Agent'],
+                        ':level': 0,
+                        ':levelIndex': inparam.token.userId
+                    }
+                }
+            }
+            [queryErr, queryRet] = await this.scan(platfromQuery)
+        }
         // 查询代理组织架构
         if (inparam.type == 'agent') {
-            [queryErr, queryRet] = await this.query({
+            let agentQuery = {
                 KeyConditionExpression: '#role = :role',
                 FilterExpression: '#level <> :level',
                 ExpressionAttributeNames: {
@@ -46,7 +66,25 @@ export class UserModel extends BaseModel {
                     ':role': RoleCodeEnum['Agent'],
                     ':level': 0,
                 }
-            })
+            }
+            // 代理非管理员
+            if (!Model.isAgentAdmin(inparam.token)) {
+                let agentQuery = {
+                    KeyConditionExpression: '#role = :role',
+                    FilterExpression: '#level <> :level AND contains(#levelIndex,:levelIndex)',
+                    ExpressionAttributeNames: {
+                        '#role': 'role',
+                        '#level': 'level',
+                        '#levelIndex': 'levelIndex'
+                    },
+                    ExpressionAttributeValues: {
+                        ':role': RoleCodeEnum['Agent'],
+                        ':level': 0,
+                        ':levelIndex': inparam.token.userId
+                    }
+                }
+            }
+            [queryErr, queryRet] = await this.query(agentQuery)
         }
         if (queryErr) {
             return [queryErr, 0]
@@ -67,7 +105,21 @@ export class UserModel extends BaseModel {
             }
         }
         tree(organizeTree, childTree)
-        return [0, { name: 'NA集团', children: organizeTree }]
+        // 优化显示直属线路商和直属商户
+        organizeTree = { name: 'NA集团', children: organizeTree }
+        if (inparam.type == 'admin' && Model.isPlatformAdmin(inparam.token)) {
+            const directManagerNode = { name: '直属线路商', children: [] }
+            const directMerchantNode = { name: '直属商户', children: [] }
+            for (let directNode of organizeTree.children) {
+                if (directNode.role == RoleCodeEnum.Manager) {
+                    directManagerNode.children.push(directNode)
+                } else if (directNode.role == RoleCodeEnum.Merchant) {
+                    directMerchantNode.children.push(directNode)
+                }
+            }
+            organizeTree.children = [directManagerNode, directMerchantNode]
+        }
+        return [0, organizeTree]
     }
 }
 /**
