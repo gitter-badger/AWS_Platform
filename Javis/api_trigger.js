@@ -36,8 +36,8 @@ const userTrigger = async (e, c, cb) => {
     }
     console.log(userInfo);
     let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
-    msnInfo = msnInfo || {msn:"-1"};
-    msnInfo.msn = msnInfo.msn || "-1";
+    msnInfo = msnInfo || {msn:"0"};
+    msnInfo.msn = msnInfo.msn || "0";
     let pushModel = new PushModel({
         username : userInfo.username,
         userId :userInfo.userId,
