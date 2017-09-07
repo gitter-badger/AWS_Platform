@@ -30,6 +30,7 @@
     "qiniu": "^7.0.5",
     "rxjs": "^5.4.2",
     "safe-json-parse": "^4.0.0",
+    "serverless-dynamodb-autoscaling": "^0.6.1",
     "serverless-secrets-plugin": "0.0.1",
     "source-map-support": "^0.4.14",
     "uuid": "^3.1.0"

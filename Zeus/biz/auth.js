@@ -79,9 +79,9 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   }
 
   // 检查下级成数
-  if (parentUser.level != 0 && (CheckUser.rate > parentUser.rate)) {
-    return [BizErr.InparamErr('成数比不能高于上级'), 0]
-  }
+  // if (parentUser.level != 0 && (CheckUser.rate > parentUser.rate)) {
+  //   return [BizErr.InparamErr('成数比不能高于上级'), 0]
+  // }
 
   // 如果是线路商创建商户，检查可用余额
   // if (parentUser.role === RoleCodeEnum['Manager'] && CheckUser.role === RoleCodeEnum['Merchant']) {
@@ -106,7 +106,11 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (initPoints > queryBalanceRet.lastBalance) {
     return [BizErr.BalanceErr(), 0]
   }
-
+  // 层级处理
+  let levelIndex = Model.DefaultParent
+  if (parentUser.levelIndex && parentUser.levelIndex != '0' && parentUser.levelIndex != 0) {
+    levelIndex = parentUser.levelIndex + ',' + parentUser.userId
+  }
   // 保存用户，处理用户名前缀
   const User = {
     ...CheckUser,
@@ -118,7 +122,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     parentSuffix: parentUser.suffix,
     points: Model.NumberValue,
     level: parentUser.level + 1,
-    levelIndex: parentUser.levelIndex ? parentUser.levelIndex + ',' + parentUser.userId : Model.DefaultParent
+    levelIndex: levelIndex
   }
   //推送给游戏服务器(A3)
   // let pushModel = new PushModel(User);

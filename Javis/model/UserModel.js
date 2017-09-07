@@ -94,7 +94,7 @@ export class UserModel extends BaseModel {
         let childTree = []
         for (let item of queryRet.Items) {
             // 第一层
-            if (item.level == 1) {
+            if (item.level == parseInt(inparam.token.level) + 1) {
                 let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, children: [], role: item.role, level: item.level, status: item.status }
                 organizeTree.push(treeNode)
             }

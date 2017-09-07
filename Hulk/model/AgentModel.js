@@ -98,6 +98,12 @@ export class AgentModel extends BaseModel {
             return [BizErr.BalanceErr(), 0]
         }
 
+        // 层级处理
+        let levelIndex = Model.DefaultParent
+        if (parentUser.levelIndex && parentUser.levelIndex != '0' && parentUser.levelIndex != 0) {
+            levelIndex = parentUser.levelIndex + ',' + parentUser.userId
+        }
+
         // 保存用户，处理用户名前缀
         const User = {
             ...CheckUser,
@@ -109,7 +115,7 @@ export class AgentModel extends BaseModel {
             parentSuffix: parentUser.suffix,
             points: Model.NumberValue,
             level: parentUser.level + 1,
-            levelIndex: parentUser.levelIndex ? parentUser.levelIndex + ',' + parentUser.userId : Model.DefaultParent
+            levelIndex: levelIndex
         }
         const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
