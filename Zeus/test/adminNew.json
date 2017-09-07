@@ -4,22 +4,23 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_cheney",
+      "username": "Platform_NAtest",
       "parent": "00",
       "role": "1",
-      "userId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783",
-      "principalId": "8aa7fa07-756e-4ecd-b7ff-f146cc4df783"
+      "userId": "-1",
+      "suffix": "Platform"
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "username": "NAtest001",
-    "password": "chnewenGG886",
     "role": "1",
-    "adminName": "ceshi",
-    "adminEmail": "test@test.com",
-    "adminContact": "联系人"
+    "subRole": "admin",
+    "username": "NAtest",
+    "password": "Ab123456",
+    "adminName": "初始管理员",
+    "adminContact": "18780004427",
+    "adminEmail": "NAtest@admin.com"
   }
 }

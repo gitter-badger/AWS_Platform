@@ -39,14 +39,14 @@ functions:
     handler: api.jwtverify
     integration: lambda
   #==================== 以下是管理员接口 ====================
-  eva: #创建第一个管理员，接口编号0
-    handler: api_admin.eva
-    events:
-      -
-        http:
-          path: beings
-          method: post
-          cors: true
+  # eva: #创建第一个管理员，接口编号0
+  #   handler: api_admin.eva
+  #   events:
+  #     -
+  #       http:
+  #         path: beings
+  #         method: post
+  #         cors: true
   adminList: #管理员列表
     handler: api_admin.adminList
     events:

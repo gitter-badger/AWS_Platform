@@ -9,22 +9,22 @@ import { UserCheck } from './biz/UserCheck'
 /**
  * 生成第一个管理员
  */
-const eva = async (e, c, cb) => {
-    try {
-        // 入参数据
-        const res = { m: 'eva' }
-        const [jsonParseErr, userInfo] = JSONParser(e && e.body)
-        // 检查参数是否合法
-        const [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
-        // 生成第一个管理员业务
-        const [registerUserErr, resgisterUserRet] = await RegisterAdmin(Model.addSourceIP(e, userInfo))
-        // 结果返回
-        if (registerUserErr) { return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code) }
-        return ResOK(cb, { ...res, payload: resgisterUserRet })
-    } catch (error) {
-        return ResErr(cb, error)
-    }
-}
+// const eva = async (e, c, cb) => {
+//     try {
+//         // 入参数据
+//         const res = { m: 'eva' }
+//         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+//         // 检查参数是否合法
+//         const [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
+//         // 生成第一个管理员业务
+//         const [registerUserErr, resgisterUserRet] = await RegisterAdmin(Model.addSourceIP(e, userInfo))
+//         // 结果返回
+//         if (registerUserErr) { return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code) }
+//         return ResOK(cb, { ...res, payload: resgisterUserRet })
+//     } catch (error) {
+//         return ResErr(cb, error)
+//     }
+// }
 
 /**
  * 创建管理员帐号
@@ -391,7 +391,6 @@ const subRoleList = async (e, c, cb) => {
 // ==================== 以下为内部方法 ====================
 
 export {
-    eva,                          // 用于创建系统的第一个管理员账号
     userAuth,                     // 用户登录
     adminNew,                     // 新管理员
     adminList,                    // 管理员列表
@@ -406,4 +405,6 @@ export {
     checkNickExist,               // 检查昵称是否被占用
 
     updatePassword                // 更新密码
+
+    // eva,                          // 用于创建系统的第一个管理员账号
 }
