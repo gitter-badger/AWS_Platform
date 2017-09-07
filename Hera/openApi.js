@@ -903,7 +903,7 @@ async function playerGameRecord(event, context, callback) {
       userName, 
       betId : betId+"",
       parentId : parentId,
-      gameId : gameId,
+      gameId : gameId+"",
       betTime : new Date(betTime).getTime(),
       record
     })

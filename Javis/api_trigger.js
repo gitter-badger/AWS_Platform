@@ -42,13 +42,13 @@ const userTrigger = async (e, c, cb) => {
         username : userInfo.username,
         userId :userInfo.userId,
         role : userInfo.role,
-        headPic : "",
+        headPic : "NULL!",
         parent : userInfo.parent,
         msn : msnInfo.msn,
         gameList : userInfo.gameList,
-        displayName : userInfo.displayName || "",
+        displayName : userInfo.displayName || "NULL!",
         suffix : userInfo.suffix,
-        levelIndex : userInfo.levelIndex
+        levelIndex : userInfo.levelIndex+""
     })
     if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Agent) {
         pushModel.gameList = ["10000", "30000","40000"]
@@ -64,7 +64,7 @@ const userTrigger = async (e, c, cb) => {
     }
 }
 
-const playerBalanceTrigger = async(e, c , cb) =>{
+const playerBalanceTrigger = async(e, c , cb) => {
     console.log(e);
     let record = e.Records[0].dynamodb.Keys;
     console.log(record);
