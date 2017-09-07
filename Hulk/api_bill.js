@@ -103,7 +103,7 @@ const billTransfer = async (e, c, cb) => {
         const [userBalanceErr, userBalance] = await new BillModel().checkUserBalance(fromUser)
         if (userBalanceErr) { return ResErr(cb, userBalanceErr) }
         if (transferInfo.amount > userBalance) {
-            return ResFail(cb, BizErr.BalanceErr())
+            return ResErr(cb, BizErr.BalanceErr())
         }
         // 开始转账业务
         const [depositBillErr, depositBillRet] = await new BillModel().billTransfer(fromUser, {
