@@ -3,12 +3,14 @@ service: StateMachine
 plugins:
   - serverless-webpack
   - serverless-secrets-plugin
-  - serverless-step-functions
+  # - serverless-step-functions
 provider:
   name: aws
   runtime: nodejs6.10
-  region: ap-northeast-1
+  # region: ap-northeast-1
+  region: ap-southeast-1
   memorySize: 256
+  timeout: 300
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -45,21 +47,27 @@ functions:
     environment:
       ACCESS_KEY: ${self:custom.secrets.ACCESS_KEY}
       SECRET_KEY: ${self:custom.secrets.SECRET_KEY}
-stepFunctions:
-  stateMachines:
-    backup:
-      events:
+    events:
         - http:
             path: /backup
             method: post
             cors: true
             authorizer: tokenAuth
-      name: backupStateMachine
-      definition:
-        Comment: "备份数据库"
-        StartAt: BackupStart
-        States:
-          BackupStart:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.secrets.ACCOUNT_ID}:function:${self:service}-${opt:stage}-backup
-            End: true
+# stepFunctions:
+#   stateMachines:
+#     backup:
+#       events:
+#         - http:
+#             path: /backup
+#             method: post
+#             cors: true
+#             authorizer: tokenAuth
+#       name: backupStateMachine
+#       definition:
+#         Comment: "备份数据库"
+#         StartAt: BackupStart
+#         States:
+#           BackupStart:
+#             Type: Task
+#             Resource: arn:aws:lambda:${opt:region}:${self:custom.secrets.ACCOUNT_ID}:function:${self:service}-${opt:stage}-backup
+#             End: true
