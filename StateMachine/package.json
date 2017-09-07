@@ -24,6 +24,7 @@
     "babel-runtime": "^6.23.0",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.0",
+    "dynamo-backup-to-s3": "^0.6.1",
     "jsonwebtoken": "^7.4.1",
     "lodash": "^4.17.4",
     "qiniu": "^7.0.5",
@@ -31,6 +32,7 @@
     "safe-json-parse": "^4.0.0",
     "serverless-dynamodb-autoscaling": "^0.6.1",
     "serverless-secrets-plugin": "0.0.1",
+    "serverless-step-functions": "^1.1.0",
     "source-map-support": "^0.4.14",
     "uuid": "^3.1.0"
   }

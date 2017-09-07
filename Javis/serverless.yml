@@ -227,18 +227,6 @@ functions:
     environment:
       TOKEN_SECRET: ${self:custom.secrets.TOKEN_SECRET}
     integration: lambda
-  backup: #备份数据库
-    handler: api_backup.backup
-    environment:
-      ACCESS_KEY: ${self:custom.secrets.ACCESS_KEY}
-      SECRET_KEY: ${self:custom.secrets.SECRET_KEY}
-    events:
-      -
-        http:
-          path: /backup
-          method: post
-          cors: true
-          authorizer: tokenAuth
   upToken: #七牛云上传TOKEN
     handler: api_qiniu.upToken
     events:
