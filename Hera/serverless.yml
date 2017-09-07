@@ -110,7 +110,7 @@ functions:
           path: /game/player/join
           method: post
           cors: true
-  playerRecord:  #获取玩家记录验证
+  playerRecord:  #玩家记录验证
     handler: openApi.playerRecordValidate
     events:
       - http:
