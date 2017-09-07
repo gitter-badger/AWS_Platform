@@ -71,6 +71,14 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  playerList :  #玩家列表
+    handler: playerManagerApi.playerList
+    events:
+      - http:
+          path: /player/list
+          method: post
+          cors: true
+          authorizer: tokenVerify
   info :  #公告信息
     handler: openApi.info
     events:

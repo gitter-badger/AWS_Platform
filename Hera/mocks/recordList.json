@@ -1,0 +1,11 @@
+{
+    "body" : {
+        "gameId" : "30001",
+        "apiKey": "b6afa92f-8fb3-4740-9166-41050e943ba1", 
+        "buId" : "586542",
+        "pageSize" : 20,
+        "startTime" :0,
+        "lastTime" : 12345678945414,
+        "endTime" : 12345678945414
+    }
+}
