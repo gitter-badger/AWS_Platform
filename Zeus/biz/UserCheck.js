@@ -31,7 +31,7 @@ export class UserCheck {
         // 数据类型处理
         inparam.role = inparam.role.toString()
         inparam.level = 0
-        inparam.levelIndex = 0
+        inparam.levelIndex = '0'
         inparam.rate = 100.00
 
         return [checkAttError, errorParams]

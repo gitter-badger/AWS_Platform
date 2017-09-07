@@ -3,13 +3,193 @@ service: Javis
 plugins:
   - serverless-webpack
   - serverless-secrets-plugin
+  - serverless-dynamodb-autoscaling
 custom:
   webpackIncludeModules: true
   secrets: ${file(secrets.${opt:stage, self:provider.stage}.yml)} #密钥文件
+  capacities: #数据库自动扩容
+    - table: ZeusPlatformUser
+      index:
+        - RoleSuffixIndex
+        - RoleUsernameIndex
+        - RoleParentIndex
+        - UserIdIndex
+        - merchantIdIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: DianaPlatformGame
+      index:
+        - GameNameIndex
+        - GameTypeIndex
+        - GameIdIndex
+        - KindIdIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: ZeusPlatformBill
+      index:
+        - UserIdIndex
+        - UserIdIndexSec
+        - SnIndex
+        - ActionIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: ZeusPlatformMSN
+      index:
+        - UserIdIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: ZeusPlatformCode
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: ZeusPlatformCaptcha
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: ZeusPlatformLog
+      index:
+        - LogRoleIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: DianaPlatformCompany
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: DianaPlatformTool
+      index:
+        - toolIdIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: DianaPlatformPackage
+      index:
+        - packageIdIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: DianaPlatformSeat
+      index:
+        - SeatTypeIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: HeraGamePlayerBill
+      index:
+        - userNameIndex
+        - userIdIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: HawkeyeGameNotice
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: HawkeyeGameEmail
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: HeraGameDiamondBill
+      index:
+        - UserNameIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+    - table: HulkPlatformAd
+      index:
+        - AdNameIndex
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
 provider:
   name: aws
   runtime: nodejs6.10
   region: ap-southeast-1
+  memorySize: 256
   iamRoleStatements:
     - Effect: Allow
       Action:

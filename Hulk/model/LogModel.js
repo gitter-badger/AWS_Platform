@@ -202,7 +202,7 @@ export class LogModel extends BaseModel {
             level = '-1'
         }
         let levelIndex = loginUserRet.levelIndex
-        if (!levelIndex && levelIndex != 0) {
+        if (!levelIndex && levelIndex != '0' && levelIndex != 0) {
             levelIndex = '-1'
         }
 
