@@ -645,6 +645,9 @@ async function playerRecordValidate(event, context, callback){
   if(validErr) {
     return callback(null, ReHandler.fail(err));
   }
+  console.log("当前余额:"+ oriBalance);
+  console.log("出账:"+requestParams.checkOutBalance);
+  console.log("账单消耗:"+income);
   //验证余额是否正确
   if((oriBalance + income).toFixed(2) != requestParams.checkOutBalance.toFixed(2)) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.billNotMatchErr)));

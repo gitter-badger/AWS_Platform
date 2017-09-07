@@ -59,18 +59,22 @@ const playerList = async (event,  context, cb) => {
     let displayId = parentInfo.displayId;
     let playerModel = new UserModel({});
     let [palyerListErr, playerList] = await playerModel.scan({buId:displayId});
-    console.log(2);
     if(palyerListErr) {
         return ResFail(cb, new CHeraErr(CODES.palyerListErr));
     }
     let returnArr = playerList.map((item) => {
+        let name =item.userName;
+        if(parentInfo.suffix) {
+            name = `【${parentInfo.suffix}】` + item.userName.split("_")[1];
+        }
         return {
             userId: item.userId,
             userName : item.userName,
-            nickname : item.nickname
+            nickname : item.nickname,
+            role : item.role,
+            name
         }
     })
-    console.log(3);
     ResOK(cb, {list:returnArr})
 }
 export{
