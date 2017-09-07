@@ -102,12 +102,15 @@ const billTransfer = async (e, c, cb) => {
         // 获取fromUser的当前余额
         const [userBalanceErr, userBalance] = await new BillModel().checkUserBalance(fromUser)
         if (userBalanceErr) { return ResErr(cb, userBalanceErr) }
+        if (transferInfo.amount > userBalance) {
+            return ResFail(cb, BizErr.BalanceErr())
+        }
         // 开始转账业务
         const [depositBillErr, depositBillRet] = await new BillModel().billTransfer(fromUser, {
             ...transferInfo,
             toLevel: toUser.level,
             toDisplayName: toUser.displayName,
-            amount: Math.min(userBalance, transferInfo.amount)
+            amount: transferInfo.amount
         })
         // 结果返回
         if (depositBillErr) { return ResErr(cb, depositBillErr) }
