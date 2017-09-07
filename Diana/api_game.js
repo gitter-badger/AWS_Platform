@@ -134,6 +134,8 @@ const gameType = async (e, c, cb) => {
     }
     // 上级游戏类别
     const [err, ret] = await new UserModel().queryUserById(inparam.parent)
+    // 结果返回
+    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
     ret.gameList = ret.gameList || []
     return ResOK(cb, { ...res, payload: ret.gameList })
   } catch (error) {
