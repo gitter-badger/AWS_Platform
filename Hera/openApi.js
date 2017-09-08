@@ -168,6 +168,10 @@ async function gamePlayerRegister(event, context, callback) {
   if(!white) {
     return errorHandler(callback, new CHeraErr(CODES.ipError), "register", merchantInfo, requestParams);
   }
+  let length = 3-merchantInfo.msn.length;
+  for(let i = 0; i < length;i ++) {
+    merchantInfo.msn = "0"+merchantInfo.msn;
+  }
   Object.assign(requestParams, {
     msn : merchantInfo.msn,
     merchantName : merchantInfo.displayName,
@@ -262,6 +266,10 @@ async function gamePlayerLogin(event, context, callback) {
   let [updateError] = await user.update({userName: userName},{ updateAt:Date.now()});
   if(updateError){
     return errorHandler(callback, updateError, "login", merchantInfo, requestParams);
+  }
+  let length = 3-merchantInfo.msn.length;
+  for(let i = 0; i < length;i ++) {
+    merchantInfo.msn = "0"+merchantInfo.msn;
   }
   successHandler(callback,{
       data:{token : loginToken, msn:merchantInfo.msn}
@@ -468,21 +476,19 @@ async function gamePlayerA3Login(event, context, callback) {
   } 
 
   let {userName, userPwd, msn} = requestParams;
-
+  msn = +msn;
   //根据线路号获取商家
   let msnModel = new MSNModel();
-  let [msnError, merchantInfo] = await msnModel.findMerchantByMsn(msn);
+  let [msnError, merchantInfo] = await msnModel.findMerchantByMsn(msn+"");
   if(msnError) {
     return callback(null, ReHandler.fail(msnError));
   }
   if(!merchantInfo && msn!="000") {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
-  
   if(msn != "000") {
     userName = `${merchantInfo.suffix}_${userName}`; 
   }
-  
   let user = new UserModel(requestParams);
   let [userExistError, userInfo] = await user.get({userName:userName});
   if(userExistError) return callback(null, ReHandler.fail(userExistError));

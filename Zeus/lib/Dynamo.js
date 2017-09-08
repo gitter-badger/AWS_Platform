@@ -40,6 +40,7 @@ const DianaPlatformSeat = 'DianaPlatformSeat'
 const HulkPlatformAd = 'HulkPlatformAd'
 const HeraGamePlayer = 'HeraGamePlayer'
 const PushErrorModel = 'PushErrorModel'
+const ZeusPlatformGame = 'DianaPlatformGame'
 
 const SYSConfig = 'SYSConfig'
 
@@ -50,7 +51,7 @@ export const Tables = {
   ZeusPlatformCaptcha,
   ZeusPlatformLog,
   ZeusPlatformCode,
-
+  ZeusPlatformGame,
   DianaPlatformGame,
   DianaPlatformCompany,
   DianaPlatformTool,
