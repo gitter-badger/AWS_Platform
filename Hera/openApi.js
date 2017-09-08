@@ -535,7 +535,9 @@ async function gamePlayerA3Login(event, context, callback) {
       nickname : userInfo.nickname,
       headPic : userInfo.headPic,
       sex : userInfo.sex || 0,
-      parentId : merchantInfo.userId
+      parentId : merchantInfo.userId,
+      liveMix : userInfo.liveMix || -1,
+      vedioMix : userInfo.vedioMix || -1,
     }
   }
   callback(null, ReHandler.success(callObj));

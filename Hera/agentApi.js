@@ -215,7 +215,7 @@ export async function agentPlayerCudian(event, context, cb){
         return ResFail(cb, new CHeraErr(CODES.AgentNotExist)); 
     }
     
-    let [cudianErr] = await cudian(userInfo, merchantInfo, requestParams);
+    let [cudianErr] = await cudian(userInfo, merchantInfo, requestParams, tokenInfo);
     if(cudianErr) {
         return ResFail(cb, cudianErr);
     }
@@ -272,7 +272,7 @@ export async function agentPlayerQudian(event, context, cb){
     if(!merchantInfo) {
         return ResFail(cb, new CHeraErr(CODES.AgentNotExist)); 
     }
-    let [cudianErr] = await qudian(userInfo, merchantInfo, requestParams);
+    let [cudianErr] = await qudian(userInfo, merchantInfo, requestParams, tokenInfo);
     if(cudianErr) {
         return ResFail(cb, cudianErr);
     }
@@ -284,7 +284,7 @@ export async function agentPlayerQudian(event, context, cb){
     // ResOK(cb, {data:{points}});
 }
 
-async function qudian(userInfo, merchantInfo, requestParams) {
+async function qudian(userInfo, merchantInfo, requestParams, tokenInfo) {
     //玩家余额
     let [playerBError, playerBalance] = await new UserBillModel({userName:userInfo.userName}).getBalance();
     if(playerBError)return ResFail(cb, agentBError);
@@ -299,7 +299,7 @@ async function qudian(userInfo, merchantInfo, requestParams) {
       toUser : merchantInfo.username,
       msn : "000",
       amount : +requestParams.points,
-      operator : merchantInfo.username,
+      operator : tokenInfo.username,
       remark : requestParams.remark,
       gameType : -1,
       typeName : "代理取点"
@@ -343,7 +343,7 @@ async function qudian(userInfo, merchantInfo, requestParams) {
  * @param {*} context 
  * @param {*} cb 
  */
-async function cudian(userInfo, merchantInfo, requestParams){
+async function cudian(userInfo, merchantInfo, requestParams, tokenInfo){
     //玩家余额
     let [playerBError, playerBalance] = await new UserBillModel({userName:userInfo.userName}).getBalance();
     if(playerBError)return ResFail(cb, agentBError);
@@ -362,7 +362,7 @@ async function cudian(userInfo, merchantInfo, requestParams){
       toUser : userInfo.userName,
       msn : "000",
       amount : +requestParams.points,
-      operator : merchantInfo.username,
+      operator : tokenInfo.username,
       remark : requestParams.remark,
       gameType : -1,
       typeName : "代理存点"
@@ -622,7 +622,7 @@ export async function createPlayer(event, context, cb) {
     let baseBillModel = {
       fromRole : RoleCodeEnum.Agent,
       toRole : RoleCodeEnum.Player,
-      fromUser : username,
+      fromUser : merchantInfo.username,
       toUser : userName,
       msn : "000",
       amount : +requestParams.points,
