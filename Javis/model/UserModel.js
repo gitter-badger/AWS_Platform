@@ -106,7 +106,11 @@ export class UserModel extends BaseModel {
         }
         tree(organizeTree, childTree)
         // 优化显示直属线路商和直属商户
-        organizeTree = { name: 'NA集团', children: organizeTree }
+        let name = 'NA集团'
+        if (!Model.isPlatformAdmin(inparam.token)) {
+            name = inparam.token.displayName
+        }
+        organizeTree = { name: name, children: organizeTree }
         if (inparam.type == 'admin' && Model.isPlatformAdmin(inparam.token)) {
             const directManagerNode = { name: '直属线路商', children: [] }
             const directMerchantNode = { name: '直属商户', children: [] }
