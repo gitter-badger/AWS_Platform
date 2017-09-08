@@ -240,7 +240,7 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         StreamSpecification:
-          StreamViewType: NEW_AND_OLD_IMAGESNEW_AND_OLD_IMAGES
+          StreamViewType: NEW_AND_OLD_IMAGES
 
     DianaPlatformGame: #游戏表
       Type: AWS::DynamoDB::Table
