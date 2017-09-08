@@ -7,7 +7,7 @@ const State = {
     normal : 1,  //正常,
     forzen : 2 //冻结
 }
-// const host = '192.168.3.131';
+// const host = '192.168.3.11';
 const host = '47.88.192.69';
 const port = 20003;
 export class PushModel{
@@ -38,7 +38,7 @@ export class PushModel{
     }
     pushUserBalance(userId) {
         const proId = 8;  //协议
-        return pushUserBalance(userId+"", host, port, proId);
+        return pushUserBalance(userId, host, port, proId);
     }
     //公告推送
     pushGameNotice(noid) {

@@ -164,6 +164,7 @@ export async function agentPlayerList(event, context, cb) {
         return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
     }
     userList.forEach(function(element) {
+        console.log(element.createAt);
         delete element.userPwd
     }, this);
     ResOK(cb, {list: userList});
