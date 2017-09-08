@@ -117,15 +117,7 @@ const lockmsn = async (e, c, cb) => {
     // 获取令牌,只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 查询msn
-    const [queryErr, queryRet] = await new MsnModel().query({
-      KeyConditionExpression: '#msn = :msn',
-      ExpressionAttributeNames: {
-        '#msn': 'msn',
-      },
-      ExpressionAttributeValues: {
-        ':msn': params.msn
-      }
-    })
+    const [queryErr, queryRet] = await new MsnModel().queryMSN(params)
     // 锁定
     if (params.status == MSNStatusEnum.Locked) {
       if (queryRet.Items.length == 0) {
