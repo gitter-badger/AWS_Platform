@@ -125,6 +125,7 @@ export class AdModel extends BaseModel {
         ret.img = inparam.img
         ret.url = inparam.url
         ret.remark = inparam.remark
+        ret.adName = inparam.adName
         // ret.adStatus = inparam.adStatus
         ret.updatedAt = Model.timeStamp()
         return await this.putItem(ret)
