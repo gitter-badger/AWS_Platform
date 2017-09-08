@@ -11,7 +11,7 @@ const State = {
 const host = '47.88.192.69';
 const port = 20003;
 export class PushModel{
-    constructor({username, role, userId, displayName,  headPic, parent, msn, gameList, suffix, levelIndex} = {}) {
+    constructor({username, role, userId, displayName,  headPic, parent, msn, gameList, suffix, levelIndex, liveMix, vedioMix, rate} = {}) {
         this.username = username;
         this.role = role;
         this.id = userId,
@@ -21,6 +21,9 @@ export class PushModel{
         this.msn = msn;
         this.suffix = suffix;
         this.levelIndex = levelIndex;
+        this.liveMix = liveMix;
+        this.vedioMix = vedioMix;
+        this.rate = rate;
         this.gameList = this.setGameList(gameList)
     }
     pushMerchant(){

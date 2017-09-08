@@ -48,7 +48,7 @@ const userTrigger = async (e, c, cb) => {
         gameList : userInfo.gameList,
         liveMix : userInfo.liveMix || -1,
         vedioMix : userInfo.vedioMix || -1,
-        rate : userInfo.rate || 1,
+        rate : userInfo.rate || -1,
         displayName : userInfo.displayName || "NULL!",
         suffix : userInfo.suffix,
         levelIndex : userInfo.levelIndex+""
