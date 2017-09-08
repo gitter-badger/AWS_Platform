@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Trim, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, Trim, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { AgentModel } from './model/AgentModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
@@ -11,7 +11,6 @@ import { AgentCheck } from './biz/AgentCheck'
  */
 const agentAdminNew = async (e, c, cb) => {
     try {
-        const res = { m: 'agentAdminNew' }
         // 入参数据
         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
         //检查参数是否合法
@@ -28,8 +27,8 @@ const agentAdminNew = async (e, c, cb) => {
         userInfo.operateToken = token
         new LogModel().addOperate(Model.addSourceIP(e, userInfo), registerUserErr, resgisterUserRet)
         // 结果返回
-        if (registerUserErr) { return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code) }
-        return ResOK(cb, { ...res, payload: resgisterUserRet })
+        if (registerUserErr) { return ResErr(cb, registerUserErr) }
+        return ResOK(cb, { payload: resgisterUserRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -40,7 +39,6 @@ const agentAdminNew = async (e, c, cb) => {
  */
 const agentNew = async (e, c, cb) => {
     try {
-        const res = { m: 'agentNew' }
         // 入参数据
         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
         //检查参数是否合法
@@ -54,8 +52,8 @@ const agentNew = async (e, c, cb) => {
         userInfo.operateToken = token
         new LogModel().addOperate(Model.addSourceIP(e, userInfo), registerUserErr, resgisterUserRet)
         // 结果返回
-        if (registerUserErr) { return ResFail(cb, { ...res, err: registerUserErr }, registerUserErr.code) }
-        return ResOK(cb, { ...res, payload: resgisterUserRet })
+        if (registerUserErr) { return ResErr(cb, registerUserErr) }
+        return ResOK(cb, { payload: resgisterUserRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -66,7 +64,6 @@ const agentNew = async (e, c, cb) => {
  */
 const agentLogin = async (e, c, cb) => {
     try {
-        const res = { m: 'agentLogin' }
         // 输入参数转换与校验
         const [jsonParseErr, userLoginInfo] = JSONParser(e && e.body)
         //检查参数是否合法
@@ -76,8 +73,8 @@ const agentLogin = async (e, c, cb) => {
         // 登录日志
         new LogModel().addLogin(Model.addSourceIP(e, userLoginInfo), loginUserErr, Model.addSourceIP(e, loginUserRet))
         // 结果返回
-        if (loginUserErr) { return ResFail(cb, { ...res, err: loginUserErr }, loginUserErr.code) }
-        return ResOK(cb, { ...res, payload: loginUserRet })
+        if (loginUserErr) { return ResErr(cb, loginUserErr) }
+        return ResOK(cb, { payload: loginUserRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -89,18 +86,17 @@ const agentLogin = async (e, c, cb) => {
 const agentOne = async (e, c, cb) => {
     try {
         // 入参校验
-        const res = { m: 'agentOne' }
         const [paramsErr, params] = Model.pathParams(e)
         if (paramsErr || !params.id) {
-            return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
+            return ResErr(cb, paramsErr)
         }
         // 获取令牌，只有代理有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作
         const [err, ret] = await new UserModel().getUser(params.id, RoleCodeEnum['Agent'])
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -112,16 +108,15 @@ const agentOne = async (e, c, cb) => {
 const agentList = async (e, c, cb) => {
     try {
         // 入参校验
-        const res = { m: 'agentList' }
         const [paramsErr, inparam] = Model.pathParams(e)
         if (paramsErr) {
-            return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
+            return ResErr(cb, paramsErr)
         }
         // 获取令牌，只有代理有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作
         const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Agent, inparam)
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
+        if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of ret) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
@@ -129,7 +124,7 @@ const agentList = async (e, c, cb) => {
             user.lastBill = lastBill
         }
         // 结果返回
-        return ResOK(cb, { ...res, payload: ret })
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -141,7 +136,6 @@ const agentList = async (e, c, cb) => {
 const agentUpdate = async (e, c, cb) => {
     try {
         // 入参校验
-        const res = { m: 'agentUpdate' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         //检查参数是否合法
         const [checkAttError, errorParams] = new AgentCheck().checkUpdate(inparam)
@@ -149,7 +143,7 @@ const agentUpdate = async (e, c, cb) => {
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作
         const [err, ret] = await new UserModel().getUser(inparam.userId, RoleCodeEnum['Agent'])
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
+        if (err) { return ResErr(cb, err) }
         // 获取更新属性和新密码HASH
         const Agent = { ...ret, ...Pick(inparam, RoleEditProps[RoleCodeEnum['Agent']]) }
         Agent.passhash = Model.hashGen(Agent.password)
@@ -160,8 +154,8 @@ const agentUpdate = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, updateErr, updateRet)
         // 结果返回
-        if (updateErr) { return ResFail(cb, { ...res, err: updateErr }, updateErr.code) }
-        return ResOK(cb, { ...res, payload: updateRet })
+        if (updateErr) { return ResErr(cb, updateErr) }
+        return ResOK(cb, { payload: updateRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -172,15 +166,14 @@ const agentUpdate = async (e, c, cb) => {
  */
 const availableAgents = async (e, c, cb) => {
     try {
-        const res = { m: 'avalibleAgents' }
         // 入参转换
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 获取令牌，只有代理有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作
         const [err, ret] = await new UserModel().listAvailableAgents(token, inparam)
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
