@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { PackageModel } from './model/PackageModel'
@@ -11,7 +11,6 @@ import { PackageCheck } from './biz/PackageCheck'
 const packageNew = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'packageNew' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new PackageCheck().check(inparam)
@@ -26,8 +25,8 @@ const packageNew = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, addInfoErr, addRet)
         // 返回结果
-        if (addInfoErr) { return ResFail(cb, { ...res, err: addInfoErr }, addInfoErr.code) }
-        return ResOK(cb, { ...res, payload: addRet })
+        if (addInfoErr) { return ResErr(cb, addInfoErr) }
+        return ResOK(cb, { payload: addRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -39,7 +38,6 @@ const packageNew = async (e, c, cb) => {
 const packageList = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'packageList' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -48,8 +46,8 @@ const packageList = async (e, c, cb) => {
         const [err, ret] = await new PackageModel().list(inparam)
 
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -61,7 +59,6 @@ const packageList = async (e, c, cb) => {
 const packageOne = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'packageOne' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -70,8 +67,8 @@ const packageOne = async (e, c, cb) => {
         const [err, ret] = await new PackageModel().getOne(inparam.packageName, inparam.packageId)
 
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -83,7 +80,6 @@ const packageOne = async (e, c, cb) => {
 const packageChangeStatus = async (e, c, cb) => {
     try {
         // 数据输入，转换，校验
-        const res = { m: 'packageChangeStatus' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new PackageCheck().checkStatus(inparam)
@@ -98,8 +94,8 @@ const packageChangeStatus = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, err, ret)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -111,7 +107,6 @@ const packageChangeStatus = async (e, c, cb) => {
 const packageUpdate = async (e, c, cb) => {
     try {
         // 数据输入，转换，校验
-        const res = { m: 'packageUpdate' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         //检查参数是否合法
         const [checkAttError, errorParams] = new PackageCheck().checkUpdate(inparam)
@@ -126,8 +121,8 @@ const packageUpdate = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, err, ret)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -139,7 +134,6 @@ const packageUpdate = async (e, c, cb) => {
 const packageDelete = async (e, c, cb) => {
     try {
         // 数据输入，转换，校验
-        const res = { m: 'packageDelete' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new PackageCheck().checkDelete(inparam)
@@ -154,8 +148,8 @@ const packageDelete = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, err, ret)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }

@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
 // import { LogModel } from './model/LogModel'
 
 // ==================== 以下为内部方法 ====================
