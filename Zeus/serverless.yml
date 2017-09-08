@@ -32,14 +32,6 @@ functions:
     handler: api.jwtverify
     integration: lambda
   #==================== 以下是管理员接口 ====================
-  # eva: #创建第一个管理员，接口编号0
-  #   handler: api_admin.eva
-  #   events:
-  #     -
-  #       http:
-  #         path: beings
-  #         method: post
-  #         cors: true
   adminList: #管理员列表
     handler: api_admin.adminList
     events:
@@ -84,14 +76,6 @@ functions:
           path: users/auth
           method: post
           cors: true
-  # userGrabToken: #获取用户TOKEN
-  #   handler: api_admin.userGrabToken
-  #   events:
-  #     -
-  #       http:
-  #         path: users/token
-  #         method: post
-  #         cors: true
   checkUserExist: #检查用户是否被占用
     handler: api_admin.checkUserExist
     events:

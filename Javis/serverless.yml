@@ -956,3 +956,19 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+
+    SYSConfig: #系统配置
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSConfig
+        AttributeDefinitions:
+          -
+            AttributeName: code
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: code
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

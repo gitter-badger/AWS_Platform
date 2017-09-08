@@ -37,6 +37,12 @@ const DianaPlatformTool = 'DianaPlatformTool'
 const DianaPlatformPackage = 'DianaPlatformPackage'
 const DianaPlatformSeat = 'DianaPlatformSeat'
 
+const HulkPlatformAd = 'HulkPlatformAd'
+const HeraGamePlayer = 'HeraGamePlayer'
+const PushErrorModel = 'PushErrorModel'
+
+const SYSConfig = 'SYSConfig'
+
 export const Tables = {
   ZeusPlatformUser,
   ZeusPlatformBill,
@@ -49,7 +55,13 @@ export const Tables = {
   DianaPlatformCompany,
   DianaPlatformTool,
   DianaPlatformPackage,
-  DianaPlatformSeat
+  DianaPlatformSeat,
+
+  HulkPlatformAd,
+  HeraGamePlayer,
+  PushErrorModel,
+
+  SYSConfig
 }
 
 /**

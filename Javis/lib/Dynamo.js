@@ -28,7 +28,6 @@ export const Store$ = async (action, params) => {
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
-const HeraGamePlayer = 'HeraGamePlayer'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'
 const ZeusPlatformCode = 'ZeusPlatformCode'
@@ -36,7 +35,14 @@ const ZeusPlatformCode = 'ZeusPlatformCode'
 const DianaPlatformGame = 'DianaPlatformGame'
 const DianaPlatformCompany = 'DianaPlatformCompany'
 const DianaPlatformTool = 'DianaPlatformTool'
+const DianaPlatformPackage = 'DianaPlatformPackage'
+const DianaPlatformSeat = 'DianaPlatformSeat'
+
+const HulkPlatformAd = 'HulkPlatformAd'
+const HeraGamePlayer = 'HeraGamePlayer'
 const PushErrorModel = 'PushErrorModel'
+
+const SYSConfig = 'SYSConfig'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -45,12 +51,18 @@ export const Tables = {
   ZeusPlatformCaptcha,
   ZeusPlatformLog,
   ZeusPlatformCode,
-  HeraGamePlayer,
 
   DianaPlatformGame,
   DianaPlatformCompany,
   DianaPlatformTool,
+  DianaPlatformPackage,
+  DianaPlatformSeat,
+
+  HulkPlatformAd,
+  HeraGamePlayer,
   PushErrorModel,
+
+  SYSConfig
 }
 
 /**
