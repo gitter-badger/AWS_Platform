@@ -69,16 +69,18 @@ export class LogModel extends BaseModel {
                 ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
                 KeyConditionExpression: "#role = :role",
-                FilterExpression: "#type = :type AND #level = :level",
+                FilterExpression: "#type = :type AND (#level = :level OR #username = :username)",
                 ExpressionAttributeNames: {
                     '#role': 'role',
                     '#type': 'type',
-                    '#level': 'level'
+                    '#level': 'level',
+                    '#username': 'username'
                 },
                 ExpressionAttributeValues: {
                     ':role': inparam.role.toString(),
                     ':type': inparam.type,
-                    ':level': inparam.level
+                    ':level': inparam.level,
+                    ':username': 'NAagent'
                 }
             }
         }
@@ -90,16 +92,18 @@ export class LogModel extends BaseModel {
                 ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
                 KeyConditionExpression: "#role = :role",
-                FilterExpression: "#type = :type AND #level <> :level",
+                FilterExpression: "#type = :type AND #level <> :level AND #username <> :username",
                 ExpressionAttributeNames: {
                     '#role': 'role',
                     '#type': 'type',
-                    '#level': 'level'
+                    '#level': 'level',
+                    '#username': 'username'
                 },
                 ExpressionAttributeValues: {
                     ':role': inparam.role.toString(),
                     ':type': inparam.type,
-                    ':level': 0
+                    ':level': 0,
+                    ':username': 'NAagent'
                 }
             }
         }
