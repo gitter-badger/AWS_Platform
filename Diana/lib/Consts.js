@@ -12,6 +12,11 @@ export const CompanyStatusEnum = {
   Enable: 1,
   Disable: 0
 }
+// 配置状态枚举
+export const ConfigStatusEnum = {
+  Enable: 1,
+  Disable: 0
+}
 // 游戏类型枚举
 export const GameTypeEnum = {
   '10000': { code: '10000', name: '棋牌游戏', url: 'http://root.rottagame.com/admin/api/checkLoginAccess', desc: '这是棋牌游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },

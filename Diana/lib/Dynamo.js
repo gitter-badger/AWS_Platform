@@ -37,6 +37,8 @@ const DianaPlatformTool = 'DianaPlatformTool'
 const DianaPlatformPackage = 'DianaPlatformPackage'
 const DianaPlatformSeat = 'DianaPlatformSeat'
 
+const SYSConfig = 'SYSConfig'
+
 export const Tables = {
   ZeusPlatformUser,
   ZeusPlatformBill,
@@ -49,7 +51,8 @@ export const Tables = {
   DianaPlatformCompany,
   DianaPlatformTool,
   DianaPlatformPackage,
-  DianaPlatformSeat
+  DianaPlatformSeat,
+  SYSConfig
 }
 
 /**
