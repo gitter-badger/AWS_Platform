@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
@@ -11,7 +11,6 @@ import { UserCheck } from './biz/UserCheck'
 const managerList = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'managerList' }
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 只有管理员/线路商有权限
@@ -21,7 +20,7 @@ const managerList = async (e, c, cb) => {
     // 业务操作
     const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Manager)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
+    if (err) { return ResErr(cb, err) }
     // 查询每个用户余额
     for (let user of ret) {
       const [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
@@ -35,7 +34,7 @@ const managerList = async (e, c, cb) => {
         user.merchantUsedCount = 0
       }
     }
-    return ResOK(cb, { ...res, payload: ret })
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -46,10 +45,9 @@ const managerList = async (e, c, cb) => {
 const managerOne = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'managerOne' }
     const [paramsErr, params] = Model.pathParams(e)
     if (paramsErr || !params.id) {
-      return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
+      return ResErr(cb, paramsErr)
     }
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
@@ -69,8 +67,8 @@ const managerOne = async (e, c, cb) => {
     }
 
     // 结果返回
-    if (managerErr) { return ResFail(cb, { ...res, err: managerErr }, managerErr.code) }
-    return ResOK(cb, { ...res, payload: manager })
+    if (managerErr) { return ResErr(cb, managerErr) }
+    return ResOK(cb, { payload: manager })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -81,10 +79,9 @@ const managerOne = async (e, c, cb) => {
 const managerUpdate = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'managerUpdate' }
     const [paramsErr, params] = Model.pathParams(e)
     if (paramsErr || !params.id) {
-      return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
+      return ResErr(cb, paramsErr)
     }
     // 入参转化
     const [jsonParseErr, managerInfo] = JSONParser(e && e.body)
@@ -99,7 +96,7 @@ const managerUpdate = async (e, c, cb) => {
     // 业务操作
     const [managerErr, manager] = await new UserModel().getUser(params.id, RoleCodeEnum['Manager'])
     if (managerErr) {
-      return ResFail(cb, { ...res, err: managerErr }, managerErr.code)
+      return ResErr(cb, managerErr)
     }
     // 获取更新属性和新密码HASH
     const Manager = { ...manager, ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']]) }
@@ -112,9 +109,9 @@ const managerUpdate = async (e, c, cb) => {
     new LogModel().addOperate(params, updateErr, updateRet)
     // 结果返回
     if (updateErr) {
-      return ResFail(cb, { ...res, err: updateErr }, updateErr.code)
+      return ResErr(cb, updateErr)
     }
-    return ResOK(cb, { ...res, payload: updateRet })
+    return ResOK(cb, { payload: updateRet })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -125,7 +122,6 @@ const managerUpdate = async (e, c, cb) => {
  */
 const avalibleManagers = async (e, c, cb) => {
   try {
-    const res = { m: 'avalibleManagers' }
     // 获取令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 只有管理员/线路商有权限
@@ -135,8 +131,8 @@ const avalibleManagers = async (e, c, cb) => {
     // 业务操作
     const [err, ret] = await new UserModel().listAvalibleManagers()
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }

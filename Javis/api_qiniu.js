@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Tables, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, Tables, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 // 七牛上传工具
 const qiniu = require('qiniu')
@@ -11,7 +11,6 @@ const QINIU_BUCKET = 'rotta-file'
  */
 const upToken = async (e, c, cb) => {
   try {
-    const res = { m: 'upToken' }
     // 入参转换
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 身份令牌
@@ -21,7 +20,7 @@ const upToken = async (e, c, cb) => {
     const options = { scope: QINIU_BUCKET + ':' + inparam.fileKey }
     const putPolicy = new qiniu.rs.PutPolicy(options)
     const upToken = putPolicy.uploadToken(mac)
-    return ResOK(cb, { ...res, payload: upToken })
+    return ResOK(cb, { payload: upToken })
   } catch (error) {
     return ResErr(cb, error)
   }

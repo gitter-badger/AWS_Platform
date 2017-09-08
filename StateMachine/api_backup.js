@@ -1,5 +1,4 @@
-import { ResOK, ResFail, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
-import { UserModel } from './model/UserModel'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
 
 let DynamoBackup = require('dynamo-backup-to-s3')
 
@@ -8,11 +7,24 @@ let DynamoBackup = require('dynamo-backup-to-s3')
  */
 const backup = async (e, c, cb) => {
     try {
-        const res = { m: 'organize' }
+        const res = { m: 'backup' }
         // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
+        // 开始备份
+        const [backupErr, backupRet] = await doBackup()
+        if (backupErr) { return ResErr(cb, backupErr) }
+        // 结果返回
+        console.info(backupRet)
+        return ResOK(cb, { ...res, payload: backupRet })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
+function doBackup() {
+    return new Promise((reslove, reject) => {
         // 初始化备份对象
         let backup = new DynamoBackup({
             bucket: 'backup-na',
@@ -23,24 +35,23 @@ const backup = async (e, c, cb) => {
             awsSecretKey: process.env.SECRET_KEY,
             awsRegion: 'ap-southeast-1'
         })
+        let res = ''
         backup.on('error', function (data) {
             console.error('备份发生错误：' + data.table)
             console.error(data.err)
+            return reslove(['备份发生错误：' + data.table + '详细：' + data.err, false])
         })
         backup.on('start-backup', function (tableName, startTime) {
-            console.log('开始备份表： ' + tableName)
+            res += ('开始备份表：' + tableName + '，开始时间：' + startTime)
         })
         backup.on('end-backup', function (tableName, backupDuration) {
-            console.log('结束备份表：' + tableName)
+            res += ('结束备份表：' + tableName + '耗时：' + backupDuration)
         })
         backup.backupAllTables(function () {
-            console.log('备份结束！')
+            res += '所有表备份结束！'
         })
-        // 结果返回
-        return ResOK(cb, { ...res, payload: {} })
-    } catch (error) {
-        return ResErr(cb, error)
-    }
+        return reslove([false, res])
+    })
 }
 
 // ==================== 以下为内部方法 ====================

@@ -1,0 +1,73 @@
+
+service: StateMachine
+plugins:
+  - serverless-webpack
+  - serverless-secrets-plugin
+  # - serverless-step-functions
+provider:
+  name: aws
+  runtime: nodejs6.10
+  # region: ap-northeast-1
+  region: ap-southeast-1
+  memorySize: 256
+  timeout: 300
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
+      Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
+custom:
+  webpackIncludeModules: true
+  secrets: ${file(secrets.${opt:stage, self:provider.stage}.yml)} #密钥文件
+functions:
+  tokenAuth: #TOKEN验证
+    handler: api.jwtverify
+    environment:
+      TOKEN_SECRET: ${self:custom.secrets.TOKEN_SECRET}
+    integration: lambda
+  backup: #备份数据库
+    handler: api_backup.backup
+    environment:
+      ACCESS_KEY: ${self:custom.secrets.ACCESS_KEY}
+      SECRET_KEY: ${self:custom.secrets.SECRET_KEY}
+    events:
+        - http:
+            path: /backup
+            method: post
+            cors: true
+            authorizer: tokenAuth
+# stepFunctions:
+#   stateMachines:
+#     backup:
+#       events:
+#         - http:
+#             path: /backup
+#             method: post
+#             cors: true
+#             authorizer: tokenAuth
+#       name: backupStateMachine
+#       definition:
+#         Comment: "备份数据库"
+#         StartAt: BackupStart
+#         States:
+#           BackupStart:
+#             Type: Task
+#             Resource: arn:aws:lambda:${opt:region}:${self:custom.secrets.ACCOUNT_ID}:function:${self:service}-${opt:stage}-backup
+#             End: true

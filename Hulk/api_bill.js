@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 import { UserModel } from './model/UserModel'
@@ -76,7 +76,6 @@ const billList = async (e, c, cb) => {
  */
 const billTransfer = async (e, c, cb) => {
     try {
-        const res = { m: 'billTransfer' }
         // 入参数据转换
         const [jsonParseErr, transferInfo] = JSONParser(e && e.body)
         // 检查参数是否合法
@@ -86,7 +85,7 @@ const billTransfer = async (e, c, cb) => {
         // 获取转账账户
         const fromUserId = transferInfo.fromUserId || token.userId
         const [queryErr, fromUser] = await new UserModel().queryUserById(fromUserId)
-        if (queryErr) { return ResFail(cb, queryErr) }
+        if (queryErr) { return ResErr(cb, queryErr) }
         // 操作权限
         if (!Model.isAgent(fromUser) && !Model.isPlatformAdmin(token) && !Model.isSubChild(token, fromUser) && fromUser.userId != token.userId) {
             return ResErr(cb, BizErr.TokenErr('平台用户只有平台管理员/上级/自己能操作'))
@@ -96,22 +95,25 @@ const billTransfer = async (e, c, cb) => {
         }
         // 获取目的账户
         const [queryErr2, toUser] = await new UserModel().getUserByName(transferInfo.toRole, transferInfo.toUser)
-        if (queryErr2) { return ResFail(cb, queryErr2) }
+        if (queryErr2) { return ResErr(cb, queryErr2) }
         // 设置操作人TOKEN
         fromUser.operatorToken = token
         // 获取fromUser的当前余额
         const [userBalanceErr, userBalance] = await new BillModel().checkUserBalance(fromUser)
         if (userBalanceErr) { return ResErr(cb, userBalanceErr) }
+        if (transferInfo.amount > userBalance) {
+            return ResErr(cb, BizErr.BalanceErr())
+        }
         // 开始转账业务
         const [depositBillErr, depositBillRet] = await new BillModel().billTransfer(fromUser, {
             ...transferInfo,
             toLevel: toUser.level,
             toDisplayName: toUser.displayName,
-            amount: Math.min(userBalance, transferInfo.amount)
+            amount: transferInfo.amount
         })
         // 结果返回
         if (depositBillErr) { return ResErr(cb, depositBillErr) }
-        return ResOK(cb, { ...res, payload: depositBillRet })
+        return ResOK(cb, {  payload: depositBillRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -123,7 +125,6 @@ const billTransfer = async (e, c, cb) => {
 const logList = async (e, c, cb) => {
     try {
         // 入参数据
-        const res = { m: 'logList' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new LogCheck().checkPage(inparam)
@@ -152,8 +153,8 @@ const logList = async (e, c, cb) => {
         // 业务操作
         const [err, ret] = await new LogModel().logPage(inparam)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, {  payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }

@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, GameTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, GameTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { GameModel } from './model/GameModel'
 import { LogModel } from './model/LogModel'
 import { UserModel } from './model/UserModel'
@@ -11,7 +11,6 @@ import { GameCheck } from './biz/GameCheck'
 const gameNew = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'gameNew' }
     const [jsonParseErr, gameInfo] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new GameCheck().checkGame(gameInfo)
@@ -26,8 +25,8 @@ const gameNew = async (e, c, cb) => {
     gameInfo.operateToken = token
     new LogModel().addOperate(gameInfo, addGameInfoErr, addGameRet)
     // 结果返回
-    if (addGameInfoErr) { return ResFail(cb, { ...res, err: addGameInfoErr }, addGameInfoErr.code) }
-    return ResOK(cb, { ...res, payload: addGameRet })
+    if (addGameInfoErr) { return ResErr(cb, addGameInfoErr) }
+    return ResOK(cb, { payload: addGameRet })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -38,7 +37,6 @@ const gameNew = async (e, c, cb) => {
  */
 const gameList = async (e, c, cb) => {
   try {
-    const res = { m: 'gamelist' }
     // const [paramsErr, gameParams] = Model.pathParams(e)
     // if (paramsErr) {
     //   return ResErr(cb, jsonParseErr)
@@ -55,11 +53,11 @@ const gameList = async (e, c, cb) => {
     // else {
     // [err, ret] = await new UserModel().queryUserById(gameParams.parent)
     // }
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
+    if (err) { return ResErr(cb, err) }
     // if (gameParams.parent) {
     //   ret = ret.gameList
     // }
-    return ResOK(cb, { ...res, payload: ret })
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -71,7 +69,6 @@ const gameList = async (e, c, cb) => {
 const gameOne = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'gameOne' }
     const [paramsErr, gameParams] = Model.pathParams(e)
     if (paramsErr) { return ResErr(cb, jsonParseErr) }
     // 获取令牌，只有管理员有权限
@@ -80,8 +77,8 @@ const gameOne = async (e, c, cb) => {
     const [err, ret] = await new GameModel().getOne(gameParams.gameType, gameParams.gameId)
     ret.gameType = GameTypeEnum[ret.gameType].name
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -93,7 +90,6 @@ const gameOne = async (e, c, cb) => {
 const gameChangeStatus = async (e, c, cb) => {
   try {
     // 数据输入，转换，校验
-    const res = { m: 'gameChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new GameCheck().checkStatus(inparam)
@@ -108,8 +104,8 @@ const gameChangeStatus = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -120,7 +116,6 @@ const gameChangeStatus = async (e, c, cb) => {
  */
 const gameType = async (e, c, cb) => {
   try {
-    const res = { m: 'gameType' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
@@ -130,12 +125,14 @@ const gameType = async (e, c, cb) => {
       for (let item in GameTypeEnum) {
         gameTypeArr.push(GameTypeEnum[item])
       }
-      return ResOK(cb, { ...res, payload: gameTypeArr })
+      return ResOK(cb, { payload: gameTypeArr })
     }
     // 上级游戏类别
     const [err, ret] = await new UserModel().queryUserById(inparam.parent)
+    // 结果返回
+    if (err) { return ResErr(cb, err) }
     ret.gameList = ret.gameList || []
-    return ResOK(cb, { ...res, payload: ret.gameList })
+    return ResOK(cb, { payload: ret.gameList })
   } catch (error) {
     return ResErr(cb, error)
   }

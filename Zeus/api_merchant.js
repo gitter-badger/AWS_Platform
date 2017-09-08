@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
@@ -11,18 +11,17 @@ import { UserCheck } from './biz/UserCheck'
 const merchantOne = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'merchantOne' }
     const [paramsErr, params] = Model.pathParams(e)
     if (paramsErr || !params.id) {
-      return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
+      return ResErr(cb, paramsErr)
     }
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 业务操作
     const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Merchant'])
     // 结果返回
-    if (merchantErr) { return ResFail(cb, { ...res, err: merchantErr }, merchantErr.code) }
-    return ResOK(cb, { ...res, payload: merchant })
+    if (merchantErr) { return ResErr(cb, merchantErr) }
+    return ResOK(cb, { payload: merchant })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -34,13 +33,12 @@ const merchantOne = async (e, c, cb) => {
 const merchantList = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'merchantList' }
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
 
     // 业务操作
     const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Merchant)
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
+    if (err) { return ResErr(cb, err) }
 
     // 查询每个用户余额
     for (let user of ret) {
@@ -49,7 +47,8 @@ const merchantList = async (e, c, cb) => {
       user.lastBill = lastBill
     }
     // 结果返回
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -61,10 +60,9 @@ const merchantList = async (e, c, cb) => {
 const merchantUpdate = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'merchantUpdate' }
     const [paramsErr, params] = Model.pathParams(e)
     if (paramsErr || !params.id) {
-      return ResFail(cb, { ...res, err: paramsErr }, paramsErr.code)
+      return ResErr(cb, paramsErr)
     }
     const [jsonParseErr, merchantInfo] = JSONParser(e && e.body)
     //检查参数是否合法
@@ -74,7 +72,7 @@ const merchantUpdate = async (e, c, cb) => {
     // 业务操作
     const [merchantErr, merchant] = await new UserModel().getUser(params.id, RoleCodeEnum['Merchant'])
     if (merchantErr) {
-      return ResFail(cb, { ...res, err: merchantErr }, merchantErr.code)
+      return ResErr(cb, merchantErr)
     }
     // 获取更新属性和新密码HASH
     const Merchant = {
@@ -88,8 +86,8 @@ const merchantUpdate = async (e, c, cb) => {
     params.operateToken = token
     new LogModel().addOperate(params, updateErr, updateRet)
     // 结果返回
-    if (updateErr) { return ResFail(cb, { ...res, err: updateErr }, updateErr.code) }
-    return ResOK(cb, { ...res, payload: updateRet })
+    if (updateErr) { return ResErr(cb, updateErr) }
+    return ResOK(cb, { payload: updateRet })
   } catch (error) {
     return ResErr(cb, error)
   }

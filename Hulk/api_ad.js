@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { AdModel } from './model/AdModel'
@@ -11,7 +11,6 @@ import { AdCheck } from './biz/AdCheck'
 const adNew = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'adNew' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
     const [checkAttError, errorParams] = new AdCheck().check(inparam)
@@ -24,8 +23,8 @@ const adNew = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, addInfoErr, addRet)
     // 返回结果
-    if (addInfoErr) { return ResFail(cb, { ...res, err: addInfoErr }, addInfoErr.code) }
-    return ResOK(cb, { ...res, payload: addRet })
+    if (addInfoErr) { return ResErr(cb, addInfoErr) }
+    return ResOK(cb, { payload: addRet })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -37,15 +36,14 @@ const adNew = async (e, c, cb) => {
 const adList = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'adList' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 业务操作
     const [err, ret] = await new AdModel().list(inparam)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -58,15 +56,14 @@ const adList = async (e, c, cb) => {
 const adOne = async (e, c, cb) => {
   try {
     // 入参数据
-    const res = { m: 'adOne' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 业务操作
     const [err, ret] = await new AdModel().getOne(inparam)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -78,7 +75,6 @@ const adOne = async (e, c, cb) => {
 const adChangeStatus = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'adChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new AdCheck().checkStatus(inparam)
@@ -91,8 +87,8 @@ const adChangeStatus = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -104,7 +100,6 @@ const adChangeStatus = async (e, c, cb) => {
 const adUpdate = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'adUpdate' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
     const [checkAttError, errorParams] = new AdCheck().checkUpdate(inparam)
@@ -119,8 +114,8 @@ const adUpdate = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -132,7 +127,6 @@ const adUpdate = async (e, c, cb) => {
 const adDelete = async (e, c, cb) => {
   try {
     // 数据输入，转换，校验
-    const res = { m: 'adDelete' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
     const [checkAttError, errorParams] = new AdCheck().checkDelete(inparam)
@@ -147,15 +141,14 @@ const adDelete = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
 }
 
 // ==================== 以下为内部方法 ====================
-
 export {
   adNew,                      // 创建
   adList,                     // 列表

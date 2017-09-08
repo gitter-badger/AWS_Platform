@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, SeatTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, SeatTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { SeatModel } from './model/SeatModel'
@@ -11,7 +11,6 @@ import { SeatCheck } from './biz/SeatCheck'
 const seatNew = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'seatNew' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new SeatCheck().check(inparam)
@@ -25,8 +24,8 @@ const seatNew = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, addInfoErr, addRet)
         // 返回结果
-        if (addInfoErr) { return ResFail(cb, { ...res, err: addInfoErr }, addInfoErr.code) }
-        return ResOK(cb, { ...res, payload: addRet })
+        if (addInfoErr) { return ResErr(cb, addInfoErr) }
+        return ResOK(cb, { payload: addRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -38,7 +37,6 @@ const seatNew = async (e, c, cb) => {
 const seatList = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'seatList' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new SeatCheck().checkQuery(inparam)
@@ -49,8 +47,8 @@ const seatList = async (e, c, cb) => {
         const [err, ret] = await new SeatModel().list(inparam)
 
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -62,7 +60,6 @@ const seatList = async (e, c, cb) => {
 const seatOne = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'seatOne' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -71,8 +68,8 @@ const seatOne = async (e, c, cb) => {
         const [err, ret] = await new SeatModel().getOne(inparam)
 
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -84,7 +81,6 @@ const seatOne = async (e, c, cb) => {
 const seatChangeStatus = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'seatChangeStatus' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new SeatCheck().checkStatus(inparam)
@@ -99,8 +95,8 @@ const seatChangeStatus = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, err, ret)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -112,7 +108,6 @@ const seatChangeStatus = async (e, c, cb) => {
 const seatUpdate = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'seatUpdate' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
         const [checkAttError, errorParams] = new SeatCheck().checkUpdate(inparam)
@@ -127,8 +122,8 @@ const seatUpdate = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, err, ret)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -140,7 +135,6 @@ const seatUpdate = async (e, c, cb) => {
 const seatDelete = async (e, c, cb) => {
     try {
         // 入参转换
-        const res = { m: 'seatDelete' }
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         //检查参数是否合法
         const [checkAttError, errorParams] = new SeatCheck().checkDelete(inparam)
@@ -155,8 +149,8 @@ const seatDelete = async (e, c, cb) => {
         inparam.operateToken = token
         new LogModel().addOperate(inparam, err, ret)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: ret })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -171,7 +165,7 @@ const seatType = async (e, c, cb) => {
     for (let code in SeatTypeEnum) {
         seatTypeArr.push({ 'code': code, 'name': SeatTypeEnum[code] })
     }
-    return ResOK(cb, { ...res, payload: seatTypeArr })
+    return ResOK(cb, { payload: seatTypeArr })
 }
 
 // ==================== 以下为内部方法 ====================

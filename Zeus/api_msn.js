@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { LogModel } from './model/LogModel'
@@ -12,7 +12,6 @@ const captchapng = require('captchapng')
 const msnList = async (e, c, cb) => {
   try {
     // 数据输入，转换，校验
-    const res = { m: 'msnList' }
     e = e || {}
     e.body = e.body || {}
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -21,7 +20,7 @@ const msnList = async (e, c, cb) => {
     // 业务操作
     const [err, ret] = await new MsnModel().scan()
     if (err) {
-      return ResFail(cb, { ...res, err: err }, err.code)
+      return ResErr(cb, err)
     } else {
       let arr = new Array()
       let flag = true
@@ -38,7 +37,7 @@ const msnList = async (e, c, cb) => {
       }
       ret.Items.push(...arr)
       // 结果返回
-      return ResOK(cb, { ...res, payload: ret })
+      return ResOK(cb, { payload: ret })
     }
   } catch (error) {
     return ResErr(cb, error)
@@ -51,10 +50,9 @@ const msnList = async (e, c, cb) => {
 const checkMsn = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'checkMsn' }
     const [paramErr, params] = Model.pathParams(e)
     if (paramErr) {
-      return ResFail(cb, { ...res, err: paramErr }, paramErr.code)
+      return ResErr(cb, paramErr)
     }
     //检查参数是否合法
     const [checkAttError, errorParams] = new MsnCheck().check(params)
@@ -63,8 +61,8 @@ const checkMsn = async (e, c, cb) => {
     // 业务操作
     const [checkErr, checkRet] = await new MsnModel().checkMSN(params)
     // 结果返回
-    if (checkErr) { return ResFail(cb, { ...res, err: checkErr }, checkErr.code) }
-    return ResOK(cb, { ...res, payload: { avalible: Boolean(checkRet) } })
+    if (checkErr) { return ResErr(cb, checkErr) }
+    return ResOK(cb, { payload: { avalible: Boolean(checkRet) } })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -75,17 +73,16 @@ const checkMsn = async (e, c, cb) => {
 const msnRandom = async (e, c, cb) => {
   try {
     // 数据输入，转换，校验
-    const res = { m: 'msnRandom' }
     // 获取身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 业务操作
     const [err, ret] = await new MsnModel().scan()
     if (err) {
-      return ResFail(cb, { ...res, err: err }, err.code)
+      return ResErr(cb, err)
     } else {
       // 所有线路号都被占用
       if (ret.Items.length >= 999) {
-        return ResFail(cb, { ...res, err: BizErr.MsnFullError() }, BizErr.MsnFullError().code)
+        return ResErr(cb, BizErr.MsnFullError())
       }
       // 所有占用线路号组成数组
       let msnArr = new Array()
@@ -99,7 +96,7 @@ const msnRandom = async (e, c, cb) => {
         randomMsn = randomNum(1, 999)
       }
       // 结果返回
-      return ResOK(cb, { ...res, payload: randomMsn })
+      return ResOK(cb, { payload: randomMsn })
     }
   } catch (error) {
     return ResErr(cb, error)
@@ -111,25 +108,16 @@ const msnRandom = async (e, c, cb) => {
 const lockmsn = async (e, c, cb) => {
   try {
     // 入参校验
-    const res = { m: 'lockmsn' }
     const [paramErr, params] = Model.pathParams(e)
     if (paramErr) {
-      return ResFail(cb, { ...res, err: paramErr }, paramErr.code)
+      return ResErr(cb, paramErr)
     }
     //检查参数是否合法
     const [checkAttError, errorParams] = new MsnCheck().checkMsnLock(params)
     // 获取令牌,只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
     // 查询msn
-    const [queryErr, queryRet] = await new MsnModel().query({
-      KeyConditionExpression: '#msn = :msn',
-      ExpressionAttributeNames: {
-        '#msn': 'msn',
-      },
-      ExpressionAttributeValues: {
-        ':msn': params.msn
-      }
-    })
+    const [queryErr, queryRet] = await new MsnModel().queryMSN(params)
     // 锁定
     if (params.status == MSNStatusEnum.Locked) {
       if (queryRet.Items.length == 0) {
@@ -141,14 +129,11 @@ const lockmsn = async (e, c, cb) => {
         params.operateToken = token
         new LogModel().addOperate(params, err, ret)
 
-        if (err) {
-          return ResFail(cb, { ...res, err: err }, err.code)
-        } else {
-          return ResOK(cb, { ...res, payload: msn })
-        }
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: msn })
       }
       else {
-        return ResFail(cb, { ...res, err: BizErr.MsnUsedError() }, BizErr.MsnUsedError().code)
+        return ResErr(cb, BizErr.MsnUsedError())
       }
     }
     // 解锁
@@ -160,11 +145,11 @@ const lockmsn = async (e, c, cb) => {
         params.operateToken = token
         new LogModel().addOperate(params, err, ret)
         // 结果返回
-        if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-        return ResOK(cb, { ...res, payload: params.msn })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: params.msn })
       }
       else {
-        return ResFail(cb, { ...res, err: BizErr.MsnNotExistError() }, BizErr.MsnNotExistError().code)
+        return ResErr(cb, BizErr.MsnNotExistError())
       }
     }
   } catch (error) {
@@ -178,7 +163,6 @@ const lockmsn = async (e, c, cb) => {
 const captcha = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'captcha' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
     const [checkAttError, errorParams] = new CaptchaCheck().checkCaptcha(inparam)
@@ -190,8 +174,8 @@ const captcha = async (e, c, cb) => {
     p.color(255, 255, 255, 0) // First color: background (red, green, blue, alpha)
     p.color(80, 80, 80, 255)  // Second color: paint (red, green, blue, alpha)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: p.getBase64() })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: p.getBase64() })
   } catch (error) {
     return ResErr(cb, error)
   }

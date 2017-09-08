@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { ToolModel } from './model/ToolModel'
@@ -11,7 +11,6 @@ import { ToolCheck } from './biz/ToolCheck'
 const toolNew = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'toolNew' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
     const [checkAttError, errorParams] = new ToolCheck().check(inparam)
@@ -26,8 +25,8 @@ const toolNew = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, addInfoErr, addRet)
     // 返回结果
-    if (addInfoErr) { return ResFail(cb, { ...res, err: addInfoErr }, addInfoErr.code) }
-    return ResOK(cb, { ...res, payload: addRet })
+    if (addInfoErr) { return ResErr(cb, addInfoErr) }
+    return ResOK(cb, {  payload: addRet })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -39,7 +38,6 @@ const toolNew = async (e, c, cb) => {
 const toolList = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'toolList' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -48,8 +46,8 @@ const toolList = async (e, c, cb) => {
     const [err, ret] = await new ToolModel().list(inparam)
 
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, {  payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -62,7 +60,6 @@ const toolList = async (e, c, cb) => {
 const toolOne = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'toolOne' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -71,8 +68,8 @@ const toolOne = async (e, c, cb) => {
     const [err, ret] = await new ToolModel().getOne(inparam)
 
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, {  payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -85,7 +82,6 @@ const toolOne = async (e, c, cb) => {
 const toolChangeStatus = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'toolChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
     const [checkAttError, errorParams] = new ToolCheck().checkStatus(inparam)
@@ -100,8 +96,8 @@ const toolChangeStatus = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, {  payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -113,7 +109,6 @@ const toolChangeStatus = async (e, c, cb) => {
 const toolUpdate = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'toolUpdate' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 检查参数是否合法
     const [checkAttError, errorParams] = new ToolCheck().checkUpdate(inparam)
@@ -128,8 +123,8 @@ const toolUpdate = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, {  payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -141,7 +136,6 @@ const toolUpdate = async (e, c, cb) => {
 const toolDelete = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'toolDelete' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new ToolCheck().checkDelete(inparam)
@@ -156,8 +150,8 @@ const toolDelete = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, {  payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
