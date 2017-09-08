@@ -116,7 +116,7 @@ export async function agentPlayerList(event, context, cb) {
     let role = tokenInfo.role;
     let parent = tokenInfo.parent;
     let sortKey = requestParams.sortKey || "createAt";
-    let sortMode = requestParams.sortKey || "asc";  //asc 升序  dsc 降序
+    let sortMode = requestParams.sortKey || "dsc";  //asc 升序  dsc 降序
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
     let flag  = false;
@@ -164,7 +164,6 @@ export async function agentPlayerList(event, context, cb) {
         return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
     }
     userList.forEach(function(element) {
-        console.log(element.buId);
         delete element.userPwd
     }, this);
     ResOK(cb, {list: userList});
@@ -294,10 +293,10 @@ async function qudian(userInfo, merchantInfo, requestParams) {
     }
     //玩家账单
     let baseBillModel = {
-      fromRole : RoleCodeEnum.Agent,
-      toRole : RoleCodeEnum.Player,
-      fromUser : merchantInfo.username,
-      toUser : userInfo.userName,
+      fromRole : RoleCodeEnum.Player,
+      toRole : RoleCodeEnum.Agent,
+      fromUser : userInfo.userName,
+      toUser : merchantInfo.username,
       msn : "000",
       amount : +requestParams.points,
       operator : merchantInfo.username,
@@ -322,8 +321,8 @@ async function qudian(userInfo, merchantInfo, requestParams) {
         action : 1,
         userId :merchantInfo.userId,
         username : merchantInfo.username,
-        fromLevel : merchantInfo.level,
-        toLevel : 10000,
+        fromLevel : 10000,
+        toLevel : merchantInfo.level,
     });
     let [mError] = await merchantBillModel.save();
 
@@ -488,7 +487,7 @@ export async function childrenAgent(event, context, cb) {
             let agent = agentList[i];
             if(agent.parent == '00') {
                 agentList.splice(i, 1);
-                break;
+                i --;
             }
         }
     }else {
@@ -627,7 +626,7 @@ export async function createPlayer(event, context, cb) {
       toUser : userName,
       msn : "000",
       amount : +requestParams.points,
-      operator : username,
+      operator : tokenInfo.username,
       remark : requestParams.remark,
       originalAmount : 0,
       gameType : -1,

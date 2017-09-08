@@ -122,7 +122,7 @@ export async function gamePlayerList(event, context, cb) {
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
     let sortKey = requestParams.sortKey || "createAt";
-    let sortMode = requestParams.sortKey || "asc";  //asc 升序  dsc 降序
+    let sortMode = requestParams.sortKey || "dsc";  //asc 升序  dsc 降序
     let userModel = new UserModel();
     let err, userList=[];
     //如果是平台管理员，可以查看所有的玩家信息

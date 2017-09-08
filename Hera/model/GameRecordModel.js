@@ -71,11 +71,15 @@ export class GameRecordModel extends BaseModel{
             opts.FilterExpression = "";
         }
         if(userName) {
-            opts.FilterExpression += "userName=:userName",
+            opts.FilterExpression += "userName=:userName ",
             opts.ExpressionAttributeValues[":userName"] = userName;
         }
         if(gameId) {
-            opts.FilterExpression += "gameId=:gameId",
+            if(userName) {
+                opts.FilterExpression += "and gameId=:gameId";
+            }else {
+                opts.FilterExpression += "gameId=:gameId";
+            }
             opts.ExpressionAttributeValues[":gameId"] = gameId;
         }
         let [countErr, count] = await this.count(opts);

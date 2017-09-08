@@ -367,10 +367,10 @@ async function gamePlayerBalance(event, context, callback) {
     userName = `${merchantInfo.suffix}_${userName}`;
     requestParams.userName = userName;
     let baseModel = {
-      fromRole : RoleCodeEnum.Player,
-      toRole : RoleCodeEnum.Merchant,
-      fromUser : userName,
-      toUser : merchantInfo.username,
+      fromRole : action == 1 ? RoleCodeEnum.Merchant : RoleCodeEnum.Player,
+      toRole : action == 1 ? RoleCodeEnum.Player : RoleCodeEnum.Merchant,
+      fromUser : action == 1 ? merchantInfo.username : userName,
+      toUser : action == 1 ? userName : merchantInfo.username,
       amount : +requestParams.amount,
       operator : userName,
       remark : action > 0 ? "中心钱包转入" : "中心钱包转出",
@@ -887,7 +887,7 @@ async function playerGameRecord(event, context, callback) {
   ], requestParams);
   if(checkAttError) {
     Object.assign(checkAttError, {params: errorParams});
-      return callback(null, ReHandler.fail(checkAttError));
+    return callback(null, ReHandler.fail(checkAttError));
   }
   let {records} = requestParams;
   let buffer = Buffer.from(records, 'base64');
@@ -902,15 +902,17 @@ async function playerGameRecord(event, context, callback) {
     let record = records[i];
     let {userId, userName, betId, betTime, parentId, gameId} = record;
     batchSaveArr.push({
-      userId,
+      userId : +userId,
       userName, 
       betId : betId+"",
       parentId : parentId,
       gameId : gameId+"",
+      gameType : (+gameId) - (+gameId)%10000 || 100000,
       betTime : new Date(betTime).getTime(),
       record
     })
   }
+  console.log(batchSaveArr);
   let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
   if(batchSaveErr) {
     return callback(null, ReHandler.fail(batchSaveErr));
@@ -976,6 +978,9 @@ async function getPlayerGameRecord(event, context, callback) {
   let white = validateIp(event, merchantInfo);
   if(!white) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  }
+  if(merchantInfo.suffix && userName) {
+    userName = merchantInfo.suffix+"_"+ userName;
   }
   let gameRecordModel = new GameRecordModel();
   let [pageErr, page] = await gameRecordModel.page(pageSize, parentId, userName, gameId, startTime, endTime, lastTime);

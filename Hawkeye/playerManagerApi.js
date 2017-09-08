@@ -63,9 +63,9 @@ const playerList = async (event,  context, cb) => {
         return ResFail(cb, new CHeraErr(CODES.palyerListErr));
     }
     let returnArr = playerList.map((item) => {
-        let name =item.userName;
+        let name = item.userName.split("_")[1] || item.userName;
         if(parentInfo.suffix) {
-            name = `【${parentInfo.suffix}】` + item.userName.split("_")[1];
+            name = `【${parentInfo.suffix}】` + name;
         }
         return {
             userId: item.userId,
