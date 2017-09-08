@@ -23,23 +23,45 @@ export const Store$ = async (action, params) => {
   }
 }
 
-// table names
+// 所有数据库表
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformBill = 'ZeusPlatformBill'
-const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'
 const ZeusPlatformCode = 'ZeusPlatformCode'
 
+const DianaPlatformGame = 'DianaPlatformGame'
+const DianaPlatformCompany = 'DianaPlatformCompany'
+const DianaPlatformTool = 'DianaPlatformTool'
+const DianaPlatformPackage = 'DianaPlatformPackage'
+const DianaPlatformSeat = 'DianaPlatformSeat'
+
+const HulkPlatformAd = 'HulkPlatformAd'
+const HeraGamePlayer = 'HeraGamePlayer'
+const PushErrorModel = 'PushErrorModel'
+
+const SYSConfig = 'SYSConfig'
+
 export const Tables = {
   ZeusPlatformUser,
   ZeusPlatformBill,
-  ZeusPlatformGame,
   ZeusPlatformMSN,
   ZeusPlatformCaptcha,
   ZeusPlatformLog,
-  ZeusPlatformCode
+  ZeusPlatformCode,
+
+  DianaPlatformGame,
+  DianaPlatformCompany,
+  DianaPlatformTool,
+  DianaPlatformPackage,
+  DianaPlatformSeat,
+
+  HulkPlatformAd,
+  HeraGamePlayer,
+  PushErrorModel,
+
+  SYSConfig
 }
 
 export const Model = {

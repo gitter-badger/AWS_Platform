@@ -37,6 +37,10 @@ const DianaPlatformTool = 'DianaPlatformTool'
 const DianaPlatformPackage = 'DianaPlatformPackage'
 const DianaPlatformSeat = 'DianaPlatformSeat'
 
+const HulkPlatformAd = 'HulkPlatformAd'
+const HeraGamePlayer = 'HeraGamePlayer'
+const PushErrorModel = 'PushErrorModel'
+
 const SYSConfig = 'SYSConfig'
 
 export const Tables = {
@@ -52,6 +56,11 @@ export const Tables = {
   DianaPlatformTool,
   DianaPlatformPackage,
   DianaPlatformSeat,
+
+  HulkPlatformAd,
+  HeraGamePlayer,
+  PushErrorModel,
+
   SYSConfig
 }
 
