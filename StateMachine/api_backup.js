@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
 
 let DynamoBackup = require('dynamo-backup-to-s3')
 

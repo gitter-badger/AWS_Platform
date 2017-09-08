@@ -1,4 +1,4 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { LogModel } from './model/LogModel'
 import { CompanyModel } from './model/CompanyModel'
 
@@ -9,7 +9,6 @@ import { CompanyCheck } from './biz/CompanyCheck'
  */
 const companyNew = async (e, c, cb) => {
   try {
-    const res = { m: 'companyNew' }
     const [jsonParseErr, companyInfo] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new CompanyCheck().checkCompany(companyInfo)
@@ -24,8 +23,8 @@ const companyNew = async (e, c, cb) => {
     companyInfo.operateToken = token
     new LogModel().addOperate(companyInfo, addCompanyErr, addCompanyRet)
     // 结果返回
-    if (addCompanyErr) { return ResFail(cb, { ...res, err: addCompanyErr }, addCompanyErr.code) }
-    return ResOK(cb, { ...res, payload: addCompanyRet })
+    if (addCompanyErr) { return ResErr(cb, addCompanyErr) }
+    return ResOK(cb, { payload: addCompanyRet })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -36,7 +35,6 @@ const companyNew = async (e, c, cb) => {
  */
 const companyList = async (e, c, cb) => {
   try {
-    const res = { m: 'companyList' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
@@ -45,8 +43,8 @@ const companyList = async (e, c, cb) => {
     const [err, ret] = await new CompanyModel().listCompany(inparam)
 
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -58,7 +56,6 @@ const companyList = async (e, c, cb) => {
 const companyOne = async (e, c, cb) => {
   try {
     // 入参转换
-    const res = { m: 'companyOne' }
     const [paramsErr, companyParams] = Model.pathParams(e)
     if (paramsErr) {
       return ResErr(cb, jsonParseErr)
@@ -76,8 +73,8 @@ const companyOne = async (e, c, cb) => {
     const [err, ret] = await new CompanyModel().getOne(companyParams.companyName, companyParams.companyId)
 
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -89,7 +86,6 @@ const companyOne = async (e, c, cb) => {
 const companyChangeStatus = async (e, c, cb) => {
   try {
     // 数据输入，转换，校验
-    const res = { m: 'companyChangeStatus' }
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new CompanyCheck().checkStatus(inparam)
@@ -104,8 +100,8 @@ const companyChangeStatus = async (e, c, cb) => {
     inparam.operateToken = token
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
-    if (err) { return ResFail(cb, { ...res, err: err }, err.code) }
-    return ResOK(cb, { ...res, payload: ret })
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
