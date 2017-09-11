@@ -4,15 +4,35 @@
     },
     "requestContext": {
         "authorizer": {
+            "userId": "242b5dac-5b60-49bf-b1fa-c3f1c16006ad",
+            "role": "1",
+            "suffix": "Platform",
             "username": "Platform_NAtest",
             "parent": "00",
-            "role": "1",
-            "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
-            "suffix": "Platform"
+            "parentName": "SuperAdmin",
+            "parentRole": "00",
+            "displayName": "平台管理员",
+            "level": 0,
+            "subRole": "admin",
+            "subRolePermission": {
+                "merchant": true,
+                "player": true,
+                "game": true,
+                "person": true,
+                "operation": true,
+                "finance": true,
+                "risk": true,
+                "service": true,
+                "system": true
+            },
+            "iat": 1505099101
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
-    "body": {}
+    "body": {
+        "table": "SYSConfig",
+        "s3": "SYSConfig_2017-09-11_17:02:56"
+    }
 }
