@@ -217,6 +217,23 @@ export class AgentCheck {
 
         return [checkAttError, errorParams]
     }
+
+    /**
+     * 检查查询代理列表
+     * @param {*} inparam 
+     */
+    checkQueryList(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "parent", type: "S", min: 2, max: 36 }]
+            , inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+        
+        return [checkAttError, errorParams]
+    }
 }
 
 /**

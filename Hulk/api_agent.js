@@ -109,11 +109,12 @@ const agentList = async (e, c, cb) => {
     try {
         // 入参校验
         const [paramsErr, inparam] = Model.pathParams(e)
-        if (paramsErr) {
-            return ResErr(cb, paramsErr)
-        }
+        if (paramsErr) { return ResErr(cb, paramsErr) }
         // 获取令牌，只有代理有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
+        //检查参数是否合法
+        inparam.token = token
+        const [checkAttError, errorParams] = new AgentCheck().checkQueryList(inparam)
         // 业务操作
         const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Agent, inparam)
         if (err) { return ResErr(cb, err) }
