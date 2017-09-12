@@ -24,33 +24,33 @@ export class UserModel extends BaseModel {
     async listChildUsers(token, roleCode, inparam) {
         // 查询用户的所有可用代理
         let query = {
-            IndexName: 'RoleSuffixIndex',
-            KeyConditionExpression: '#role = :role',
-            FilterExpression: 'contains(#levelIndex,:levelIndex)',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#levelIndex': 'levelIndex'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Agent'],
-                ':levelIndex': token.userId
-            }
+            // IndexName: 'RoleSuffixIndex',
+            // KeyConditionExpression: '#role = :role',
+            // FilterExpression: 'contains(#levelIndex,:levelIndex)',
+            // ExpressionAttributeNames: {
+            //     '#role': 'role',
+            //     '#levelIndex': 'levelIndex'
+            // },
+            // ExpressionAttributeValues: {
+            //     ':role': RoleCodeEnum['Agent'],
+            //     ':levelIndex': token.userId
+            // }
         }
         // 代理管理员查询所有
-        if (Model.isAgentAdmin(token)) {
-            query = {
-                IndexName: 'RoleParentIndex',
-                KeyConditionExpression: '#role = :role',
-                FilterExpression: 'suffix <> :suffix',
-                ExpressionAttributeNames: {
-                    '#role': 'role',
-                },
-                ExpressionAttributeValues: {
-                    ':role': roleCode,
-                    ':suffix': 'Agent'
-                }
-            }
-        }
+        // if (Model.isAgentAdmin(token)) {
+        //     query = {
+        //         IndexName: 'RoleParentIndex',
+        //         KeyConditionExpression: '#role = :role',
+        //         FilterExpression: 'suffix <> :suffix',
+        //         ExpressionAttributeNames: {
+        //             '#role': 'role',
+        //         },
+        //         ExpressionAttributeValues: {
+        //             ':role': roleCode,
+        //             ':suffix': 'Agent'
+        //         }
+        //     }
+        // }
         // 查询用户直属代理
         if (inparam.parent && inparam.parent != '0' && inparam.parent != 'false') {
             query = {
@@ -78,7 +78,9 @@ export class UserModel extends BaseModel {
             return item
         })
         // 按照层级排序
-        const sortResult = _.sortBy(users, ['level'])
+        // const sortResult = _.sortBy(users, ['level'])
+        // 按照创建时间排序
+        const sortResult = _.sortBy(users, ['createdAt'])
         return [0, sortResult]
     }
 
