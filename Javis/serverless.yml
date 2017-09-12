@@ -1,4 +1,3 @@
-
 service: Javis
 plugins:
   - serverless-webpack
@@ -62,24 +61,24 @@ custom:
     #     minimum: 1
     #     maximum: 2
     #     usage: 0.75
-    # - table: ZeusPlatformCode
-    #   read:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: ZeusPlatformCaptcha
-    #   read:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
+    - table: ZeusPlatformCode
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
+    - table: ZeusPlatformCaptcha
+      read:
+        minimum: 1
+        maximum: 2
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
     - table: ZeusPlatformLog
       index:
         - LogRoleIndex
