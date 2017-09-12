@@ -53,6 +53,17 @@ functions:
             method: post
             cors: true
             authorizer: tokenAuth
+  restore: #恢复数据库
+    handler: api_backup.restore
+    environment:
+      ACCESS_KEY: ${self:custom.secrets.ACCESS_KEY}
+      SECRET_KEY: ${self:custom.secrets.SECRET_KEY}
+    events:
+        - http:
+            path: /restore
+            method: post
+            cors: true
+            authorizer: tokenAuth
 # stepFunctions:
 #   stateMachines:
 #     backup:
