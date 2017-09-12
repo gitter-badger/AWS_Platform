@@ -36,6 +36,7 @@ export class UserRecordModel extends athena.BaseModel {
         this.id = Util.uuid();
         this.userId = userId;
         this.createAt = Date.now();
+        this.createdAt = Date.now();
         this.depositAmount = depositAmount || 0; //转入金额
         this.checkOutBalance = checkOutBalance || 0;     //转出金额
         this.income = income || 0;    //收益

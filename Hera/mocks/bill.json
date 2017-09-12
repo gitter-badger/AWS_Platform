@@ -3,5 +3,5 @@
     "headers":{
         "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfZGF5MDEwIiwic3VmZml4IjoiQ1pTWSIsInVzZXJJZCI6MzIxODI0LCJpYXQiOjE1MDQ3NzI3NDd9.VaFHdVduLJasHMr8KOSbU7CDS8RgCNAj_zmqrhl1zFU"
     },
-    "body":{"userId":"773845","gameId":"40000","checkOutBalance":"28045","records":[{"amount":-25,"type":3}]}
+    "body":{"userId":"582770","gameId":"40000","checkOutBalance":10005,"records":[{"amount":-25,"type":3},{"amount":35,"type":4},{"amount":-25,"type":3},{"amount":20,"type":4},{"amount":-25,"type":3},{"amount":0,"type":4},{"amount":-25,"type":3},{"amount":0,"type":4},{"amount":-25,"type":3},{"amount":30,"type":4},{"amount":-25,"type":3},{"amount":70,"type":4}]}
 }

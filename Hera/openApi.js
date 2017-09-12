@@ -670,7 +670,8 @@ async function playerRecordValidate(event, context, callback){
 
   //获取商家
   let merchantId = userModel.buId;
-  let [meError, merchantModel] = await new MerchantModel().findById(merchantId);
+  let parentId = userModel.parent;
+  let [meError, merchantModel] = await new MerchantModel().findByUserId(parentId);
   if(meError) {
     return callback(null, ReHandler.fail(meError));
   }
