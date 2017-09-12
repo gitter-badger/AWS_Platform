@@ -44,6 +44,7 @@ export const CODES = {
     AgentBalanceIns : 14002, //代理点数不足
     nicknameAlreadyExist : 14003,  //昵称已存在
     mixError : 14004,//洗码比有误
+    gameKeyError : 15000, //游戏key错误
 }
 
 const errorMessage = {
@@ -84,7 +85,8 @@ const errorMessage = {
   "14001" : "你没有权限",
   "14002" : "你的点数不足",
   "14003" : "昵称已存在",
-  "14004" : "洗码比有误"
+  "14004" : "洗码比有误",
+  "15000" : "游戏key错误"
 }
 
 
