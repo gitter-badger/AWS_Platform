@@ -17,11 +17,11 @@ custom:
         - merchantIdIndex
       read:
         minimum: 1
-        maximum: 2
+        maximum: 10
         usage: 0.75
       write:
         minimum: 1
-        maximum: 2
+        maximum: 10
         usage: 0.75
     # - table: DianaPlatformGame
     #   index:
@@ -37,20 +37,20 @@ custom:
     #     minimum: 1
     #     maximum: 2
     #     usage: 0.75
-    # - table: ZeusPlatformBill
-    #   index:
-    #     - UserIdIndex
-    #     - UserIdIndexSec
-    #     - SnIndex
-    #     - ActionIndex
-    #   read:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
+    - table: ZeusPlatformBill
+      index:
+        - UserIdIndex
+        - UserIdIndexSec
+        - SnIndex
+        - ActionIndex
+      read:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
     # - table: ZeusPlatformMSN
     #   index:
     #     - UserIdIndex
@@ -85,11 +85,11 @@ custom:
         - LogRoleIndex
       read:
         minimum: 1
-        maximum: 2
+        maximum: 10
         usage: 0.75
       write:
         minimum: 1
-        maximum: 2
+        maximum: 10
         usage: 0.75
     # - table: DianaPlatformCompany
     #   read:
@@ -133,18 +133,18 @@ custom:
     #     minimum: 1
     #     maximum: 2
     #     usage: 0.75
-    # - table: HeraGamePlayerBill
-    #   index:
-    #     - userNameIndex
-    #     - userIdIndex
-    #   read:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: 1
-    #     maximum: 2
-    #     usage: 0.75
+    - table: HeraGamePlayerBill
+      index:
+        - userNameIndex
+        - userIdIndex
+      read:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
     # - table: HawkeyeGameNotice
     #   read:
     #     minimum: 1
