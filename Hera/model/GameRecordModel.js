@@ -91,10 +91,12 @@ export class GameRecordModel extends BaseModel{
             pageSize : pageSize,
             list : []
         }
+        console.log("count:"+count);
         opts.Limit = 1000;
         if(lastTime) {
             opts.ExpressionAttributeValues[":endTime"] = lastTime-1;
         }
+        console.log(opts);
         let [pageErr] = await this.findRecords(opts, page);
         if(pageErr){
             return [pageErr, page];

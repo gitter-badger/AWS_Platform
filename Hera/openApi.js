@@ -405,6 +405,12 @@ async function gamePlayerBalance(event, context, callback) {
     if(gameing) {
       return errorHandler(callback, new CHeraErr(CODES.gameingError) , logType, merchantInfo, event.pathParameters);
     }
+    //账号已冻结
+    if(user.state == State.forzen) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
+    //商户是否被锁定
+    if(merchantInfo.status == "0") {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantForzen)));
+    }
     let merchantObj = {
       ...baseModel,
       username : merchantInfo.username,
@@ -660,7 +666,7 @@ async function playerRecordValidate(event, context, callback){
   if((oriBalance + income).toFixed(2) != requestParams.checkOutBalance.toFixed(2)) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.playerRecordError.billNotMatchErr)));
   }
-  let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
+  let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1 
 
   //获取商家
   let merchantId = userModel.buId;
@@ -736,9 +742,11 @@ async function joinGame(event, context, callback){
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userId", type:"N"}
+      {name : "userId", type:"N"},
+      {name : "gameId", type:"S"}
   ], requestParams);
   let userId = +requestParams.userId;
+  let gameId = requestParams.gameId;
   //验证token
   let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
   if(err ||  !userInfo || !Object.is(+userId, +userInfo.userId)){
@@ -972,7 +980,9 @@ async function getPlayerGameRecord(event, context, callback) {
     return callback(null, ReHandler.fail(checkAttError));
   } 
   let {buId, apiKey,  pageSize, startTime, endTime, userName, lastTime, gameId} = requestParams;
-
+  if(endTime < lastTime) {
+    lastTime = endTime;
+  }
   //检查商户信息是否正确
   const merchant = new MerchantModel();
   const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);

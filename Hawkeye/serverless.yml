@@ -182,6 +182,20 @@ functions:
           path: /game/advert/list
           method: get
           cors: true
+  gameState:  #游戏状态更新
+    handler: gameApi.updateState
+    events:
+      - http:
+          path: /game/status
+          method: post
+          cors: true
+  gameQueue:  #游戏玩家排队
+    handler: gameApi.gameAwait
+    events:
+      - http:
+          path: /game/queue
+          method: post
+          cors: true
 resources:
   Resources:
     HawkeyePlayerEmailRecord: #玩家接收邮件记录
