@@ -110,7 +110,7 @@ export class UserModel extends BaseModel {
         if (!Model.isPlatformAdmin(inparam.token)) {
             topName = inparam.token.displayName
         }
-        organizeTree = { name: topName, children: organizeTree }
+        organizeTree = { id: '01', name: topName, children: organizeTree }
         if (inparam.type == 'admin' && Model.isPlatformAdmin(inparam.token)) {
             const directManagerNode = { name: '直属线路商', children: [] }
             const directMerchantNode = { name: '直属商户', children: [] }
