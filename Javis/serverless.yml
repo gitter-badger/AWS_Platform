@@ -137,6 +137,7 @@ custom:
       index:
         - userNameIndex
         - userIdIndex
+        - CreatedDateIndex
       read:
         minimum: 1
         maximum: 10
@@ -415,6 +416,9 @@ resources:
           -
             AttributeName: createdAt
             AttributeType: N
+          -
+            AttributeName: createdDate
+            AttributeType: S
         KeySchema:
           -
             AttributeName: sn
@@ -471,6 +475,17 @@ resources:
               -
                 AttributeName: action
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+              -
+                AttributeName: createdDate
+                KeyType: HASH
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
@@ -563,13 +578,28 @@ resources:
           -
             AttributeName: emid
             AttributeType: S
+          -
+            AttributeName: createdDate
+            AttributeType: S
         KeySchema:
           -
             AttributeName: emid
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-          WriteCapacityUnits: 1  
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+              -
+                AttributeName: createdDate
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
 
@@ -909,6 +939,9 @@ resources:
           -
             AttributeName: createAt
             AttributeType: N
+          -
+            AttributeName: createdDate
+            AttributeType: S
         KeySchema:
           -
             AttributeName: userName
@@ -944,7 +977,17 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-    
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+              -
+                AttributeName: createdDate
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
     HeraGameDiamondBill:  #钻石账单
       Type: AWS::DynamoDB::Table
@@ -956,6 +999,9 @@ resources:
             AttributeType: S
           -
             AttributeName: billId
+            AttributeType: S
+          -
+            AttributeName: createdDate
             AttributeType: S
         KeySchema:
           -
@@ -970,6 +1016,17 @@ resources:
             KeySchema:
               -
                 AttributeName: userName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+              -
+                AttributeName: createdDate
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
