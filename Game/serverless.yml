@@ -143,7 +143,7 @@ resources:
             AttributeType: N
           -
             AttributeName: createdDate
-            AttributeType: Ss
+            AttributeType: S
         KeySchema:
           -
             AttributeName: userName
