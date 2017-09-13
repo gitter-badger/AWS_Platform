@@ -37,7 +37,6 @@ import {Util} from "./lib/Util"
 const gamePlatform = "NA"
 
 function validateIp(event, merchant) {
-  return true;
   let loginWhiteStr = merchant.loginWhiteList;
   let whiteList = loginWhiteStr.split(";");
   whiteList.forEach(function(element) {
