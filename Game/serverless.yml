@@ -84,16 +84,16 @@ resources:
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
-              IndexName: CreatedDateIndex
-              KeySchema:
-          -
-            AttributeName: createdDate
-            KeyType: HASH
-              Projection:
-                ProjectionType: ALL
-              ProvisionedThroughput:
-                ReadCapacityUnits: 1
-                WriteCapacityUnits: 1
+            IndexName: CreatedDateIndex
+            KeySchema:
+            -
+              AttributeName: createdDate
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
     HeraGamePlayer:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -170,13 +170,13 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
           -
-              IndexName: CreatedDateIndex
-              KeySchema:
-                -
-                  AttributeName: createdDate
-                  KeyType: HASH
-              Projection:
-                ProjectionType: ALL
-              ProvisionedThroughput:
-                ReadCapacityUnits: 1
-                WriteCapacityUnits: 1
+            IndexName: CreatedDateIndex
+            KeySchema:
+              -
+                AttributeName: createdDate
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
