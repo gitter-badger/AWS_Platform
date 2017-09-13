@@ -25,7 +25,6 @@ export class UserModel extends athena.BaseModel {
         this.role = RoleCodeEnum.Player;
         this.state = state || State.normal;
         this.updateAt = Date.now();
-        this.createdAt = Date.now();
         this.createAt = Date.now();
         this.merchantName = merchantName || Model.StringValue;
         this.balance = balance || 0;

@@ -32,7 +32,7 @@ export const pushUserInfo =  (body, host, port, proId) => {
         client.on("error", function(err){
             setTimeout(function() {
                 pushUserInfo(body, host, port, proId);
-            }, 10*60*60*1000);
+            }, 10*60*1000);
             // reslove([BizErr.TcpErr(), 0]);
         })
     })
