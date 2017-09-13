@@ -1,0 +1,182 @@
+
+service: Game
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-autoscaling
+custom:
+  webpackIncludeModules: true
+  capacities: #数据库自动扩容
+    - table: HeraGameRecord
+      index:
+        - parentIdIndex
+        - CreatedDateIndex
+      read:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
+    - table: HeraGamePlayer
+      index:
+        - userIdIndex
+      read:
+        minimum: 1
+        maximum: 100
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 15
+        usage: 0.75
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  memorySize: 256
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
+functions:
+  tokenVerify:
+    handler: api.jwtverify
+    integration: lambda
+resources:
+  Resources:
+    HawkeyePlayerEmailRecord: #玩家接收邮件记录
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyePlayerEmailRecord
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: N
+          -
+            AttributeName: emid
+            AttributeType: S
+          -
+            AttributeName: createdDate
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+          -
+            AttributeName: emid
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+            -
+              AttributeName: createdDate
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    HeraGamePlayer:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGamePlayer
+        AttributeDefinitions:
+          -
+            AttributeName: userName
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: userName
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: userIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    HeraGameRecord:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGameRecord
+        AttributeDefinitions:
+          -
+            AttributeName: userName
+            AttributeType: S
+          -
+            AttributeName: betId
+            AttributeType: S
+          -
+            AttributeName: parentId
+            AttributeType: S
+          -
+            AttributeName: betTime
+            AttributeType: N
+          -
+            AttributeName: createdDate
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userName
+            KeyType: HASH
+          -
+            AttributeName: betId
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: parentIdIndex
+            KeySchema:
+              -
+                AttributeName: parentId
+                KeyType: HASH
+              -
+                AttributeName: betTime
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+              -
+                AttributeName: createdDate
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
