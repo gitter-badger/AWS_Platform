@@ -72,7 +72,7 @@ functions:
       SECRET_KEY: ${self:custom.secrets.SECRET_KEY}
     events:
         - http:
-            path: /backup
+            path: /incBackup
             method: post
             cors: true
             authorizer: tokenAuth
