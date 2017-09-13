@@ -82,7 +82,7 @@ custom:
     - table: ZeusPlatformLog
       index:
         - LogRoleIndex
-        - LogCreatedAtIndex
+        - CreatedAtIndex
       read:
         minimum: 1
         maximum: 10
@@ -520,7 +520,7 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
           -
-            IndexName: LogCreatedAtIndex
+            IndexName: CreatedAtIndex
             KeySchema:
               -
                 AttributeName: createdAt

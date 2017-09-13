@@ -1,5 +1,5 @@
 import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
-
+import { BaseModel } from './model/BaseModel'
 // let DynamoBackup = require('dynamo-backup-to-s3')
 // let DynamoRestore = require('dynamo-backup-to-s3').Restore
 
@@ -65,19 +65,27 @@ const restore = async (e, c, cb) => {
 /**
  * 增量备份数据表
  */
-const incrementBackup = async (e, c, cb) => {
+const incBackup = async (e, c, cb) => {
     try {
         // // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
         // // 开始备份
-        // const [backupErr, backupRet] = await doBackup()
-        // if (backupErr) { return ResErr(cb, backupErr) }
-
-        
-
-        return ResOK(cb, { payload: '备份完成' })
+        const begin = new Date(inparam.begin).getTime()
+        const end = new Date(inparam.end).getTime()
+        console.info(begin)
+        console.info(end)
+        const [err, ret] = await new BaseModel().query({
+            TableName: inparam.table,
+            IndexName: 'CreatedAtIndex',
+            KeyConditionExpression: '#createdAt > :begin AND #createdAt <= :end',
+            ExpressionAttributeValues: {
+                ':begin': begin,
+                ':end': end
+            }
+        })
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -154,5 +162,6 @@ const incrementBackup = async (e, c, cb) => {
 
 export {
     backup,
-    restore
+    restore,
+    incBackup
 }
