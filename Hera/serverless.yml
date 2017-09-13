@@ -301,6 +301,9 @@ resources:
               -
                 AttributeName: betTime
                 KeyType: RANGE
+              -
+                AttributeName: createdDate
+                AttributeType: S
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
