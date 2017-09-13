@@ -62,6 +62,27 @@ const restore = async (e, c, cb) => {
     }
 }
 
+/**
+ * 增量备份数据表
+ */
+const incrementBackup = async (e, c, cb) => {
+    try {
+        // // 入参转换和校验
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
+        // // 身份令牌
+        const [tokenErr, token] = await Model.currentToken(e)
+        // // 开始备份
+        // const [backupErr, backupRet] = await doBackup()
+        // if (backupErr) { return ResErr(cb, backupErr) }
+
+        
+
+        return ResOK(cb, { payload: '备份完成' })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
 // function doBackup() {
 //     return new Promise((reslove, reject) => {
 //         // 初始化备份对象
