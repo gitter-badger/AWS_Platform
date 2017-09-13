@@ -586,6 +586,8 @@ export async function createPlayer(event, context, cb) {
     let {suffix} = merchantInfo;
     //实际的用户名
     let userName = requestParams.userName;
+    delete requestParams.nickName;
+    delete requestParams.balance;
     console.log("merchantInfo");
     console.log(merchantInfo);
     let userModel = new UserModel({

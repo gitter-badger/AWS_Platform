@@ -183,6 +183,7 @@ async function gamePlayerRegister(event, context, callback) {
   userName = `${merchantInfo.suffix}_${userName}`;
   requestParams.userName = userName;
   let user = new UserModel(requestParams);
+  console.log(user);
   let [existError, flag] = await user.isExist(userName);
   if(existError){
     return errorHandler(callback, existError, "register", merchantInfo, requestParams);

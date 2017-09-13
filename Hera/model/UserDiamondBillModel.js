@@ -20,7 +20,6 @@ export class UserDiamondBillModel extends athena.BaseModel {
         this.msn = msn;
         this.originalDiamonds = 0;
         this.createAt = Date.now();
-        this.createdAt = Date.now();
         this.diamonds = +diamonds;
         this.toolId = toolId;
         this.emid = emid;

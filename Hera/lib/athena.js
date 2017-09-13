@@ -11,8 +11,14 @@ export class BaseModel{
     constructor(tableName){
         this.tableName = tableName;
         this.dbClient = dbClient;
+        this.createdDate = this.parseDay(new Date());
     }
-
+    parseDay(date){
+        return date.getFullYear()+"-"+ toNumber(date.getMonth()+1)+"-"+toNumber(date.getDate());
+        function toNumber(number) {
+            return number > 9 ? number+"" : "0"+number; 
+        }
+    }
     setProperties(){
         let item = {};
         for(let key in this){
@@ -24,6 +30,8 @@ export class BaseModel{
     }
     save(){
         let item = this.setProperties();
+        console.log("11111111111111111111");
+        console.log(item);
         return new Promise((reslove, reject) => {
             this.db$("put", {Item:item}).then((result) => {
                 return reslove([null, result]);
