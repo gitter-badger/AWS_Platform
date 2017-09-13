@@ -25,6 +25,7 @@ export class UserBillModel extends athena.BaseModel {
         this.originalAmount = originalAmount || 0;
         this.operator = operator;
         this.createAt = Date.now();
+        this.createdAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
         this.seatInfo = seatInfo;

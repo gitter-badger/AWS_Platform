@@ -19,6 +19,7 @@ export class GameRecordModel extends BaseModel{
         this.betId = betId;  //投注编号
         this.betTime = betTime;  //投注时间
         this.parentId = parentId; //上一级ID
+        this.createdAt = Date.now();
         this.record = record; //记录，包含所有的详情
     }
     async batchWrite(records) {
