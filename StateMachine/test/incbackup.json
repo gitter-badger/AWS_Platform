@@ -34,6 +34,6 @@
     "body": {
         "table": "ZeusPlatformLog",
         "date": "2017-09-13",
-        "bucket":"incbackup-prod-na"
+        "bucket":"backup-na-inc-prod"
     }
 }
