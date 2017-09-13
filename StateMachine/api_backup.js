@@ -6,7 +6,10 @@ import { BaseModel } from './model/BaseModel'
 const Backup = require('dynamodb-backup-restore').Backup
 const Restore = require('dynamodb-backup-restore').Restore
 const moment = require('moment')
-const S3Bucket = 'backup-na'
+// const S3Bucket = 'backup-na'
+// const S3BucketInc = 'incbackup-na'
+const S3Bucket = 'backup-prod-na'
+const S3BucketInc = 'incbackup-prod-na'
 const S3Region = 'ap-southeast-1'
 const DbRegion = 'ap-southeast-1'
 
@@ -81,7 +84,7 @@ const incBackup = async (e, c, cb) => {
             }
         })
         if (err) { return ResErr(cb, err) }
-        const [s3err, s3ret] = await S3Store$('incbackup-na', inparam.table + '_' + inparam.date, JSON.stringify(ret))
+        const [s3err, s3ret] = await S3Store$(S3BucketInc, inparam.table + '_' + inparam.date, JSON.stringify(ret))
         if (s3err) { return ResErr(cb, s3err) }
         return ResOK(cb, { payload: s3ret })
     } catch (error) {
