@@ -15,11 +15,11 @@ const DbRegion = 'ap-southeast-1'
  */
 const backup = async (e, c, cb) => {
     try {
-        // // 入参转换和校验
+        // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
-        // // 身份令牌
+        // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
-        // // 开始备份
+        // 开始备份
         // const [backupErr, backupRet] = await doBackup()
         // if (backupErr) { return ResErr(cb, backupErr) }
         let config = {
@@ -41,11 +41,11 @@ const backup = async (e, c, cb) => {
  */
 const restore = async (e, c, cb) => {
     try {
-        // // 入参转换和校验
+        // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
-        // // 身份令牌
+        // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
-        // // 开始备份
+        // 开始备份
         // const [backupErr, backupRet] = await doRestore()
         // if (backupErr) { return ResErr(cb, backupErr) }
         let config = {
@@ -67,24 +67,20 @@ const restore = async (e, c, cb) => {
  */
 const incBackup = async (e, c, cb) => {
     try {
-        // // 入参转换和校验
+        // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
-        // // 身份令牌
+        // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
-        // // 开始备份
-        const begin = new Date(inparam.begin).getTime()
-        const end = new Date(inparam.end).getTime()
-        console.info(begin)
-        console.info(end)
+        // 开始备份
         const [err, ret] = await new BaseModel().query({
             TableName: inparam.table,
-            IndexName: 'CreatedAtIndex',
-            KeyConditionExpression: '#createdAt > :begin AND #createdAt <= :end',
+            IndexName: 'CreatedDateIndex',
+            KeyConditionExpression: 'createdDate = :date',
             ExpressionAttributeValues: {
-                ':begin': begin,
-                ':end': end
+                ':date': inparam.date
             }
         })
+        if (err) { return ResErr(cb, err) }
         return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
