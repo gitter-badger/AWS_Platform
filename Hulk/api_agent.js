@@ -94,6 +94,9 @@ const agentOne = async (e, c, cb) => {
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         // 业务操作
         const [err, ret] = await new UserModel().getUser(params.id, RoleCodeEnum['Agent'])
+        const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(ret)
+        ret.balance = lastBill.lastBalance
+        ret.lastBill = lastBill
         // 结果返回
         if (err) { return ResErr(cb, err) }
         return ResOK(cb, { payload: ret })

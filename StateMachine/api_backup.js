@@ -1,5 +1,5 @@
 import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
-
+import { BaseModel } from './model/BaseModel'
 // let DynamoBackup = require('dynamo-backup-to-s3')
 // let DynamoRestore = require('dynamo-backup-to-s3').Restore
 
@@ -15,11 +15,11 @@ const DbRegion = 'ap-southeast-1'
  */
 const backup = async (e, c, cb) => {
     try {
-        // // 入参转换和校验
+        // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
-        // // 身份令牌
+        // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
-        // // 开始备份
+        // 开始备份
         // const [backupErr, backupRet] = await doBackup()
         // if (backupErr) { return ResErr(cb, backupErr) }
         let config = {
@@ -41,11 +41,11 @@ const backup = async (e, c, cb) => {
  */
 const restore = async (e, c, cb) => {
     try {
-        // // 入参转换和校验
+        // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
-        // // 身份令牌
+        // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
-        // // 开始备份
+        // 开始备份
         // const [backupErr, backupRet] = await doRestore()
         // if (backupErr) { return ResErr(cb, backupErr) }
         let config = {
@@ -57,6 +57,31 @@ const restore = async (e, c, cb) => {
         }
         await Restore(config)
         return ResOK(cb, { payload: '恢复完成' })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
+/**
+ * 增量备份数据表
+ */
+const incBackup = async (e, c, cb) => {
+    try {
+        // 入参转换和校验
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
+        // 身份令牌
+        const [tokenErr, token] = await Model.currentToken(e)
+        // 开始备份
+        const [err, ret] = await new BaseModel().query({
+            TableName: inparam.table,
+            IndexName: 'CreatedDateIndex',
+            KeyConditionExpression: 'createdDate = :date',
+            ExpressionAttributeValues: {
+                ':date': inparam.date
+            }
+        })
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -133,5 +158,6 @@ const restore = async (e, c, cb) => {
 
 export {
     backup,
-    restore
+    restore,
+    incBackup
 }
