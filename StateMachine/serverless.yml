@@ -65,6 +65,7 @@ functions:
             cors: true
             authorizer: tokenAuth
   incBackup: #增量备份数据库
+    memorySize: 1536
     handler: api_backup.incBackup
     environment:
       ACCESS_KEY: ${self:custom.secrets.ACCESS_KEY}

@@ -1,4 +1,4 @@
-import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, S3Store$ } from './lib/all'
 import { BaseModel } from './model/BaseModel'
 // let DynamoBackup = require('dynamo-backup-to-s3')
 // let DynamoRestore = require('dynamo-backup-to-s3').Restore
@@ -81,7 +81,9 @@ const incBackup = async (e, c, cb) => {
             }
         })
         if (err) { return ResErr(cb, err) }
-        return ResOK(cb, { payload: ret })
+        const [s3err, s3ret] = await S3Store$('incbackup-na', inparam.table + '_' + inparam.date, JSON.stringify(ret))
+        if (s3err) { return ResErr(cb, s3err) }
+        return ResOK(cb, { payload: s3ret })
     } catch (error) {
         return ResErr(cb, error)
     }

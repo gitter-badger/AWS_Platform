@@ -8,6 +8,7 @@ custom:
     - table: HeraGameRecord
       index:
         - parentIdIndex
+        - CreatedDateIndex
       read:
         minimum: 1
         maximum: 10
@@ -304,5 +305,15 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 1
-         
               WriteCapacityUnits: 1
+          -
+              IndexName: CreatedDateIndex
+              KeySchema:
+                -
+                  AttributeName: createdDate
+                  KeyType: HASH
+              Projection:
+                ProjectionType: ALL
+              ProvisionedThroughput:
+                ReadCapacityUnits: 1
+                WriteCapacityUnits: 1

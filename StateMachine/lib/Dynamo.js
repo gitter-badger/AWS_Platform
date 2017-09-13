@@ -9,6 +9,24 @@ const uid = require('uuid/v4')
 AWS.config.update({ region: 'ap-southeast-1' })
 AWS.config.setPromisesDependency(require('bluebird'))
 
+// 存储对象数据到S3
+export const S3Store$ = (bucket, key, data) => {
+  return new Promise((reslove, reject) => {
+    new AWS.S3().putObject({
+      Bucket: bucket,
+      Key: key,
+      Body: data
+    }, function (err, data) {
+      if (err) {
+        console.info(err)
+        return reslove([err, false])
+      } else {
+        return reslove([false, data])
+      }
+    })
+  })
+}
+
 // 数据库封装
 const dbClient = new AWS.DynamoDB.DocumentClient()
 const db$ = (action, params) => {
