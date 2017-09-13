@@ -1,0 +1,16 @@
+{
+    "requestContext" : {
+        "authorizer" : [0,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRHWDAyX1RneDAwMiIsInBhc3N3b3JkIjoiVGd4MDAyIiwic3VmZml4IjoiVEdYMDIiLCJwYXJlbnQiOiI5NDQ1MzE2Ni02ZmFmLTQzMmMtOTFlNy0zYzZkNWVmMmI1MzYiLCJwYXJlbnROYW1lIjoiVEdYMV9UR1h0ZXN0MSIsInVzZXJJZCI6ImRhYzRlM2UyLTYwN2QtNDgxNy1iOGY5LTExNmEwZjk0NjRmNyIsInJvbGUiOiIxMCIsImRpc3BsYXlOYW1lIjoiVEdYMDIiLCJ1cGRhdGVkQXQiOjE1MDI2OTk2NDI2NzEsImRpc3BsYXlJZCI6ODI4NTA2LCJpYXQiOjE1MDI2OTk2MTJ9.kp_5IUJs0otcc8dfD4Tsb3R10OZY1MmbsRFJjoEvyRk"]
+    },
+    "body" : {
+        "noid" : "451cf277-e927-420b-bdc5-eadd472c9843",
+        "content" : "这是更改后的公告",
+        "msn" : "752609",
+        "kindId" : "-1",
+        "showTime" : 60,
+        "startTime" : 1,
+        "endTime" :3600000,
+        "splitTime" : 36,
+        "count" :123
+    }
+}
