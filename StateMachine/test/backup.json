@@ -33,6 +33,7 @@
     },
     "body": {
         "table": "SYSConfig",
-        "s3": "SYSConfig_2017-09-11_17:02:56"
+        "s3": "SYSConfig_2017-09-11_17:02:56",
+        "bucket": "backup-prod-na"
     }
 }
