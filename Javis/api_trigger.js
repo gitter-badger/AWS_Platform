@@ -3,6 +3,8 @@ import { Success, Fail, Codes, Tables, JwtVerify, JSONParser,RoleCodeEnum } from
 
 import {PlatformUserModel} from "./model/PlatformUserModel"
 
+import {PlatformBillModel} from "./model/PlatformBillModel"
+
 import {PushModel} from "./model/PushModel"
 
 
@@ -13,7 +15,11 @@ import {MSNModel} from "./model/MSNModel"
 
 import {UserBillModel} from "./model/UserBillModel"
 
+import {BillStatModel} from "./model/BillStatModel"
+
 import {PlayerModel} from "./model/PlayerModel"
+
+import {TimeUtil}  from "./lib/TimeUtil"
 
 import {TcpUtil} from "./lib/TcpUtil"
 
@@ -72,7 +78,8 @@ const playerBalanceTrigger = async(e, c , cb) => {
     let record = e.Records[0].dynamodb.Keys;
     console.log(record);
     let userName = record.userName.S;
-    console.log("userName: "+ userName);
+    let createAt = +record.createAt.N;
+    playerBillStat(userName, createAt);
     let playerModel = new PlayerModel();
     let [playErr, playerInfo] = await playerModel.get({userName});
     if(playErr) {
@@ -82,7 +89,6 @@ const playerBalanceTrigger = async(e, c , cb) => {
     if(!playerInfo) {
         return;
     }
-    console.log(playerInfo);
     let userId = playerInfo.userId;
     let pushModel = new PushModel();
     let [er] = await pushModel.pushUserBalance(userId);
@@ -91,6 +97,57 @@ const playerBalanceTrigger = async(e, c , cb) => {
         console.info(er);
     }else {
         console.info("玩家余额变更推送成功");
+    }
+}
+const saveStatRecord = async(userId, role,amount, obj) => {
+    //天统计
+    let todayStr = TimeUtil.formatDay(new Date());
+
+    //获取当天的
+    let [getDayErr, dayStat] = await new BillStatModel().get({userId:userId, dateStr : todayStr});
+    if(getDayErr) {
+        return console.log(getDayErr);
+    }
+    dayStat = dayStat || {amount : 0}
+    let oriAmount = dayStat.amount || 0;
+    let billStatModel = new BillStatModel({
+        userId : userId,
+        role : role,
+        amount : oriAmount+ amount,
+        dateStr : todayStr,
+        ...obj
+    });
+    let [daySaveErr] = await billStatModel.save();
+    if(daySaveErr) {
+        return console.log(daySaveErr);
+    }
+    //获取当月的
+    let monthStr = TimeUtil.formatMonth(new Date());
+    let [getMonthErr, monthStat] = await new BillStatModel().get({userId:userId, dateStr : monthStr});
+    if(getMonthErr) {
+        return console.log(getMonthErr);
+    }
+    monthStat = monthStat || {amount:0};
+    billStatModel.dateStr = monthStr;
+    billStatModel.amount = monthStat.amount + amount;
+    let [monthSaveErr] = await billStatModel.save();
+    if(monthSaveErr) {
+        return console.log(monthSaveErr);
+    }
+}
+const playerBillStat = async(userName, createAt) => {
+    let [infoErr, billInfo] = await new UserBillModel().get({userName, createAt});
+    if(infoErr) {
+        return console.log(infoErr)
+    }
+    if(!billInfo) {
+        console.log("没有找到账单信息");
+        return;
+    }
+    if(billInfo.type == 3 || billInfo.type == 4) {
+        saveStatRecord(billInfo.userId+"", "10000", billInfo.amount,{
+            gameType : billInfo.gameType
+        });
     }
 }
 /**
@@ -144,10 +201,79 @@ const gameAdvert = async(e, c, cb) => {
     }
 }
 
+/**
+ * 用户账单
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const userBillTrigger = async(e, c, cb) => {
+    console.log(e);
+    let record = e.Records[0].dynamodb.Keys;
+    let sn = record.sn.S;
+    let userId = record.userId.S;
+    let platformBillModel = new PlatformBillModel();
+    let [getErr, billInfo] = await platformBillModel.get({userId:userId, sn:sn});
+    console.log(getErr);
+    console.log(billInfo);
+    if(getErr) {
+        console.log(getErr);
+        return;
+    }
+    if(!billInfo) {
+        console.log("账单不存在");
+        return;
+    }
+    let amount = billInfo.amount;
+    let [userErr, userInfo] = await new PlatformUserModel().findByUserId(userId);
+    if(userErr) {
+        console.log(userErr);
+        return;
+    }
+    if(!userInfo) {
+        console.log("用户不存在");
+        return;
+    }
+    //天统计
+    let todayStr = TimeUtil.formatDay(new Date());
+
+    //获取当天的
+    let [getDayErr, dayStat] = await new BillStatModel().get({userId:userId, dateStr : todayStr});
+    if(getDayErr) {
+        return console.log(getDayErr);
+    }
+    dayStat = dayStat || {amount : 0}
+    let oriAmount = dayStat.amount || 0;
+    let billStatModel = new BillStatModel({
+        userId : billInfo.userId,
+        role : userInfo.role,
+        amount : oriAmount+ amount,
+        dateStr : todayStr
+    });
+    let [daySaveErr] = await billStatModel.save();
+    if(daySaveErr) {
+        return console.log(daySaveErr);
+    }
+    //获取当月的
+    let monthStr = TimeUtil.formatMonth(new Date());
+    let [getMonthErr, monthStat] = await new BillStatModel().get({userId:userId, dateStr : monthStr});
+    if(getMonthErr) {
+        return console.log(getMonthErr);
+    }
+    monthStat = monthStat || {amount:0};
+    billStatModel.dateStr = monthStr;
+    billStatModel.amount = monthStat.amount + amount;
+    let [monthSaveErr] = await billStatModel.save();
+    if(monthSaveErr) {
+        return console.log(monthSaveErr);
+    }
+}
+
 export {
     userTrigger,                     // 用户表触发器
     playerBalanceTrigger,
     gameNotice,
     gameEmail,
-    gameAdvert //广告
+    gameAdvert, //广告
+    userBillTrigger //用户账单
 }

@@ -57,7 +57,10 @@ const TimeUtil = {
         return d.setEnd();
     },
     formatDay(date){
-        return this.toNumberTwo(date.getMonth()+1) + "-"+ this.toNumberTwo(date.getDate());
+        return date.getFullYear()+"-"+this.toNumberTwo(date.getMonth()+1) + "-"+ this.toNumberTwo(date.getDate());
+    },
+    formatMonth(date){
+        return date.getFullYear()+"-"+this.toNumberTwo(date.getMonth()+1);
     },
     toNumberTwo(number){
         return number > 9 ? number+"" : "0"+number

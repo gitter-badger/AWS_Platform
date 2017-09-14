@@ -33,6 +33,31 @@ export class PlatformUserModel extends athena.BaseModel {
             })
         })
     }
+    //商户数量
+    merchantCount(startTime){
+        let opts = {
+            TableName : this.tableName,
+            FilterExpression : "#role=:role",
+            ExpressionAttributeNames :{
+                "#role" : "role"
+            },
+            ExpressionAttributeValues : {
+                ":role" : RoleCodeEnum.Merchant
+            }
+        }
+        if(startTime) {
+            opts.FilterExpression += " and createdAt> :createdAt";
+            opts.ExpressionAttributeValues[":createdAt"] = startTime
+        }
+        return new Promise((reslove, reject) => {
+            this.db$("scan", opts, ["msn"]).then((result) => {
+                return reslove([null,  result.Items.length]);
+            }).catch((err) => {
+                console.log(err);
+                return reslove([err, 0]);
+            })
+        })
+    }
     findByUids(uids){
         let filterExpression = "",
             expressionAttributeValues = {};

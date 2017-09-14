@@ -11,11 +11,7 @@ const responseTemplate = (statusCode, body, code, headers = {}) => {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': true
   }
-  const content = {
-    ...body,
-    code: code
-  }
-  return { statusCode, headers, body: JSON.stringify(content) }
+  return {statusCode, headers, body: JSON.stringify(body)}
 }
 // 返回工具类
 export const Success = (body, code = Codes.OK, headers = {}) => {

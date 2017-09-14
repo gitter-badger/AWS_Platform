@@ -264,6 +264,15 @@ functions:
               Fn::GetAtt:
                 - HeraGamePlayerBill
                 - StreamArn
+  userBillTrigger: #用户账单表触发器
+      handler: api_trigger.userBillTrigger
+      events:
+        - stream:
+            type: dynamodb
+            arn:
+              Fn::GetAtt:
+                - ZeusPlatformBill
+                - StreamArn
   gameNotice: #游戏公告触发器
       handler: api_trigger.gameNotice
       events:
@@ -479,7 +488,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
     ZeusPlatformLog: #日志表
       Type: AWS::DynamoDB::Table
       Properties:

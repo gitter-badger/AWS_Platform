@@ -9,8 +9,8 @@
             "ApproximateCreationDateTime": 1502074740,
             "Keys" : 
                 {
-                    "createAt": { "N": 1505276798169 },
-                    "userName": { "S": "ZCSH02_day001" } 
+                    "userId": { "S": "11e59e7f-14f7-4928-bb34-0ceff3f53a63" },
+                    "sn": { "S": "289b3c8d-5abe-4283-972a-afb060d16ab6" }
                 }
         }
     }
