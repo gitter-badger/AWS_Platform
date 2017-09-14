@@ -178,29 +178,29 @@ export class UserModel extends BaseModel {
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]
         // 对于代理管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-        if (suffix == 'Agent') {
-            [err, ret] = await this.queryUserBySuffix(role, suffix, username)
-        } else {
-            // 对于其他用户，角色和前缀具有联合唯一性
-            [err, ret] = await this.query({
-                TableName: Tables.ZeusPlatformUser,
-                IndexName: 'RoleSuffixIndex',
-                KeyConditionExpression: '#suffix = :suffix and #role = :role',
-                ExpressionAttributeNames: {
-                    '#role': 'role',
-                    '#suffix': 'suffix'
-                },
-                ExpressionAttributeValues: {
-                    ':suffix': suffix,
-                    ':role': role
-                }
-            })
-        }
-        if (err) {
-            return [err, 0]
-        }
+        // if (suffix == 'Agent') {
+        //     [err, ret] = await this.queryUserBySuffix(role, suffix, username)
+        // } else {
+        //     // 对于其他用户，角色和前缀具有联合唯一性
+        //     [err, ret] = await this.query({
+        //         TableName: Tables.ZeusPlatformUser,
+        //         IndexName: 'RoleSuffixIndex',
+        //         KeyConditionExpression: '#suffix = :suffix and #role = :role',
+        //         ExpressionAttributeNames: {
+        //             '#role': 'role',
+        //             '#suffix': 'suffix'
+        //         },
+        //         ExpressionAttributeValues: {
+        //             ':suffix': suffix,
+        //             ':role': role
+        //         }
+        //     })
+        // }
+        // if (err) {
+        //     return [err, 0]
+        // }
         // 还需要校验角色和用户名的唯一性
-        if (suffix != 'Agent' && ret.Items.length == 0) {
+        // if (suffix != 'Agent' && ret.Items.length == 0) {
             [err, ret] = await this.query({
                 TableName: Tables.ZeusPlatformUser,
                 IndexName: 'RoleUsernameIndex',
@@ -214,7 +214,7 @@ export class UserModel extends BaseModel {
                     ':role': role
                 }
             })
-        }
+        // }
         if (ret.Items.length > 0) {
             return [0, false]
         } else {
