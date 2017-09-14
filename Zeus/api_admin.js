@@ -137,6 +137,7 @@ const checkUserExist = async (e, c, cb) => {
     try {
         // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
+        inparam.suffix = inparam.suffix || Model.StringValue
         if (!inparam.role || !inparam.suffix || !inparam.username) {
             return ResErr(cb, BizErr.InparamErr())
         }
