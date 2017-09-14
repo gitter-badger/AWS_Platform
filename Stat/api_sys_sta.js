@@ -29,6 +29,7 @@ import {Model} from "./lib/Dynamo"
  * @param {*} callback 
  */
 const overview = async function(event, context, callback) {
+  console.log(event);
   const [tokenErr, token] = await Model.currentToken(event);
   if (tokenErr) {
       errorHandle(callback, ReHandler.fail(tokenErr));
@@ -44,6 +45,10 @@ const overview = async function(event, context, callback) {
   let [checkAttError, errorParams] = Util.checkProperties([
     {name : "type", type:"N"}  //售出情况   2，收益情况  3，玩家数量情况  4，签约情况
   ], requestParams);
+  if(checkAttError) {
+     Object.assign(checkAttError, {params: params});
+     return callback(null, ReHandler.fail(checkAttError));
+  }
   let {date, type} = requestParams;
   switch(type) {
       case 1 : {
@@ -104,6 +109,52 @@ const overview = async function(event, context, callback) {
       }
   }
 }
+/**
+ * 游戏消耗详情
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+const gameConsumeStat = async function(event, context, callback) {
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+      errorHandle(callback, ReHandler.fail(tokenErr));
+  }
+  //检查参数是否合法
+  let [checkAttError, errorParams] = Util.checkProperties([
+    {name : "startTime", type:"N"},
+    {name : "endTime", type:"N"},
+  ], requestParams);
+  if(checkAttError) {
+     Object.assign(checkAttError, {params: params});
+     return callback(null, ReHandler.fail(checkAttError));
+  }
+  let {startTime, endTime} = requestParams;
+  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime);
+  if(listErr) {
+    return callback(null, ReHandler.fail(listErr));
+  }
+  let sum = 0;
+  list.forEach((item) => sum+= item.amount);
+  let returnObj = {
+      sum : sum,
+      keys : [], 
+      vedio : [],  //真人
+      elec : [],    //电子
+      store : []   //商店
+  };
+  for(let i = startTime; i < endTime+24*60*60*1000-1; i+=24*60*60*1000) {
+    returnObj.keys.push(TimeUtil.formatDay(startTime));
+    returnObj.vedio.push(0);
+    returnObj.elec.push(0);
+    returnObj.store.push(0);
+  }
+  list.forEach((item) => {
+      let {dateStr, gameType} = item;
+      let index = returnObj.keys.indexOf(dateStr);
+  })
+}
+
 /**
  * 当日售出点数
  */
@@ -177,6 +228,7 @@ const errorHandle = (cb, error) =>{
     errObj.code = error.code;
     cb(null, ReHandler.fail(errObj));
 }
+
 
 export{
     overview //总看板

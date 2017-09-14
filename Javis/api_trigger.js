@@ -99,7 +99,8 @@ const playerBalanceTrigger = async(e, c , cb) => {
         console.info("玩家余额变更推送成功");
     }
 }
-const saveStatRecord = async(userId, role,amount, obj) => {
+const saveStatRecord = async(userId, role,amount, obj,isAllUser) => {
+    obj.createdAt = Date.now();
     //天统计
     let todayStr = TimeUtil.formatDay(new Date());
 
@@ -109,11 +110,11 @@ const saveStatRecord = async(userId, role,amount, obj) => {
         return console.log(getDayErr);
     }
     dayStat = dayStat || {amount : 0}
-    let oriAmount = dayStat.amount || 0;
     let billStatModel = new BillStatModel({
         userId : userId,
         role : role,
-        amount : oriAmount+ amount,
+        type : 1,
+        amount : dayStat.amount+ amount,
         dateStr : todayStr,
         ...obj
     });
@@ -121,6 +122,7 @@ const saveStatRecord = async(userId, role,amount, obj) => {
     if(daySaveErr) {
         return console.log(daySaveErr);
     }
+    
     //获取当月的
     let monthStr = TimeUtil.formatMonth(new Date());
     let [getMonthErr, monthStat] = await new BillStatModel().get({userId:userId, dateStr : monthStr});
@@ -128,12 +130,40 @@ const saveStatRecord = async(userId, role,amount, obj) => {
         return console.log(getMonthErr);
     }
     monthStat = monthStat || {amount:0};
-    billStatModel.dateStr = monthStr;
-    billStatModel.amount = monthStat.amount + amount;
+    billStatModel = new BillStatModel({
+        userId : userId,
+        role : role,
+        type :2,
+        amount : monthStat.amount + amount,
+        dateStr : monthStr,
+        ...obj
+    });
     let [monthSaveErr] = await billStatModel.save();
     if(monthSaveErr) {
         return console.log(monthSaveErr);
     }
+    if(isAllUser){
+        //所有用户当天的
+        let allUserId = "ALL_USER"
+        let [allUserErr, allUserStat] = await new BillStatModel().get({userId:allUserId, dateStr : todayStr});
+        if(getDayErr) {
+            return console.log(getDayErr);
+        }
+        allUserStat = allUserStat || {amount : 0}
+        billStatModel = new BillStatModel({
+            userId : allUserId,
+            role : role,
+            type : 3,
+            amount : dayStat.amount+ amount,
+            dateStr : todayStr,
+            ...obj
+        });
+        let [allUserSaveErr] = await billStatModel.save();
+        if(allUserSaveErr) {
+            return console.log(daySaveErr);
+        }
+    }
+    
 }
 const playerBillStat = async(userName, createAt) => {
     let [infoErr, billInfo] = await new UserBillModel().get({userName, createAt});
@@ -147,7 +177,7 @@ const playerBillStat = async(userName, createAt) => {
     if(billInfo.type == 3 || billInfo.type == 4) {
         saveStatRecord(billInfo.userId+"", "10000", billInfo.amount,{
             gameType : billInfo.gameType
-        });
+        }, true);
     }
 }
 /**
@@ -234,39 +264,7 @@ const userBillTrigger = async(e, c, cb) => {
         console.log("用户不存在");
         return;
     }
-    //天统计
-    let todayStr = TimeUtil.formatDay(new Date());
-
-    //获取当天的
-    let [getDayErr, dayStat] = await new BillStatModel().get({userId:userId, dateStr : todayStr});
-    if(getDayErr) {
-        return console.log(getDayErr);
-    }
-    dayStat = dayStat || {amount : 0}
-    let oriAmount = dayStat.amount || 0;
-    let billStatModel = new BillStatModel({
-        userId : billInfo.userId,
-        role : userInfo.role,
-        amount : oriAmount+ amount,
-        dateStr : todayStr
-    });
-    let [daySaveErr] = await billStatModel.save();
-    if(daySaveErr) {
-        return console.log(daySaveErr);
-    }
-    //获取当月的
-    let monthStr = TimeUtil.formatMonth(new Date());
-    let [getMonthErr, monthStat] = await new BillStatModel().get({userId:userId, dateStr : monthStr});
-    if(getMonthErr) {
-        return console.log(getMonthErr);
-    }
-    monthStat = monthStat || {amount:0};
-    billStatModel.dateStr = monthStr;
-    billStatModel.amount = monthStat.amount + amount;
-    let [monthSaveErr] = await billStatModel.save();
-    if(monthSaveErr) {
-        return console.log(monthSaveErr);
-    }
+    saveStatRecord(userId, userInfo.role, billInfo.amount, {});
 }
 
 export {

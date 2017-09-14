@@ -9,8 +9,8 @@
             "ApproximateCreationDateTime": 1502074740,
             "Keys" : 
                 {
-                    "userId": { "S": "11e59e7f-14f7-4928-bb34-0ceff3f53a63" },
-                    "sn": { "S": "289b3c8d-5abe-4283-972a-afb060d16ab6" }
+                    "userId": { "S": "526666d2-43cf-4cc2-a7d2-30943c453593" },
+                    "sn": { "S": "28cfbcf0-6418-4538-95b7-fbfce1d14623" }
                 }
         }
     }
