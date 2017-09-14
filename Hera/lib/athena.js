@@ -30,8 +30,6 @@ export class BaseModel{
     }
     save(){
         let item = this.setProperties();
-        console.log("11111111111111111111");
-        console.log(item);
         return new Promise((reslove, reject) => {
             this.db$("put", {Item:item}).then((result) => {
                 return reslove([null, result]);

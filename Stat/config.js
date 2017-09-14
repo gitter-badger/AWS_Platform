@@ -5,5 +5,6 @@ export const TABLE_NAMES = {
     TABLE_MERCHANT : "ZeusPlatformUser",
     TABLE_MSN : "ZeusPlatformMSN",
     GAME_TOOL : "DianaPlatformTool",
-    TABLE_PALYER_RECORD : "HeraGameRecord"
+    TABLE_PALYER_RECORD : "HeraGameRecord",
+    BILL_STAT : "BillStat"
 }

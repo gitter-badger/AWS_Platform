@@ -50,15 +50,16 @@ const TimeUtil = {
     },
     getDayFirstTime(date) {
         let d = new Date(date);
-        return d.setFirst();
+        return this.setFirst(d);
     },
     getDayEndTime(date) {
         let d = new Date(date);
         return d.setEnd();
     },
     formatDay(date){
-        return this.toNumberTwo(date.getMonth()+1) + "-"+ this.toNumberTwo(date.getDate());
+        return date.getFullYear()+this.toNumberTwo(date.getMonth()+1) + "-"+ this.toNumberTwo(date.getDate());
     },
+ 
     toNumberTwo(number){
         return number > 9 ? number+"" : "0"+number
     }

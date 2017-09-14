@@ -10,9 +10,17 @@ import {PlatformUserModel} from "./model/PlatformUserModel"
 
 import {PlatformBillModel} from "./model/PlatformBillModel"
 
+import {BillStatModel} from "./model/BillStatModel"
+
+import {PlayerModel} from "./model/PlayerModel"
+
 import {RoleCodeEnum} from "./lib/all";
 
 import {TimeUtil}  from "./lib/TimeUtil"
+
+import {onlineUser}  from "./lib/TcpUtil"
+
+import {Model} from "./lib/Dynamo"
 
 /**
  * 系统总看板
@@ -20,54 +28,142 @@ import {TimeUtil}  from "./lib/TimeUtil"
  * @param {*} context 
  * @param {*} callback 
  */
-const sumBoard = async function(event, context, callback) {
+const overview = async function(event, context, callback) {
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+      errorHandle(callback, ReHandler.fail(tokenErr));
+  }
+//   const [e, tokenInfo] = await JwtVerify(token[1])
+//   if(e) {
+//     return errorHandle(callback, ReHandler.fail(e));
+//   }
+  //json转换
+  let [parserErr, requestParams] = Util.parseJSON(event.body || {});
+  if(parserErr) return cb(null, ReHandler.fail(parserErr));
   //检查参数是否合法
-  let [checkAttError, errorParams] = athena.Util.checkProperties([
-    {name : "date", type:"N"},
-    {name : "type", type:"N"},  //1今日售出点数   2，代理已消耗点数  3，玩家总数  4，游戏下载次数
+  let [checkAttError, errorParams] = Util.checkProperties([
+    {name : "type", type:"N"}  //售出情况   2，收益情况  3，玩家数量情况  4，签约情况
   ], requestParams);
   let {date, type} = requestParams;
   switch(type) {
       case 1 : {
+        let date = TimeUtil.formatDay(new Date());
         //获取当天的售出点数
-        let [currErr, sum] = await soldPointsByDate(date);
+        console.log(1);
+        let [currErr, sumTodayPoints] = await salePointsByDate("1",date);
         if(currErr) {
-            errorHandle(callback, ReHandler.fail(checkAttError));
+            return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let preDate = new Date(date);
-        preDate.setDate(preDate.getDate()-7);
-        let [preErr, preSum] = await soldPointsByDate(preDate);
-        return callback(null, ReHandler.success({currSum: sum, preSum}));
+        console.log(2);
+        let [sumErr, sumPoints] = await saleSumPoints("1");
+        if(sumErr) {
+            return errorHandle(callback, ReHandler.fail(sumErr));
+        }
+        return callback(null, ReHandler.success({oneNum: sumTodayPoints, twoNum:sumPoints}));
       }
-      case 2 : {
-
+      case 2 : {  //收益情况
+        let date = TimeUtil.formatDay(new Date());
+        //获取当天的售出点数
+        console.log(1);
+        let [currErr, sumTodayPoints] = await salePointsByDate("10000",date);
+        if(currErr) {
+            return errorHandle(callback, ReHandler.fail(checkAttError));
+        }
+        console.log(2);
+        let [sumErr, sumPoints] = await saleSumPoints("10000");
+        if(sumErr) {
+            return errorHandle(callback, ReHandler.fail(sumErr));
+        }
+        return callback(null, ReHandler.success({oneNum: sumTodayPoints, twoNum:sumPoints}));
       }
       case 3 : {  //玩家总数
-        
+        let [sumErr, count] = await new PlayerModel().sumCount();
+        if(sumErr) {
+            return errorHandle(callback, ReHandler.fail(sumErr));
+        }
+        let [onLineErr, online] = await onlineUser();
+        if(onLineErr) {
+            return errorHandle(callback, ReHandler.fail(onLineErr));
+        }
+        return callback(null, ReHandler.success({oneNum: count, twoNum : online}));
       }
-      case 4 : {
-
+      case 4 : { //签约情况
+        let startTime = TimeUtil.getDayFirstTime(new Date());
+        let [todayErr, todayMerchantCount] = await new PlatformUserModel().merchantCount(startTime.getTime());
+        if(todayErr) {
+            return errorHandle(callback, ReHandler.fail(todayErr));
+        }
+        let [sumErr, sumCount] = await new PlatformUserModel().merchantCount();
+        if(sumErr) {
+            return errorHandle(callback, ReHandler.fail(sumErr));
+        }
+        return callback(null, ReHandler.success({oneNum: todayMerchantCount, twoNum:sumCount}));
       }
       default : {
-
+        return callback(null, ReHandler.success({oneNum: 0, twoNum:0}));
       }
   }
 }
 /**
- * 售出点数
+ * 当日售出点数
  */
-async function soldPointsByDate(date){
-    let billModel = new PlatformBillModel();
-    let d = new Date(date);
-    let firstTime = TimeUtil.getDayFirstTime(date);
-    let endTime = TimeUtil.getDayEndTime(date);
-    let [dayError, array] = billModel.statistics(null, firstTime, endTime);
-    if(dayError) {
-        return [dayError, 0]
+async function salePointsByDate(role, date){
+    let billStatModel = new BillStatModel();
+    let [billErr, array] = await billStatModel.get({role:role, dateStr:date},[],"roleDateIndex", true);
+    if(billErr) {
+        return [billErr, 0]
     }
     let sum = 0;
     array.forEach(function(element) {
-        sum -= element.amount;
+        sum += element.amount;
+    }, this);
+    return [null, sum];
+}
+
+/**
+ * 售出点数总和
+ */
+async function saleSumPoints(role){
+    let billStatModel = new BillStatModel();
+    let [billErr, array] = await billStatModel.get({role:role, type:2}, [] ,"roleTypeIndex", true);
+    if(billErr) {
+        return [billErr, 0]
+    }
+    let sum = 0;
+    array.forEach(function(element) {
+        sum += element.amount;
+    }, this);
+    return [null, sum];
+}
+
+/**
+ * 当日收益点数,指的是，玩家消费
+ */
+async function incomePointsByDate(role, date){
+    let billStatModel = new BillStatModel();
+    let [billErr, array] = await billStatModel.get({role:role, date:date},"" ,"roleDateIndex", true);
+    if(billErr) {
+        return [billErr, 0]
+    }
+    let sum = 0;
+    array.forEach(function(element) {
+        sum += element.amount;
+    }, this);
+    return [null, sum];
+}
+
+/**
+ * 收益点数总和
+ */
+async function incomeSumPoints(role){
+    let billStatModel = new BillStatModel();
+    let [billErr, array] = await billStatModel.get({role:role, type:2}, "" ,"roleTypeIndex", true);
+    if(billErr) {
+        return [billErr, 0]
+    }
+    let sum = 0;
+    array.forEach(function(element) {
+        sum += element.amount;
     }, this);
     return [null, sum];
 }
@@ -83,5 +179,5 @@ const errorHandle = (cb, error) =>{
 }
 
 export{
-    sumBoard //总看板
+    overview //总看板
 }

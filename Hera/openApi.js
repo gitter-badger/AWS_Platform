@@ -37,7 +37,6 @@ import {Util} from "./lib/Util"
 const gamePlatform = "NA"
 
 function validateIp(event, merchant) {
-  return true;
   let loginWhiteStr = merchant.loginWhiteList;
   let whiteList = loginWhiteStr.split(";");
   whiteList.forEach(function(element) {
@@ -183,7 +182,6 @@ async function gamePlayerRegister(event, context, callback) {
   userName = `${merchantInfo.suffix}_${userName}`;
   requestParams.userName = userName;
   let user = new UserModel(requestParams);
-  console.log(user);
   let [existError, flag] = await user.isExist(userName);
   if(existError){
     return errorHandler(callback, existError, "register", merchantInfo, requestParams);

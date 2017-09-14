@@ -33,6 +33,11 @@ export class PlatformUserModel extends athena.BaseModel {
             })
         })
     }
+    findByUserId(userId) {
+        return this.get({
+            userId
+        }, [], "UserIdIndex");
+    }
     findByUids(uids){
         let filterExpression = "",
             expressionAttributeValues = {};
