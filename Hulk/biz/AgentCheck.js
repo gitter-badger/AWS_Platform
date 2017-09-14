@@ -61,7 +61,7 @@ export class AgentCheck {
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
-            { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
@@ -88,9 +88,9 @@ export class AgentCheck {
             throw checkAttError
         }
 
-        if (inparam.suffix == 'Agent') {
-            throw { "code": -1, "msg": "该前缀已系统保留", "params": ["suffix"] }
-        }
+        // if (inparam.suffix == 'Agent') {
+        //     throw { "code": -1, "msg": "该前缀已系统保留", "params": ["suffix"] }
+        // }
         if ((!inparam.contractPeriod && inparam.contractPeriod != 0) || (inparam.isforever !== true && inparam.isforever !== false)) {
             throw { "code": -1, "msg": "有效期不能为空", "params": ["contractPeriod"] }
         }
@@ -101,6 +101,7 @@ export class AgentCheck {
         inparam.role = RoleCodeEnum.Agent
         inparam.vedioMix = parseFloat(inparam.vedioMix)
         inparam.liveMix = parseFloat(inparam.liveMix)
+        inparam.suffix = Model.StringValue
 
         return [checkAttError, errorParams]
     }
@@ -116,7 +117,7 @@ export class AgentCheck {
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
@@ -147,6 +148,7 @@ export class AgentCheck {
         inparam.role = RoleCodeEnum.Agent
         inparam.vedioMix = parseFloat(inparam.vedioMix)
         inparam.liveMix = parseFloat(inparam.liveMix)
+        inparam.suffix = Model.StringValue
 
         return [checkAttError, errorParams]
     }
