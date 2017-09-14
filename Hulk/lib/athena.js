@@ -255,8 +255,10 @@ export const RegEnum = {
     COMPANYCONTACTWAY: /^[0-9]{2,20}$/,
 
     DISPLAYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{2,10}$/,
-    USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{4,16}$/,
-    USERNAME_UPDATE: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}_[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,    
+    // USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{4,16}$/,
+    USERNAME: /^[A-Za-z0-9_\-.@]{4,16}$/,
+    // USERNAME_UPDATE: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}_[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    USERNAME_UPDATE: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}_[A-Za-z0-9_\-.@]{5,16}$/,    
     HOSTNAME: /^[\u4E00-\u9FA5A-Za-z]{2,16}$/,
 
     EMAIL: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
