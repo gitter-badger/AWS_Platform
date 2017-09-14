@@ -275,7 +275,9 @@ export class UserModel extends BaseModel {
         // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
         if (role === RoleCodeEnum['PlatformAdmin']) {
             [err, ret] = await this.queryUserBySuffix(role, suffix, username)
-        } else {
+        }
+        // 非代理
+        else if (role != RoleCodeEnum['Agent']) {
             // 对于其他用户，角色和前缀具有联合唯一性
             [err, ret] = await this.query({
                 TableName: Tables.ZeusPlatformUser,
@@ -291,9 +293,8 @@ export class UserModel extends BaseModel {
                 }
             })
         }
-
-        // 代理还需要校验角色和用户名的唯一性
-        if (role == RoleCodeEnum['Agent'] && suffix != 'Agent' && ret.Items.length == 0) {
+        // 代理需要校验角色和用户名的唯一性
+        if (role == RoleCodeEnum['Agent']) {
             [err, ret] = await this.query({
                 TableName: Tables.ZeusPlatformUser,
                 IndexName: 'RoleUsernameIndex',
