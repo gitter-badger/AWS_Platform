@@ -42,4 +42,22 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  gameConsumeStat: #游戏消耗
+    handler: api_sys_sta.gameConsumeStat
+    events:
+      -
+        http:
+          path: /statistics/consume
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  consumeAndIncome: #消耗与收益
+    handler: api_sys_sta.consumeAndIncome
+    events:
+      -
+        http:
+          path: /statistics/consumeAndIncome
+          method: post
+          cors: true
+          authorizer: tokenAuth
   

@@ -186,6 +186,9 @@ resources:
         TableName: BillStat
         AttributeDefinitions:
           -
+            AttributeName: sn
+            AttributeType: S
+          -
             AttributeName: userId
             AttributeType: S
           -
@@ -199,11 +202,8 @@ resources:
             AttributeType: N
         KeySchema:
           -
-            AttributeName: userId
+            AttributeName: sn
             KeyType: HASH
-          -
-            AttributeName: dateStr
-            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
@@ -230,6 +230,20 @@ resources:
                 KeyType: HASH
               -
                 AttributeName: type
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: userIdAndDate
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+              -
+                AttributeName: dateStr
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL

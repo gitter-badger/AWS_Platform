@@ -57,9 +57,11 @@ const TimeUtil = {
         return d.setEnd();
     },
     formatDay(date){
-        return date.getFullYear()+(date.getMonth()+1+"") + "-"+ date.getDate();
+        date.setHours(date.getHours()+8)
+        return date.getFullYear()+"-"+(date.getMonth()+1+"") + "-"+ date.getDate();
     },
     formatMonth(date){
+        date.setHours(date.getHours()+8)
         return date.getFullYear()+"-"+this.toNumberTwo(date.getMonth()+1);
     },
     toNumberTwo(number){
