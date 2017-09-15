@@ -8,11 +8,13 @@ const State = {
 }
 
 export class BillStatModel extends athena.BaseModel {
-    constructor({userId, dateStr, fromRole,amount,role,gameType} = {}) {
+    constructor({userId, dateStr, fromRole,amount,role,gameType, type,createdAt} = {}) {
         super(TABLE_NAMES.BILL_STAT);
+        this.createdAt = createdAt;
         this.userId = userId;
         this.dateStr = dateStr;
         this.role = role;
+        this.type = type;  //1，日统计，2，月统计,3,所有用户日统计
         this.amount = amount;
         this.gemeType = gameType;
     }

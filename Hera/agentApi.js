@@ -560,7 +560,7 @@ export async function createPlayer(event, context, cb) {
     if(checkAttError){
         Object.assign(checkAttError, {params: errorParams});
         return cb(null, ReHandler.fail(checkAttError));
-    } 
+    }
     //创建者信息
     let {userId,username, role} = tokenInfo;
     if(role != RoleCodeEnum.Agent) {
