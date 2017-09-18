@@ -1,11 +1,11 @@
 service: Javis
 plugins:
   - serverless-webpack
-  - serverless-secrets-plugin
+  # - serverless-secrets-plugin
   - serverless-dynamodb-autoscaling
 custom:
   webpackIncludeModules: true
-  secrets: ${file(secrets.${opt:stage, self:provider.stage}.yml)} #密钥文件
+  # secrets: ${file(secrets.${opt:stage, self:provider.stage}.yml)} #密钥文件
   capacities: #数据库自动扩容
     - table: ZeusPlatformUser
       index:
@@ -226,7 +226,7 @@ functions:
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
     environment:
-      TOKEN_SECRET: ${self:custom.secrets.TOKEN_SECRET}
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
     integration: lambda
   upToken: #七牛云上传TOKEN
     handler: api_qiniu.upToken
