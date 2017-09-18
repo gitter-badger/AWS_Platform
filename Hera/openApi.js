@@ -639,7 +639,7 @@ async function playerRecordValidate(event, context, callback){
       return callback(null, ReHandler.fail(gameError));
     }
     return callback(null, ReHandler.success({
-      data :{balance : b}
+      data :{balance : oriBalance}
     }));
   }
   //获取游戏

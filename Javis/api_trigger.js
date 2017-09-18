@@ -99,18 +99,21 @@ const playerBalanceTrigger = async(e, c , cb) => {
         console.info("玩家余额变更推送成功");
     }
 }
-const saveStatRecord = async(userId, role,amount, obj,isAllUser) => {
+const saveStatRecord = async(userId, role,amount, obj,allUserId) => {
+    console.log("账单金额："+amount);
     obj.createdAt = Date.now();
     //天统计
     let todayStr = TimeUtil.formatDay(new Date());
 
     //获取当天的
-    let [getDayErr, dayStat] = await new BillStatModel().get({userId:userId, dateStr : todayStr});
+    let [getDayErr, dayStat] = await new BillStatModel().get({userId:userId, dateStr : todayStr},[],"userIdAndDate");
     if(getDayErr) {
         return console.log(getDayErr);
     }
     dayStat = dayStat || {amount : 0}
     let billStatModel = new BillStatModel({
+        createdAt : dayStat.createdAt,
+        sn : dayStat.sn,
         userId : userId,
         role : role,
         type : 1,
@@ -125,12 +128,15 @@ const saveStatRecord = async(userId, role,amount, obj,isAllUser) => {
     
     //获取当月的
     let monthStr = TimeUtil.formatMonth(new Date());
-    let [getMonthErr, monthStat] = await new BillStatModel().get({userId:userId, dateStr : monthStr});
+    let [getMonthErr, monthStat] = await new BillStatModel().get({userId:userId, dateStr : monthStr},[],"userIdAndDate");
     if(getMonthErr) {
         return console.log(getMonthErr);
     }
     monthStat = monthStat || {amount:0};
+    
     billStatModel = new BillStatModel({
+        createdAt : monthStat.createdAt,
+        sn : monthStat.sn,
         userId : userId,
         role : role,
         type :2,
@@ -142,26 +148,27 @@ const saveStatRecord = async(userId, role,amount, obj,isAllUser) => {
     if(monthSaveErr) {
         return console.log(monthSaveErr);
     }
-    if(isAllUser){
-        //所有用户当天的
-        let allUserId = "ALL_USER"
-        let [allUserErr, allUserStat] = await new BillStatModel().get({userId:allUserId, dateStr : todayStr});
-        if(getDayErr) {
-            return console.log(getDayErr);
-        }
-        allUserStat = allUserStat || {amount : 0}
-        billStatModel = new BillStatModel({
-            userId : allUserId,
-            role : role,
-            type : 3,
-            amount : dayStat.amount+ amount,
-            dateStr : todayStr,
-            ...obj
-        });
-        let [allUserSaveErr] = await billStatModel.save();
-        if(allUserSaveErr) {
-            return console.log(daySaveErr);
-        }
+    //所有用户当天的
+    let [allUserErr, allUserStat] = await new BillStatModel().get({userId:allUserId, dateStr : todayStr},[],"userIdAndDate");
+    if(getDayErr) {
+        return console.log(getDayErr);
+    }
+    console.log("最初余额");
+    allUserStat = allUserStat || {amount : 0}
+    console.log(allUserStat.amount)
+    billStatModel = new BillStatModel({
+        createdAt : allUserStat.createdAt,
+        sn : allUserStat.sn,
+        userId : allUserId,
+        role : role,
+        type : 3,
+        amount : allUserStat.amount+ amount,
+        dateStr : todayStr
+    });
+    console.log(billStatModel);
+    let [allUserSaveErr] = await billStatModel.save();
+    if(allUserSaveErr) {
+        return console.log(daySaveErr);
     }
     
 }
@@ -175,9 +182,10 @@ const playerBillStat = async(userName, createAt) => {
         return;
     }
     if(billInfo.type == 3 || billInfo.type == 4) {
+        console.log("1111111111111");
         saveStatRecord(billInfo.userId+"", "10000", billInfo.amount,{
             gameType : billInfo.gameType
-        }, true);
+        }, "ALL_PLAYER");
     }
 }
 /**
@@ -264,7 +272,7 @@ const userBillTrigger = async(e, c, cb) => {
         console.log("用户不存在");
         return;
     }
-    saveStatRecord(userId, userInfo.role, billInfo.amount, {});
+    saveStatRecord(userId, userInfo.role, billInfo.amount, {}, "ALL_ADMIN");
 }
 
 export {

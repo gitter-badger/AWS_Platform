@@ -54,12 +54,10 @@ const overview = async function(event, context, callback) {
       case 1 : {
         let date = TimeUtil.formatDay(new Date());
         //获取当天的售出点数
-        console.log(1);
         let [currErr, sumTodayPoints] = await salePointsByDate("1",date);
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        console.log(2);
         let [sumErr, sumPoints] = await saleSumPoints("1");
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
@@ -68,13 +66,10 @@ const overview = async function(event, context, callback) {
       }
       case 2 : {  //收益情况
         let date = TimeUtil.formatDay(new Date());
-        //获取当天的售出点数
-        console.log(1);
         let [currErr, sumTodayPoints] = await salePointsByDate("10000",date);
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        console.log(2);
         let [sumErr, sumPoints] = await saleSumPoints("10000");
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
@@ -109,6 +104,7 @@ const overview = async function(event, context, callback) {
       }
   }
 }
+
 /**
  * 游戏消耗详情
  * @param {*} event 
@@ -120,6 +116,8 @@ const gameConsumeStat = async function(event, context, callback) {
   if (tokenErr) {
       errorHandle(callback, ReHandler.fail(tokenErr));
   }
+  let [parserErr, requestParams] = Util.parseJSON(event.body || {});
+  if(parserErr) return cb(null, ReHandler.fail(parserErr));
   //检查参数是否合法
   let [checkAttError, errorParams] = Util.checkProperties([
     {name : "startTime", type:"N"},
@@ -130,7 +128,7 @@ const gameConsumeStat = async function(event, context, callback) {
      return callback(null, ReHandler.fail(checkAttError));
   }
   let {startTime, endTime} = requestParams;
-  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime);
+  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1);
   if(listErr) {
     return callback(null, ReHandler.fail(listErr));
   }
@@ -143,24 +141,92 @@ const gameConsumeStat = async function(event, context, callback) {
       elec : [],    //电子
       store : []   //商店
   };
-  for(let i = startTime; i < endTime+24*60*60*1000-1; i+=24*60*60*1000) {
-    returnObj.keys.push(TimeUtil.formatDay(startTime));
+  for(let i = startTime; i <= endTime; i+=24*60*60*1000) {
+    returnObj.keys.push(TimeUtil.formatDay(i));
     returnObj.vedio.push(0);
     returnObj.elec.push(0);
     returnObj.store.push(0);
   }
   list.forEach((item) => {
-      let {dateStr, gameType} = item;
+      let {dateStr, gameType,amount} = item;
       let index = returnObj.keys.indexOf(dateStr);
+      if(gameType == "30000") { //真人视讯
+        returnObj.vedio[index] -= amount
+      }
+      if(gameType == "40000") { //电子游戏
+        
+        returnObj.elec[index] -= amount
+      }
+      if(gameType == "-1") { //商城买钻石
+        returnObj.store[index] -= amount
+      }
   })
+  callback(null, ReHandler.success({data:returnObj}));
 }
+
+/**总收益与总消耗
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+const consumeAndIncome = async function(event, context, callback) {
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+      errorHandle(callback, ReHandler.fail(tokenErr));
+  }
+  let [parserErr, requestParams] = Util.parseJSON(event.body || {});
+  if(parserErr) return cb(null, ReHandler.fail(parserErr));
+  //检查参数是否合法
+  let [checkAttError, errorParams] = Util.checkProperties([
+    {name : "startTime", type:"N"},
+    {name : "endTime", type:"N"},
+  ], requestParams);
+  if(checkAttError) {
+     Object.assign(checkAttError, {params: params});
+     return callback(null, ReHandler.fail(checkAttError));
+  }
+  let {startTime, endTime} = requestParams;
+
+  //游戏消耗
+  let [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "10000", 3, "ALL_PLAYER");
+  if(consumeErr) {
+      return callback(null, ReHandler.fail(consumeErr));
+  }
+  //售出点数
+  let [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "1", 3, "ALL_ADMIN");
+  if(saldeErr) {
+      return callback(null, ReHandler.fail(saldeErr));
+  }
+  let returnObj = {
+      keys : [], 
+      consume : [],  //收益
+      sale : [],    //售出
+  };
+  for(let i = startTime; i <= endTime; i+=24*60*60*1000) {
+    returnObj.keys.push(TimeUtil.formatDay(i));
+    returnObj.consume.push(0);
+    returnObj.sale.push(0);
+  }
+  consumeList.forEach((item) => {
+      let {dateStr,amount} = item;
+      let index = returnObj.keys.indexOf(dateStr);
+      returnObj.consume[index] -= amount;
+  })
+  saleList.forEach((item) => {
+      let {dateStr,amount} = item;
+      let index = returnObj.keys.indexOf(dateStr);
+      returnObj.sale[index] -= amount;
+  })
+  callback(null, ReHandler.success({data:returnObj}));
+}
+
 
 /**
  * 当日售出点数
  */
 async function salePointsByDate(role, date){
     let billStatModel = new BillStatModel();
-    let [billErr, array] = await billStatModel.get({role:role, dateStr:date},[],"roleDateIndex", true);
+    let [billErr, array] = await billStatModel.get({role:role, dateStr:date},[], "roleDateIndex", true);
     if(billErr) {
         return [billErr, 0]
     }
@@ -231,5 +297,7 @@ const errorHandle = (cb, error) =>{
 
 
 export{
-    overview //总看板
+    overview, //总看板
+    gameConsumeStat, //游戏消耗详情
+    consumeAndIncome
 }

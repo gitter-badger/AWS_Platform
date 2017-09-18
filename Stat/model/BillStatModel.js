@@ -2,10 +2,8 @@ let  athena  = require("../lib/athena");
 let {RoleCodeEnum} = require("../lib/all");
 import {TABLE_NAMES} from "../config";
 
-const State = {
-    normal : 1,  //正常,
-    forzen : 2 //冻结
-}
+import {Codes, CHeraErr} from "../lib/Codes"
+
 
 export class BillStatModel extends athena.BaseModel {
     constructor({userId, dateStr, fromRole,amount,role,gameType,type} = {}) {
@@ -15,40 +13,41 @@ export class BillStatModel extends athena.BaseModel {
         this.role = role;
         this.type = type;
         this.amount = amount;
-        this.gemeType = gameType;
+        this.gameType = gameType;
     }
-    findGameConsume(startTime, endTime){
+    findGameConsume(startTime, endTime, role, type, userId){
         let keyConditionExpression = "#type=:type and #role=:role";
-        let filterExpression = "#createdAt between :startTime and :endTime and #userId=:userId";
+        let filterExpression = "#createdAt between :startTime and :endTime ";
         let expressionAttributeNames = {
             "#type" : "type",
             "#role" : "role",
             "#createdAt" : "createdAt",
-            "#userId" : "userId"
         }
         let expressionAttributeValues = {
-            ":type" : 1,
-            ":role" : "10000",
+            ":type" : type,
+            ":role" : role,
             ":startTime" : startTime,
             ":endTime" : endTime,
-            ":userId" : "ALL_USER"
         };
+        if(userId) {
+            filterExpression += "and #userId=:userId";
+            expressionAttributeNames["#userId"] = "userId";
+            expressionAttributeValues[":userId"] = userId;
+        }
         return new Promise((reslove, reject) => {
             this.db$("query", {
                 IndexName : "roleTypeIndex",
                 KeyConditionExpression: keyConditionExpression,
                 FilterExpression : filterExpression,
                 ExpressionAttributeNames :expressionAttributeNames,
-                ExpressionAttributeValues: expressionAttributeValues,
-                IndexName: indexName,
-                ReturnValues: returnValues.join(",")
+                ExpressionAttributeValues: expressionAttributeValues
             }).then((result) => {
                 result = result || {};
                 result.Items = result.Items || [];
                 return reslove([null, result.Items]);
             }).catch((err) => {
                 console.log(err);
-                return reslove([new AError(CODES.DB_ERROR, err.stack), null]);
+                return reslove([new CHeraErr(Codes.DBError), null]);
             });
         })
     }
