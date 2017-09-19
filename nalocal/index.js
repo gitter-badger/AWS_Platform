@@ -2,10 +2,11 @@ const AWS = require('aws-sdk')
 const Backup = require('dynamodb-backup-restore').Backup
 const moment = require('moment')
 const schedule = require('node-schedule')
+const config = require('config')
 // 基础数据
 const region = 'ap-southeast-1'                 // 区域
-const stage = '-prod'                           // 阶段
-// const stage = ''
+// const stage = '-prod'                           // 阶段
+const stage = ''
 const FullBucket = 'backup-rotta-full' + stage  // 全备份桶
 const IncBucket = 'backup-rotta-inc' + stage    // 增量备份桶
 // 备份区域
@@ -23,9 +24,9 @@ const FullBackupTables = ['ZeusPlatformUser', 'ZeusPlatformMSN', 'ZeusPlatformCa
 const IncBackupTables = ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill',
     'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord']
 
-// 每天凌晨2点定时备份
-console.info('定时任务开始执行，凌晨2点定时备份...')
-schedule.scheduleJob('0 2 * * *', function () {
+// 每天定时备份
+console.info('定时任务开始执行...')
+schedule.scheduleJob(config.cron, function () {
     // 执行全备份
     backup(FullBucket)
     // 执行增量备份

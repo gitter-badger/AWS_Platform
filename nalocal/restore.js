@@ -2,9 +2,10 @@ const AWS = require('aws-sdk')
 const Restore = require('dynamodb-backup-restore').Restore
 const moment = require('moment')
 const _ = require('lodash')
+const prompt = require('prompt-sync')()
 // 基础数据
-const stage = '-prod'                           // 阶段
-// const stage = ''
+// const stage = '-prod'                           // 阶段
+const stage = ''
 const region = 'ap-southeast-1'                 // 区域
 const FullBucket = 'backup-rotta-full' + stage  // 全备份桶
 const IncBucket = 'backup-rotta-inc' + stage    // 增量备份桶
@@ -14,10 +15,33 @@ const DbRegion = region
 AWS.config.update({ region: region })
 AWS.config.setPromisesDependency(require('bluebird'))
 
-// 执行表恢复
-restore(FullBucket, 'SYSConfig_2017-09-14_12:30:06', 'SYSConfig')
-// 执行表增量恢复
-incRestore(IncBucket, 'ZeusPlatformLog_2017-09-14', 'ZeusPlatformLog')
+// 全备份数据库表
+const FullBackupTables = ['ZeusPlatformUser', 'ZeusPlatformMSN', 'ZeusPlatformCaptcha', 'ZeusPlatformCode',
+    'DianaPlatformGame', 'DianaPlatformCompany', 'DianaPlatformTool', 'DianaPlatformPackage',
+    'DianaPlatformSeat', 'HulkPlatformAd', 'HeraGamePlayer', 'SYSConfig',
+    'HawkeyeGameNotice']
+// 增量备份数据库表
+const IncBackupTables = ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill',
+    'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord']
+
+console.info('===========================================')
+console.info('NA平台DynamoDB数据库恢复程式，请根据提示操作')
+console.info('===========================================')
+
+let file = prompt('请输入S3恢复文件：')
+let table = prompt('请输入需要恢复的DynamoDB数据表：')
+if (!file || !table) {
+    console.error('恢复未执行，请输入必要参数!!!')
+} else {
+    // 判断是否是全备份
+    if (_.includes(FullBackupTables, table)) {
+        restore(FullBucket, file, table)
+    } else {
+        console.info('增量恢复' + file + table)
+        incRestore(IncBucket, file, table)
+    }
+}
+
 /**
  * 恢复数据表
  */
