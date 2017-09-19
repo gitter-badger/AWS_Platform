@@ -1,4 +1,3 @@
-
 service: Stat
 plugins:
   - serverless-webpack
