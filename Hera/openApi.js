@@ -367,10 +367,10 @@ async function gamePlayerBalance(event, context, callback) {
     if(merError) return callback(null, ReHandler.fail(merError));
     if(!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
     //验证白名单
-    let white = validateIp(event, merchantInfo);
-    if(!white) {
-      return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
-    }
+    // let white = validateIp(event, merchantInfo);
+    // if(!white) {
+    //   return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+    // }
     userName = `${merchantInfo.suffix}_${userName}`;
     requestParams.userName = userName;
     let baseModel = {

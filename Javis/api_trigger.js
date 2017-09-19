@@ -179,11 +179,19 @@ const playerBillStat = async(userName, createAt) => {
         console.log("没有找到账单信息");
         return;
     }
+    let [userErr, userInfo] = await new PlayerModel().get({userName:userName});
+    if(userErr) {
+        return console.log(infoErr)
+    }
+    if(!userInfo) {
+        console.log("没有找到用户信息信息");
+        return;
+    }
     if(billInfo.type == 3 || billInfo.type == 4) {
-        console.log("1111111111111");
+        let allUserId = userInfo.msn == "000" ? "ALL_AGENT_PLAYER" : "ALL_PLAYER";
         saveStatRecord(billInfo.userId+"", "10000", billInfo.amount,{
             gameType : billInfo.gameType
-        }, "ALL_PLAYER");
+        }, allUserId);
     }
 }
 /**

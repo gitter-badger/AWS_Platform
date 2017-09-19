@@ -34,7 +34,7 @@ export class UserModel extends athena.BaseModel {
         this.remark = remark || Model.StringValue;
         this.nickname = nickname || Model.StringValue;
         this.headPic = headPic || Model.StringValue;
-        this.gameState = gameState || GameState.allow;
+        this.gameState = gameState || GameState.offline;
         this.liveMix = liveMix || 0;
         this.vedioMix = vedioMix || 0;
         this.parent = parent;
