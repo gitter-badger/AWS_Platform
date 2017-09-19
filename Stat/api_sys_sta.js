@@ -18,7 +18,6 @@ import {RoleCodeEnum} from "./lib/all";
 
 import {TimeUtil}  from "./lib/TimeUtil"
 
-import {onlineUser}  from "./lib/TcpUtil"
 
 import {Model} from "./lib/Dynamo"
 
@@ -77,15 +76,21 @@ const overview = async function(event, context, callback) {
         return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
       }
       case 3 : {  //玩家总数
-        let [sumErr, count] = await new PlayerModel().sumCount();
-        if(sumErr) {
-            return errorHandle(callback, ReHandler.fail(sumErr));
+        // let [sumErr, count] = await new PlayerModel().sumCount();
+        // if(sumErr) {
+        //     return errorHandle(callback, ReHandler.fail(sumErr));
+        // }
+        // console.log("玩家总数:"+ count);
+        // let [onLineErr, online] = await new PlayerModel().online();
+        // if(onLineErr) {
+        //     return errorHandle(callback, ReHandler.fail(onLineErr));
+        // }
+        let [err, obj] = await new PlayerModel().statCount();
+        if(err) {
+            return errorHandle(callback, ReHandler.fail(err));
         }
-        let [onLineErr, online] = await onlineUser();
-        if(onLineErr) {
-            return errorHandle(callback, ReHandler.fail(onLineErr));
-        }
-        return callback(null, ReHandler.success({oneNum: online, twoNum : count, type:type}));
+        obj.type = type;
+        return callback(null, ReHandler.success(obj));
       }
       case 4 : { //签约情况
         let startTime = TimeUtil.getDayFirstTime(new Date());
@@ -137,6 +142,9 @@ const gameConsumeStat = async function(event, context, callback) {
   let returnObj = {
       sum : sum,
       keys : [], 
+      vedioSum : 0,
+      elecSum : 0,
+      storeSum : 0,
       vedio : [],  //真人
       elec : [],    //电子
       store : []   //商店
@@ -151,13 +159,15 @@ const gameConsumeStat = async function(event, context, callback) {
       let {dateStr, gameType,amount} = item;
       let index = returnObj.keys.indexOf(dateStr);
       if(gameType == "30000") { //真人视讯
+        returnObj.vedioSum -= amount;
         returnObj.vedio[index] -= amount
       }
       if(gameType == "40000") { //电子游戏
-        
+        returnObj.elecSum -= amount;
         returnObj.elec[index] -= amount
       }
       if(gameType == "-1") { //商城买钻石
+        returnObj.storeSum -= amount;
         returnObj.store[index] -= amount
       }
   })

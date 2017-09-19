@@ -17,7 +17,7 @@ export const GameState = {  //游戏状态
     gameing : 3  //游戏中
 }
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName, parent,  msn, sex, paymentState, nickname, headPic,remark} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName, parent,  msn, sex, gameState, nickname, headPic,remark} = {}) {
         super(Tables.HeraGamePlayer);
         this.userName = userName;
         this.userPwd = userPwd;
@@ -77,7 +77,7 @@ export class UserModel extends athena.BaseModel {
         this.userPwd = Util.sha256(this.userPwd);
     }
     updateGameState(userName, state){
-        return this.update({userName}, {payState: state})
+        return this.update({userName}, {gameState: state})
     }
     async save(len, num){
         len = len || 6;

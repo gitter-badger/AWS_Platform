@@ -34,7 +34,7 @@ export class UserModel extends athena.BaseModel {
         this.remark = remark || Model.StringValue;
         this.nickname = nickname || Model.StringValue;
         this.headPic = headPic || Model.StringValue;
-        this.gameState = gameState || GameState.allow;
+        this.gameState = gameState || GameState.offline;
         this.liveMix = liveMix || 0;
         this.vedioMix = vedioMix || 0;
         this.parent = parent;
@@ -82,7 +82,7 @@ export class UserModel extends athena.BaseModel {
         this.userPwd = Util.sha256(this.userPwd);
     }
     updateGameState(userName, state){
-        return this.update({userName}, {payState: state})
+        return this.update({userName}, {gameState: state})
     }
     async save(len, num){
         len = len || 6;

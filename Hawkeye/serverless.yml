@@ -197,3 +197,10 @@ functions:
           path: /game/queue
           method: post
           cors: true
+  playerOffline:  #玩家退出游戏
+    handler: gameApi.playerOffline
+    events:
+      - http:
+          path: /game/player/offline
+          method: post
+          cors: true
