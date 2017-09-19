@@ -1,4 +1,3 @@
-
 service: Thor
 plugins:
   - serverless-webpack

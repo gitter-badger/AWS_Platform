@@ -11,7 +11,7 @@ const uid = require('uuid/v4');
 
 require('uuid/v4')
 
-const TOKEN_SECRET = "f78jkf45k5k5_fxfjei11223kjljka77po";
+const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
 export class Util{
     static hashGen(pass){
