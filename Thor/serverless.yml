@@ -30,6 +30,8 @@ custom:
 functions:
   tokenAuth:
     handler: api.jwtverify
+    environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
     integration: lambda
   # ==================== 以下是道具管理接口服务 ====================
   toolNew: #创建道具
