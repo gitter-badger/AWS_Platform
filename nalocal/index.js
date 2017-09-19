@@ -1,37 +1,42 @@
 const AWS = require('aws-sdk')
 const Backup = require('dynamodb-backup-restore').Backup
 const moment = require('moment')
-
+const schedule = require('node-schedule')
 // 基础数据
-const stage = '-prod'
-const region = 'ap-southeast-1'
-// 全备份桶
-const FullBucket = 'backup-rotta-full' + stage
-// 增量备份桶
-const IncBucket = 'backup-rotta-inc' + stage
+const region = 'ap-southeast-1'                 // 区域
+const stage = '-prod'                           // 阶段
+// const stage = ''
+const FullBucket = 'backup-rotta-full' + stage  // 全备份桶
+const IncBucket = 'backup-rotta-inc' + stage    // 增量备份桶
 // 备份区域
 const S3Region = region
 const DbRegion = region
 AWS.config.update({ region: region })
 AWS.config.setPromisesDependency(require('bluebird'))
 
-
 // 全备份数据库表
-const FullBackupTables = ['ZeusPlatformUser', 'ZeusPlatformMSN', 'ZeusPlatformCaptcha', 'ZeusPlatformCode', 'DianaPlatformGame',
-    'DianaPlatformCompany', 'DianaPlatformTool', 'DianaPlatformPackage', 'DianaPlatformSeat', 'HulkPlatformAd', 'HeraGamePlayer', 'SYSConfig']
+const FullBackupTables = ['ZeusPlatformUser', 'ZeusPlatformMSN', 'ZeusPlatformCaptcha', 'ZeusPlatformCode',
+    'DianaPlatformGame', 'DianaPlatformCompany', 'DianaPlatformTool', 'DianaPlatformPackage',
+    'DianaPlatformSeat', 'HulkPlatformAd', 'HeraGamePlayer', 'SYSConfig',
+    'HawkeyeGameNotice']
 // 增量备份数据库表
-const IncBackupTables = ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill', 'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord']
+const IncBackupTables = ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill',
+    'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord']
 
-// 执行全备份
-backup(FullBucket)
-// 执行增量备份
-incBackup(IncBucket)
+// 每天凌晨2点定时备份
+console.info('定时任务开始执行，凌晨2点定时备份...')
+schedule.scheduleJob('0 2 * * *', function () {
+    // 执行全备份
+    backup(FullBucket)
+    // 执行增量备份
+    incBackup(IncBucket)
+})
 
 /**
  * 全备份数据表
  */
 async function backup(bucket) {
-    console.info('==========开始全备份==========')
+    console.info('==========开始全备份==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
     try {
         for (let fullTable of FullBackupTables) {
             let config = {
@@ -44,7 +49,7 @@ async function backup(bucket) {
             await new Backup(config).full()
             console.info('全备份表【' + fullTable + '】完成')
         }
-        console.info('==========全备份所有表完成==========')
+        console.info('==========全备份所有表完成==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
     } catch (error) {
         console.error('全备份表捕获异常：' + error)
     }
@@ -54,7 +59,7 @@ async function backup(bucket) {
  * 增量备份数据表
  */
 async function incBackup(bucket) {
-    console.info('==========开始增量备份==========')
+    console.info('==========开始增量备份==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
     try {
         // 今日日期
         const incDate = moment().subtract(1, "days").format('YYYY-MM-DD')
@@ -82,7 +87,7 @@ async function incBackup(bucket) {
                 }
             }
         }
-        console.info('==========增量备份所有表完成==========')
+        console.info('==========增量备份所有表完成==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
     } catch (error) {
         console.error('增量备份表捕获异常：' + error)
     }

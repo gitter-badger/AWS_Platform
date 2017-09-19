@@ -42,11 +42,13 @@ export const SubRolePermissionN = {
 export const SubRoleEnum = {
     // 管理员，所有权限
     'admin': {
-        ...SubRolePermissionY
+        ...SubRolePermissionY,
+        'person': true
     },
     // 总裁，所有权限
     'president': {
-        ...SubRolePermissionY
+        ...SubRolePermissionY,
+        'person': true
     },
     // 市场部
     'marketing': {
@@ -72,5 +74,6 @@ export const SubRoleEnum = {
         ...SubRolePermissionN,
         'finance': true,
         'risk': true,
+        'person': true
     }
 }
