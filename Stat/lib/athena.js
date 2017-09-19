@@ -87,14 +87,17 @@ export class BaseModel {
             });
         })
     }
-    async scan(conditions) {
+    async scan(conditions, projectionExpression) {
         let filterExpression = "";
         let expressionAttributeValues = {};
         for (let key in conditions) {
             filterExpression += `${key}=:${key} and `;
             expressionAttributeValues[`:${key}`] = conditions[key];
         }
-        let scanOpts = undefined;
+        let scanOpts = {};
+        if(projectionExpression) {
+            scanOpts.ProjectionExpression = projectionExpression
+        }
         if (filterExpression.length != 0) {
             filterExpression = filterExpression.substr(0, filterExpression.length - 4);
             scanOpts = {
