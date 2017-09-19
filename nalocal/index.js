@@ -12,15 +12,10 @@ const S3Region = region
 const DbRegion = region
 AWS.config.update({ region: region })
 AWS.config.setPromisesDependency(require('bluebird'))
-
 // 全备份数据库表
-const FullBackupTables = ['ZeusPlatformUser', 'ZeusPlatformMSN', 'ZeusPlatformCaptcha', 'ZeusPlatformCode',
-    'DianaPlatformGame', 'DianaPlatformCompany', 'DianaPlatformTool', 'DianaPlatformPackage',
-    'DianaPlatformSeat', 'HulkPlatformAd', 'HeraGamePlayer', 'SYSConfig',
-    'HawkeyeGameNotice']
+const FullBackupTables = config.fullBackupTables
 // 增量备份数据库表
-const IncBackupTables = ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill',
-    'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord']
+const IncBackupTables = config.incBackupTables
 
 // 每天定时备份
 console.info('定时任务开始执行...')

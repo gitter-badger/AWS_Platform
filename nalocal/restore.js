@@ -13,15 +13,10 @@ const S3Region = region
 const DbRegion = region
 AWS.config.update({ region: region })
 AWS.config.setPromisesDependency(require('bluebird'))
-
 // 全备份数据库表
-const FullBackupTables = ['ZeusPlatformUser', 'ZeusPlatformMSN', 'ZeusPlatformCaptcha', 'ZeusPlatformCode',
-    'DianaPlatformGame', 'DianaPlatformCompany', 'DianaPlatformTool', 'DianaPlatformPackage',
-    'DianaPlatformSeat', 'HulkPlatformAd', 'HeraGamePlayer', 'SYSConfig',
-    'HawkeyeGameNotice']
+const FullBackupTables = config.fullBackupTables
 // 增量备份数据库表
-const IncBackupTables = ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill',
-    'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord']
+const IncBackupTables = config.incBackupTables
 
 console.info('===========================================')
 console.info('NA平台DynamoDB数据库恢复程式，请根据提示操作')
