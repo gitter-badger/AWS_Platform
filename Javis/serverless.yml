@@ -189,6 +189,8 @@ provider:
   runtime: nodejs6.10
   region: ap-southeast-1
   memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -223,8 +225,6 @@ functions:
   #         cors: true
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
-    environment:
-      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
     integration: lambda
   upToken: #七牛云上传TOKEN
     handler: api_qiniu.upToken
