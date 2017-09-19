@@ -206,6 +206,11 @@ export async function agentPlayerCudian(event, context, cb){
     if(!userInfo) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
     }
+    //玩家是否正在游戏中
+    let gameing = new UserModel().isGames(userInfo);
+    if(gameing) {
+        return ResFail(cb, new CHeraErr(CODES.gameingError));
+    }
     let userId = requestParams.fromUserId || tokenInfo.userId;
     const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(userId);
 
@@ -263,6 +268,11 @@ export async function agentPlayerQudian(event, context, cb){
     }
     if(!userInfo) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
+    }
+    //玩家是否正在游戏中
+    let gameing = new UserModel().isGames(userInfo);
+    if(gameing) {
+        return ResFail(cb, new CHeraErr(CODES.gameingError));
     }
     let userId = requestParams.fromUserId || tokenInfo.userId; //如果传了userID，则扣除userId账户的点数
     const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(userId);

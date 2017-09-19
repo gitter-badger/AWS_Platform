@@ -11,7 +11,7 @@ export class BillStatModel extends athena.BaseModel {
         this.userId = userId;
         this.dateStr = dateStr;
         this.role = role;
-        this.type = type;
+        this.type = type;  //1，日统计，2，月统计,3,所有用户日统计
         this.amount = amount;
         this.gameType = gameType;
     }

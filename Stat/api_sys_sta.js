@@ -62,7 +62,7 @@ const overview = async function(event, context, callback) {
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
-        return callback(null, ReHandler.success({oneNum: sumTodayPoints, twoNum:sumPoints}));
+        return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
       }
       case 2 : {  //收益情况
         let date = TimeUtil.formatDay(new Date());
@@ -74,7 +74,7 @@ const overview = async function(event, context, callback) {
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
-        return callback(null, ReHandler.success({oneNum: sumTodayPoints, twoNum:sumPoints}));
+        return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
       }
       case 3 : {  //玩家总数
         let [sumErr, count] = await new PlayerModel().sumCount();
@@ -85,7 +85,7 @@ const overview = async function(event, context, callback) {
         if(onLineErr) {
             return errorHandle(callback, ReHandler.fail(onLineErr));
         }
-        return callback(null, ReHandler.success({oneNum: count, twoNum : online}));
+        return callback(null, ReHandler.success({oneNum: online, twoNum : count, type:type}));
       }
       case 4 : { //签约情况
         let startTime = TimeUtil.getDayFirstTime(new Date());
@@ -97,10 +97,10 @@ const overview = async function(event, context, callback) {
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
-        return callback(null, ReHandler.success({oneNum: todayMerchantCount, twoNum:sumCount}));
+        return callback(null, ReHandler.success({oneNum: todayMerchantCount, twoNum:sumCount, type:type}));
       }
       default : {
-        return callback(null, ReHandler.success({oneNum: 0, twoNum:0}));
+        return callback(null, ReHandler.success({oneNum: 0, twoNum:0,type:type}));
       }
   }
 }
@@ -133,7 +133,7 @@ const gameConsumeStat = async function(event, context, callback) {
     return callback(null, ReHandler.fail(listErr));
   }
   let sum = 0;
-  list.forEach((item) => sum+= item.amount);
+  list.forEach((item) => sum -= item.amount);
   let returnObj = {
       sum : sum,
       keys : [], 
@@ -232,7 +232,9 @@ async function salePointsByDate(role, date){
     }
     let sum = 0;
     array.forEach(function(element) {
-        sum += element.amount;
+        if(element.type == 3) {
+            sum += element.amount;
+        }
     }, this);
     return [null, sum];
 }

@@ -57,7 +57,8 @@ const userTrigger = async (e, c, cb) => {
         rate : userInfo.rate || -1,
         displayName : userInfo.displayName || "NULL!",
         suffix : userInfo.suffix,
-        levelIndex : userInfo.levelIndex+""
+        levelIndex : userInfo.levelIndex+"",
+        merUrl : userInfo.frontURL || "-1"
     })
     if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Agent) {
         pushModel.gameList = ["10000", "30000","40000"]
@@ -112,7 +113,6 @@ const saveStatRecord = async(userId, role,amount, obj,allUserId) => {
     }
     dayStat = dayStat || {amount : 0}
     let billStatModel = new BillStatModel({
-        createdAt : dayStat.createdAt,
         sn : dayStat.sn,
         userId : userId,
         role : role,
@@ -135,7 +135,6 @@ const saveStatRecord = async(userId, role,amount, obj,allUserId) => {
     monthStat = monthStat || {amount:0};
     
     billStatModel = new BillStatModel({
-        createdAt : monthStat.createdAt,
         sn : monthStat.sn,
         userId : userId,
         role : role,
@@ -157,7 +156,6 @@ const saveStatRecord = async(userId, role,amount, obj,allUserId) => {
     allUserStat = allUserStat || {amount : 0}
     console.log(allUserStat.amount)
     billStatModel = new BillStatModel({
-        createdAt : allUserStat.createdAt,
         sn : allUserStat.sn,
         userId : allUserId,
         role : role,
@@ -272,7 +270,10 @@ const userBillTrigger = async(e, c, cb) => {
         console.log("用户不存在");
         return;
     }
-    saveStatRecord(userId, userInfo.role, billInfo.amount, {}, "ALL_ADMIN");
+    //退钱不管，只管上级给下级存钱
+    if(amount<0 && +billInfo.fromRole < +billInfo.toRole) {  //扣钱(上级给下级存钱)
+        saveStatRecord(userId, userInfo.role, billInfo.amount, {}, "ALL_ADMIN");
+    }
 }
 
 export {
