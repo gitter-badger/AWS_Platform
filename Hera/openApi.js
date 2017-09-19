@@ -12,7 +12,7 @@ import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
 import {MerchantModel} from "./model/MerchantModel";
 
-import {UserModel, PaymentState, State} from "./model/UserModel";
+import {UserModel, GameState, State} from "./model/UserModel";
 
 import {UserBillModel, Type} from "./model/UserBillModel";
 
@@ -402,7 +402,7 @@ async function gamePlayerBalance(event, context, callback) {
     //玩家是否正在游戏中
     let gameing = u.isGames(user);
     if(gameing) {
-      return errorHandler(callback, new CHeraErr(CODES.gameingError) , logType, merchantInfo, event.pathParameters);
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
     }
     //账号已冻结
     if(user.state == State.forzen) return callback(null, ReHandler.fail(new CHeraErr(CODES.Frozen)));
@@ -520,7 +520,7 @@ async function gamePlayerA3Login(event, context, callback) {
   if(!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let suffix = userInfo.userName.split("_")[0];
   let loginToken = Util.createTokenJWT({userName : userInfo.userName, suffix:suffix, userId:+userInfo.userId});
-  let [updateError] = await user.update({userName: userInfo.userName},{updateAt:Date.now()});
+  let [updateError] = await user.update({userName: userInfo.userName},{updateAt:Date.now(),gameState: GameState.online});
   if(updateError) return callback(null, ReHandler.fail(updateError));
   //获取余额
   let userBill = new UserBillModel(userInfo);
@@ -553,7 +553,6 @@ async function gamePlayerA3Login(event, context, callback) {
   }
   callback(null, ReHandler.success(callObj));
 }
-
 
 /**
  * 用户余额（A3）
@@ -634,10 +633,12 @@ async function playerRecordValidate(event, context, callback){
   //如果记录没有，直接跳过
   if(records.length == 0) { //如果记录为null
     //解除玩家状态
-    let [gameError] = await new UserModel().updateGameState(userModel.userName, PaymentState.allow);
-    if(gameError) {
-      return callback(null, ReHandler.fail(gameError));
-    }
+    if(userModel.gameState != GameState.offline) {
+      let [gameError] = await new UserModel().updateGameState(userModel.userName, GameState.online);
+      if(gameError) {
+        return callback(null, ReHandler.fail(gameError));
+      }
+    } 
     return callback(null, ReHandler.success({
       data :{balance : oriBalance}
     }));
@@ -722,10 +723,12 @@ async function playerRecordValidate(event, context, callback){
   let [updatebError] = await u.update({userName:userModel.userName},{balance : userSumAmount});
   if(updatebError) return callback(null, ReHandler.fail(updatebError));
   //解除玩家状态
-  let [gameError] = await u.updateGameState(userModel.userName, PaymentState.allow);
-  if(gameError) {
-    return callback(null, ReHandler.fail(gameError));
-  }
+  if(userModel.gameState != GameState.offline) {
+    let [gameError] = await u.updateGameState(userModel.userName, GameState.online);
+    if(gameError) {
+      return callback(null, ReHandler.fail(gameError));
+    }
+  } 
   callback(null, ReHandler.success({
       data :{balance : userSumAmount}
   }));
@@ -768,7 +771,7 @@ async function joinGame(event, context, callback){
       return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
   }
   //修改游戏状态（不能进行转账操作）
-  let [updateError] = await userModel.updateGameState(userObj.userName, PaymentState.forbid);
+  let [updateError] = await userModel.updateGameState(userObj.userName, GameState.gameing);
   if(updateError) {
     return callback(null, ReHandler.fail(updateError));
   }

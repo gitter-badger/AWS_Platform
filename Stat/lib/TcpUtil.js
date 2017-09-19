@@ -35,10 +35,7 @@ export  const onlineUser = async() => {
             reslove([null, online]);
         });
         client.on("error", function(err){
-            setTimeout(function() {
-                pushUserInfo(body, host, port, proId);
-            }, 10*60*60*1000);
-            // reslove([BizErr.TcpErr(), 0]);
+            reslove([null, 0]);
         })
     })
 }

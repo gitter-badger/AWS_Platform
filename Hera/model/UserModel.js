@@ -12,12 +12,13 @@ const SexEnum = {
     man : 1,
     woman : 2
 }
-export const PaymentState = {  //是否可以进行转账操作
-    allow :1 ,//允许
-    forbid : 2 //禁止（正在游戏中不能转账）
+export const GameState = {  //游戏状态
+    offline :1 ,//离线
+    online : 2, //在线
+    gameing : 3  //游戏中
 }
 export class UserModel extends athena.BaseModel {
-    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, paymentState, nickname, headPic,remark, balance, liveMix, vedioMix, parent, parentName} = {}) {
+    constructor({userName, userPwd, buId, state, merchantName,  msn, sex, gameState, nickname, headPic,remark, balance, liveMix, vedioMix, parent, parentName} = {}) {
         super(TABLE_NAMES.TABLE_USER);
         this.userName = userName;
         this.userPwd = userPwd;
@@ -33,7 +34,7 @@ export class UserModel extends athena.BaseModel {
         this.remark = remark || Model.StringValue;
         this.nickname = nickname || Model.StringValue;
         this.headPic = headPic || Model.StringValue;
-        this.payState = paymentState || PaymentState.allow;
+        this.gameState = gameState || GameState.allow;
         this.liveMix = liveMix || 0;
         this.vedioMix = vedioMix || 0;
         this.parent = parent;
@@ -75,7 +76,7 @@ export class UserModel extends athena.BaseModel {
         return [null, userList[0]]
     }
     isGames(user) {
-        return user.payState == PaymentState.forbid;
+        return user.gameState == GameState.gameing;
     }
     cryptoPassword(){
         this.userPwd = Util.sha256(this.userPwd);

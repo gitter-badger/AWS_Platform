@@ -177,6 +177,11 @@ async function playerBuyDiamonds(event, context, callback){
   if(!userModel) {
       return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
+  //判断是否正在游戏中
+  let game = new UserModel().isGames(userModel);
+  if(game) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
+  }
   //查询商家信息
   let [merError, merchantModel] = await new MerchantModel().findById(+userModel.buId);
   if(merError) {
