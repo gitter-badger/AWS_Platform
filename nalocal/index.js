@@ -4,11 +4,9 @@ const moment = require('moment')
 const schedule = require('node-schedule')
 const config = require('config')
 // 基础数据
-const region = 'ap-southeast-1'                 // 区域
-// const stage = '-prod'                           // 阶段
-const stage = ''
-const FullBucket = 'backup-rotta-full' + stage  // 全备份桶
-const IncBucket = 'backup-rotta-inc' + stage    // 增量备份桶
+const region = 'ap-southeast-1'                          // 区域
+const FullBucket = 'backup-rotta-full-' + config.stage   // 全备份桶
+const IncBucket = 'backup-rotta-inc-' + config.stage     // 增量备份桶
 // 备份区域
 const S3Region = region
 const DbRegion = region
@@ -37,7 +35,7 @@ schedule.scheduleJob(config.cron, function () {
  * 全备份数据表
  */
 async function backup(bucket) {
-    console.info('==========开始全备份==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+    console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========开始全备份==========')
     try {
         for (let fullTable of FullBackupTables) {
             let config = {
@@ -50,7 +48,7 @@ async function backup(bucket) {
             await new Backup(config).full()
             console.info('全备份表【' + fullTable + '】完成')
         }
-        console.info('==========全备份所有表完成==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+        console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========全备份所有表完成==========')
     } catch (error) {
         console.error('全备份表捕获异常：' + error)
     }
@@ -60,7 +58,7 @@ async function backup(bucket) {
  * 增量备份数据表
  */
 async function incBackup(bucket) {
-    console.info('==========开始增量备份==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+    console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========开始增量备份==========')
     try {
         // 今日日期
         const incDate = moment().subtract(1, "days").format('YYYY-MM-DD')
@@ -88,7 +86,7 @@ async function incBackup(bucket) {
                 }
             }
         }
-        console.info('==========增量备份所有表完成==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+        console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========增量备份所有表完成==========')
     } catch (error) {
         console.error('增量备份表捕获异常：' + error)
     }

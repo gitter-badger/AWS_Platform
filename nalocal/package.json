@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "na local backup dynamodb to s3",
   "main": "index.js",
-  "bin": {
-    "restore": "./restore.js"
-  },
   "scripts": {
     "restore": "echo \"Error: no test specified\" && exit 1"
   },
