@@ -21,8 +21,7 @@ import {PlayerModel} from "./model/PlayerModel"
 
 import {TimeUtil}  from "./lib/TimeUtil"
 
-import {TcpUtil} from "./lib/TcpUtil"
-
+import {Util} from "./lib/Util"
 
 const userTrigger = async (e, c, cb) => {
     console.info(e.Records)
@@ -52,9 +51,9 @@ const userTrigger = async (e, c, cb) => {
         parent : userInfo.parent,
         msn : msnInfo.msn,
         gameList : userInfo.gameList,
-        liveMix : userInfo.liveMix || -1,
-        vedioMix : userInfo.vedioMix || -1,
-        rate : userInfo.rate || -1,
+        liveMix : typeof userInfo.liveMix == "undefined" ? -1 : userInfo.liveMix,
+        vedioMix : typeof userInfo.vedioMix == "undefined" ? -1 : userInfo.vedioMix,
+        rate :  typeof userInfo.rate == "undefined" ? -1 : userInfo.rate,
         displayName : userInfo.displayName || "NULL!",
         suffix : userInfo.suffix,
         levelIndex : userInfo.levelIndex + "",
@@ -100,80 +99,61 @@ const playerBalanceTrigger = async(e, c , cb) => {
         console.info("玩家余额变更推送成功");
     }
 }
+async function updateAmount(userId, dateStr,amount, obj) {
+    let billStatModel = new BillStatModel({userId:userId, dateStr : dateStr, ...obj});
+    let [getErr, statInfo] = await billStatModel.get({userId:userId, dateStr : dateStr},[],"userIdAndDate");
+    if(getErr) {
+        return [getErr];
+    }
+    if(!statInfo) {
+        let [saveErr] = await billStatModel.save();
+        if(saveErr) {
+            return [saveErr];
+        }
+    }else{
+        billStatModel.sn = statInfo.sn;
+    }
+    let [updateErr] = await billStatModel.update({sn:billStatModel.sn}, {
+        amount : {"$inc":+amount}
+    })
+    if(updateErr) {
+        return [updateErr];
+    }
+    return [null]
+}
 const saveStatRecord = async(userId, role,amount, obj,allUserId) => {
     console.log("账单金额："+amount);
-    obj.createdAt = Date.now();
     //天统计
     let todayStr = TimeUtil.formatDay(new Date());
-
-    //获取当天的
-    let [getDayErr, dayStat] = await new BillStatModel().get({userId:userId, dateStr : todayStr},[],"userIdAndDate");
-    if(getDayErr) {
-        return console.log(getDayErr);
-    }
-    dayStat = dayStat || {amount : 0}
-    let billStatModel = new BillStatModel({
-        sn : dayStat.sn,
-        userId : userId,
+    let [dayErr] = await updateAmount(userId, todayStr, amount, {
         role : role,
         type : 1,
-        amount : dayStat.amount+ amount,
-        dateStr : todayStr,
         ...obj
     });
-    let [daySaveErr] = await billStatModel.save();
-    if(daySaveErr) {
-        return console.log(daySaveErr);
+    if(dayErr) {
+        return console.log(dayErr);
     }
-    
-    //获取当月的
+    //月统计
     let monthStr = TimeUtil.formatMonth(new Date());
-    let [getMonthErr, monthStat] = await new BillStatModel().get({userId:userId, dateStr : monthStr},[],"userIdAndDate");
-    if(getMonthErr) {
-        return console.log(getMonthErr);
-    }
-    monthStat = monthStat || {amount:0};
-    
-    billStatModel = new BillStatModel({
-        sn : monthStat.sn,
-        userId : userId,
+    let [monthErr] = await updateAmount(userId, monthStr, amount, {
         role : role,
-        type :2,
-        amount : monthStat.amount + amount,
-        dateStr : monthStr,
+        type : 2,
         ...obj
     });
-    let [monthSaveErr] = await billStatModel.save();
-    if(monthSaveErr) {
-        return console.log(monthSaveErr);
+    if(monthErr) {
+        return console.log(dayErr);
     }
-    //所有用户当天的
-    let [allUserErr, allUserStat] = await new BillStatModel().get({userId:allUserId, dateStr : todayStr},[],"userIdAndDate");
-    if(getDayErr) {
-        return console.log(getDayErr);
-    }
-    // console.log("最初余额");
-    // console.log({userId:allUserId, dateStr : todayStr});
-    // console.log(allUserStat);
-    // console.log({userId:allUserId, dateStr : todayStr});
-    //  console.log(allUserStat.amount)
-    allUserStat = allUserStat || {amount : 0}
-   
-    billStatModel = new BillStatModel({
-        sn : allUserStat.sn,
-        userId : allUserId,
+    //总统计日统计
+    let [sumErr] = await updateAmount(allUserId, todayStr, amount, {
         role : role,
-        type : 3,
-        amount : allUserStat.amount+ amount,
-        dateStr : todayStr
+        type : 1,
+        ...obj
     });
-    console.log(billStatModel);
-    let [allUserSaveErr] = await billStatModel.save();
-    if(allUserSaveErr) {
-        return console.log(daySaveErr);
+    if(sumErr) {
+        return console.log(sumErr);
     }
-    
 }
+
 const playerBillStat = async(userName, createAt) => {
     let [infoErr, billInfo] = await new UserBillModel().get({userName, createAt});
     if(infoErr) {

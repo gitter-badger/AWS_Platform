@@ -65,11 +65,11 @@ const overview = async function(event, context, callback) {
       }
       case 2 : {  //收益情况
         let date = TimeUtil.formatDay(new Date());
-        let [currErr, sumTodayPoints] = await salePointsByDate("10000",date);
+        let [currErr, sumTodayPoints] = await salePointsByDate("10000",date, "ALL_PLAYER");
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints("10000");
+        let [sumErr, sumPoints] = await saleSumPoints("10000", "ALL_PLAYER");
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
@@ -133,7 +133,7 @@ const gameConsumeStat = async function(event, context, callback) {
      return callback(null, ReHandler.fail(checkAttError));
   }
   let {startTime, endTime} = requestParams;
-  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1);
+  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1,"ALL_PLAYER");
   if(listErr) {
     return callback(null, ReHandler.fail(listErr));
   }
@@ -155,6 +155,7 @@ const gameConsumeStat = async function(event, context, callback) {
     returnObj.elec.push(0);
     returnObj.store.push(0);
   }
+  console.log(list);
   list.forEach((item) => {
       let {dateStr, gameType,amount} = item;
       let index = returnObj.keys.indexOf(dateStr);
@@ -234,7 +235,7 @@ const consumeAndIncome = async function(event, context, callback) {
 /**
  * 当日售出点数
  */
-async function salePointsByDate(role, date){
+async function salePointsByDate(role, date, userId){
     let billStatModel = new BillStatModel();
     let [billErr, array] = await billStatModel.get({role:role, dateStr:date},[], "roleDateIndex", true);
     if(billErr) {
@@ -242,7 +243,7 @@ async function salePointsByDate(role, date){
     }
     let sum = 0;
     array.forEach(function(element) {
-        if(element.type == 3) {
+        if(element.type == 3 && element.userId == userId) {
             sum += element.amount;
         }
     }, this);
@@ -252,7 +253,7 @@ async function salePointsByDate(role, date){
 /**
  * 售出点数总和
  */
-async function saleSumPoints(role){
+async function saleSumPoints(role, userId){
     let billStatModel = new BillStatModel();
     let [billErr, array] = await billStatModel.get({role:role, type:2}, [] ,"roleTypeIndex", true);
     if(billErr) {
@@ -260,7 +261,9 @@ async function saleSumPoints(role){
     }
     let sum = 0;
     array.forEach(function(element) {
-        sum += element.amount;
+        if(userId  && element.userId == userId) {
+            sum += element.amount;
+        }
     }, this);
     return [null, sum];
 }

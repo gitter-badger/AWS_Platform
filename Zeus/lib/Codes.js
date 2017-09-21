@@ -136,10 +136,10 @@ export const BizErr = {
   HttpsErr: (errMsg = '请求游戏服务器后台失败') => {
     return { code: Codes.HttpsError, msg: errMsg }
   },
-  CompanyNotExistError: (errMsg = "company not exist") => {
+  CompanyNotExistError: (errMsg = "游戏厂商不存在") => {
     return { code: Codes.CompanyNotExistError, msg: errMsg }
   },
-  PushMerchantError: (errMsg = "company not exist") => {
+  PushMerchantError: (errMsg = "推送商户错误") => {
     return { code: Codes.PushMerchantError, msg: errMsg }
   }
 }
