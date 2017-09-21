@@ -21,12 +21,12 @@ const IncBackupTables = config.incBackupTables
 
 // 每天定时备份
 console.info('定时任务开始执行...')
-// schedule.scheduleJob(config.cron, function () {
-// 执行全备份
-// backup(FullBucket)
-// 执行增量备份
-incBackup(IncBucket)
-// })
+schedule.scheduleJob(config.cron, function () {
+    // 执行全备份
+    backup(FullBucket)
+    // 执行增量备份
+    incBackup(IncBucket)
+})
 
 /**
  * 全备份数据表
@@ -58,18 +58,14 @@ async function incBackup(bucket) {
     console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========开始增量备份==========')
     try {
         // 今日日期
-        // const incDate = moment().subtract(1, "days").format('YYYY-MM-DD')
-        const incDate = '2017-09-14'
-        // 分页参数
+        const incDate = moment().subtract(1, "days").format('YYYY-MM-DD')
         // 循环所有需要增量备份的表
         for (let incTable of IncBackupTables) {
             let isContinue = true
             let startKey = null
             let finalRet = []
-            console.info(incTable)
             // 单表中每页数据遍历
             while (isContinue) {
-                console.info(startKey)
                 const [err, ret] = await Store$('query', {
                     Limit: pageSize,
                     ExclusiveStartKey: startKey,
@@ -94,15 +90,14 @@ async function incBackup(bucket) {
                     isContinue = false
                 }
             }
-            console.info(incTable + ':' + finalRet.length)
             // 备份数据到S3
-            // const [s3err, s3ret] = await S3Store$(bucket, incTable + '_' + incDate, JSON.stringify(finalRet))
-            // if (s3err) {
-            //     console.error('增量备份表【' + incTable + '】到S3发生错误：' + s3err)
-            // }
-            // else {
-            //     console.info('增量备份表【' + incTable + '】完成')
-            // }
+            const [s3err, s3ret] = await S3Store$(bucket, incTable + '_' + incDate, JSON.stringify(finalRet))
+            if (s3err) {
+                console.error('增量备份表【' + incTable + '】到S3发生错误：' + s3err)
+            }
+            else {
+                console.info('增量备份表【' + incTable + '】完成')
+            }
         }
         console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========增量备份所有表完成==========')
     } catch (error) {
