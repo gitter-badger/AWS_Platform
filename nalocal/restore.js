@@ -5,9 +5,9 @@ const _ = require('lodash')
 const config = require('config')
 const prompt = require('prompt-sync')()
 // 基础数据
-const region = 'ap-southeast-1'                         // 区域
-const FullBucket = 'backup-rotta-full-' + config.stage  // 全备份桶
-const IncBucket = 'backup-rotta-inc-' + config.stage    // 增量备份桶
+const region = config.region                             // 区域
+const FullBucket = config.bucketPrefix + config.stage    // 全备份桶
+const IncBucket = config.bucketPrefix + config.stage     // 增量备份桶
 // 备份区域
 const S3Region = region
 const DbRegion = region
