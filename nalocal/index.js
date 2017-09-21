@@ -7,8 +7,8 @@ const _ = require('lodash')
 // 基础数据
 const pageSize = 100                                     // 分页大小
 const region = 'ap-southeast-1'                          // 区域
-const FullBucket = 'backup-rotta-full-' + config.stage   // 全备份桶
-const IncBucket = 'backup-rotta-inc-' + config.stage     // 增量备份桶
+const FullBucket = 'backup-na-full-' + config.stage   // 全备份桶
+const IncBucket = 'backup-na-inc-' + config.stage     // 增量备份桶
 // 备份区域
 const S3Region = region
 const DbRegion = region
