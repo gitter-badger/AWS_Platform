@@ -1,6 +1,6 @@
 {
     "stage": "dev",
-    "cron": "22 14 * * *",
+    "cron": "0 2 * * *",
     "fullBackupTables": [
         "ZeusPlatformUser",
         "ZeusPlatformMSN",
