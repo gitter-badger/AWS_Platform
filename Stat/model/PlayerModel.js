@@ -34,7 +34,6 @@ export class PlayerModel extends athena.BaseModel {
         if(palyErr) {
             return [palyErr, {}];
         }
-        console.log(list[0]);
         let sum = 0;
         let online =0;
         list.forEach(function(element) {

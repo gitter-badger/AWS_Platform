@@ -57,7 +57,7 @@ const userTrigger = async (e, c, cb) => {
         rate : userInfo.rate || -1,
         displayName : userInfo.displayName || "NULL!",
         suffix : userInfo.suffix,
-        levelIndex : userInfo.levelIndex+"",
+        levelIndex : userInfo.levelIndex + "",
         merUrl : userInfo.frontURL || "-1"
     })
     if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Agent) {
@@ -152,9 +152,13 @@ const saveStatRecord = async(userId, role,amount, obj,allUserId) => {
     if(getDayErr) {
         return console.log(getDayErr);
     }
-    console.log("最初余额");
+    // console.log("最初余额");
+    // console.log({userId:allUserId, dateStr : todayStr});
+    // console.log(allUserStat);
+    // console.log({userId:allUserId, dateStr : todayStr});
+    //  console.log(allUserStat.amount)
     allUserStat = allUserStat || {amount : 0}
-    console.log(allUserStat.amount)
+   
     billStatModel = new BillStatModel({
         sn : allUserStat.sn,
         userId : allUserId,
@@ -189,6 +193,7 @@ const playerBillStat = async(userName, createAt) => {
     }
     if(billInfo.type == 3 || billInfo.type == 4) {
         let allUserId = userInfo.msn == "000" ? "ALL_AGENT_PLAYER" : "ALL_PLAYER";
+        console.log("allUserId:" +allUserId);
         saveStatRecord(billInfo.userId+"", "10000", billInfo.amount,{
             gameType : billInfo.gameType
         }, allUserId);

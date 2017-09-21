@@ -74,7 +74,7 @@ export class BaseModel {
             opts.ExpressionAttributeNames[`#${k}`] = k;
             if (index != keys.length - 1) opts.UpdateExpression += ", ";
         });
-
+        console.log(opts);
         return new Promise((reslove, reject) => {
             this.db$("update", opts).then((result) => {
                 reslove([null, result]);

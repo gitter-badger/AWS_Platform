@@ -12,7 +12,7 @@ const State = {
 const host = '47.74.154.114';  //开发环境
 const port = 20003;
 export class PushModel{
-    constructor({username, role, userId, displayName,  headPic, parent, msn, gameList, suffix, levelIndex, liveMix, vedioMix, rate} = {}) {
+    constructor({username, role, userId, displayName,  headPic, parent, msn, gameList, suffix, levelIndex, liveMix, vedioMix, rate, merUrl} = {}) {
         this.username = username;
         this.role = role;
         this.id = userId,
@@ -25,7 +25,8 @@ export class PushModel{
         this.liveMix = liveMix;
         this.vedioMix = vedioMix;
         this.rate = rate;
-        this.gameList = this.setGameList(gameList)
+        this.gameList = this.setGameList(gameList);
+        this.merUrl = merUrl;
     }
     pushMerchant(){
         const proId = 9;  //协议
