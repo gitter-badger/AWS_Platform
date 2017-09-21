@@ -2,22 +2,40 @@ const AWS = require('aws-sdk')
 const Restore = require('dynamodb-backup-restore').Restore
 const moment = require('moment')
 const _ = require('lodash')
+const config = require('config')
+const prompt = require('prompt-sync')()
 // 基础数据
-const stage = '-prod'                           // 阶段
-// const stage = ''
-const region = 'ap-southeast-1'                 // 区域
-const FullBucket = 'backup-rotta-full' + stage  // 全备份桶
-const IncBucket = 'backup-rotta-inc' + stage    // 增量备份桶
+const region = 'ap-southeast-1'                         // 区域
+const FullBucket = 'backup-rotta-full-' + config.stage  // 全备份桶
+const IncBucket = 'backup-rotta-inc-' + config.stage    // 增量备份桶
 // 备份区域
 const S3Region = region
 const DbRegion = region
 AWS.config.update({ region: region })
 AWS.config.setPromisesDependency(require('bluebird'))
+// 全备份数据库表
+const FullBackupTables = config.fullBackupTables
+// 增量备份数据库表
+const IncBackupTables = config.incBackupTables
 
-// 执行表恢复
-restore(FullBucket, 'SYSConfig_2017-09-14_12:30:06', 'SYSConfig')
-// 执行表增量恢复
-incRestore(IncBucket, 'ZeusPlatformLog_2017-09-14', 'ZeusPlatformLog')
+console.info('===========================================')
+console.info('NA平台DynamoDB数据库恢复程式，请根据提示操作')
+console.info('===========================================')
+
+let file = prompt('请输入S3恢复文件：')
+let table = prompt('请输入需要恢复的DynamoDB数据表：')
+if (!file || !table) {
+    console.error('恢复未执行，请输入必要参数!!!')
+} else {
+    // 判断是否是全备份
+    if (_.includes(FullBackupTables, table)) {
+        restore(FullBucket, file, table)
+    } else {
+        console.info('增量恢复' + file + table)
+        incRestore(IncBucket, file, table)
+    }
+}
+
 /**
  * 恢复数据表
  */

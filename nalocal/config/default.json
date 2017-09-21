@@ -1,0 +1,28 @@
+{
+    "stage": "dev",
+    "cron": "22 14 * * *",
+    "fullBackupTables": [
+        "ZeusPlatformUser",
+        "ZeusPlatformMSN",
+        "ZeusPlatformCaptcha",
+        "ZeusPlatformCode",
+        "DianaPlatformGame",
+        "DianaPlatformCompany",
+        "DianaPlatformTool",
+        "DianaPlatformPackage",
+        "DianaPlatformSeat",
+        "HulkPlatformAd",
+        "HeraGamePlayer",
+        "SYSConfig",
+        "HawkeyeGameNotice"
+    ],
+    "incBackupTables": [
+        "HeraGameRecord",
+        "ZeusPlatformLog",
+        "HeraGamePlayerBill",
+        "HeraGameDiamondBill",
+        "ZeusPlatformBill",
+        "HawkeyeGameEmail",
+        "HawkeyePlayerEmailRecord"
+    ]
+}

@@ -2,41 +2,37 @@ const AWS = require('aws-sdk')
 const Backup = require('dynamodb-backup-restore').Backup
 const moment = require('moment')
 const schedule = require('node-schedule')
+const config = require('config')
+const _ = require('lodash')
 // 基础数据
-const region = 'ap-southeast-1'                 // 区域
-const stage = '-prod'                           // 阶段
-// const stage = ''
-const FullBucket = 'backup-rotta-full' + stage  // 全备份桶
-const IncBucket = 'backup-rotta-inc' + stage    // 增量备份桶
+const pageSize = 100                                     // 分页大小
+const region = 'ap-southeast-1'                          // 区域
+const FullBucket = 'backup-rotta-full-' + config.stage   // 全备份桶
+const IncBucket = 'backup-rotta-inc-' + config.stage     // 增量备份桶
 // 备份区域
 const S3Region = region
 const DbRegion = region
 AWS.config.update({ region: region })
 AWS.config.setPromisesDependency(require('bluebird'))
-
 // 全备份数据库表
-const FullBackupTables = ['ZeusPlatformUser', 'ZeusPlatformMSN', 'ZeusPlatformCaptcha', 'ZeusPlatformCode',
-    'DianaPlatformGame', 'DianaPlatformCompany', 'DianaPlatformTool', 'DianaPlatformPackage',
-    'DianaPlatformSeat', 'HulkPlatformAd', 'HeraGamePlayer', 'SYSConfig',
-    'HawkeyeGameNotice']
+const FullBackupTables = config.fullBackupTables
 // 增量备份数据库表
-const IncBackupTables = ['HeraGameRecord', 'ZeusPlatformLog', 'HeraGamePlayerBill',
-    'HeraGameDiamondBill', 'ZeusPlatformBill', 'HawkeyeGameEmail', 'HawkeyePlayerEmailRecord']
+const IncBackupTables = config.incBackupTables
 
-// 每天凌晨2点定时备份
-console.info('定时任务开始执行，凌晨2点定时备份...')
-schedule.scheduleJob('0 2 * * *', function () {
-    // 执行全备份
-    backup(FullBucket)
-    // 执行增量备份
-    incBackup(IncBucket)
-})
+// 每天定时备份
+console.info('定时任务开始执行...')
+// schedule.scheduleJob(config.cron, function () {
+// 执行全备份
+// backup(FullBucket)
+// 执行增量备份
+incBackup(IncBucket)
+// })
 
 /**
  * 全备份数据表
  */
 async function backup(bucket) {
-    console.info('==========开始全备份==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+    console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========开始全备份==========')
     try {
         for (let fullTable of FullBackupTables) {
             let config = {
@@ -49,7 +45,7 @@ async function backup(bucket) {
             await new Backup(config).full()
             console.info('全备份表【' + fullTable + '】完成')
         }
-        console.info('==========全备份所有表完成==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+        console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========全备份所有表完成==========')
     } catch (error) {
         console.error('全备份表捕获异常：' + error)
     }
@@ -59,35 +55,56 @@ async function backup(bucket) {
  * 增量备份数据表
  */
 async function incBackup(bucket) {
-    console.info('==========开始增量备份==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+    console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========开始增量备份==========')
     try {
         // 今日日期
-        const incDate = moment().subtract(1, "days").format('YYYY-MM-DD')
+        // const incDate = moment().subtract(1, "days").format('YYYY-MM-DD')
+        const incDate = '2017-09-14'
+        // 分页参数
         // 循环所有需要增量备份的表
         for (let incTable of IncBackupTables) {
-            const [err, ret] = await Store$('query', {
-                TableName: incTable,
-                IndexName: 'CreatedDateIndex',
-                KeyConditionExpression: 'createdDate = :date',
-                ExpressionAttributeValues: {
-                    ':date': incDate
+            let isContinue = true
+            let startKey = null
+            let finalRet = []
+            console.info(incTable)
+            // 单表中每页数据遍历
+            while (isContinue) {
+                console.info(startKey)
+                const [err, ret] = await Store$('query', {
+                    Limit: pageSize,
+                    ExclusiveStartKey: startKey,
+                    TableName: incTable,
+                    IndexName: 'CreatedDateIndex',
+                    KeyConditionExpression: 'createdDate = :date',
+                    ExpressionAttributeValues: {
+                        ':date': incDate
+                    }
+                })
+                if (err) {
+                    console.error('查询增量备份表【' + incTable + '】发生错误：' + err)
+                    return
                 }
-            })
-            if (err) {
-                console.error('查询增量备份表【' + incTable + '】发生错误：' + err)
-            }
-            else {
-                // 备份数据到S3
-                const [s3err, s3ret] = await S3Store$(bucket, incTable + '_' + incDate, JSON.stringify(ret))
-                if (s3err) {
-                    console.error('增量备份表【' + incTable + '】到S3发生错误：' + s3err)
+                // 累加结果
+                finalRet.push(...ret.Items)
+                // 重置起始key
+                if (!_.isEmpty(ret.LastEvaluatedKey)) {
+                    startKey = ret.LastEvaluatedKey
                 }
                 else {
-                    console.info('增量备份表【' + incTable + '】完成')
+                    isContinue = false
                 }
             }
+            console.info(incTable + ':' + finalRet.length)
+            // 备份数据到S3
+            // const [s3err, s3ret] = await S3Store$(bucket, incTable + '_' + incDate, JSON.stringify(finalRet))
+            // if (s3err) {
+            //     console.error('增量备份表【' + incTable + '】到S3发生错误：' + s3err)
+            // }
+            // else {
+            //     console.info('增量备份表【' + incTable + '】完成')
+            // }
         }
-        console.info('==========增量备份所有表完成==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
+        console.info(moment().format('YYYY-MM-DD_HH:mm:ss') + ':==========增量备份所有表完成==========')
     } catch (error) {
         console.error('增量备份表捕获异常：' + error)
     }
