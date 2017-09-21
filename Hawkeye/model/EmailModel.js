@@ -17,7 +17,7 @@ const EmailState = {
 export class EmailModel extends athena.BaseModel {
     constructor({emid, userId, content,  state, msn, sendTime,title,sendUser,nickname,tools, sendUserId} = {}) {
         super(Tables.HawkeyeGameEmail);
-        this.userId = userId || -1;    //创建者
+        this.userId = userId || -1;    //接收人，如果是-1表示所有人
         this.title = title;
         this.nickname = nickname || Model.StringValue;
         this.emid = emid || Util.uuid();
@@ -46,18 +46,10 @@ export class EmailModel extends athena.BaseModel {
         this.tools = tools;
     }
     async isUser(userId) {
-        if(this.nickname == Model.StringValue) {
+        if(this.userId == -1 || this.userId == userId) {
             return [null, true];
         } 
-        let userModel = new UserModel();
-        let [getError, userInfo] = await userModel.get({userId},[],"userIdIndex");
-        if(getError) {
-            return [getError, null]
-        }
-        if(userInfo.nickname == this.sendUser){
-            return [null, true]
-        }
-        return [null, false]
+        return [null, false];
     }
     async findByIds(emids) {
         let filterExpression = "",

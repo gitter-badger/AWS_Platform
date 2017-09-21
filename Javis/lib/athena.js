@@ -69,12 +69,18 @@ export class BaseModel {
         };
 
         keys.forEach((k, index) => {
-            opts.UpdateExpression += `#${k}=:${k} `;
-            opts.ExpressionAttributeValues[`:${k}`] = updates[k];
+            let value = (updates[k]|| {})["$inc"];
             opts.ExpressionAttributeNames[`#${k}`] = k;
+            if(typeof updates[k] == "object") { 
+                //只支持自增
+                opts.UpdateExpression += `#${k} = #${k} + :${k} `
+                opts.ExpressionAttributeValues[`:${k}`] = value;
+            }else {
+                opts.UpdateExpression += `#${k}=:${k} `;
+                opts.ExpressionAttributeValues[`:${k}`] =  updates[k];
+            }
             if (index != keys.length - 1) opts.UpdateExpression += ", ";
         });
-        console.log(opts);
         return new Promise((reslove, reject) => {
             this.db$("update", opts).then((result) => {
                 reslove([null, result]);
