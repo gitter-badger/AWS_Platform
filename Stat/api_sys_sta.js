@@ -33,10 +33,10 @@ const overview = async function(event, context, callback) {
   if (tokenErr) {
       errorHandle(callback, ReHandler.fail(tokenErr));
   }
-//   const [e, tokenInfo] = await JwtVerify(token[1])
-//   if(e) {
-//     return errorHandle(callback, ReHandler.fail(e));
-//   }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return errorHandle(callback, ReHandler.fail(e));
+  }
   //json转换
   let [parserErr, requestParams] = Util.parseJSON(event.body || {});
   if(parserErr) return cb(null, ReHandler.fail(parserErr));
@@ -57,7 +57,7 @@ const overview = async function(event, context, callback) {
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints("1");
+        let [sumErr, sumPoints] = await saleSumPoints("1","ALL_ADMIN");
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
@@ -69,7 +69,7 @@ const overview = async function(event, context, callback) {
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints("10000");
+        let [sumErr, sumPoints] = await saleSumPoints("10000", "ALL_PLAYER");
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
@@ -245,15 +245,15 @@ async function salePointsByDate(role, date, userId){
  */
 async function saleSumPoints(role, userId){
     let billStatModel = new BillStatModel();
-    let [billErr, array] = await billStatModel.get({role:role, type:2}, [] ,"roleTypeIndex", true);
+    let [billErr, array] = await billStatModel.get({role:role, type:3}, [] ,"roleTypeIndex", true);
     if(billErr) {
         return [billErr, 0]
     }
     let sum = 0;
     array.forEach(function(element) {
-        // if(userId  && element.userId == userId) {
+        if(userId  && element.userId == userId) {
             sum += element.amount;
-        // }
+        }
     }, this);
     return [null, sum];
 }
