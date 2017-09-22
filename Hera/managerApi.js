@@ -109,6 +109,8 @@ async function successHandler(callback, data, type, merchantInfo, userInfo) {
 export async function gamePlayerList(event, context, cb) {
     console.log(event);
     //json转换
+    let date = Date.now();
+    console.log("请求开始:"+date);
     let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
     if(parserErr) return cb(null, ReHandler.fail(parserErr));
     const [tokenErr, token] = await Model.currentToken(event);
@@ -129,6 +131,7 @@ export async function gamePlayerList(event, context, cb) {
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
         console.log("guangliyuan");
         [err, userList] = await userModel.scan(requestParams);
+        console.log("查询结束:"+Date.now());
     }else if(role == RoleCodeEnum.Merchant) { //如果是商家
         requestParams = requestParams || {};
         requestParams.buId = displayId;
@@ -175,6 +178,7 @@ export async function gamePlayerList(event, context, cb) {
     function isSort(a, b){
         return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
     }
+    
     ResOK(cb, {list: userList});
 }
 
