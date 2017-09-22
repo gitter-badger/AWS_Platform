@@ -1,4 +1,6 @@
 {
+    "region": "ap-southeast-1",
+    "bucketPrefix": "backup-na-full-",
     "stage": "dev",
     "cron": "0 2 * * *",
     "fullBackupTables": [

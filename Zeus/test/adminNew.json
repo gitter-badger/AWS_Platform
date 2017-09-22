@@ -17,10 +17,10 @@
   "body": {
     "role": "1",
     "subRole": "admin",
-    "username": "NAtest",
+    "username": "NAadmin",
     "password": "Ab123456",
     "adminName": "初始管理员",
     "adminContact": "18780004427",
-    "adminEmail": "NAtest@admin.com"
+    "adminEmail": "naadmin@na.com"
   }
 }

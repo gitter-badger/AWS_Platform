@@ -2,6 +2,36 @@ service: Javis
 plugins:
   - serverless-webpack
   - serverless-dynamodb-autoscaling
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
+      # Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
+      Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
 custom:
   webpackIncludeModules: true
   capacities: #数据库自动扩容
@@ -184,36 +214,6 @@ custom:
     #     minimum: 1
     #     maximum: 2
     #     usage: 0.75
-provider:
-  name: aws
-  runtime: nodejs6.10
-  region: ap-southeast-1
-  memorySize: 256
-  environment:
-      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-        - dynamodb:DescribeStream
-        - dynamodb:GetRecords
-        - dynamodb:GetShardIterator
-        - dynamodb:ListStreams
-      # Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
-      Resource:
-          Fn::Join:
-          - ''
-          - - 'arn:aws:dynamodb:'
-            - Ref: AWS::Region
-            - ":"
-            - Ref: AWS::AccountId
-            - ":table/*"
 functions:
   # initData:
   #   handler: api.initData
