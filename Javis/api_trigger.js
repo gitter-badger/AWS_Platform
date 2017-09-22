@@ -116,8 +116,6 @@ async function updateAmount(userId, dateStr,amount, gameType, obj) {
         return [getErr];
     }
     let statInfo = findStat(statInfoList);
-    console.log("11111");
-    console.log(statInfo);
     if(!statInfo) {
         let [saveErr] = await billStatModel.save();
         if(saveErr) {
