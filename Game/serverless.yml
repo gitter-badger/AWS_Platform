@@ -39,14 +39,15 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:BatchWriteItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
+        - dynamodb:*
+        # - dynamodb:DescribeTable
+        # - dynamodb:Query
+        # - dynamodb:Scan
+        # - dynamodb:GetItem
+        # - dynamodb:PutItem
+        # - dynamodb:BatchWriteItem
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
       Resource:
           Fn::Join:
           - ''
@@ -113,8 +114,8 @@ resources:
             AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
         GlobalSecondaryIndexes:
           -
             IndexName: userIdIndex
@@ -125,8 +126,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
     HeraGameRecord:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -208,8 +209,8 @@ resources:
             AttributeName: sn
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
         GlobalSecondaryIndexes:
           -
             IndexName: roleDateIndex
@@ -223,8 +224,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: roleTypeIndex
             KeySchema:
@@ -237,8 +238,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: userIdAndDate
             KeySchema:
@@ -251,5 +252,5 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5

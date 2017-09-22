@@ -99,12 +99,25 @@ const playerBalanceTrigger = async(e, c , cb) => {
         console.info("玩家余额变更推送成功");
     }
 }
-async function updateAmount(userId, dateStr,amount, obj) {
+async function updateAmount(userId, dateStr,amount, gameType, obj) {
+    function findStat(list){
+        let stat = null;
+        list.forEach((item) => {
+            if(item.gameType == gameType) {
+                stat = item;
+                return;
+            }
+        })
+        return stat;
+    }
     let billStatModel = new BillStatModel({userId:userId, dateStr : dateStr, ...obj});
-    let [getErr, statInfo] = await billStatModel.get({userId:userId, dateStr : dateStr},[],"userIdAndDate");
+    let [getErr, statInfoList] = await billStatModel.get({userId:userId, dateStr : dateStr},[], "userIdAndDate", true);
     if(getErr) {
         return [getErr];
     }
+    let statInfo = findStat(statInfoList);
+    console.log("11111");
+    console.log(statInfo);
     if(!statInfo) {
         let [saveErr] = await billStatModel.save();
         if(saveErr) {
@@ -121,35 +134,41 @@ async function updateAmount(userId, dateStr,amount, obj) {
     }
     return [null]
 }
-const saveStatRecord = async(userId, role,amount, obj,allUserId) => {
+const saveStatRecord = async(userId, role,amount, gameType,obj,allUserId) => {
     console.log("账单金额："+amount);
     //天统计
     let todayStr = TimeUtil.formatDay(new Date());
-    let [dayErr] = await updateAmount(userId, todayStr, amount, {
+    let [dayErr] = await updateAmount(userId, todayStr, amount, gameType,{
         role : role,
         type : 1,
         ...obj
     });
+    console.log("保存天");
     if(dayErr) {
+        console.log("保存天错误");
         return console.log(dayErr);
     }
     //月统计
     let monthStr = TimeUtil.formatMonth(new Date());
-    let [monthErr] = await updateAmount(userId, monthStr, amount, {
+    let [monthErr] = await updateAmount(userId, monthStr, amount, gameType, {
         role : role,
         type : 2,
         ...obj
     });
+    console.log("保存月");
     if(monthErr) {
+        console.log("保存月错误");
         return console.log(dayErr);
     }
     //总统计日统计
-    let [sumErr] = await updateAmount(allUserId, todayStr, amount, {
+    let [sumErr] = await updateAmount(allUserId, todayStr, amount, gameType, {
         role : role,
-        type : 1,
+        type : 3,
         ...obj
     });
+    console.log("总统计日统计");
     if(sumErr) {
+        console.log("总统计日统计错误");
         return console.log(sumErr);
     }
 }
@@ -174,7 +193,7 @@ const playerBillStat = async(userName, createAt) => {
     if(billInfo.type == 3 || billInfo.type == 4) {
         let allUserId = userInfo.msn == "000" ? "ALL_AGENT_PLAYER" : "ALL_PLAYER";
         console.log("allUserId:" +allUserId);
-        saveStatRecord(billInfo.userId+"", "10000", billInfo.amount,{
+        saveStatRecord(billInfo.userId+"", "10000", billInfo.amount, billInfo.gameType, {
             gameType : billInfo.gameType
         }, allUserId);
     }
@@ -265,7 +284,7 @@ const userBillTrigger = async(e, c, cb) => {
     }
     //退钱不管，只管上级给下级存钱
     if(amount<0 && +billInfo.fromRole < +billInfo.toRole) {  //扣钱(上级给下级存钱)
-        saveStatRecord(userId, userInfo.role, billInfo.amount, {}, "ALL_ADMIN");
+        saveStatRecord(userId, userInfo.role, billInfo.amount, "-1", {}, "ALL_ADMIN");
     }
 }
 

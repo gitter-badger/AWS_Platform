@@ -69,22 +69,13 @@ const overview = async function(event, context, callback) {
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints("10000", "ALL_PLAYER");
+        let [sumErr, sumPoints] = await saleSumPoints("10000");
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
         return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
       }
       case 3 : {  //玩家总数
-        // let [sumErr, count] = await new PlayerModel().sumCount();
-        // if(sumErr) {
-        //     return errorHandle(callback, ReHandler.fail(sumErr));
-        // }
-        // console.log("玩家总数:"+ count);
-        // let [onLineErr, online] = await new PlayerModel().online();
-        // if(onLineErr) {
-        //     return errorHandle(callback, ReHandler.fail(onLineErr));
-        // }
         let [err, obj] = await new PlayerModel().statCount();
         if(err) {
             return errorHandle(callback, ReHandler.fail(err));
@@ -133,7 +124,7 @@ const gameConsumeStat = async function(event, context, callback) {
      return callback(null, ReHandler.fail(checkAttError));
   }
   let {startTime, endTime} = requestParams;
-  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1,"ALL_PLAYER");
+  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",3,"ALL_PLAYER");
   if(listErr) {
     return callback(null, ReHandler.fail(listErr));
   }
@@ -155,7 +146,6 @@ const gameConsumeStat = async function(event, context, callback) {
     returnObj.elec.push(0);
     returnObj.store.push(0);
   }
-  console.log(list);
   list.forEach((item) => {
       let {dateStr, gameType,amount} = item;
       let index = returnObj.keys.indexOf(dateStr);
@@ -261,9 +251,9 @@ async function saleSumPoints(role, userId){
     }
     let sum = 0;
     array.forEach(function(element) {
-        if(userId  && element.userId == userId) {
+        // if(userId  && element.userId == userId) {
             sum += element.amount;
-        }
+        // }
     }, this);
     return [null, sum];
 }
