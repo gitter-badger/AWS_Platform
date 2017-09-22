@@ -100,6 +100,7 @@ const playerBalanceTrigger = async(e, c , cb) => {
     }
 }
 async function updateAmount(userId, dateStr,amount, gameType, obj) {
+    obj.gameType = gameType;
     function findStat(list){
         let stat = null;
         list.forEach((item) => {
@@ -132,7 +133,7 @@ async function updateAmount(userId, dateStr,amount, gameType, obj) {
     }
     return [null]
 }
-const saveStatRecord = async(userId, role,amount, gameType,obj,allUserId) => {
+const saveStatRecord = async(userId, role,amount, gameType,obj,allUserId,merchantId) => {
     console.log("账单金额："+amount);
     //天统计
     let todayStr = TimeUtil.formatDay(new Date());
@@ -158,16 +159,28 @@ const saveStatRecord = async(userId, role,amount, gameType,obj,allUserId) => {
         console.log("保存月错误");
         return console.log(dayErr);
     }
-    //总统计日统计
-    let [sumErr] = await updateAmount(allUserId, todayStr, amount, gameType, {
-        role : role,
-        type : 3,
-        ...obj
-    });
-    console.log("总统计日统计");
-    if(sumErr) {
-        console.log("总统计日统计错误");
-        return console.log(sumErr);
+    if(allUserId) {
+        //总统计日统计
+        let [sumErr] = await updateAmount(allUserId, todayStr, amount, gameType, {
+            role : role,
+            type : 3,
+            ...obj
+        });
+        console.log("总统计日统计");
+        if(sumErr) {
+            console.log("总统计日统计错误");
+            return console.log(sumErr);
+        }
+    }
+    if(merchantId) {
+        let [merchantErr] = await updateAmount(merchantId, todayStr, amount, gameType,{
+            role : role,
+            type : 1,
+            ...obj
+        });
+        if(merchantErr) {
+            return console.log(merchantErr);
+        }
     }
 }
 
@@ -193,7 +206,7 @@ const playerBillStat = async(userName, createAt) => {
         console.log("allUserId:" +allUserId);
         saveStatRecord(billInfo.userId+"", "10000", billInfo.amount, billInfo.gameType, {
             gameType : billInfo.gameType
-        }, allUserId);
+        }, allUserId, userInfo.parent);
     }
 }
 /**
@@ -270,7 +283,7 @@ const userBillTrigger = async(e, c, cb) => {
         console.log("账单不存在");
         return;
     }
-    let amount = billInfo.amount;
+    let {amount, fromUser, toUser,fromRole, toRole} = billInfo;
     let [userErr, userInfo] = await new PlatformUserModel().findByUserId(userId);
     if(userErr) {
         console.log(userErr);
@@ -280,9 +293,22 @@ const userBillTrigger = async(e, c, cb) => {
         console.log("用户不存在");
         return;
     }
-    //退钱不管，只管上级给下级存钱
-    if(amount<0 && +billInfo.fromRole < +billInfo.toRole) {  //扣钱(上级给下级存钱)
-        saveStatRecord(userId, userInfo.role, billInfo.amount, "-1", {}, "ALL_ADMIN");
+    //找到上下级关系，只有上次给下级存钱才保存
+    let [fromUserErr, fromUserInfo] = await new PlatformUserModel().get({username:fromUser,role:fromRole},[], "RoleUsernameIndex");
+    if(fromUserErr || !fromUserInfo) {
+        return console.log("找来源用户错误:"+fromUserErr);
+    }
+    let [toUserErr, toUserInfo] = await new PlatformUserModel().get({username:toUser,role:toRole},[], "RoleUsernameIndex");
+    if(toUserErr || !toUserInfo) {
+        return console.log("找来源用户错误:"+toUserErr);
+    }
+    let levelArr = toUserInfo.levelIndex.split(",");
+    let isAdmin = fromRole == RoleCodeEnum.SuperAdmin || fromRole == RoleCodeEnum.PlatformAdmin;
+    let parentUid = levelArr.pop();
+    if((parentUid == userId || (isAdmin && parentUid == "01")) && amount < 0) { //只管直属上级对下级存钱
+        console.log("是直属");
+        let allUserId = isAdmin ? "ALL_ADMIN" : null;
+        saveStatRecord(userId, userInfo.role, billInfo.amount, "-1", {}, allUserId);
     }
 }
 

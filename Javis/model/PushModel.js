@@ -10,6 +10,7 @@ const State = {
 // const host = '192.168.3.11';
 // const host = '47.88.192.69'; //生产环境
 const host = '47.74.154.114';  //开发环境
+// const host = '47.74.152.121';  //正式环境
 const port = 20003;
 export class PushModel{
     constructor({username, role, userId, displayName,  headPic, parent, msn, gameList, suffix, levelIndex, liveMix, vedioMix, rate, merUrl} = {}) {

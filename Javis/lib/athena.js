@@ -36,15 +36,18 @@ export class BaseModel {
     get(conditions, returnValues = [], indexName, all) {
         let keyConditionExpression = "";
         let expressionAttributeValues = {};
+        let expressionAttributeNames = {};
         for (let key in conditions) {
-            keyConditionExpression += `${key}=:${key} and `;
+            keyConditionExpression += `#${key}=:${key} and `;
             expressionAttributeValues[`:${key}`] = conditions[key];
+            expressionAttributeNames[`#${key}`] = key;
         }
         keyConditionExpression = keyConditionExpression.substr(0, keyConditionExpression.length - 4);
         return new Promise((reslove, reject) => {
             this.db$("query", {
                 // Key:key,
                 KeyConditionExpression: keyConditionExpression,
+                ExpressionAttributeNames : expressionAttributeNames,
                 ExpressionAttributeValues: expressionAttributeValues,
                 IndexName: indexName,
                 ReturnValues: returnValues.join(",")

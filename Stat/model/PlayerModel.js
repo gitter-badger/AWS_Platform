@@ -29,8 +29,8 @@ export class PlayerModel extends athena.BaseModel {
         }
         return [null, sum - agentCount];
     }
-    async statCount(){
-        let [palyErr, list] = await this.scan({},"msn,gameState");
+    async statCount(buIds) {
+        let [palyErr, list] = await this.scan({},"msn,gameState,parent");
         if(palyErr) {
             return [palyErr, {}];
         }
@@ -38,10 +38,21 @@ export class PlayerModel extends athena.BaseModel {
         let online =0;
         list.forEach(function(element) {
             if(element.msn != "000") {
-                sum ++;
-                if(element.gameState ==2  || element.gameState ==3) {
-                    online ++;
+                if(!buIds) {
+                    sum ++;
+                    if(element.gameState ==2  || element.gameState ==3) {
+                        online ++;
+                    }
+                }else {
+                    let parent = element.parent;
+                    if(buIds.indexOf(parent) != -1) {
+                        sum ++;
+                        if(element.gameState ==2  || element.gameState ==3) {
+                            online ++;
+                        }
+                    }
                 }
+                
             }
         }, this);
         return [null,  {oneNum : online, twoNum:sum}];

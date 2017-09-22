@@ -29,54 +29,80 @@ import {Model} from "./lib/Dynamo"
  */
 const overview = async function(event, context, callback) {
   console.log(event);
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-      errorHandle(callback, ReHandler.fail(tokenErr));
-  }
-  const [e, tokenInfo] = await JwtVerify(token[1])
-  if(e) {
-    return errorHandle(callback, ReHandler.fail(e));
-  }
   //json转换
   let [parserErr, requestParams] = Util.parseJSON(event.body || {});
   if(parserErr) return cb(null, ReHandler.fail(parserErr));
+
+  let [tokenErr, tokenInfo] = await validateToken(event);
+  if(tokenErr) {
+      return callback(null, ReHandler.fail(tokenErr));
+  }
   //检查参数是否合法
   let [checkAttError, errorParams] = Util.checkProperties([
-    {name : "type", type:"N"}  //售出情况   2，收益情况  3，玩家数量情况  4，签约情况
+    {name : "type", type:"N"}  //1,售出情况   2，收益情况  3，玩家数量情况  4，签约情况
   ], requestParams);
   if(checkAttError) {
      Object.assign(checkAttError, {params: params});
      return callback(null, ReHandler.fail(checkAttError));
   }
   let {date, type} = requestParams;
+  let {role, userId} = tokenInfo;
+  let isAdmin = role == RoleCodeEnum.SuperAdmin || role ==RoleCodeEnum.PlatformAdmin;
+  if(role == RoleCodeEnum.SuperAdmin) {
+      role = RoleCodeEnum.PlatformAdmin;
+  }
   switch(type) {
       case 1 : {
         let date = TimeUtil.formatDay(new Date());
         //获取当天的售出点数
-        let [currErr, sumTodayPoints] = await salePointsByDate("1",date);
+        console.log(role+"     "+date);
+        let [currErr, sumTodayPoints] = await salePointsByDate(role, date, isAdmin ? "ALL_ADMIN" : userId);
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints("1","ALL_ADMIN");
+        let [sumErr, sumPoints] = await saleSumPoints(role ,isAdmin ? "ALL_ADMIN" : userId);
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
         return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
       }
       case 2 : {  //收益情况
+        let uids = [];
+        //管理员
+        if(isAdmin) uids = ["ALL_PLAYER"];
+        //商户
+        if(role == RoleCodeEnum.Merchant) uids = [userId];
+        //线路商
+        if(role == RoleCodeEnum.Manager) {
+            uids = await findChildrenMerchant(userId);
+            console.log("线路商");
+            console.log(uids);
+        }
         let date = TimeUtil.formatDay(new Date());
-        let [currErr, sumTodayPoints] = await salePointsByDate("10000",date, "ALL_PLAYER");
+        let [currErr, sumTodayPoints] = await salePointsByDate("10000",date, uids);
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints("10000", "ALL_PLAYER");
+        let [sumErr, sumPoints] = await consumeSumPoints("10000", isAdmin? "ALL_PLAYER" : uids);
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
         return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
       }
       case 3 : {  //玩家总数
-        let [err, obj] = await new PlayerModel().statCount();
+        let err, obj;
+        if(isAdmin) {
+            [err, obj] = await new PlayerModel().statCount();
+        }else {
+            let buIds = [];
+            if(role == RoleCodeEnum.Merchant) {
+                buIds = [userId];
+            }
+            if(role == RoleCodeEnum.Manager) {
+                buIds = await findChildrenMerchant(userId);
+            }
+            [err, obj] = await new PlayerModel().statCount(buIds);
+        }
         if(err) {
             return errorHandle(callback, ReHandler.fail(err));
         }
@@ -84,23 +110,45 @@ const overview = async function(event, context, callback) {
         return callback(null, ReHandler.success(obj));
       }
       case 4 : { //签约情况
+        let buIds;
+        if(role == RoleCodeEnum.Manager) {
+            buIds = await findChildrenMerchant(userId);
+        }else if(role == RoleCodeEnum.Merchant) {
+            return callback(null, ReHandler.success({oneNum: 0, twoNum:0,type:type}));
+        }
         let startTime = TimeUtil.getDayFirstTime(new Date());
-        let [todayErr, todayMerchantCount] = await new PlatformUserModel().merchantCount(startTime.getTime());
+        let [todayErr, todayMerchantCount] = await new PlatformUserModel().merchantCount(startTime.getTime(), buIds);
         if(todayErr) {
             return errorHandle(callback, ReHandler.fail(todayErr));
         }
-        let [sumErr, sumCount] = await new PlatformUserModel().merchantCount();
+        let [sumErr, sumCount] = await new PlatformUserModel().merchantCount(null, buIds);
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
         return callback(null, ReHandler.success({oneNum: todayMerchantCount, twoNum:sumCount, type:type}));
-      }
-      default : {
-        return callback(null, ReHandler.success({oneNum: 0, twoNum:0,type:type}));
-      }
+        }
+        default : {
+            return callback(null, ReHandler.success({oneNum: 0, twoNum:0,type:type}));
+        }
   }
 }
 
+async function validateToken(event){
+    const [tokenErr, token] = await Model.currentToken(event);
+    if (tokenErr) {
+        return [tokenErr,null]
+    }
+    const [e, tokenInfo] = await JwtVerify(token[1])
+    return [e,tokenInfo];
+}
+async function findChildrenMerchant(userId) {
+    //找到该线路商下所有商户
+    let [merErr, merchantList] = await new PlatformUserModel().childrenMerchant(userId);
+    if(merErr) {
+        return null;
+    }
+    return merchantList.map((item) => item.userId);
+}
 /**
  * 游戏消耗详情
  * @param {*} event 
@@ -108,10 +156,7 @@ const overview = async function(event, context, callback) {
  * @param {*} callback 
  */
 const gameConsumeStat = async function(event, context, callback) {
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-      errorHandle(callback, ReHandler.fail(tokenErr));
-  }
+  console.log(event);
   let [parserErr, requestParams] = Util.parseJSON(event.body || {});
   if(parserErr) return cb(null, ReHandler.fail(parserErr));
   //检查参数是否合法
@@ -123,8 +168,28 @@ const gameConsumeStat = async function(event, context, callback) {
      Object.assign(checkAttError, {params: params});
      return callback(null, ReHandler.fail(checkAttError));
   }
+  let [tokenErr, tokenInfo] = await validateToken(event);
+  if(tokenErr) {
+      return callback(null, ReHandler.fail(tokenErr));
+  }
   let {startTime, endTime} = requestParams;
-  let [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",3,"ALL_PLAYER");
+  let {userId, role} = tokenInfo;
+  let listErr, list= [];
+  if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {  //平台管理员
+      [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",3,"ALL_PLAYER");
+  }else if(role == RoleCodeEnum.Manager){  //线路商
+    //找到该线路商下所有商户
+    let [merErr, merchantList] = await new PlatformUserModel().childrenMerchant(userId);
+    if(merErr) {
+        return callback(null, ReHandler.fail(merErr));
+    }
+    if(merchantList.length > 0) {
+        let uids = merchantList.map((item) => item.userId);
+        [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1, uids);
+    }
+  } else if(role == RoleCodeEnum.Merchant) { //商户
+    [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1, userId);
+  } 
   if(listErr) {
     return callback(null, ReHandler.fail(listErr));
   }
@@ -171,10 +236,7 @@ const gameConsumeStat = async function(event, context, callback) {
  * @param {*} callback 
  */
 const consumeAndIncome = async function(event, context, callback) {
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-      errorHandle(callback, ReHandler.fail(tokenErr));
-  }
+  console.log(event);
   let [parserErr, requestParams] = Util.parseJSON(event.body || {});
   if(parserErr) return cb(null, ReHandler.fail(parserErr));
   //检查参数是否合法
@@ -186,15 +248,40 @@ const consumeAndIncome = async function(event, context, callback) {
      Object.assign(checkAttError, {params: params});
      return callback(null, ReHandler.fail(checkAttError));
   }
-  let {startTime, endTime} = requestParams;
 
+  let [tokenErr, tokenInfo] = await validateToken(event);
+  if(tokenErr) {
+      return callback(null, ReHandler.fail(tokenErr));
+  }
+  let {startTime, endTime} = requestParams;
+  let {userId, role} = tokenInfo;
+
+  let consumeErr, consumeList = [], saldeErr, saleList = [];
   //游戏消耗
-  let [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "10000", 3, "ALL_PLAYER");
+  if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {  //平台管理员
+    [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "10000", 3, "ALL_PLAYER");
+    //售出点数
+  [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "1", 3, "ALL_ADMIN");
+  }else if(role == RoleCodeEnum.Manager) {  //线路商
+    //找到该线路商下所有商户
+    let [merErr, merchantList] = await new PlatformUserModel().childrenMerchant(userId);
+    if(merErr) {
+        return callback(null, ReHandler.fail(merErr));
+    }
+    if(merchantList.length > 0) {
+        let uids = merchantList.map((item) => item.userId);
+        [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1, uids);
+    }
+    //售出点数
+  [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "1", 1, userId);
+  }else if(role == RoleCodeEnum.Merchant) {  //商户
+    [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1, userId);
+  }
+  
   if(consumeErr) {
       return callback(null, ReHandler.fail(consumeErr));
   }
-  //售出点数
-  let [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "1", 3, "ALL_ADMIN");
+  
   if(saldeErr) {
       return callback(null, ReHandler.fail(saldeErr));
   }
@@ -225,7 +312,8 @@ const consumeAndIncome = async function(event, context, callback) {
 /**
  * 当日售出点数
  */
-async function salePointsByDate(role, date, userId){
+async function salePointsByDate(role, date, uids){
+    if(typeof uids == "string") uids = [uids];
     let billStatModel = new BillStatModel();
     let [billErr, array] = await billStatModel.get({role:role, dateStr:date},[], "roleDateIndex", true);
     if(billErr) {
@@ -233,7 +321,7 @@ async function salePointsByDate(role, date, userId){
     }
     let sum = 0;
     array.forEach(function(element) {
-        if(element.type == 3 && element.userId == userId) {
+        if(uids.indexOf(element.userId)!=-1){
             sum += element.amount;
         }
     }, this);
@@ -244,8 +332,17 @@ async function salePointsByDate(role, date, userId){
  * 售出点数总和
  */
 async function saleSumPoints(role, userId){
+    console.log("role:"+role)
     let billStatModel = new BillStatModel();
-    let [billErr, array] = await billStatModel.get({role:role, type:3}, [] ,"roleTypeIndex", true);
+    let conditions = {
+        role : role
+    }
+    if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
+        conditions.type = 3;
+    }else {
+        conditions.type = 1;
+    }
+    let [billErr, array] = await billStatModel.get(conditions, [] ,"roleTypeIndex", true);
     if(billErr) {
         return [billErr, 0]
     }
@@ -254,6 +351,39 @@ async function saleSumPoints(role, userId){
         if(userId  && element.userId == userId) {
             sum += element.amount;
         }
+    }, this);
+    return [null, sum];
+}
+/**
+ * 收益点数总和
+ */
+async function consumeSumPoints(role, userId){
+   
+    let billStatModel = new BillStatModel();
+    let conditions = {
+        role : role,
+    }
+    if(typeof userId == "string") {
+        conditions.type = 3;
+    }else {
+        conditions.type = 1;
+    }
+    let [billErr, array] = await billStatModel.get(conditions, [] ,"roleTypeIndex", true);
+    if(billErr) {
+        return [billErr, 0]
+    }
+    let sum = 0;
+    array.forEach(function(element) {
+        if(typeof userId == "string") {
+            if(userId  && element.userId == userId) {
+                sum += element.amount;
+            }
+        }else {
+            if(userId.indexOf(element.userId)!=-1) {
+                sum += element.amount;
+            }
+        }
+        
     }, this);
     return [null, sum];
 }
@@ -304,5 +434,5 @@ const errorHandle = (cb, error) =>{
 export{
     overview, //总看板
     gameConsumeStat, //游戏消耗详情
-    consumeAndIncome
+    consumeAndIncome, //售出/收益
 }

@@ -14,9 +14,15 @@ export const MSNStatusEnum = {
 // }
 
 //测试环境
+// export const GameTypeEnum = {
+//   '10000': { code: '10000', name: '棋牌游戏', url: 'http://47.74.154.114/webadmin/public/admin/api/checkLoginAccess', desc: '这是棋牌游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+//   '40000': { code: '40000', name: '电子游戏', url: 'http://47.74.154.114/tigergame/public/admin/api/checkLoginAccess', desc: '这是电子游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+//   '30000': { code: '30000', name: '真人视讯', url: 'http://52.221.134.197:8080/gate/player/login', desc: '这是真人视讯', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' }
+// }
+
 export const GameTypeEnum = {
-  '10000': { code: '10000', name: '棋牌游戏', url: 'http://47.74.154.114/webadmin/public/admin/api/checkLoginAccess', desc: '这是棋牌游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
-  '40000': { code: '40000', name: '电子游戏', url: 'http://47.74.154.114/tigergame/public/admin/api/checkLoginAccess', desc: '这是电子游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+  '10000': { code: '10000', name: '棋牌游戏', url: 'http://47.88.175.41/webadmin/public/admin/api/checkLoginAccess', desc: '这是棋牌游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+  '40000': { code: '40000', name: '电子游戏', url: 'http://47.88.175.41/tigergame/public/admin/api/checkLoginAccess', desc: '这是电子游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
   '30000': { code: '30000', name: '真人视讯', url: 'http://52.221.134.197:8080/gate/player/login', desc: '这是真人视讯', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' }
 }
 /**
