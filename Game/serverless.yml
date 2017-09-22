@@ -1,34 +1,7 @@
-
 service: Game
 plugins:
   - serverless-webpack
   - serverless-dynamodb-autoscaling
-custom:
-  webpackIncludeModules: true
-  capacities: #数据库自动扩容
-    - table: HeraGameRecord
-      index:
-        - parentIdIndex
-        - CreatedDateIndex
-      read:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
-      write:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
-    - table: HeraGamePlayer
-      index:
-        - userIdIndex
-      read:
-        minimum: 1
-        maximum: 100
-        usage: 0.75
-      write:
-        minimum: 1
-        maximum: 15
-        usage: 0.75
 provider:
   name: aws
   runtime: nodejs6.10
@@ -56,6 +29,32 @@ provider:
             - ":"
             - Ref: AWS::AccountId
             - ":table/*"
+custom:
+  webpackIncludeModules: true
+  capacities: #数据库自动扩容
+    - table: HeraGameRecord
+      index:
+        - parentIdIndex
+        - CreatedDateIndex
+      read:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 10
+        usage: 0.75
+    - table: HeraGamePlayer
+      index:
+        - userIdIndex
+      read:
+        minimum: 1
+        maximum: 100
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 15
+        usage: 0.75
 functions:
   tokenVerify:
     handler: api.jwtverify

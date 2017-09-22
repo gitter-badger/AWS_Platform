@@ -1,8 +1,6 @@
 service: Hera
 plugins:
   - serverless-webpack
-custom:
-  webpackIncludeModules: true
 provider:
   name: aws
   runtime: nodejs6.10
@@ -35,6 +33,8 @@ provider:
             - ":"
             - Ref: AWS::AccountId
             - ":table/*"
+custom:
+  webpackIncludeModules: true
 functions:
   tokenVerify:
     handler: managerApi.jwtverify
