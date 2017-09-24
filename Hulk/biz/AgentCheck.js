@@ -47,8 +47,8 @@ export class AgentCheck {
         inparam.level = 0
         inparam.levelIndex = '0'
         inparam.rate = 100.00
-        inparam.vedioMix = 100.00
-        inparam.liveMix = 100.00
+        inparam.vedioMix = 1.00
+        inparam.liveMix = 1.00
 
         return [checkAttError, errorParams]
     }
