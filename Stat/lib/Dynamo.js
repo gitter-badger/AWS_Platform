@@ -118,11 +118,18 @@ export const Model = {
   },
   uuid: () => uid(),
   timeStamp: () => (new Date()).getTime(),
-  currentToken: async (e) => {
-    if (!e || !e.requestContext.authorizer) {
-      throw BizErr.TokenErr()
+  currentToken: async (e) =>{
+    e.headers = e.headers || {};
+    e.headers.Authorization = e.headers.Authorization;
+    e.requestContext = e.requestContext || {};
+    if (!e || (!e.requestContext.authorizer && !e.headers.Authorization)) {
+      return [new CHeraErr(CODES.TokenError),0]
     }
-    return [0, e.requestContext.authorizer]
+    if(!e.headers.Authorization) {
+      return [0, e.requestContext.authorizer]
+    }else {
+      return [0,e.headers.Authorization.split(" ")]
+    }
   },
   currentRoleToken: async (e, roleCode) => {
     if (!e || !e.requestContext.authorizer) {

@@ -4,7 +4,7 @@ import {Tables} from "../lib/Dynamo"
 
 import {RoleCodeEnum} from "../lib/all";
 
-import {CODES, CHeraErr} from "../lib/Codes";
+import {Codes, BizErr} from "../lib/Codes";
 
 const sumLineMerchantCount = 999;
 
@@ -34,7 +34,7 @@ export class PlatformUserModel extends athena.BaseModel {
         })
     }
     //商户数量
-    merchantCount(startTime){
+    merchantCount(startTime, buIds){
         let opts = {
             TableName : this.tableName,
             FilterExpression : "#role=:role",
@@ -50,12 +50,48 @@ export class PlatformUserModel extends athena.BaseModel {
             opts.ExpressionAttributeValues[":createdAt"] = startTime
         }
         return new Promise((reslove, reject) => {
-            this.db$("scan", opts, ["msn"]).then((result) => {
-                return reslove([null,  result.Items.length]);
+            this.db$("scan", opts, ["msn,userId"]).then((result) => {
+                if(!buIds) {
+                    return reslove([null,  result.Items.length]);
+                } else {
+                    let count = 0;
+                    result.Items.forEach(function(element) {
+                        if(buIds.indexOf(element.userId)!=-1) {
+                            count ++;
+                        }
+                    }, this);
+                    return reslove([null,  count]);
+                }
+                
             }).catch((err) => {
                 console.log(err);
                 return reslove([err, 0]);
             })
+        })
+    }
+    async childrenMerchant(userId) {
+        let opts = {
+            FilterExpression : "contains(#levelIndex, :userId) and #role=:role",
+            ExpressionAttributeValues : {
+                ":userId" : userId,
+                ":role" : RoleCodeEnum.Merchant
+            },
+            ExpressionAttributeNames : {
+                "#levelIndex" : "levelIndex",
+                "#role" : "role"
+            },
+            ProjectionExpression : "userId"
+        }
+        console.log(opts);
+        return new Promise((reslove, reject) => {
+            this.db$("scan", opts).then((result) => {
+                result = result || {};
+                result.Items = result.Items || [];
+                return reslove([null, result.Items]);
+            }).catch((err) => {
+                console.log(err);
+                return reslove([BizErr.DBErr(), null]);
+            });
         })
     }
     findByUids(uids){

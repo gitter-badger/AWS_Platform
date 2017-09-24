@@ -1,0 +1,8 @@
+{
+    "requestContext" : {
+        "authorizer" : [0, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyM2UwN2RmMS00NzJmLTRiOTctOGVhNy02ZjNkZjBlZTA1ZTUiLCJyb2xlIjoiMTAiLCJzdWZmaXgiOiJTVEFUTDEiLCJ1c2VybmFtZSI6IlNUQVRMMV9TdGF0TGluZTEiLCJwYXJlbnQiOiIwMSIsInBhcmVudE5hbWUiOiJQbGF0Zm9ybV9jaGVud2VuZGV2YWRtaW4iLCJwYXJlbnREaXNwbGF5TmFtZSI6IuW5s-WPsOeuoeeQhuWRmCIsInBhcmVudFJvbGUiOiIxIiwiZGlzcGxheU5hbWUiOiLnu5_orqHnrKzkuIDkuKrnur_ot6_llYYiLCJsZXZlbCI6MSwiZGlzcGxheUlkIjoyMzc0MDcsImNvbnRyYWN0UGVyaW9kIjowLCJpc2ZvcmV2ZXIiOnRydWUsInVwZGF0ZWRBdCI6MTUwNjA4OTc0NDA1OSwiaWF0IjoxNTA2MDkwMzc0fQ.6l8PRqTTI3pM-wbdPi9maoYHzMcJzhrg6DjDlGI1-jE"]
+    },
+    "body" : {
+        "type" : 2
+    }
+}

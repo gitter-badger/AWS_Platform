@@ -29,11 +29,30 @@ export class BillStatModel extends athena.BaseModel {
             ":startTime" : startTime,
             ":endTime" : endTime,
         };
-        if(userId) {
+        if(userId && typeof userId == "string") {
             filterExpression += "and #userId=:userId";
             expressionAttributeNames["#userId"] = "userId";
             expressionAttributeValues[":userId"] = userId;
         }
+        if(userId && typeof userId == "object") {
+            filterExpression += "and ("
+            expressionAttributeNames["#userId"] = "userId";
+            for(let i = 0; i < userId.length; i ++) {
+                if(i == userId.length -1) {
+                    filterExpression += `#userId=:userId${i})`
+                }else {
+                    filterExpression += `#userId=:userId${i} or `
+                }
+                expressionAttributeValues[`:userId${i}`] = userId[i];
+            }
+        }
+        console.log({
+                IndexName : "roleTypeIndex",
+                KeyConditionExpression: keyConditionExpression,
+                FilterExpression : filterExpression,
+                ExpressionAttributeNames :expressionAttributeNames,
+                ExpressionAttributeValues: expressionAttributeValues
+            });
         return new Promise((reslove, reject) => {
             this.db$("query", {
                 IndexName : "roleTypeIndex",
