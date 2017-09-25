@@ -49,6 +49,8 @@ export const Codes = {
   CompanyNotExistError: "60005",
   PushMerchantError: "60006",
   HttpsError: '60007',
+
+  TokenExpire: '90001',
 }
 
 export const BizErr = {
@@ -141,5 +143,8 @@ export const BizErr = {
   },
   PushMerchantError: (errMsg = "company not exist") => {
     return { code: Codes.PushMerchantError, msg: errMsg }
+  },
+  TokenExpire: (errMsg = 'TOKEN已过期') => {
+    return { code: Codes.TokenExpire, msg: errMsg }
   }
 }

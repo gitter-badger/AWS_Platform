@@ -42,6 +42,7 @@ const HeraGamePlayer = 'HeraGamePlayer'
 const PushErrorModel = 'PushErrorModel'
 
 const SYSConfig = 'SYSConfig'
+const SYSToken = 'SYSToken'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -61,7 +62,8 @@ export const Tables = {
   HeraGamePlayer,
   PushErrorModel,
 
-  SYSConfig
+  SYSConfig,
+  SYSToken
 }
 
 /**
