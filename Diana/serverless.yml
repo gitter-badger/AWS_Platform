@@ -116,6 +116,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  companyUpdate: #变更厂商
+    handler: api_company.companyUpdate
+    events:
+      -
+        http:
+          path: companyUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是系统配置接口服务 ====================
   queueNew: #创建排队配置
     handler: api_config.queueNew
