@@ -109,7 +109,7 @@ export class CompanyModel extends BaseModel {
      */
     async update(inparam) {
         // 更新
-        const [err, ret] = await this.getOne(inparam)
+        let [err, ret] = await this.getOne(inparam)
         if (err) {
             return [err, 0]
         }
@@ -124,7 +124,11 @@ export class CompanyModel extends BaseModel {
         ret.companyRegion = inparam.companyRegion
         ret.license = inparam.license
         ret.updatedAt = Model.timeStamp()
-        return await this.putItem(ret)
+        [err, ret] = await this.putItem(ret)
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
     }
 }
 
