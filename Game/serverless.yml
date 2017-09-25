@@ -55,6 +55,15 @@ custom:
         minimum: 1
         maximum: 15
         usage: 0.75
+    - table: SYSToken
+      read:
+        minimum: 1
+        maximum: 100
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 100
+        usage: 0.75
 functions:
   tokenVerify:
     handler: api.jwtverify
@@ -113,8 +122,8 @@ resources:
             AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
             IndexName: userIdIndex
@@ -125,8 +134,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
     HeraGameRecord:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -253,3 +262,18 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 5
               WriteCapacityUnits: 5
+    SYSToken:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSToken
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
