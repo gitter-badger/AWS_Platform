@@ -135,22 +135,25 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    // 'password',
+    
     'parent',
     'parentName',
     'parentRole',
     'displayName',
     'level',
     'subRole'           // 二级权限
+
+    // 'password',
   ],
   '10': [// 线路商
     'userId',
     'role',
     'suffix',
     'username',
-    // 'password',
+    
     'parent',
     'parentName',
+    'parentDisplayName',
     'parentRole',
     'displayName',
     'level',
@@ -158,17 +161,20 @@ export const RoleDisplay = {
     'displayId',        // 显示ID
     'contractPeriod',   // 有效期
     'isforever',        // 是否永久
-    'updatedAt',        // 更新时间
-    'remark'            // 备注
+    'updatedAt'
+
+    // 'password',
+    // 'remark'
   ],
   '100': [// 商户
     'userId',
     'role',
     'suffix',
     'username',
-    // 'password',
+    
     'parent',
     'parentName',
+    'parentDisplayName',
     'parentRole',
     'displayName',
     'level',
@@ -179,17 +185,20 @@ export const RoleDisplay = {
     'displayId',
     'contractPeriod',
     'isforever',
-    'updatedAt',
-    'remark'
+    'updatedAt'
+
+    // 'password',
+    // 'remark'
   ],
   '1000': [// 代理
     'userId',
     'role',
     'suffix',
     'username',
-    // 'password',
+    
     'parent',
     'parentName',
+    'parentDisplayName',
     'parentRole',
     'displayName',
     'level',
@@ -200,8 +209,10 @@ export const RoleDisplay = {
     'displayId',
     'contractPeriod',
     'isforever',
-    'updatedAt',
-    'remark'
+    'updatedAt'
+
+    // 'password',
+    // 'remark'
   ]
 }
 /**
