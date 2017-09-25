@@ -12,17 +12,18 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-        - dynamodb:DescribeStream
-        - dynamodb:GetRecords
-        - dynamodb:GetShardIterator
-        - dynamodb:ListStreams
+        - dynamodb:*
+        # - dynamodb:DescribeTable
+        # - dynamodb:Query
+        # - dynamodb:Scan
+        # - dynamodb:GetItem
+        # - dynamodb:PutItem
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
+        # - dynamodb:DescribeStream
+        # - dynamodb:GetRecords
+        # - dynamodb:GetShardIterator
+        # - dynamodb:ListStreams
       # Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
       Resource:
           Fn::Join:
@@ -98,27 +99,27 @@ custom:
         minimum: 1
         maximum: 10
         usage: 0.75
-    - table: ZeusPlatformCaptcha
-      read:
-        minimum: 1
-        maximum: 2
-        usage: 0.75
-      write:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
-    - table: ZeusPlatformLog
-      index:
-        - LogRoleIndex
-        - CreatedDateIndex
-      read:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
-      write:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
+    # - table: ZeusPlatformCaptcha
+    #   read:
+    #     minimum: 1
+    #     maximum: 2
+    #     usage: 0.75
+    #   write:
+    #     minimum: 1
+    #     maximum: 10
+    #     usage: 0.75
+    # - table: ZeusPlatformLog
+    #   index:
+    #     - LogRoleIndex
+    #     - CreatedDateIndex
+    #   read:
+    #     minimum: 1
+    #     maximum: 10
+    #     usage: 0.75
+    #   write:
+    #     minimum: 1
+    #     maximum: 10
+    #     usage: 0.75
     # - table: DianaPlatformCompany
     #   read:
     #     minimum: 1
@@ -161,19 +162,19 @@ custom:
     #     minimum: 1
     #     maximum: 2
     #     usage: 0.75
-    - table: HeraGamePlayerBill
-      index:
-        - userNameIndex
-        - userIdIndex
-        - CreatedDateIndex
-      read:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
-      write:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
+    # - table: HeraGamePlayerBill
+    #   index:
+    #     - userNameIndex
+    #     - userIdIndex
+    #     - CreatedDateIndex
+    #   read:
+    #     minimum: 1
+    #     maximum: 10
+    #     usage: 0.75
+    #   write:
+    #     minimum: 1
+    #     maximum: 10
+    #     usage: 0.75
     # - table: HawkeyeGameNotice
     #   read:
     #     minimum: 1

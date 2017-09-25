@@ -1,5 +1,5 @@
 import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
-
+import { TokenModel } from './model/TokenModel'
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -16,10 +16,14 @@ const jwtverify = async (e, c, cb) => {
     return c.fail('未授权')
   }
   // 有效期校验
-  console.info('解密')
-  console.info(Math.floor(new Date().getTime() / 1000))
-  console.info(userInfo.iat)
-  console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
+  const [checkErr, checkRet] = await new TokenModel().checkExpire(userInfo)
+  if (checkErr) {
+    return c.fail(checkErr.msg)
+  }
+  // console.info('解密')
+  // console.info(Math.floor(new Date().getTime() / 1000))
+  // console.info(userInfo.iat)
+  // console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
   // if(new Date().getTime - userInfo.iat > 100000){
   //   return c.fail('Token expire')
   // }
