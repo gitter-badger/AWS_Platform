@@ -39,7 +39,7 @@ export class ToolModel extends BaseModel {
         }
 
         // Start:从编号池获取新编号
-        if (inparam.toolName == '钻石') {
+        if (inparam.toolName == 'N币') {
             inparam.toolId = '100000'
         } else if (inparam.toolName == '房卡') {
             inparam.toolId = '200000'
