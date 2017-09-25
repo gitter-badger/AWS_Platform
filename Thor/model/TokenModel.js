@@ -21,6 +21,10 @@ export class TokenModel extends BaseModel {
      * @param {*} inparam 
      */
     async checkExpire(inparam) {
+        // 判断TOKEN是否太老（大于24小时）
+        if (Math.floor((new Date().getTime() / 1000)) - inparam.iat > 86400) {
+            return [BizErr.TokenExpire(), 0]
+        }
         // 根据userId查询TOKEN
         const [err, ret] = await this.query({
             KeyConditionExpression: 'userId = :userId',
@@ -35,8 +39,6 @@ export class TokenModel extends BaseModel {
         if (ret.Items.length > 0) {
             // 超过600秒过期
             if (Math.floor((new Date().getTime() / 1000)) - ret.Items[0].iat > 600) {
-                // 删除TOKEN
-                this.deleteItem({Key: {'userId': inparam.userId}})
                 return [BizErr.TokenExpire(), 0]
             }
             // 更新过期时间
@@ -46,13 +48,6 @@ export class TokenModel extends BaseModel {
                 if (putErr) {
                     return [putErr, 0]
                 }
-            }
-        }
-        // 保存新的TOKEN
-        else {
-            const [putErr, putRet] = await this.putItem(inparam)
-            if (putErr) {
-                return [putErr, 0]
             }
         }
         return [0, inparam]

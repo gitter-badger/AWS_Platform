@@ -240,6 +240,8 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // 返回用户身份令牌
   saveUserRet = Pick(User, RoleDisplay[User.role])
   saveUserRet.subRolePermission = User.subRolePermission
+  // 更新TOKEN
+  await Store$('put', { TableName: Tables.SYSToken, Item: saveUserRet })
   return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
 }
 

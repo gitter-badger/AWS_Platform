@@ -19,20 +19,21 @@ const jwtverify = async (e, c, cb) => {
   const [checkErr, checkRet] = await new TokenModel().checkExpire(userInfo)
   if (checkErr) {
     return c.fail(checkErr.msg)
+  } else {
+    // console.info('解密')
+    // console.info(Math.floor(new Date().getTime() / 1000))
+    // console.info(userInfo.iat)
+    // console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
+    // if(new Date().getTime - userInfo.iat > 100000){
+    //   return c.fail('Token expire')
+    // }
+    // TOKEN是否有效校验（判断密码是否一致）
+    // if(!userInfo.password){
+    //   return c.fail('Token locked')
+    // }
+    // 结果返回
+    return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
   }
-  // console.info('解密')
-  // console.info(Math.floor(new Date().getTime() / 1000))
-  // console.info(userInfo.iat)
-  // console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
-  // if(new Date().getTime - userInfo.iat > 100000){
-  //   return c.fail('Token expire')
-  // }
-  // TOKEN是否有效校验（判断密码是否一致）
-  // if(!userInfo.password){
-  //   return c.fail('Token locked')
-  // }
-  // 结果返回
-  return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }
 
 export {
