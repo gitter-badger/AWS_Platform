@@ -37,8 +37,8 @@ export class TokenModel extends BaseModel {
         }
         // 存在，则判断是否过期
         if (ret.Items.length > 0) {
-            // 超过600秒过期
-            if (Math.floor((new Date().getTime() / 1000)) - ret.Items[0].iat > 600) {
+            // 超过30分钟过期
+            if (Math.floor((new Date().getTime() / 1000)) - ret.Items[0].iat > 1800) {
                 return [BizErr.TokenExpire(), 0]
             }
             // 更新过期时间
