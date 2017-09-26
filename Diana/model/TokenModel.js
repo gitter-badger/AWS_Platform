@@ -50,6 +50,10 @@ export class TokenModel extends BaseModel {
                 }
             }
         }
+        // 不存在，返回错误
+        else{
+            return [BizErr.TokenErr(), 0]
+        }
         return [0, inparam]
     }
 }
