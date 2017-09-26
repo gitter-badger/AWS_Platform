@@ -704,7 +704,7 @@ async function playerRecordValidate(event, context, callback) {
     userId: +userModel.userId,
     action: userAction,
     userName: userModel.userName,
-    amount: income
+    amount: +(income.toFixed(2))
   })
 
   userBillModel.originalAmount = oriBalance;
@@ -726,7 +726,7 @@ async function playerRecordValidate(event, context, callback) {
   }
   //更新余额
   let u = new UserModel();
-  let [updatebError] = await u.update({ userName: userModel.userName }, { balance: userSumAmount });
+  let [updatebError] = await u.update({ userName: userModel.userName }, { balance: +(userSumAmount).toFixed(2) });
   if (updatebError) return callback(null, ReHandler.fail(updatebError));
   //解除玩家状态
   if (userModel.gameState != GameState.offline) {

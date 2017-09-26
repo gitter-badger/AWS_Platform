@@ -1,10 +1,9 @@
 {
     "headers" : {},
     "body" : {
-        "nickname" : "歪歪专用",
-        "userName" : ""
+        "userName" : "歪歪专用"
     },
     "requestContext" : {
-        "authorizer" : [0,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3OWRkNzlmMS0wOTQ4LTRmZGItYWJjZi05NjFmMjQxYzY5NTYiLCJyb2xlIjoiMTAwIiwic3VmZml4IjoiWVlBMDEiLCJ1c2VybmFtZSI6IllZQTAxX3dhaXdhaXNoIiwicGFyZW50IjoiMTlhNmI2MTktOTRhMS00MTVlLTljOTMtZTBiMmEyMDg4NGVlIiwicGFyZW50TmFtZSI6IllZMDFfWXhsczAxIiwicGFyZW50Um9sZSI6IjEwIiwiZGlzcGxheU5hbWUiOiLmrarmrarnm7TlsZ7llYbmiLciLCJsZXZlbCI6MiwibXNuIjoiOTgiLCJhcGlLZXkiOiIwNTgxMGQzYS01NzhiLTQ4NGYtOWYxYi00MGFiNmMzMTdkMDMiLCJkaXNwbGF5SWQiOjY2NDYxNiwiY29udHJhY3RQZXJpb2QiOjAsImlzZm9yZXZlciI6dHJ1ZSwidXBkYXRlZEF0IjoxNTA1OTc3MjAwMDc1LCJyZW1hcmsiOiIx77yM5L2g44CCIiwiaWF0IjoxNTA2MDQ4OTgwfQ.q3txpe0rOH85Fm3pNXwpVNlpFfYaAbQrM3uq8bcNUAs"]
+        "authorizer" : [0,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOGIxODlhZS1iNzA3LTRhMTEtYTdkYS1lY2FjYWEyYWIyMjUiLCJyb2xlIjoiMSIsInN1ZmZpeCI6IlBsYXRmb3JtIiwidXNlcm5hbWUiOiJQbGF0Zm9ybV9OQWFkbWluIiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInBhcmVudFJvbGUiOiIwMCIsImRpc3BsYXlOYW1lIjoi5bmz5Y-w566h55CG5ZGYIiwibGV2ZWwiOjAsInN1YlJvbGUiOiJhZG1pbiIsInN1YlJvbGVQZXJtaXNzaW9uIjp7Im1lcmNoYW50Ijp0cnVlLCJwbGF5ZXIiOnRydWUsImdhbWUiOnRydWUsInBlcnNvbiI6dHJ1ZSwib3BlcmF0aW9uIjp0cnVlLCJmaW5hbmNlIjp0cnVlLCJyaXNrIjp0cnVlLCJzZXJ2aWNlIjp0cnVlLCJzeXN0ZW0iOnRydWV9LCJpYXQiOjE1MDYzMjQyNDl9.DTfJL8EnQEiATslg_AJgSkgRXSFIV-Bqimzrx8LEmIM"]
     }
 }

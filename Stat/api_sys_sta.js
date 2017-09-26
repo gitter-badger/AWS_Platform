@@ -64,7 +64,7 @@ const overview = async function(event, context, callback) {
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
-        return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
+        return callback(null, ReHandler.success({oneNum: -(sumTodayPoints).toFixed(2), twoNum:-(sumPoints).toFixed(2), type:type}));
       }
       case 2 : {  //收益情况
         let uids = [];
@@ -87,7 +87,7 @@ const overview = async function(event, context, callback) {
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
-        return callback(null, ReHandler.success({oneNum: -sumTodayPoints, twoNum:-sumPoints, type:type}));
+        return callback(null, ReHandler.success({oneNum: -(sumTodayPoints).toFixed(2), twoNum:-(sumPoints).toFixed(2), type:type}));
       }
       case 3 : {  //玩家总数
         let err, obj;
@@ -227,9 +227,18 @@ const gameConsumeStat = async function(event, context, callback) {
         returnObj.store[index] -= amount
       }
   })
+  //
+  returnObj.sum = +(returnObj.sum).toFixed(2);
+  filterNumber(returnObj.vedio);
+  filterNumber(returnObj.elec);
+  filterNumber(returnObj.store);
   callback(null, ReHandler.success({data:returnObj}));
 }
-
+function filterNumber(array = []){
+    array.forEach((item) => {
+        item = +(item).toFixed(2);
+    })
+}
 /**总收益与总消耗
  * @param {*} event 
  * @param {*} context 
@@ -305,6 +314,8 @@ const consumeAndIncome = async function(event, context, callback) {
       let index = returnObj.keys.indexOf(dateStr);
       returnObj.sale[index] -= amount;
   })
+    filterNumber(returnObj.sale);
+  filterNumber(returnObj.consume);
   callback(null, ReHandler.success({data:returnObj}));
 }
 

@@ -68,7 +68,7 @@ export function httpRequest(addr, post_data){
                 console.log("-------------");
                 console.log(str);
                 let [err, obj] = Util.parseJSON(str);
-                if(err) reslove([err,null]);
+                if(err) return reslove([err,null]);
                 if(obj.code != 0) {
                     reslove([obj,null]);
                 }else {

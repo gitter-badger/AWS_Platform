@@ -41,6 +41,7 @@ export class UserDiamondBillModel extends athena.BaseModel {
         records.forEach(function(element) {
             sumMount += +element.diamonds;
         });
+        sumMount = +(sumMount.toFixed(2));
         return [null, sumMount];
     }
     
