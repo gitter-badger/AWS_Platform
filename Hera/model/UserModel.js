@@ -4,6 +4,8 @@ import {Model} from "../lib/Dynamo"
 import {TABLE_NAMES} from "../config";
 import {Util} from "../lib/Util"
 
+import {CODES, CHeraErr} from "../lib/Codes";
+
 export const State = {
     normal : 1,  //正常,
     forzen : 0 //冻结
@@ -50,20 +52,39 @@ export class UserModel extends athena.BaseModel {
     isExist(userName) {
         return super.isExist({userName});
     }
-    findByBuIds(buIds) {
-        let filterExpression = "",
-            expressionAttributeValues = {};
+    findByBuIds(buIds, conditions = {}) {
+        console.log("111111111111111111111111");
+        let {userName, merchantName, nickname} = conditions;
+        let filterExpression = "(",
+            expressionAttributeValues = {},
+            expressionAttributeNames = {};
         for(var i =0; i < buIds.length; i++){
-            filterExpression += `buId=:buId${i} or `;
+            filterExpression += `#buId${i}=:buId${i} or `;
+            expressionAttributeNames[`#buId${i}`] = "buId";
             expressionAttributeValues[`:buId${i}`] = buIds[i];
         }
-        filterExpression = filterExpression.substring(0, filterExpression.length -3);
+        
+        filterExpression = filterExpression.substring(0,filterExpression.length -3);
+        filterExpression += ")";
+        for(let key in conditions){
+            if(userName || merchantName || nickname) {
+                if(conditions[key]) {
+                    filterExpression += `and contains(#${key},:${key}) `
+                    expressionAttributeValues[`:${key}`] = conditions[key];
+                    expressionAttributeNames[`#${key}`]  = key;
+                }
+            }
+        }
+       
+        let scanOpts = {
+            TableName : this.tableName,
+            FilterExpression : filterExpression,
+            ExpressionAttributeValues : expressionAttributeValues,
+            ExpressionAttributeNames : expressionAttributeNames
+        }
+        console.log(scanOpts);
         return new Promise((reslove, reject) => {
-            this.db$("scan", {
-                TableName : this.tableName,
-                FilterExpression : filterExpression,
-                ExpressionAttributeValues : expressionAttributeValues
-            }).then((result) => {
+            this.db$("scan", scanOpts).then((result) => {
                 reslove([null, result.Items]);
             }).catch((err) => {
                 reslove([err, 0]);
@@ -100,6 +121,46 @@ export class UserModel extends athena.BaseModel {
         }else {
             return super.save();
         }
+    }
+    async playerList(conditions) {
+        let {userName, merchantName, nickname} = conditions;
+        let filterExpression = "";
+        let expressionAttributeValues = {};
+        let expressionAttributeNames = {};
+        for(let key in conditions){
+            if(key == "userName" || key == "merchantName" || key=="nickname") {
+                if(conditions[key]) {
+                    filterExpression += `contains(#${key},:${key}) and `
+                    expressionAttributeValues[`:${key}`] = conditions[key];
+                    expressionAttributeNames[`#${key}`]  = key;
+                }
+            }else {
+                filterExpression += `#${key}=:${key} and `;
+                expressionAttributeValues[`:${key}`] = conditions[key];
+                expressionAttributeNames[`#${key}`]  = key;
+            }
+        }
+        let scanOpts = {};
+        if(filterExpression.length!=0){
+            filterExpression = filterExpression.substr(0, filterExpression.length-4);
+            scanOpts = {
+                FilterExpression : filterExpression,
+                ExpressionAttributeNames : expressionAttributeNames,
+                ExpressionAttributeValues:expressionAttributeValues
+            }
+        }
+        console.log(scanOpts);
+        return new Promise((reslove, reject) => {
+            this.db$("scan", scanOpts).then((result) => {
+                result = result || {};
+                result.Items = result.Items || [];
+                return reslove([null, result.Items || []]);
+            }).catch((err) => {
+                console.log(111);
+                console.log(err);
+                return reslove([new CHeraErr(CODES.SystemError), []]);
+            });
+        })
     }
     list(buId){
         let scanParams = {

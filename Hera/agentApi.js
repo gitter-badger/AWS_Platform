@@ -133,8 +133,15 @@ export async function agentPlayerList(event, context, cb) {
         // //找到代理所有用户
         // [err, userList] = await userModel.findByBuIds(buIds);
         if(parent == "00" && !flag) {
-            [err, userList] = await userModel.scan({msn:"000"});
+            
+            Object.assign(requestParams, {
+                msn : "000"
+            })
+            console.log("代理管理员");
+            console.log(requestParams);
+            [err, userList] = await userModel.playerList(requestParams);
         }else {
+            requestParams.buId = userId;
             let [agentErr, agentInfo] = await new MerchantModel().findByUserId(userId);
             if(agentErr) return ResFail(cb, childrenError);
             if(!agentInfo){
@@ -142,7 +149,7 @@ export async function agentPlayerList(event, context, cb) {
             }
             let userModel = new UserModel();
             //找到代理所有用户
-            [err, userList] = await userModel.findByBuIds([+agentInfo.displayId]);
+            [err, userList] = await userModel.findByBuIds([+agentInfo.displayId], requestParams);
         }
     }else {
         return ResOK(cb, { list: []})

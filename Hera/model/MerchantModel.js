@@ -12,6 +12,9 @@ export class MerchantModel extends athena.BaseModel {
     }
 
     findById(displayId){
+        if(!displayId) {
+            return [null, null];
+        }
         return this.get({
             displayId
         }, [], "merchantIdIndex");

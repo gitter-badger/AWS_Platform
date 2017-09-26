@@ -111,7 +111,7 @@ export async function gamePlayerList(event, context, cb) {
     //json转换
     let date = Date.now();
     console.log("请求开始:"+date);
-    let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
     if(parserErr) return cb(null, ReHandler.fail(parserErr));
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
@@ -127,15 +127,17 @@ export async function gamePlayerList(event, context, cb) {
     let sortMode = requestParams.sortKey || "dsc";  //asc 升序  dsc 降序
     let userModel = new UserModel();
     let err, userList=[];
+    console.log(requestParams);
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
         console.log("guangliyuan");
-        [err, userList] = await userModel.scan(requestParams);
+        [err, userList] = await userModel.playerList(requestParams);
         console.log("查询结束:"+Date.now());
     }else if(role == RoleCodeEnum.Merchant) { //如果是商家
+        console.log("这是商户");
         requestParams = requestParams || {};
         requestParams.buId = displayId;
-        [err, userList] = await userModel.scan(requestParams);
+        [err, userList] = await userModel.playerList(requestParams);
     }else if(role == RoleCodeEnum.Manager){  //如果是线路商
         console.log("这是线路商");
         //找到所有下级商户
@@ -145,9 +147,8 @@ export async function gamePlayerList(event, context, cb) {
             return ResFail(cb, merListErr)
         }
         let merchantIds = merchantList.map((merchant) => merchant.displayId);
-        console.log(merchantIds);
         if(merchantIds.length> 0) {
-            [err, userList] = await userModel.findByBuIds(merchantIds);
+            [err, userList] = await userModel.findByBuIds(merchantIds, requestParams);
         }
     }else {
         return ResOK(cb, { list: [] })
