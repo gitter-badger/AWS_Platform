@@ -39,31 +39,31 @@ custom:
         - CreatedDateIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: HeraGamePlayer
       index:
         - userIdIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 15
+        maximum: 1000
         usage: 0.75
     - table: SYSToken
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: BillStat
       index:
@@ -72,22 +72,22 @@ custom:
         - userIdAndDate
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: HawkeyePlayerEmailRecord
       index:
         - CreatedDateIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
 functions:
   tokenVerify:

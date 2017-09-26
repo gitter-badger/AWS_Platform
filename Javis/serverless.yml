@@ -46,11 +46,11 @@ custom:
         - merchantIdIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: ZeusPlatformBill
       index:
@@ -60,29 +60,29 @@ custom:
         - ActionIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: ZeusPlatformCode
       read:
         minimum: 1
-        maximum: 2
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: ZeusPlatformCaptcha
       read:
         minimum: 1
-        maximum: 2
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: ZeusPlatformLog
       index:
@@ -90,11 +90,11 @@ custom:
         - CreatedDateIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: HeraGamePlayerBill
       index:
@@ -103,31 +103,31 @@ custom:
         - CreatedDateIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: HawkeyeGameEmail
       read:
         minimum: 1
-        maximum: 2
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 2
+        maximum: 1000
         usage: 0.75
     - table: HeraGameDiamondBill
       index:
         - UserNameIndex
       read:
         minimum: 1
-        maximum: 2
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 2
+        maximum: 1000
         usage: 0.75
     # - table: DianaPlatformGame
     #   index:
