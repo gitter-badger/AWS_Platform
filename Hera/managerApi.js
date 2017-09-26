@@ -22,6 +22,8 @@ import {Util} from "./lib/Util"
 
 import {RoleCodeEnum} from "./lib/Consts";
 
+import { TokenModel } from './model/TokenModel'
+
 
 const ResOK = (callback, res) => callback(null, ReHandler.success(res))
 const ResFail = (callback, res) => {
@@ -365,5 +367,15 @@ export const jwtverify = async (e, c, cb) => {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
-  return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+
+
+  const [checkErr, checkRet] = await new TokenModel(userInfo).checkExpire(userInfo);
+  if (checkErr) {
+    return c.fail(checkErr.msg)
+  } else {
+    // 结果返回
+    return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  }
+
+//   return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }

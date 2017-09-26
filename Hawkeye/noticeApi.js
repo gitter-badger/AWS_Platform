@@ -14,6 +14,8 @@ import {MerchantModel} from "./model/MerchantModel"
 
 import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
+import { TokenModel } from './model/TokenModel'
+
 /**
  * 添加公告
  * @param {*} e 
@@ -253,5 +255,11 @@ export const jwtverify = async (e, c, cb) => {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
-  return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  const [checkErr, checkRet] = await new TokenModel(userInfo).checkExpire(userInfo);
+  if (checkErr) {
+    return c.fail(checkErr.msg)
+  } else {
+    return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  }
+
 }
