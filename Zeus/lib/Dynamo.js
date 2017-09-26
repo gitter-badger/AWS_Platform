@@ -43,6 +43,7 @@ const PushErrorModel = 'PushErrorModel'
 const ZeusPlatformGame = 'DianaPlatformGame'
 
 const SYSConfig = 'SYSConfig'
+const SYSToken = 'SYSToken'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -62,7 +63,8 @@ export const Tables = {
   HeraGamePlayer,
   PushErrorModel,
 
-  SYSConfig
+  SYSConfig,
+  SYSToken
 }
 
 export const Model = {

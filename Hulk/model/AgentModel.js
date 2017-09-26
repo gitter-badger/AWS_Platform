@@ -189,6 +189,8 @@ export class AgentModel extends BaseModel {
         }
         // 返回用户身份令牌
         saveUserRet = Pick(User, RoleDisplay[User.role])
+        // 更新TOKEN
+        await Store$('put', { TableName: Tables.SYSToken, Item: { iat: Math.floor(Date.now() / 1000) - 30, ...saveUserRet } })
         return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
     }
 }

@@ -35,7 +35,9 @@ export const Codes = {
 
   InparamError: '60001',
   CaptchaErr: '60002',
-  MerchantPeriodErr: '60003'
+  MerchantPeriodErr: '60003',
+
+  TokenExpire: '90001',
 }
 
 export const BizErr = {
@@ -74,5 +76,8 @@ export const BizErr = {
   },
   CaptchaErr: (errMsg = '验证码错误') => {
     return { code: Codes.CaptchaErr, msg: errMsg }
+  },
+  TokenExpire: (errMsg = 'TOKEN已过期') => {
+    return { code: Codes.TokenExpire, msg: errMsg }
   }
 }
