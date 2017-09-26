@@ -2,6 +2,7 @@ service: StateMachine
 plugins:
   - serverless-webpack
   - serverless-secrets-plugin
+  - serverless-prune-plugin
   # - serverless-step-functions
 provider:
   name: aws

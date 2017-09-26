@@ -1,6 +1,7 @@
 service: Stat
 plugins:
   - serverless-webpack
+  - serverless-prune-plugin
 custom:
   webpackIncludeModules: true
 provider:
