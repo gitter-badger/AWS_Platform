@@ -999,7 +999,7 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
 
-    HeraGameDiamondBill:  #钻石账单
+    HeraGameDiamondBill:  #N币账单
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: HeraGameDiamondBill

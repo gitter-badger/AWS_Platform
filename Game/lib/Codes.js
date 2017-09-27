@@ -27,8 +27,8 @@ export const CODES = {
     gameNotExist : 13002,  //游戏不存在
     seatNotExist : 13003, //展位不存在
     packageNotExist : 13004, //道具包不存在
-    notDiamonds : 13005,   //不是钻石包
-    DiamondsIns : 13006,   //钻石不足
+    notDiamonds : 13005,   //不是N币包
+    DiamondsIns : 13006,   //N币不足
     notPros : 13007,   //不是道具包
 
     noticeNotExist : 13100, //公告不存在
@@ -71,8 +71,8 @@ const errorMessage = {
   "13002" : "游戏不存在",
   "13003" : "展位不存在",
   "13004" : "道具包不存在",
-  "13005" : "购买的不是钻石",
-  "13006" : "钻石不足",
+  "13005" : "购买的不是N币",
+  "13006" : "N币不足",
   "13007" : "购买的不是道具",
   "13100" : "公告不存在",
   "13101" : "没有权限",

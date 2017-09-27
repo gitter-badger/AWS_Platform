@@ -12,7 +12,7 @@ export class PackageModel extends athena.BaseModel {
         this.name = name;
     }
     /**
-     * 获取钻石
+     * 获取N币
      */
     getDiamonds(){
         return this.get({toolId:"1"},[], "toolIdIndex")

@@ -117,16 +117,16 @@ async function playerBuyProp(event, context, callback) {
   if(!userModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
-  //获取玩家钻石
+  //获取玩家N币
   let [diamondErr, diamonds] = await new UserDiamondBillModel({userName}).getBalance();
   if(diamondErr) {
     return callback(null, ReHandler.fail(diamondErr));
   }
-  //钻石不足
+  //N币不足
   if(actualAmount > diamonds) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.DiamondsIns)));
   }
-  //用户钻石发生变化
+  //用户N币发生变化
   let userDiamondBillModel = new UserDiamondBillModel({
     seatId : requestParams.seatId,
     userId : userId,
@@ -146,7 +146,7 @@ async function playerBuyProp(event, context, callback) {
 }
 
 /**
- * 玩家购买钻石
+ * 玩家购买N币
  * @param {*} event 
  * @param {*} context 
  * @param {*} callback 
@@ -165,9 +165,9 @@ async function playerBuyDiamonds(event, context, callback){
     packageSumDiamond += +(info.toolNum || 1);
   }
   let {userId, userName} = userInfo;
-  //用户得到的钻石数量
+  //用户得到的N币数量
   let diamonds = +(seatNumber * (+packageSumDiamond)).toFixed(2);
-  console.log("用户得到的钻石数量");
+  console.log("用户得到的N币数量");
   console.log(diamonds);
   //获取用户信息
   let [userError, userModel] = await new UserModel().get({userId},[], "userIdIndex");
@@ -245,7 +245,7 @@ async function playerBuyDiamonds(event, context, callback){
     return callback(null, ReHandler.fail(uSaveErr));
   }
 
-  //用户钻石发生变化
+  //用户N币发生变化
   let userDiamondBillModel = new UserDiamondBillModel({
     userId : userId,
     action :1,
@@ -255,7 +255,7 @@ async function playerBuyDiamonds(event, context, callback){
     toolId : 1,
     kindId : requestParams.kindId
   })
-  //获取用户钻石
+  //获取用户N币
   let [diamondsError, userDiamonds] = await userDiamondBillModel.getBalance();
   if(diamondsError) {
     return callback(null, ReHandler.fail(diamondsError));
@@ -265,7 +265,7 @@ async function playerBuyDiamonds(event, context, callback){
   let u = new UserModel(); 
   let [updatebError] = await u.update({userName:userModel.userName},{balance : oriSumBalance-actualAmount});
   if(updatebError) return callback(null, ReHandler.fail(updatebError));
-  //写入钻石账单
+  //写入N币账单
   let [saveDiamondError] = await userDiamondBillModel.save();
   callback(null, ReHandler.success({
       data :{balance : oriSumBalance-actualAmount, diamonds: userDiamonds+diamonds}
@@ -343,7 +343,7 @@ async function packageList(event, context, callback) {
 
 export{
   playerBuyProp,  //购买道具
-  playerBuyDiamonds, //购买钻石
+  playerBuyDiamonds, //购买N币
   toolList,  //道具列表
   seatList,  //展位列表
   packageList, //道具包列表

@@ -28,7 +28,7 @@ export class UserBillModel extends athena.BaseModel {
         this.updateAt = Date.now();
         this.amount = +amount;
         this.seatInfo = seatInfo;
-        this.kindId = kindId || -1;  //-1表示中心钱包的 -2代理操作点数 -3购买钻石
+        this.kindId = kindId || -1;  //-1表示中心钱包的 -2代理操作点数 -3购买N币
         this.toolId = toolId || -1;
         this.toolName = toolName || Model.StringValue;
         this.type = type;

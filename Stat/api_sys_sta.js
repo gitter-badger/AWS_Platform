@@ -222,7 +222,7 @@ const gameConsumeStat = async function(event, context, callback) {
         returnObj.elecSum -= amount;
         returnObj.elec[index] -= amount
       }
-      if(gameType == "-1") { //商城买钻石
+      if(gameType == "-1") { //商城买N币
         returnObj.storeSum -= amount;
         returnObj.store[index] -= amount
       }
