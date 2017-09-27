@@ -35,7 +35,7 @@ export class TokenModel extends BaseModel{
             return [new CHeraErr(CODES.TokenError), 0]
         }
         // 超过30分钟过期
-        if (Math.floor((new Date().getTime() / 1000)) - userToken.iat > 1800) {
+        if (Math.floor((new Date().getTime() / 1000)) - userToken.iat > 7200) {
             return [new CHeraErr(CODES.TokenError), 0]
         }else { // 更新过期时间
             this.iat = Math.floor(Date.now() / 1000) - 30;

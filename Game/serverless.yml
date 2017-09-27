@@ -39,55 +39,56 @@ custom:
         - CreatedDateIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: HeraGamePlayer
       index:
         - userIdIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 15
+        maximum: 1000
         usage: 0.75
     - table: SYSToken
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: BillStat
       index:
+        - CreatedDateIndex
         - roleDateIndex
         - roleTypeIndex
         - userIdAndDate
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
     - table: HawkeyePlayerEmailRecord
       index:
         - CreatedDateIndex
       read:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
       write:
         minimum: 1
-        maximum: 100
+        maximum: 1000
         usage: 0.75
 functions:
   tokenVerify:
@@ -237,6 +238,9 @@ resources:
           -
             AttributeName: type
             AttributeType: N
+          -
+            AttributeName: createdDate
+            AttributeType: S
         KeySchema:
           -
             AttributeName: sn
@@ -245,6 +249,17 @@ resources:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         GlobalSecondaryIndexes:
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+            -
+              AttributeName: createdDate
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
           -
             IndexName: roleDateIndex
             KeySchema:

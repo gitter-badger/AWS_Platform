@@ -228,6 +228,12 @@ const adminList = async (e, c, cb) => {
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
         // 业务操作
         const [err, admins] = await new UserModel().listAllAdmins(token)
+        // 查询每个用户余额
+        for (let user of admins) {
+            const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
+            user.balance = lastBill.lastBalance
+            user.lastBill = lastBill
+        }
         // 结果返回
         if (err) { return ResErr(cb, err) }
         return ResOK(cb, { payload: admins })
