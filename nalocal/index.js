@@ -5,10 +5,10 @@ const schedule = require('node-schedule')
 const config = require('config')
 const _ = require('lodash')
 // 基础数据
-const pageSize = 100                                     // 分页大小
-const region = config.region                             // 区域
-const FullBucket = config.bucketPrefix + config.stage    // 全备份桶
-const IncBucket = config.bucketPrefix + config.stage     // 增量备份桶
+const pageSize = 100                                        // 分页大小
+const region = config.region                                // 区域
+const FullBucket = config.bucketFullPrefix + config.stage   // 全备份桶
+const IncBucket = config.bucketIncPrefix + config.stage     // 增量备份桶
 // 备份区域
 const S3Region = region
 const DbRegion = region

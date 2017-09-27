@@ -1,6 +1,7 @@
 {
     "region": "ap-southeast-1",
-    "bucketPrefix": "backup-na-full-",
+    "bucketFullPrefix": "backup-na-full-",
+    "bucketIncPrefix": "backup-na-inc-",
     "stage": "prod",
     "cron": "0 2 * * *",
     "fullBackupTables": [
