@@ -36,10 +36,12 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 按照层级排序
+        const sortResult = _.sortBy(queryRet.Items, ['level'])
 
         // 查询已用商户已用数量
         let userArr = []
-        for (let user of queryRet.Items) {
+        for (let user of sortResult) {
             const [err, childs] = await new UserModel().listChildUsers(user, RoleCodeEnum['Merchant'])
             if (err) {
                 return [err, 0]
@@ -52,7 +54,7 @@ export class UserModel extends BaseModel {
         const viewList = _.map(userArr, (item) => {
             return {
                 value: item.userId,
-                label: item.suffix
+                label: item.displayName
             }
         })
         return [0, viewList]
@@ -75,9 +77,14 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
+        adminRet.Items = _.map(adminRet.Items, (item) => {
+            item.passhash = null
+            return item
+        })
+        // 按照时间排序
         const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
-        adminRet.Items = sortResult
-        return [0, adminRet.Items]
+        return [0, sortResult]
     }
 
     /**
@@ -197,7 +204,7 @@ export class UserModel extends BaseModel {
                 ':role': roleCode
             }
         }
-        if (RoleCodeEnum['PlatformAdmin'] === token.role) {
+        if (Model.isPlatformAdmin(token)) {
             query = {
                 IndexName: 'RoleParentIndex',
                 KeyConditionExpression: '#role = :role',
@@ -213,11 +220,16 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
-            return Omit(item, ['passhash'])
+            item.passhash = null
+            if (!Model.isPlatformAdmin(token)) {
+                item.password = '********'
+            }
+            return item
         })
-        // 按照时间排序
-        const sortResult = _.sortBy(users, ['createdAt']).reverse()
+        // 按照层级排序
+        const sortResult = _.sortBy(users, ['level'])
         return [0, sortResult]
     }
 
@@ -239,6 +251,16 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据（该方法不需要）
+        // queryRet.Items = _.map(queryRet.Items, (item) => {
+        //     item.passhash = null
+        //     if (!Model.isPlatformAdmin(token)) {
+        //         item.password = '********'
+        //     }
+        //     return item
+        // })
+        // 按照层级排序
+        // const sortResult = _.sortBy(queryRet.Items, ['level'])
         return [0, queryRet.Items]
     }
 
@@ -253,7 +275,9 @@ export class UserModel extends BaseModel {
         // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
         if (role === RoleCodeEnum['PlatformAdmin']) {
             [err, ret] = await this.queryUserBySuffix(role, suffix, username)
-        } else {
+        }
+        // 非代理
+        else if (role != RoleCodeEnum['Agent']) {
             // 对于其他用户，角色和前缀具有联合唯一性
             [err, ret] = await this.query({
                 TableName: Tables.ZeusPlatformUser,
@@ -269,6 +293,23 @@ export class UserModel extends BaseModel {
                 }
             })
         }
+        // 代理需要校验角色和用户名的唯一性
+        if (role == RoleCodeEnum['Agent']) {
+            [err, ret] = await this.query({
+                TableName: Tables.ZeusPlatformUser,
+                IndexName: 'RoleUsernameIndex',
+                KeyConditionExpression: '#username = :username and #role = :role',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':username': username,
+                    ':role': role
+                }
+            })
+        }
+
         if (err) {
             return [err, 0]
         }

@@ -5,7 +5,6 @@ import { JwtVerify, JwtSign } from './Response'
 import _ from 'lodash'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
-const generatePassword = require('password-generator')
 AWS.config.update({ region: 'ap-southeast-1' })
 AWS.config.setPromisesDependency(require('bluebird'))
 
@@ -38,6 +37,13 @@ const DianaPlatformTool = 'DianaPlatformTool'
 const DianaPlatformPackage = 'DianaPlatformPackage'
 const DianaPlatformSeat = 'DianaPlatformSeat'
 
+const HulkPlatformAd = 'HulkPlatformAd'
+const HeraGamePlayer = 'HeraGamePlayer'
+const PushErrorModel = 'PushErrorModel'
+
+const SYSConfig = 'SYSConfig'
+const SYSToken = 'SYSToken'
+
 export const Tables = {
   ZeusPlatformUser,
   ZeusPlatformBill,
@@ -50,7 +56,14 @@ export const Tables = {
   DianaPlatformCompany,
   DianaPlatformTool,
   DianaPlatformPackage,
-  DianaPlatformSeat
+  DianaPlatformSeat,
+
+  HulkPlatformAd,
+  HeraGamePlayer,
+  PushErrorModel,
+
+  SYSConfig,
+  SYSToken
 }
 
 /**
@@ -108,16 +121,16 @@ export const Model = {
   timeStamp: () => (new Date()).getTime(),
   currentToken: async (e) => {
     if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
+      throw BizErr.TokenErr()
     }
     return [0, e.requestContext.authorizer]
   },
   currentRoleToken: async (e, roleCode) => {
     if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
+      throw BizErr.TokenErr()
     } else {
       if (e.requestContext.authorizer.role != roleCode) {
-        return [BizErr.RoleTokenErr(), 0]
+        throw BizErr.RoleTokenErr()
       }
     }
     return [0, e.requestContext.authorizer]
@@ -131,7 +144,8 @@ export const Model = {
   baseModel: function () { // the db base model
     return {
       createdAt: (new Date()).getTime(),
-      updatedAt: (new Date()).getTime()
+      updatedAt: (new Date()).getTime(),
+      createdDate: new Date().Format("yyyy-MM-dd")
     }
   },
   hashGen: (pass) => {
@@ -153,9 +167,6 @@ export const Model = {
     } catch (err) {
       return [BizErr.ParamErr(err.toString()), 0]
     }
-  },
-  genPassword: () => {
-    return generatePassword()
   },
   addSourceIP: (e, info) => {
     const sourceIP = e && e.requestContext && e.requestContext.identity.sourceIp || '-100'
@@ -184,4 +195,20 @@ export const Model = {
     }, {})
     return values
   }
+}
+// 私有日期格式化方法
+Date.prototype.Format = function (fmt) {
+  var o = {
+    "M+": this.getMonth() + 1, //月份 
+    "d+": this.getDate(), //日 
+    "h+": this.getHours(), //小时 
+    "m+": this.getMinutes(), //分 
+    "s+": this.getSeconds(), //秒 
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+    "S": this.getMilliseconds() //毫秒 
+  };
+  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return fmt;
 }

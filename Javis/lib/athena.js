@@ -36,15 +36,18 @@ export class BaseModel {
     get(conditions, returnValues = [], indexName, all) {
         let keyConditionExpression = "";
         let expressionAttributeValues = {};
+        let expressionAttributeNames = {};
         for (let key in conditions) {
-            keyConditionExpression += `${key}=:${key} and `;
+            keyConditionExpression += `#${key}=:${key} and `;
             expressionAttributeValues[`:${key}`] = conditions[key];
+            expressionAttributeNames[`#${key}`] = key;
         }
         keyConditionExpression = keyConditionExpression.substr(0, keyConditionExpression.length - 4);
         return new Promise((reslove, reject) => {
             this.db$("query", {
                 // Key:key,
                 KeyConditionExpression: keyConditionExpression,
+                ExpressionAttributeNames : expressionAttributeNames,
                 ExpressionAttributeValues: expressionAttributeValues,
                 IndexName: indexName,
                 ReturnValues: returnValues.join(",")
@@ -69,12 +72,18 @@ export class BaseModel {
         };
 
         keys.forEach((k, index) => {
-            opts.UpdateExpression += `#${k}=:${k} `;
-            opts.ExpressionAttributeValues[`:${k}`] = updates[k];
+            let value = (updates[k]|| {})["$inc"];
             opts.ExpressionAttributeNames[`#${k}`] = k;
+            if(typeof updates[k] == "object") { 
+                //只支持自增
+                opts.UpdateExpression += `#${k} = #${k} + :${k} `
+                opts.ExpressionAttributeValues[`:${k}`] = value;
+            }else {
+                opts.UpdateExpression += `#${k}=:${k} `;
+                opts.ExpressionAttributeValues[`:${k}`] =  updates[k];
+            }
             if (index != keys.length - 1) opts.UpdateExpression += ", ";
         });
-
         return new Promise((reslove, reject) => {
             this.db$("update", opts).then((result) => {
                 reslove([null, result]);
@@ -254,10 +263,10 @@ export const RegEnum = {
     COMPANYCONTACT: /^[\u4E00-\u9FA5A-Za-z0-9]{2,16}$/,
     COMPANYCONTACTWAY: /^[0-9]{2,20}$/,
 
-    USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{4,16}$/,
     HOSTNAME: /^[\u4E00-\u9FA5A-Za-z]{2,16}$/,
 
-    EMAIL: /^([a-zA-Z0-9_-]){1,16}@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/,
+    EMAIL: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
 
     RATE: /^(\d{1,2}(\.\d{1,2})?|100(\.0{1,2})?)$/,
     PRICE: /^[0-9]+([.]{1}[0-9]{1,2})?$/,

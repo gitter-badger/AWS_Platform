@@ -49,6 +49,8 @@ export const Codes = {
   CompanyNotExistError: "60005",
   PushMerchantError: "60006",
   HttpsError: '60007',
+
+  TokenExpire: '90001',
 }
 
 export const BizErr = {
@@ -57,12 +59,6 @@ export const BizErr = {
   },
   DBErr: (errMsg = 'DBError') => {
     return { code: Codes.DBError, msg: errMsg }
-  },
-  UsernameTooShortErr: (errMsg = '用户名太短') => {
-    return { code: Codes.UsernameTooShort, msg: errMsg }
-  },
-  UsernameTooLongErr: (errMsg = '用户名太长') => {
-    return { code: Codes.UsernameTooLong, msg: errMsg }
   },
   UserExistErr: (errMsg = '用户已存在') => {
     return { code: Codes.DuplicateUser, msg: errMsg }
@@ -142,10 +138,13 @@ export const BizErr = {
   HttpsErr: (errMsg = '请求游戏服务器后台失败') => {
     return { code: Codes.HttpsError, msg: errMsg }
   },
-  CompanyNotExistError: (errMsg = "company not exist") => {
+  CompanyNotExistError: (errMsg = "游戏厂商不存在") => {
     return { code: Codes.CompanyNotExistError, msg: errMsg }
   },
-  PushMerchantError: (errMsg = "company not exist") => {
+  PushMerchantError: (errMsg = "推送商户错误") => {
     return { code: Codes.PushMerchantError, msg: errMsg }
+  },
+  TokenExpire: (errMsg = 'TOKEN已过期') => {
+    return { code: Codes.TokenExpire, msg: errMsg }
   }
 }

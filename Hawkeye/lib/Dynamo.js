@@ -16,24 +16,34 @@ const db$ = (action,params)=>{
 // table names
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformRole = 'ZeusPlatformRole'
-const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
+const HeraGamePlayer = 'HeraGamePlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
 const HawkeyeGameNotice = 'HawkeyeGameNotice'
 const DianaPlatformTool = 'DianaPlatformTool'
 const HawkeyeGameEmail = 'HawkeyeGameEmail'
+const HeraGameDiamondBill = 'HeraGameDiamondBill'
+const HawkeyePlayerEmailRecord = "HawkeyePlayerEmailRecord"
+const HulkPlatformAd = "HulkPlatformAd"
+const SYSConfig = "SYSConfig"
+const SYSToken = 'SYSToken'
 
 export const Tables = {
   ZeusPlatformUser,
+  HeraGameDiamondBill,
   ZeusPlatformRole,
-  ZeusPlatformPlayer,
+  HeraGamePlayer,
   ZeusPlatformBill,
   ZeusPlatformGame,
   ZeusPlatformMSN,
   HawkeyeGameNotice,
   DianaPlatformTool,
-  HawkeyeGameEmail
+  HawkeyeGameEmail,
+  HawkeyePlayerEmailRecord,
+  HulkPlatformAd,
+  SYSConfig,
+  SYSToken
 }
 
 
@@ -74,7 +84,8 @@ export const Model = {
   baseModel: function(){ // the db base model
     return {
       createdAt: (new Date()).getTime(),
-      updatedAt: (new Date()).getTime()
+      updatedAt: (new Date()).getTime(),
+      createdDate: new Date().Format("yyyy-MM-dd")
     }
   },
   hashGen: (pass) => {
@@ -107,4 +118,20 @@ export const Model = {
       lastIP:sourceIP
     }
   }
+}
+// 私有日期格式化方法
+Date.prototype.Format = function (fmt) {
+  var o = {
+    "M+": this.getMonth() + 1, //月份 
+    "d+": this.getDate(), //日 
+    "h+": this.getHours(), //小时 
+    "m+": this.getMinutes(), //分 
+    "s+": this.getSeconds(), //秒 
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+    "S": this.getMilliseconds() //毫秒 
+  };
+  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return fmt;
 }

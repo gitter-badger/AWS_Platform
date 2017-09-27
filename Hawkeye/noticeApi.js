@@ -14,6 +14,8 @@ import {MerchantModel} from "./model/MerchantModel"
 
 import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
+import { TokenModel } from './model/TokenModel'
+
 /**
  * 添加公告
  * @param {*} e 
@@ -29,25 +31,19 @@ const add = async(e, c, cb) => {
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "content", type:"S"},
+      {name : "content", type:"S", min:1, max:200},
       {name : "showTime", type:"N"},
       {name : "startTime", type:"N"},
       {name : "endTime", type:"N"},
       {name : "splitTime", type:"N"},
-      {name : "kindId", type:"S"},
-      {name : "msn", type:"N"},
-      {name : "frequency", type:"N"},
+      {name : "count", type:"N"},
   ], requestParams);
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
-  let [gameInfoErr, gameName] = getGameName(requestParams);
-  if(gameInfoErr) {
-    return errorHandle(cb, gameInfoErr);
-  }
+ 
   requestParams.userId = userInfo.userId;
-  requestParams.gameName = gameName;
   let noticeModel = new NoticeModel(requestParams);
   let [saveErr] = await noticeModel.save();
   if(saveErr) {
@@ -88,15 +84,13 @@ const update = async(e, c, cb) => {
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-    {name : "noid", type:"S"},
-    {name : "content", type:"S"},
-    {name : "showTime", type:"N"},
-    {name : "startTime", type:"N"},
-    {name : "endTime", type:"N"},
-    {name : "splitTime", type:"N"},
-    {name : "msn", type:"N"},
-    {name : "kindId", type:"S"},
-    {name : "frequency", type:"N"},
+      {name : "content", type:"S", min:1, max:200},
+      {name : "showTime", type:"N"},
+      {name : "noid", type:"S"},
+      {name : "startTime", type:"N"},
+      {name : "endTime", type:"N"},
+      {name : "splitTime", type:"N"},
+      {name : "count", type:"N"},
   ], requestParams);
   if(checkAttError){
     Object.assign(checkAttError, {params: errorParams});
@@ -110,15 +104,9 @@ const update = async(e, c, cb) => {
   if(!noticeInfo) {
     return errorHandle(cb, new CHeraErr(CODES.noticeNotExist));
   }
-  //根据kindId找到游戏
-  let [gameInfoErr, gameName] = getGameName(requestParams);
-  if(gameInfoErr) {
-    return errorHandle(cb, gameInfoErr);
-  }
-  requestParams.gameName = gameName;
   let noticeModel = new NoticeModel(requestParams);
   delete noticeModel.noid;
-  let [updateErr] = await noticeModel.update({noid:requestParams.noid});
+  let [updateErr] = await noticeModel.update({noid:requestParams.noid}, noticeModel);
   if(updateErr) {
     return errorHandle(cb, updateErr);
   }
@@ -267,5 +255,11 @@ export const jwtverify = async (e, c, cb) => {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
-  return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  const [checkErr, checkRet] = await new TokenModel(userInfo).checkExpire(userInfo);
+  if (checkErr) {
+    return c.fail(checkErr.msg)
+  } else {
+    return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  }
+
 }

@@ -10,15 +10,19 @@ import {Model} from "./lib/Dynamo"
 
 import {MerchantModel} from "./model/MerchantModel";
 
+import {LogModel} from "./model/LogModel";
+
 import {UserModel, State} from "./model/UserModel";
 
-import {UserBillModel} from "./model/UserBillModel";
+import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantBillModel} from "./model/MerchantBillModel";
 
 import {Util} from "./lib/Util"
 
 import {RoleCodeEnum} from "./lib/Consts";
+
+import { TokenModel } from './model/TokenModel'
 
 
 const ResOK = (callback, res) => callback(null, ReHandler.success(res))
@@ -29,7 +33,75 @@ const ResFail = (callback, res) => {
     callback(null, ReHandler.fail(errObj))
 }
 
+function validateIp(event, merchant) {
+  return true;
+  let loginWhiteStr = merchant.loginWhiteList;
+  let whiteList = loginWhiteStr.split(";");
+  whiteList.forEach(function(element) {
+    element.trim();
+  }, this);
+  console.log("event.headers.identity");
+  console.log(event.requestContext.identity);
+  console.log(whiteList);
+  let sourceIp = event.requestContext.identity.sourceIp;
+  let allIp = whiteList.find((ip) => ip == "0.0.0.0");
+  let whiteIp = whiteList.find((ip) => ip == sourceIp);
+  if(whiteIp || allIp) return true;
+  return false;
+}
 
+const logEnum = {
+  "jiesuo" : {
+    type :"operate",
+    action : "玩家解锁",
+    detail : "成功",
+  },
+  "suoding" : {
+    type :"operate",
+    action : "玩家锁定",
+    detail : "成功",
+  }
+}
+
+/**
+ * 错误处理
+ * @param {*} callback 
+ * @param {*} error 
+ */
+async function errorHandler(callback, error, type, merchantInfo, userInfo) {
+  ResFail(callback, error);
+  //写日志
+  delete userInfo.userId;
+  delete userInfo.role;
+  Object.assign(merchantInfo, {
+    ...userInfo,
+    ...logEnum[type],
+    detail : error.msg,
+    ret : "N"
+  })
+  let logModel = new LogModel(merchantInfo);
+  console.log(logModel);
+  let [sErr] = await logModel.save();
+}
+
+/**
+ * 成功处理
+ * @param {*} callback 
+ * @param {*} data 
+ */
+async function successHandler(callback, data, type, merchantInfo, userInfo) {
+  ResOK(callback, data);
+  //写日志
+  delete userInfo.userId;
+  delete userInfo.role;
+  Object.assign(merchantInfo, {
+    ...userInfo,
+    ...logEnum[type],
+    ret : "Y"
+  })
+  let logModel = new LogModel(merchantInfo);
+  let [sErr] = await logModel.save();
+}
 /**
  * 玩家列表
  * @param {*} event 
@@ -39,7 +111,9 @@ const ResFail = (callback, res) => {
 export async function gamePlayerList(event, context, cb) {
     console.log(event);
     //json转换
-    let [parserErr, requestParams] = athena.Util.parseJSON(event.queryStringParameters || {});
+    let date = Date.now();
+    console.log("请求开始:"+date);
+    let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
     if(parserErr) return cb(null, ReHandler.fail(parserErr));
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
@@ -51,25 +125,62 @@ export async function gamePlayerList(event, context, cb) {
     }
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
+    let sortKey = requestParams.sortKey || "createAt";
+    let sortMode = requestParams.sortKey || "dsc";  //asc 升序  dsc 降序
     let userModel = new UserModel();
-    let err, userList;
+    let err, userList=[];
+    console.log(requestParams);
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
-        [err, userList] = await userModel.scan(requestParams);
+        console.log("guangliyuan");
+        [err, userList] = await userModel.playerList(requestParams);
+        console.log("查询结束:"+Date.now());
     }else if(role == RoleCodeEnum.Merchant) { //如果是商家
+        console.log("这是商户");
         requestParams = requestParams || {};
         requestParams.buId = displayId;
-        [err, userList] = await userModel.scan(requestParams);
+        [err, userList] = await userModel.playerList(requestParams);
+    }else if(role == RoleCodeEnum.Manager){  //如果是线路商
+        console.log("这是线路商");
+        //找到所有下级商户
+        let merchantModel = new MerchantModel();
+        let [merListErr, merchantList] = await merchantModel.agentChildListByUids([tokenInfo.userId]);
+        if(merListErr) {
+            return ResFail(cb, merListErr)
+        }
+        let merchantIds = merchantList.map((merchant) => merchant.displayId);
+        if(merchantIds.length> 0) {
+            [err, userList] = await userModel.findByBuIds(merchantIds, requestParams);
+        }
     }else {
         return ResOK(cb, { list: [] })
     }
     if (err) {
         return ResFail(cb, err)
     }
+    for(let i = 0; i < userList.length; i++) {
+        let element = userList[i];
+        if(element.msn == "000") {
+            userList.splice(i, 1);
+            i --;
+        }
+    }
     userList = userList || [];
     userList.forEach(function(element) {
             delete element.userPwd
-        }, this);
+    }, this);
+    for(let i = 0; i < userList.length; i++) {
+        for(let j = i+1; j < userList.length;j++) {
+            if(isSort(userList[i], userList[j])){
+                let item = userList[i];
+                userList[i] = userList[j];
+                userList[j] = item;
+            }
+        }
+    }
+    function isSort(a, b){
+        return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+    }
     
     ResOK(cb, {list: userList});
 }
@@ -109,19 +220,37 @@ export async function gamePlayerInfo(event, context, cb) {
     let userBillModel = new UserBillModel();
     let [err, user] = await userModel.get({userName});
     if(err){
-        return ResFail(cb, billError)
+        return ResFail(cb, err)
     }
     if(!user) {
         return ResFail(cb, new CHeraErr(CODES.userNotExist));
     }
     //获取玩家的交易记录
-    let [billError, bilList] = await userBillModel.list(userName, gameId);
+    let [billError, billList] = await userBillModel.list(userName, gameId);
     if(billError) {
         return ResFail(cb, billError)
     }
-    user.list = bilList;
+    // billList = billList.sort((a, b) => {
+    //     return +a.createAt - +b.createAt > 0
+    // });
+    sort(billList);
+    user.list = billList;
+
     delete user.token;
     return ResOK(cb, user);
+}
+
+function sort(array) {
+    for(let i = 0; i <array.length; i ++) {
+        for(let j = i+1; j <array.length; j ++) {
+            if(array[j].createAt > array[i].createAt) {
+                let item = array[j];
+                array[j] = array[i];
+                array[i] = item;
+            }
+        }
+        delete array[i].seatInfo;
+    }
 }
 
 /**
@@ -170,7 +299,9 @@ export async function gamePlayerForzen(event, context, cb){
   if(err) {
       return ResFail(cb, err);
   }
-  ResOK(cb, {state});
+  let type = state == State.normal ?  "jiesuo" : "suoding";
+  successHandler(cb, {state}, type, tokenInfo, us);
+//   ResOK(cb, {state});
 }
 
 /**
@@ -217,7 +348,9 @@ export async function batchForzen(event, context, cb){
       return ResFail(cb, err);
     }
   }
-  ResOK(cb, {state});
+  let type = state == State.normal ?  "jiesuo" : "suoding";
+  successHandler(cb, {state}, type, tokenInfo, {});
+//   ResOK(cb, {state});
 }
 
 
@@ -234,5 +367,15 @@ export const jwtverify = async (e, c, cb) => {
     console.log(JSON.stringify(err), JSON.stringify(userInfo));
     return c.fail('Unauthorized')
   }
-  return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+
+
+  const [checkErr, checkRet] = await new TokenModel(userInfo).checkExpire(userInfo);
+  if (checkErr) {
+    return c.fail(checkErr.msg)
+  } else {
+    // 结果返回
+    return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  }
+
+//   return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
 }

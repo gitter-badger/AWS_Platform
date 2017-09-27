@@ -1,30 +1,41 @@
-
-service: Hera # NOTE: update this with your service name
-
-# Use the serverless-webpack plugin to transpile ES6
+service: Hera
 plugins:
   - serverless-webpack
-
-# Enable auto-packing of external modules
-custom:
-  webpackIncludeModules: true
-
-
+  - serverless-prune-plugin
 provider:
   name: aws
   runtime: nodejs6.10
   region: ap-southeast-1
+  memorySize: 256
+  timeout: 300
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
+        - dynamodb:*
+        # - dynamodb:DescribeTable
+        # - dynamodb:Query
+        # - dynamodb:Scan
+        # - dynamodb:GetItem
+        # - dynamodb:PutItem
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
+        # - dynamodb:BatchWriteItem
+        # - dynamodb:DescribeStream
+        # - dynamodb:GetRecords
+        # - dynamodb:GetShardIterator
+        # - dynamodb:ListStreams
+      Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
+custom:
+  webpackIncludeModules: true
 functions:
   tokenVerify:
     handler: managerApi.jwtverify
@@ -85,6 +96,21 @@ functions:
           path: /game/player/balance
           method: get
           cors: true
+  gameRecord:  #游戏记录
+    handler: openApi.playerGameRecord
+    events:
+      - http:
+          path: /game/player/record
+          method: post
+          cors: true
+  agentMix:  #代理洗码点
+    handler: agentApi.agentMix
+    events:
+      - http:
+          path: /agent/mix
+          method: post
+          cors: true
+          authorizer: tokenVerify
   joinGame:  #玩家进入游戏
     handler: openApi.joinGame
     events:
@@ -92,46 +118,18 @@ functions:
           path: /game/player/join
           method: post
           cors: true
-  toolList:  #道具列表
-    handler: openApi_tool.toolList
-    events:
-      - http:
-          path: /game/tool/list
-          method: get
-          cors: true
-  seatList:  #席位列表列表
-    handler: openApi_tool.seatList
-    events:
-      - http:
-          path: /game/seat/list
-          method: get
-          cors: true
-  packageList:  #道具包列表
-    handler: openApi_tool.packageList
-    events:
-      - http:
-          path: /game/package/list
-          method: get
-          cors: true
-  buy:  #购买道具
-    handler: openApi_tool.playerBuyProp
-    events:
-      - http:
-          path: /game/prop/buy
-          method: post
-          cors: true
-  buyDiamonds:  #购买钻石
-    handler: openApi_tool.playerBuyDiamonds
-    events:
-      - http:
-          path: /game/diamonds/buy
-          method: post
-          cors: true
-  playerRecord:  #获取玩家记录验证
+  playerRecord:  #玩家记录验证
     handler: openApi.playerRecordValidate
     events:
       - http:
           path: /game/bill/verify
+          method: post
+          cors: true
+  getGameRecord:  #获取玩家游戏记录
+    handler: openApi.getPlayerGameRecord
+    events:
+      - http:
+          path: /game/player/record/list
           method: post
           cors: true
   gamePlayerList:  #获取玩家列表
@@ -139,7 +137,7 @@ functions:
     events:
       - http:
           path: /player/list
-          method: get
+          method: post
           cors: true
           authorizer: tokenVerify
   gamePlayerInfo:  #玩家详情页面
@@ -158,6 +156,55 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  addPlayer:  #创建玩家
+    handler: agentApi.createPlayer
+    events:
+      - http:
+          path: /agent/player/create
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  childrenAgent:  #下级代理
+    handler: agentApi.childrenAgent
+    events:
+      - http:
+          path: /agent/children/list
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  agentPlayerList:  #代理玩家列表
+    handler: agentApi.agentPlayerList
+    events:
+      - http:
+          path: /agent/player/list
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  agentPlayerDeposit:  #玩家取点
+    handler: agentApi.agentPlayerQudian
+    events:
+      - http:
+          path: /agent/player/take
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  agentPlayerTake:  #玩家存点
+    handler: agentApi.agentPlayerCudian
+    events:
+      - http:
+          path: /agent/player/deposit
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  updateAgentPassword:  #修改代理玩家密码
+    handler: agentApi.updatePassword
+    events:
+      - http:
+          path: /agent/player/password
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  
   batchForzen:  #批量冻结/解冻玩家 1解冻,2,冻结
     handler: managerApi.batchForzen
     events:
@@ -166,50 +213,3 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-resources:
-  Resources:
-    HeraGamePlayer:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGamePlayer
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: userId
-            AttributeType: N
-        KeySchema:
-          -
-            AttributeName: userName
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          -
-            IndexName: userIdIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-    HeraGameRecord:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGameRecord
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1

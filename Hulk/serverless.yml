@@ -2,16 +2,16 @@
 service: Hulk
 plugins:
   - serverless-webpack
-custom:
-  webpackIncludeModules: true
-
+  - serverless-prune-plugin
 provider:
   name: aws
   runtime: nodejs6.10
   region: ap-southeast-1
+  memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
   iamRoleStatements:
-      -
-        Effect: Allow
+      - Effect: Allow
         Action:
           - dynamodb:GetItem
           - dynamodb:PutItem
@@ -28,14 +28,15 @@ provider:
             - ":"
             - Ref: AWS::AccountId
             - ":table/*"
-          
+custom:
+  webpackIncludeModules: true     
 functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
   # ==================== 以下是账单和日志接口服务 ====================
   billTransfer: # 转账
-    handler: api.billTransfer
+    handler: api_bill.billTransfer
     events:
       -
         http:
@@ -44,7 +45,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   billOne: # 单个账单
-    handler: api.billOne
+    handler: api_bill.billOne
     events:
       -
         http:
@@ -53,7 +54,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   billList: # 账单列表
-    handler: api.billList
+    handler: api_bill.billList
     events:
       -
         http:
@@ -62,7 +63,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   logList: #日志列表
-    handler: api.logList
+    handler: api_bill.logList
     events:
       -
         http:
@@ -79,7 +80,7 @@ functions:
           path: agentAdminNew
           method: post
           cors: true
-          # authorizer: tokenAuth
+          authorizer: tokenAuth
   agentNew: # 代理注册
     handler: api_agent.agentNew
     events:
@@ -131,6 +132,15 @@ functions:
         http:
           path: agentUpdate
           method: post
+          cors: true
+          authorizer: tokenAuth
+  agentAdminList: # 代理更新
+    handler: api_agent.agentAdminList
+    events:
+      -
+        http:
+          path: agentAdminList
+          method: get
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是公告管理接口服务 ====================

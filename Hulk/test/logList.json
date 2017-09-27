@@ -4,28 +4,32 @@
   },
   "requestContext": {
     "authorizer": {
-      "userId": "1070d03e-1652-428f-9a55-81b77ef4e8ed",
-      "role": "10",
-      "suffix": "YongA1",
-      "username": "YongA1_一二三四五六七八九十一二三四五六",
-      "parent": "01",
-      "parentName": "Platform_Yongtest001",
-      "displayName": "直属XLS01",
-      "level": 1,
-      "displayId": 156735,
+      "userId": "f65ff712-913c-4c9c-822c-61ec11b9d09e",
+      "role": "1000",
+      "suffix": "Agent",
+      "username": "Agent_NAagent",
+      "parent": "00",
+      "parentName": "PlatformAdmin",
+      "displayName": "代理管理员",
+      "level": 0,
+      "vedioMix": 100,
+      "liveMix": 100,
+      "displayId": 347267,
       "contractPeriod": 0,
       "isforever": true,
-      "updatedAt": 1503304378954,
-      "iat": 1503479013
+      "updatedAt": 1503562805243,
+      "remark": "NULL!",
+      "iat": 1503562775
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "role": "10",
-    "pageSize": 20,
+    "role": "1000",
+    "type": "login",
+    "pageSize": "20",
     "startKey": null,
-    "type": "operate"
+    "level": 0
   }
 }

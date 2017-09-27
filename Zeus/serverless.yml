@@ -1,22 +1,16 @@
-
-service: Zeus # NOTE: update this with your service name
-
-# Use the serverless-webpack plugin to transpile ES6
+service: Zeus
 plugins:
   - serverless-webpack
-
-# Enable auto-packing of external modules
-custom:
-  webpackIncludeModules: true
-
-
+  - serverless-prune-plugin
 provider:
   name: aws
   runtime: nodejs6.10
   region: ap-southeast-1
+  memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
   iamRoleStatements:
-      -
-        Effect: Allow
+      - Effect: Allow
         Action:
           - dynamodb:GetItem
           - dynamodb:PutItem
@@ -33,22 +27,15 @@ provider:
             - ":"
             - Ref: AWS::AccountId
             - ":table/*"
-
+custom:
+  webpackIncludeModules: true
 functions:
   tokenAuth:
     handler: api.jwtverify
     integration: lambda
   #==================== 以下是管理员接口 ====================
-  eva: #创建第一个管理员，接口编号0
-    handler: api.eva
-    events:
-      -
-        http:
-          path: beings
-          method: post
-          cors: true
   adminList: #管理员列表
-    handler: api.adminList
+    handler: api_admin.adminList
     events:
       -
         http:
@@ -57,7 +44,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   adminCenter: #管理员个人中心
-    handler: api.adminCenter
+    handler: api_admin.adminCenter
     events:
       -
         http:
@@ -66,7 +53,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   adminNew: #创建管理员
-    handler: api.adminNew
+    handler: api_admin.adminNew
     events:
       -
         http:
@@ -75,7 +62,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   userNew: #注册新用户
-    handler: api.userNew
+    handler: api_admin.userNew
     events:
       -
         http:
@@ -84,23 +71,15 @@ functions:
           cors: true
           authorizer: tokenAuth
   userAuth: #用户登录
-    handler: api.userAuth
+    handler: api_admin.userAuth
     events:
       -
         http:
           path: users/auth
           method: post
           cors: true
-  # userGrabToken: #获取用户TOKEN
-  #   handler: api.userGrabToken
-  #   events:
-  #     -
-  #       http:
-  #         path: users/token
-  #         method: post
-  #         cors: true
   checkUserExist: #检查用户是否被占用
-    handler: api.checkUserExist
+    handler: api_admin.checkUserExist
     events:
       -
         http:
@@ -109,7 +88,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   checkSuffixExist: #检查前缀是否被占用
-    handler: api.checkSuffixExist
+    handler: api_admin.checkSuffixExist
     events:
       -
         http:
@@ -118,7 +97,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   checkNickExist: #检查昵称是否被占用
-    handler: api.checkNickExist
+    handler: api_admin.checkNickExist
     events:
       -
         http:
@@ -127,7 +106,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   userChangeStatus: #变更用户状态
-    handler: api.userChangeStatus
+    handler: api_admin.userChangeStatus
     events:
       -
         http:
@@ -136,7 +115,7 @@ functions:
           cors: true
           authorizer: tokenAuth
   childList: #下级列表
-    handler: api.childList
+    handler: api_admin.childList
     events:
       -
         http:
@@ -144,21 +123,22 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
-  randomPassword: #随机密码
-    handler: api.randomPassword
-    events:
-      -
-        http:
-          path: random_password
-          method: post
-          cors: true
   updatePassword: #重置密码
-    handler: api.updatePassword
+    handler: api_admin.updatePassword
     events:
       -
         http:
           path: updatePassword
           method: post
+          cors: true
+          authorizer: tokenAuth
+  subRoleList: #二级权限列表
+    handler: api_admin.subRoleList
+    events:
+      -
+        http:
+          path: subRoleList
+          method: get
           cors: true
           authorizer: tokenAuth
   #==================== 以下是线路商接口 ====================

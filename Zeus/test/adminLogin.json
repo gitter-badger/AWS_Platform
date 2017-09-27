@@ -1,8 +1,8 @@
 {
   "body": {
+    "role": "1",
     "username": "NAtest",
     "password": "Ab123456",
-    "role": "1",
-    "captcha": "1974"
+    "captcha": "2183"
   }
 }

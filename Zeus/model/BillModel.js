@@ -74,7 +74,7 @@ export class BillModel extends BaseModel {
                 fromUser: fromInparam.username,
                 fromRole: fromInparam.role,
                 fromLevel: fromInparam.level,
-                fromDisplayName: fromInparam.fromDisplayName,
+                fromDisplayName: fromInparam.displayName,
                 action: 0,
                 operator: from.operatorToken.username
             }, Keys(BillMo()))
@@ -110,5 +110,29 @@ export class BillModel extends BaseModel {
             return [err, 0]
         }
         return [0, Bill]
+    }
+
+    /**
+     * 查询用户余额和最后一条账单记录
+     * @param {*} user 
+     */
+    async checkUserLastBill(user) {
+        const [queryErr, bills] = await this.query({
+            IndexName: 'UserIdIndex',
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeValues: {
+                ':userId': user.userId
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        const sums = _.reduce(bills.Items, (sum, bill) => {
+            return sum + bill.amount
+        }, 0.0)
+        let lastBill = bills.Items[bills.Items.length - 1]
+        lastBill = lastBill || {}
+        lastBill.lastBalance = user.points + sums
+        return [0, lastBill]
     }
 }

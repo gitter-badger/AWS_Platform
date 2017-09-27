@@ -24,33 +24,33 @@ export class UserModel extends BaseModel {
     async listChildUsers(token, roleCode, inparam) {
         // 查询用户的所有可用代理
         let query = {
-            IndexName: 'RoleSuffixIndex',
-            KeyConditionExpression: '#role = :role',
-            FilterExpression: 'contains(#levelIndex,:levelIndex)',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#levelIndex': 'levelIndex'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Agent'],
-                ':levelIndex': token.userId
-            }
+            // IndexName: 'RoleSuffixIndex',
+            // KeyConditionExpression: '#role = :role',
+            // FilterExpression: 'contains(#levelIndex,:levelIndex)',
+            // ExpressionAttributeNames: {
+            //     '#role': 'role',
+            //     '#levelIndex': 'levelIndex'
+            // },
+            // ExpressionAttributeValues: {
+            //     ':role': RoleCodeEnum['Agent'],
+            //     ':levelIndex': token.userId
+            // }
         }
         // 代理管理员查询所有
-        if (Model.isAgentAdmin(token)) {
-            query = {
-                IndexName: 'RoleParentIndex',
-                KeyConditionExpression: '#role = :role',
-                FilterExpression: 'userId <> :userId',
-                ExpressionAttributeNames: {
-                    '#role': 'role',
-                },
-                ExpressionAttributeValues: {
-                    ':role': roleCode,
-                    ':userId': token.userId
-                }
-            }
-        }
+        // if (Model.isAgentAdmin(token)) {
+        //     query = {
+        //         IndexName: 'RoleParentIndex',
+        //         KeyConditionExpression: '#role = :role',
+        //         FilterExpression: 'suffix <> :suffix',
+        //         ExpressionAttributeNames: {
+        //             '#role': 'role',
+        //         },
+        //         ExpressionAttributeValues: {
+        //             ':role': roleCode,
+        //             ':suffix': 'Agent'
+        //         }
+        //     }
+        // }
         // 查询用户直属代理
         if (inparam.parent && inparam.parent != '0' && inparam.parent != 'false') {
             query = {
@@ -69,11 +69,18 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
+        // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
-            return Omit(item, ['passhash'])
+            item.passhash = null
+            if (!Model.isAgentAdmin(token)) {
+                item.password = '********'
+            }
+            return item
         })
-        // 按照时间排序
-        const sortResult = _.sortBy(users, ['createdAt']).reverse()
+        // 按照层级排序
+        // const sortResult = _.sortBy(users, ['level'])
+        // 按照创建时间排序
+        const sortResult = _.sortBy(users, ['createdAt'])
         return [0, sortResult]
     }
 
@@ -85,16 +92,16 @@ export class UserModel extends BaseModel {
         const allAgent = {
             IndexName: 'RoleSuffixIndex',
             KeyConditionExpression: '#role = :role',
-            FilterExpression: '#status = :status AND #userId <> :userId',
+            FilterExpression: '#status = :status AND #level <> :level',
             ExpressionAttributeNames: {
                 '#role': 'role',
                 '#status': 'status',
-                '#userId': 'userId'
+                '#level': 'level'
             },
             ExpressionAttributeValues: {
                 ':role': RoleCodeEnum['Agent'],
                 ':status': StatusEnum.Enable,
-                ':userId': token.userId
+                ':level': 0
             }
         }
         // 查询用户的所有可用代理
@@ -124,34 +131,90 @@ export class UserModel extends BaseModel {
         if (queryErr) {
             return [queryErr, 0]
         }
-        return [0, queryRet.Items]
+        // 去除敏感数据
+        queryRet.Items = _.map(queryRet.Items, (item) => {
+            item.passhash = null
+            if (!inparam.parent) {
+                item.password = '********'
+            }
+            return item
+        })
+        // 按照层级排序
+        const sortResult = _.sortBy(queryRet.Items, ['level'])
+        return [0, sortResult]
     }
 
-    // 检查用户是否重复
+    /**
+     * 查询代理管理员列表
+     * @param {*} token 
+     */
+    async listAllAdmins(token) {
+        const [queryErr, adminRet] = await this.query({
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#suffix = :suffix',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#suffix': 'suffix'
+            },
+            ExpressionAttributeValues: {
+                ':role': RoleCodeEnum['Agent'],
+                ':suffix': 'Agent'
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        // 去除敏感数据
+        adminRet.Items = _.map(adminRet.Items, (item) => {
+            item.passhash = null
+            return item
+        })
+        // 按照时间排序
+        const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
+        return [0, sortResult]
+    }
+
+    // 检查代理用户是否重复
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]
         // 对于代理管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-        if (role === RoleCodeEnum['Agent']) {
-            [err, ret] = await this.queryUserBySuffix(role, suffix, username)
-        } else {
-            // 对于其他用户，角色和前缀具有联合唯一性
+        // if (suffix == 'Agent') {
+        //     [err, ret] = await this.queryUserBySuffix(role, suffix, username)
+        // } else {
+        //     // 对于其他用户，角色和前缀具有联合唯一性
+        //     [err, ret] = await this.query({
+        //         TableName: Tables.ZeusPlatformUser,
+        //         IndexName: 'RoleSuffixIndex',
+        //         KeyConditionExpression: '#suffix = :suffix and #role = :role',
+        //         ExpressionAttributeNames: {
+        //             '#role': 'role',
+        //             '#suffix': 'suffix'
+        //         },
+        //         ExpressionAttributeValues: {
+        //             ':suffix': suffix,
+        //             ':role': role
+        //         }
+        //     })
+        // }
+        // if (err) {
+        //     return [err, 0]
+        // }
+        // 还需要校验角色和用户名的唯一性
+        // if (suffix != 'Agent' && ret.Items.length == 0) {
             [err, ret] = await this.query({
                 TableName: Tables.ZeusPlatformUser,
-                IndexName: 'RoleSuffixIndex',
-                KeyConditionExpression: '#suffix = :suffix and #role = :role',
+                IndexName: 'RoleUsernameIndex',
+                KeyConditionExpression: '#username = :username and #role = :role',
                 ExpressionAttributeNames: {
                     '#role': 'role',
-                    '#suffix': 'suffix'
+                    '#username': 'username'
                 },
                 ExpressionAttributeValues: {
-                    ':suffix': suffix,
+                    ':username': username,
                     ':role': role
                 }
             })
-        }
-        if (err) {
-            return [err, 0]
-        }
+        // }
         if (ret.Items.length > 0) {
             return [0, false]
         } else {

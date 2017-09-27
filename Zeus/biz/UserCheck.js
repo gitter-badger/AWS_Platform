@@ -5,8 +5,8 @@ export class UserCheck {
      * 检查管理员
      */
     checkAdmin(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1, max: 1 },
@@ -24,13 +24,15 @@ export class UserCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
         inparam.role = inparam.role.toString()
         inparam.level = 0
-        inparam.levelIndex = 0
+        inparam.levelIndex = '0'
+        inparam.rate = 100.00
 
         return [checkAttError, errorParams]
     }
@@ -38,8 +40,8 @@ export class UserCheck {
      * 检查普通用户
      */
     checkUser(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 10, max: 100 },
@@ -67,19 +69,20 @@ export class UserCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 线路号处理
         if (inparam.role == RoleCodeEnum['Merchant']) {
             if (!inparam.msn) {
-                return [{ "code": -1, "msg": "入参商户线路号不存在", "params": ["msn"] }, 'msn']
+                throw { "code": -1, "msg": "入参商户线路号不存在", "params": ["msn"] }
             }
             inparam.msn = parseInt(inparam.msn).toString()
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
         if (inparam.limit) {
@@ -96,8 +99,8 @@ export class UserCheck {
      * 检查普通用户更新
      */
     checkUserUpdate(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 10, max: 100 },
@@ -125,11 +128,12 @@ export class UserCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
         if (inparam.limit) {
@@ -156,7 +160,8 @@ export class UserCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -177,7 +182,8 @@ export class UserCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -191,13 +197,19 @@ export class UserCheck {
      * @param {*} inparam 
      */
     checkPassword(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "password", type: "S", min: 6, max: 16 }]
             , inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
         return [checkAttError, errorParams]
     }
 }

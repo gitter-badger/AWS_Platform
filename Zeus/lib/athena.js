@@ -245,13 +245,13 @@ class Page {
 export const RegEnum = {
     SUFFIX: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}$/,
 
-    DISPLAYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{4,10}$/,
-    USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
+    DISPLAYNAME: /^[\u4E00-\u9FA5A-Za-z0-9]{2,10}$/,
+    USERNAME: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{4,16}$/,
     USERNAME_UPDATE: /^[a-zA-Z]{1}[a-zA-z0-9]{1,5}_[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
     PASSWORD: /^[\u4E00-\u9FA5A-Za-z0-9_\-.@]{5,16}$/,
     HOSTNAME: /^[\u4E00-\u9FA5A-Za-z]{2,16}$/,
 
-    EMAIL: /^([a-zA-Z0-9_-]){1,16}@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/,
+    EMAIL: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
 
     RATE: /^(\d{1,2}(\.\d{1,2})?|100(\.0{1,2})?)$/,
     PRICE: /^[0-9]+([.]{1}[0-9]{1,2})?$/,

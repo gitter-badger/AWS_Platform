@@ -1,4 +1,11 @@
 
 {
-    "body": "{\"userName\":\"test001\",\"userPwd\":\"test002\", \"apiKey\":\"48e33dd5-f9f8-41c2-a063-e8da4f223600\", \"buId\":\"969113\",  \"gamePlatform\":\"NA\"}"
+    "body" : {
+        "userName" : "day0012",
+        "userPwd" : "123456", 
+        "apiKey": "385b184a-048f-4210-9b30-3eb8d3045d4d", 
+        "buId" : "590867",
+        "userType":"1",
+        "gamePlatform":"NA"
+    }
 }

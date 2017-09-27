@@ -5,12 +5,28 @@ export const MSNStatusEnum = {
   Locked: 2,
   Free: 0
 }
-// 游戏类型枚举
+
+//测试环境
+// export const GameTypeEnum = {
+//   '10000': { code: '10000', name: '棋牌游戏', url: 'http://47.74.154.114/webadmin/public/admin/api/checkLoginAccess', desc: '这是棋牌游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+//   '40000': { code: '40000', name: '电子游戏', url: 'http://47.74.154.114/tigergame/public/admin/api/checkLoginAccess', desc: '这是电子游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+//   '30000': { code: '30000', name: '真人视讯', url: 'http://52.221.134.197:8080/gate/player/login', desc: '这是真人视讯', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' }
+// }
+
+// 游戏类型枚举:正式环境
 export const GameTypeEnum = {
-  '10000': { code: '10000', name: '棋牌游戏', url: 'http://root.rottagame.com/admin/api/checkLoginAccess' },
-  '40000': { code: '40000', name: '电子游戏', url: 'http://test.com' },
-  '30000': { code: '30000', name: '真人视讯', url: 'http://146.88.71.30:8011/player/login' }
+  '10000': { code: '10000', name: '棋牌游戏', url: 'http://tablegame.na12345.com/admin/api/checkLoginAccess', desc: '这是棋牌游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+  '40000': { code: '40000', name: '电子游戏', url: 'http://tigergame.na12345.com/admin/api/checkLoginAccess', desc: '这是电子游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+  '30000': { code: '30000', name: '真人视讯', url: 'http://52.221.134.197:8080/gate/player/login', desc: '这是真人视讯', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' }
 }
+
+//游戏类型枚举:开发环境
+// export const GameTypeEnum = {
+//   '10000': { code: '10000', name: '棋牌游戏', url: 'http://47.74.154.114/webadmin/public/admin/api/checkLoginAccess', desc: '这是棋牌游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+//   '40000': { code: '40000', name: '电子游戏', url: 'http://47.74.154.114/tigergame/public/admin/api/checkLoginAccess', desc: '这是电子游戏', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' },
+//   '30000': { code: '30000', name: '真人视讯', url: 'http://52.221.134.197:8080/gate/player/login', desc: '这是真人视讯', imgurl: 'https://www.baidu.com/img/qixi_pad_d84d9e2020231e3c6b22aaec04296f1a.png' }
+// }
+
 /**
  * 账单实体
  */

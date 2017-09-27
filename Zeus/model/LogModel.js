@@ -17,6 +17,49 @@ export class LogModel extends BaseModel {
         }
     }
     /**
+     * 添加操作日志
+     * @param {*} inparam 
+     * @param {*} error 
+     * @param {*} result 
+     */
+    addOperate(inparam, error, result) {
+        let userId = inparam.operateToken.userId
+        let role = inparam.operateToken.role
+        let suffix = inparam.operateToken.suffix
+        let username = inparam.operateToken.username
+        let lastIP = inparam.lastIP
+        let type = 'operate'
+        let action = inparam.operateAction
+        let inparams = inparam
+        let ret = 'Y'
+        let detail = result
+        let level = parseInt(inparam.operateToken.level)
+        let levelIndex = inparam.operateToken.levelIndex
+        if (error) {
+            ret = 'N'
+            detail = error
+        }
+        this.putItem({
+            ...this.item,
+            userId: userId,
+            role: role,
+            suffix: suffix,
+            level: level,
+            levelIndex: levelIndex,
+            username: username,
+            lastIP: lastIP,
+            type: type,
+            action: action,
+            inparams: inparams,
+            ret: ret,
+            detail: detail
+        }).then((res) => {
+        }).catch((err) => {
+            console.error(err)
+        })
+    }
+
+    /**
      * 添加登录日志
      * @param {*} loginUserRet 
      */
@@ -30,7 +73,18 @@ export class LogModel extends BaseModel {
         let lastLogin = new Date().getTime()
         let userStatus = StatusEnum.Enable
         let parent = loginUserRet.parent ? loginUserRet.parent : '0'
+        let level = parseInt(loginUserRet.level)
+        let ret = 'Y'
+        if (!level && level != 0) {
+            level = '-1'
+        }
+        let levelIndex = loginUserRet.levelIndex
+        if (!levelIndex && levelIndex != '0' && levelIndex != 0) {
+            levelIndex = '-1'
+        }
+
         if (loginUserErr) {
+            ret = 'N'
             detail = '登录失败'
             role = userLoginInfo.role
             suffix = userLoginInfo.suffix ? userLoginInfo.suffix : 'Platform'
@@ -67,52 +121,16 @@ export class LogModel extends BaseModel {
             userId: userId,
             role: role,
             suffix: suffix,
+            level: level,
+            levelIndex: levelIndex,
             username: username,
             displayName: loginUserRet.displayName,
             type: 'login',
             lastIP: lastIP,
             lastLogin: lastLogin,
             userStatus: userStatus,
-            detail: detail
-        }).then((res) => {
-        }).catch((err) => {
-            console.error(err)
-        })
-    }
-
-    /**
-     * 添加操作日志
-     * @param {*} inparam 
-     * @param {*} error 
-     * @param {*} result 
-     */
-    addOperate(inparam, error, result) {
-        let userId = inparam.operateToken.userId
-        let role = inparam.operateToken.role
-        let suffix = inparam.operateToken.suffix
-        let username = inparam.operateToken.username
-        let lastIP = inparam.lastIP
-        let type = 'operate'
-        let action = inparam.operateAction
-        let inparams = inparam
-        let ret = 'Y'
-        let detail = result
-        if (error) {
-            ret = 'N'
-            detail = error
-        }
-        this.putItem({
-            ...this.item,
-            userId: userId,
-            role: role,
-            suffix: suffix,
-            username: username,
-            lastIP: lastIP,
-            type: type,
-            action: action,
-            inparams: inparams,
-            ret: ret,
-            detail: detail
+            detail: detail,
+            ret: ret
         }).then((res) => {
         }).catch((err) => {
             console.error(err)

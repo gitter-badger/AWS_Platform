@@ -1,0 +1,304 @@
+service: Game
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-autoscaling
+  - serverless-prune-plugin
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+        # - dynamodb:DescribeTable
+        # - dynamodb:Query
+        # - dynamodb:Scan
+        # - dynamodb:GetItem
+        # - dynamodb:PutItem
+        # - dynamodb:BatchWriteItem
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
+      Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"
+custom:
+  webpackIncludeModules: true
+  capacities: #数据库自动扩容
+    - table: HeraGameRecord
+      index:
+        - parentIdIndex
+        - CreatedDateIndex
+      read:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+    - table: HeraGamePlayer
+      index:
+        - userIdIndex
+      read:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+    - table: SYSToken
+      read:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+    - table: BillStat
+      index:
+        - roleDateIndex
+        - roleTypeIndex
+        - userIdAndDate
+      read:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+    - table: HawkeyePlayerEmailRecord
+      index:
+        - CreatedDateIndex
+      read:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+      write:
+        minimum: 1
+        maximum: 1000
+        usage: 0.75
+functions:
+  tokenVerify:
+    handler: api.jwtverify
+    integration: lambda
+resources:
+  Resources:
+    HawkeyePlayerEmailRecord: #玩家接收邮件记录
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HawkeyePlayerEmailRecord
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: N
+          -
+            AttributeName: emid
+            AttributeType: S
+          -
+            AttributeName: createdDate
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+          -
+            AttributeName: emid
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+            -
+              AttributeName: createdDate
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    HeraGamePlayer:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGamePlayer
+        AttributeDefinitions:
+          -
+            AttributeName: userName
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: userName
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: userIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    HeraGameRecord:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: HeraGameRecord
+        AttributeDefinitions:
+          -
+            AttributeName: userName
+            AttributeType: S
+          -
+            AttributeName: betId
+            AttributeType: S
+          -
+            AttributeName: parentId
+            AttributeType: S
+          -
+            AttributeName: betTime
+            AttributeType: N
+          -
+            AttributeName: createdDate
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userName
+            KeyType: HASH
+          -
+            AttributeName: betId
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: parentIdIndex
+            KeySchema:
+              -
+                AttributeName: parentId
+                KeyType: HASH
+              -
+                AttributeName: betTime
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+              -
+                AttributeName: createdDate
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    BillStat:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: BillStat
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: S
+          -
+            AttributeName: dateStr
+            AttributeType: S
+          -
+            AttributeName: role
+            AttributeType: S
+          -
+            AttributeName: type
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        GlobalSecondaryIndexes:
+          -
+            IndexName: roleDateIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: dateStr
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+          -
+            IndexName: roleTypeIndex
+            KeySchema:
+              -
+                AttributeName: role
+                KeyType: HASH
+              -
+                AttributeName: type
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+          -
+            IndexName: userIdAndDate
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+              -
+                AttributeName: dateStr
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+    SYSToken:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSToken
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

@@ -9,8 +9,8 @@
             "ApproximateCreationDateTime": 1502074740,
             "Keys" : 
                 {
-                    "userId": { "N": "631944" },
-                    "userName": { "S": "CN_test02" } 
+                    "createAt": { "N": 1505986200304 },
+                    "userName": { "S": "XYC_caa1001" } 
                 }
         }
     }

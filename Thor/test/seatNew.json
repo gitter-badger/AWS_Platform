@@ -5,23 +5,38 @@
     "requestContext": {
         "authorizer": {
             "username": "Platform_NAtest",
+            "password": "Ab123456",
+            "suffix": "Platform",
             "parent": "00",
+            "parentName": "SuperAdmin",
+            "userId": "46d562f8-57f6-4511-a022-b2f414f87233",
             "role": "1",
-            "userId": "7395d4e2-7354-403b-90ff-a274804c1c40"
+            "displayName": "初始管理员一",
+            "iat": 1502250211
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "seatType": 1,
-        "order": 2,
-        "price": 100.00,
-        "sum": 20,
-        "seatStatus": 1,
+        "seatType": "1",
+        "remark": "Diamond1",
+        "order": "1",
+        "sum": "60",
+        "price": "6",
+        "prop": "钻石",
+        "seatStatus": "2",
+        "contentType": 1,
         "content": {
-            "toolId": "562860"
+            "remark": "这是钻石",
+            "toolStatus": 1,
+            "icon": "Diamond",
+            "toolName": "钻石",
+            "updatedAt": 1503548612609,
+            "createdAt": 1503548563105,
+            "toolId": "100000",
+            "desc": "这是钻石"
         },
-        "remark": "测试备注"
+        "icon": "Diamond1"
     }
 }

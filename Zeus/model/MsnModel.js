@@ -18,6 +18,26 @@ export class MsnModel extends BaseModel {
     }
 
     /**
+     * 查询MSN
+     * @param {*} inparam 
+     */
+    async queryMSN(inparam) {
+        const [queryErr, queryRet] = await this.query({
+            KeyConditionExpression: '#msn = :msn',
+            ExpressionAttributeNames: {
+                '#msn': 'msn',
+            },
+            ExpressionAttributeValues: {
+                ':msn': inparam.msn
+            }
+        })
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        return [0, queryRet]
+    }
+
+    /**
      * 检查MSN
      * @param {*} param 
      */

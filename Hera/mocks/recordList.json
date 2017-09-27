@@ -1,0 +1,12 @@
+{
+    "body" : {
+        "startTime" : 0,
+        "lastTime" : 1504978977000,
+        "gameId" : "10001",
+        "endTime" :  1514978977000,
+        "apiKey":"b6afa92f-8fb3-4740-9166-41050e943ba1",
+        "pageSize" :20,
+        "buId":"586542",
+        "gamePlatform":"NA"
+    }
+}

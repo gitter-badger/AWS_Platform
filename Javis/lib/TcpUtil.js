@@ -30,16 +30,25 @@ export const pushUserInfo =  (body, host, port, proId) => {
             }
         });
         client.on("error", function(err){
-            reslove([BizErr.TcpErr(), 0]);
+            setTimeout(function() {
+                pushUserInfo(body, host, port, proId);
+            }, 10*60*1000);
+            // reslove([BizErr.TcpErr(), 0]);
         })
     })
 }
 export const pushId = (id, host, port, proId) => {
     return pushUserBalance(id, host, port, proId);
 }
+
 export const pushUserBalance = (userId, host, port, proId) => {
     let client = new net.Socket();
-    let buffer = buildPayload(proId, userId);
+    let buffer;
+    if(typeof userId == "number") {
+        buffer = buildNumber(proId, userId);
+    }else {
+        buffer = buildPayload(proId, userId);
+    }
     return new Promise((reslove, reject) => {
         console.log("请求连接");
         console.log(port, host, proId);
@@ -62,7 +71,10 @@ export const pushUserBalance = (userId, host, port, proId) => {
             }
         });
         client.on("error", function(err){
-            reslove([BizErr.TcpErr(), 0]);
+            setTimeout(function() {
+                pushUserBalance(userId, host, port, proId);
+            }, 10*60*60*1000);
+            // reslove([BizErr.TcpErr(), 0]);
         })
     })
 }
@@ -83,7 +95,17 @@ var buildPayload = function (protocalId, data) {
     return  Buffer.concat([payloadLengthBuff, protocalLengthBuff, dataLengthBuff, dataBuffer])
 
 }
+var buildNumber = function(protocalId, number) {
 
+	var payloadLengthBuff = Buffer.alloc(4)  // 数据总长度buff
+    var protocalLengthBuff = Buffer.alloc(4) // 协议长度buff
+    var dataLengthBuff = Buffer.alloc(4) // data buff
+	var payloadLength = 4 * 3 
+	payloadLengthBuff.writeInt32LE(payloadLength)
+	protocalLengthBuff.writeInt32LE(protocalId)
+	dataLengthBuff.writeInt32LE(number)
+    return  Buffer.concat([payloadLengthBuff, protocalLengthBuff, dataLengthBuff])
+}
 
 
 

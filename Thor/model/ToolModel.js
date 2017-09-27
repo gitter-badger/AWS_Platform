@@ -39,7 +39,7 @@ export class ToolModel extends BaseModel {
         }
 
         // Start:从编号池获取新编号
-        if (inparam.toolName == '钻石') {
+        if (inparam.toolName == 'N币') {
             inparam.toolId = '100000'
         } else if (inparam.toolName == '房卡') {
             inparam.toolId = '200000'
@@ -162,16 +162,16 @@ export class ToolModel extends BaseModel {
      */
     async updateTool(inparam) {
         // 检查是否可以更新
-        let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
-        if (ret) {
-            return [BizErr.ItemUsed('道具在礼包中，不可变更'), 0]
-        }
-        [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
-        if (ret) {
-            return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
-        }
+        // let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
+        // if (ret) {
+        //     return [BizErr.ItemUsed('道具在礼包中，不可变更'), 0]
+        // }
+        // [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
+        // if (ret) {
+        //     return [BizErr.ItemUsed('道具在展位中，不可变更'), 0]
+        // }
         // 更新
-        [err, ret] = await this.getOne(inparam)
+        let [err, ret] = await this.getOne(inparam)
         if (err) {
             return [err, 0]
         }
@@ -183,7 +183,6 @@ export class ToolModel extends BaseModel {
         ret.remark = inparam.remark
         // ret.toolStatus = inparam.toolStatus
         ret.updatedAt = Model.timeStamp()
-        console.info(ret)
         return await this.putItem(ret)
     }
 

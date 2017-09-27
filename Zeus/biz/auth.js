@@ -1,18 +1,4 @@
-import {
-  Store$,
-  Tables,
-  Codes,
-  BizErr,
-  Model,
-  Pick,
-  Keys,
-  Omit,
-  StatusEnum,
-  RoleCodeEnum,
-  RoleModels,
-  RoleDisplay,
-  MSNStatusEnum
-} from '../lib/all'
+import { Store$, Tables, Codes, BizErr, Model, Pick, Keys, Omit, StatusEnum, RoleCodeEnum, SubRoleEnum, RoleModels, RoleDisplay, MSNStatusEnum } from '../lib/all'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
@@ -40,7 +26,7 @@ export const RegisterAdmin = async (userInfo) => {
     return [BizErr.UserExistErr(), 0]
   }
   // 保存用户，处理用户名前缀
-  const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}` }
+  const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}`, rate: 100.00 }
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
@@ -92,6 +78,11 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     return [queryParentErr, 0]
   }
 
+  // 检查下级成数
+  if (parentUser.level != 0 && (CheckUser.rate > parentUser.rate)) {
+    return [BizErr.InparamErr('成数比不能高于上级'), 0]
+  }
+
   // 如果是线路商创建商户，检查可用余额
   // if (parentUser.role === RoleCodeEnum['Manager'] && CheckUser.role === RoleCodeEnum['Merchant']) {
   //   // 查询已用商户已用数量
@@ -115,18 +106,23 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   if (initPoints > queryBalanceRet.lastBalance) {
     return [BizErr.BalanceErr(), 0]
   }
-
+  // 层级处理
+  let levelIndex = Model.DefaultParent
+  if (parentUser.levelIndex && parentUser.levelIndex != '0' && parentUser.levelIndex != 0) {
+    levelIndex = parentUser.levelIndex + ',' + parentUser.userId
+  }
   // 保存用户，处理用户名前缀
   const User = {
     ...CheckUser,
     uname: `${CheckUser.username}`,
     username: `${CheckUser.suffix}_${CheckUser.username}`,
     parentName: parentUser.username,
+    parentRole: parentUser.role,
     parentDisplayName: parentUser.displayName,
     parentSuffix: parentUser.suffix,
     points: Model.NumberValue,
     level: parentUser.level + 1,
-    levelIndex: parentUser.levelIndex ? parentUser.levelIndex + ',' + parentUser.userId : Model.DefaultParent
+    levelIndex: levelIndex
   }
   //推送给游戏服务器(A3)
   // let pushModel = new PushModel(User);
@@ -231,7 +227,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // }
   // 更新用户信息
   User.lastIP = LoginInfo.lastIP
-  const [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
+  let [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -239,8 +235,14 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // if (saveUserErr) {
   //   return [saveUserErr, User]
   // }
+  // 获取二级权限
+  User.subRolePermission = SubRoleEnum[User.subRole]
   // 返回用户身份令牌
-  return [0, { ...User, token: Model.token(Pick(User, RoleDisplay[User.role])) }]
+  saveUserRet = Pick(User, RoleDisplay[User.role])
+  saveUserRet.subRolePermission = User.subRolePermission
+  // 更新TOKEN
+  await Store$('put', { TableName: Tables.SYSToken, Item: { iat: Math.floor(Date.now() / 1000) - 30, ...saveUserRet } })
+  return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
 }
 
 /**

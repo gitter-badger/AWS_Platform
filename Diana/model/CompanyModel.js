@@ -1,17 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
@@ -96,15 +83,14 @@ export class CompanyModel extends BaseModel {
 
     /**
      * 查询单个厂商
-     * @param {*} companyName
-     * @param {*} companyId
+     * @param {*} inparam
      */
-    async getOne(companyName, companyId) {
+    async getOne(inparam) {
         const [err, ret] = await this.query({
             KeyConditionExpression: 'companyName = :companyName and companyId = :companyId',
             ExpressionAttributeValues: {
-                ':companyName': companyName,
-                ':companyId': companyId
+                ':companyName': inparam.companyName,
+                ':companyId': inparam.companyId
             }
         })
         if (err) {
@@ -115,6 +101,34 @@ export class CompanyModel extends BaseModel {
         } else {
             return [0, 0]
         }
+    }
+
+    /**
+     * 更新
+     * @param {*} inparam 
+     */
+    async update(inparam) {
+        // 更新
+        const [err, ret] = await this.getOne(inparam)
+        if (err) {
+            return [err, 0]
+        }
+        if (!ret) {
+            return [new BizErr.ItemNotExistErr(), 0]
+        }
+        ret.companyContact = inparam.companyContact
+        ret.companyContactWay = inparam.companyContactWay
+        ret.companyContract = inparam.companyContract
+        ret.companyDesc = inparam.companyDesc
+        ret.companyEmail = inparam.companyEmail
+        ret.companyRegion = inparam.companyRegion
+        ret.license = inparam.license
+        ret.updatedAt = Model.timeStamp()
+        const [putErr, putRet] = await this.putItem(ret)
+        if (putErr) {
+            return [putErr, 0]
+        }
+        return [0, ret]
     }
 }
 

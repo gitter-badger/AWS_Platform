@@ -1,0 +1,16 @@
+{"Records":[
+     { 
+        "eventID": "6f0291c4bdfbe4aab4dd2ac74eb9d9c4",
+        "eventName": "MODIFY",
+        "eventVersion": "1.1",
+        "eventSource": "aws:dynamodb",
+        "awsRegion": "ap-southeast-1",
+        "dynamodb": { 
+            "Keys" : 
+                {
+                     "emid": { "S": "4286d757-2050-4b64-8914-2e1a09393c6d"}
+                }
+        }
+    }
+ ]
+}

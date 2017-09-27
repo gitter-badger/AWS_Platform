@@ -13,11 +13,12 @@ export class AdCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // if(!inparam.imgs || inparam.imgs.length < 1 || inparam.imgs.length > 5){
-        //     return [{ "imgs": -1, "msg": "需要图片1-5张", "params": ["imgs"] }, 'imgs']
+        //     return { "imgs": -1, "msg": "需要图片1-5张", "params": ["imgs"] }
         // }
 
         // 数据类型处理
@@ -38,7 +39,8 @@ export class AdCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -64,7 +66,8 @@ export class AdCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // if(!inparam.imgs || inparam.imgs.length < 1 || inparam.imgs.length > 5){
@@ -89,7 +92,8 @@ export class AdCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理

@@ -1,0 +1,16 @@
+{
+    "requestContext": {
+    "authorizer": {
+      "username": "Tgx001",
+      "userId": "27d9ccea-b5be-4c52-b93f-23ad75b72325",
+      "parent": "00",
+      "role": "1"
+    },
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    }
+  },
+    "body" : {
+        "gameType" : 30000
+    }
+}

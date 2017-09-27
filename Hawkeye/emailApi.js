@@ -10,6 +10,8 @@ import {Model} from "./lib/Dynamo";
 
 import {EmailModel} from "./model/EmailModel"
 
+import {UserModel} from "./model/UserModel"
+
 import {MerchantModel} from "./model/MerchantModel"
 
 import {ToolModel} from "./model/ToolModel"
@@ -31,61 +33,70 @@ const add = async(e, c, cb) => {
   if(parserErr) return errorHandle(cb, parserErr);
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "title", type:"S"},
-      {name : "content", type:"S"},
+      {name : "title", type:"S", min:1, max:20},
+      {name : "content", type:"S", min:1, max:200},
       {name : "tools", type:"J"},
-      {name : "sendTime", type:"N"},
-      {name : "kindId", type:"S"},
-      {name : "msn", type:"N"}
+      {name : "sendTime", type:"N"}
   ], requestParams);
   
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return errorHandle(cb, checkAttError);
   }
+  
   //变量
   let {tools, kindId} = requestParams;
-  requestParams.userId = userInfo.userId;
+  //检查tools格式是否正确
+  for(let i = 0; i < tools.length; i++) {
+    let tool = tools[i];
+    if(!tool.sum || !tool.contentType) { //如果缺少数量,以及是礼包还是道具字段
+      return errorHandle(cb, new CHeraErr(CODES.DataError));
+    }
+  }
+  requestParams.sendUserId = userInfo.userId;
   requestParams.sendUser = userInfo.displayName;
   //检查道具数量
   if(tools.length > 12) {
     return errorHandle(cb, new CHeraErr(CODES.toolMoreThan));
   }
   
-  //根据kindId找到游戏
-  if(requestParams.kindId == -1) {
-    requestParams.gameName = "全部";
-  }else {
-    let gameInfo = GameTypeEnum[kindId]
-    if(!gameInfo) {
-      return errorHandle(cb, new CHeraErr(CODES.gameNotExist));
-    }
-    requestParams.gameName = gameInfo.name;
-  }
+ 
   //找道具
-  let toolModel = new ToolModel();
-  for(let i = 0; i < tools.length; i++) {
-    if(!tools[i].toolId) {
-      let cError = new CHeraErr(CODES.DataError);
-      Object.assign(cError,{params:["tools"]});
-      return errorHandle(cb, cError);
+  // let toolModel = new ToolModel();
+  // for(let i = 0; i < tools.length; i++) {
+  //   if(!tools[i].toolId) {
+  //     let cError = new CHeraErr(CODES.DataError);
+  //     Object.assign(cError,{params:["tools"]});
+  //     return errorHandle(cb, cError);
+  //   }
+  // }
+  // let toolIds = tools.map((item) => item.toolId);
+  // let [toolListError, toolList] = await toolModel.findByIds(toolIds);
+  // //如果道具数量不相等，道具ID有误，返回错误
+  // if(toolList.length != toolIds.length) {
+  //   return errorHandle(cb, new CHeraErr(CODES.toolNotExist));
+  // }
+  // //填充邮件道具实体
+  let nickname = requestParams.nickname;
+  if(nickname) {
+    let [nickNameErr, nickUser] = await new UserModel().getUserByNickname(nickname);
+    if(nickNameErr) {
+      return errorHandle(cb, nickNameErr);
     }
+    if(!nickUser) {
+      return errorHandle(cb, new CHeraErr(CODES.userNotExist));
+    }
+    requestParams.userId = nickUser.userId;
   }
-  let toolIds = tools.map((item) => item.toolId);
-  let [toolListError, toolList] = await toolModel.findByIds(toolIds);
-  //如果道具数量不相等，道具ID有误，返回错误
-  if(toolList.length != toolIds.length) {
-    return errorHandle(cb, new CHeraErr(CODES.toolNotExist));
-  }
-  //填充邮件道具实体
   let emailModel = new EmailModel(requestParams);
-  emailModel.setTools(toolList, tools);
   let [saveErr] = await emailModel.save();
   if(saveErr) {
     return errorHandle(cb, saveErr);
   }
   cb(null, ReHandler.success({data:emailModel.setProperties()}));
 }
+
+
 
 /**
  * 修改邮件
@@ -156,7 +167,7 @@ const update = async(e, c, cb) => {
   let emailModel = new EmailModel(requestParams);
   emailModel.setTools(toolList, tools);
   delete emailModel.emid;
-  let [updateErr] = await emailModel.update({emid:requestParams.emid});
+  let [updateErr] = await emailModel.update({emid:requestParams.emid}, emailModel);
   if(updateErr) {
     return errorHandle(cb, updateErr);
   }
@@ -272,21 +283,6 @@ const validateToken = async(e) => {
 
 
 
-// TOKEN验证
-export const jwtverify = async (e, c, cb) => {
-  // get the token from event.authorizationToken
-  const token = e.authorizationToken.split(' ')
-  if (token[0] !== 'Bearer') {
-    return c.fail('Unauthorized: wrong token type')
-  }
-  // verify it and return the policy statements
-  const [err, userInfo] = await JwtVerify(token[1]);
-  if (err || !userInfo) {
-    console.log(JSON.stringify(err), JSON.stringify(userInfo));
-    return c.fail('Unauthorized')
-  }
-  return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
-}
 /**
  * 错误处理
  */

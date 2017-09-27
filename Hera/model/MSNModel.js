@@ -26,7 +26,7 @@ export class MSNModel extends athena.BaseModel {
             return [err, msnInfo]
         }
         if(!msnInfo) {
-            return [err, null]
+            return [null, null]
         }
         let merchant = new MerchantModel();
         let [mError, merchantInfo] = await merchant.findById(msnInfo.displayId);

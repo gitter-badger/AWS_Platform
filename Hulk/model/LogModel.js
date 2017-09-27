@@ -1,18 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    StatusEnum,
-    RoleCodeEnum,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
 
@@ -37,27 +23,25 @@ export class LogModel extends BaseModel {
      */
     async logPage(inparam) {
         // 管理员查询
-        if (!inparam.parent) {
-            return await this.page({
-                IndexName: 'LogRoleIndex',
-                Limit: inparam.pageSize,
-                ExclusiveStartKey: inparam.startKey,
-                ScanIndexForward: false,
-                KeyConditionExpression: "#role = :role",
-                FilterExpression: "#type = :type",
-                ExpressionAttributeNames: {
-                    '#role': 'role',
-                    '#type': 'type'
-                },
-                ExpressionAttributeValues: {
-                    ':role': inparam.role.toString(),
-                    ':type': inparam.type
-                }
-            }, inparam)
+        let query = {
+            IndexName: 'LogRoleIndex',
+            Limit: inparam.pageSize,
+            ExclusiveStartKey: inparam.startKey,
+            ScanIndexForward: false,
+            KeyConditionExpression: "#role = :role",
+            FilterExpression: "#type = :type",
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#type': 'type'
+            },
+            ExpressionAttributeValues: {
+                ':role': inparam.role.toString(),
+                ':type': inparam.type
+            }
         }
         // 线路商/代理查询
-        else {
-            return await this.page({
+        if (inparam.parent) {
+            query = {
                 IndexName: 'LogRoleIndex',
                 Limit: inparam.pageSize,
                 ExclusiveStartKey: inparam.startKey,
@@ -75,8 +59,56 @@ export class LogModel extends BaseModel {
                     ':type': inparam.type,
                     ':parent': inparam.parent
                 }
-            }, inparam)
+            }
         }
+        // 代理管理员
+        if (!inparam.parent && inparam.level === 0) {
+            query = {
+                IndexName: 'LogRoleIndex',
+                Limit: inparam.pageSize,
+                ExclusiveStartKey: inparam.startKey,
+                ScanIndexForward: false,
+                KeyConditionExpression: "#role = :role",
+                FilterExpression: "#type = :type AND (#level = :level OR #username = :username)",
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#type': 'type',
+                    '#level': 'level',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':role': inparam.role.toString(),
+                    ':type': inparam.type,
+                    ':level': inparam.level,
+                    ':username': 'NAagent'
+                }
+            }
+        }
+        // 其余代理
+        else if (!inparam.parent && inparam.level === -1) {
+            query = {
+                IndexName: 'LogRoleIndex',
+                Limit: inparam.pageSize,
+                ExclusiveStartKey: inparam.startKey,
+                ScanIndexForward: false,
+                KeyConditionExpression: "#role = :role",
+                FilterExpression: "#type = :type AND #level <> :level AND #username <> :username",
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#type': 'type',
+                    '#level': 'level',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':role': inparam.role.toString(),
+                    ':type': inparam.type,
+                    ':level': 0,
+                    ':username': 'NAagent'
+                }
+            }
+        }
+        return await this.page(query, inparam)
+
         // let log = { Items: [], LastEvaluatedKey: {} }
         // let [err, ret] = [0, 0]
         // while (log.Items.length < inparam.pageSize && log.LastEvaluatedKey) {
@@ -128,6 +160,8 @@ export class LogModel extends BaseModel {
         let inparams = inparam
         let ret = 'Y'
         let detail = result
+        let level = parseInt(inparam.operateToken.level)
+        let levelIndex = inparam.operateToken.levelIndex
         if (error) {
             ret = 'N'
             detail = error
@@ -137,6 +171,8 @@ export class LogModel extends BaseModel {
             userId: userId,
             role: role,
             suffix: suffix,
+            level: level,
+            levelIndex: levelIndex,
             username: username,
             lastIP: lastIP,
             type: type,
@@ -164,7 +200,18 @@ export class LogModel extends BaseModel {
         let lastLogin = new Date().getTime()
         let userStatus = StatusEnum.Enable
         let parent = loginUserRet.parent ? loginUserRet.parent : '0'
+        let level = parseInt(loginUserRet.level)
+        let ret = 'Y'
+        if (!level && level != 0) {
+            level = '-1'
+        }
+        let levelIndex = loginUserRet.levelIndex
+        if (!levelIndex && levelIndex != '0' && levelIndex != 0) {
+            levelIndex = '-1'
+        }
+
         if (loginUserErr) {
+            ret = 'N'
             detail = '登录失败'
             role = userLoginInfo.role
             suffix = userLoginInfo.suffix ? userLoginInfo.suffix : 'Platform'
@@ -201,13 +248,16 @@ export class LogModel extends BaseModel {
             userId: userId,
             role: role,
             suffix: suffix,
+            level: level,
+            levelIndex: levelIndex,
             username: username,
             displayName: loginUserRet.displayName,
             type: 'login',
             lastIP: lastIP,
             lastLogin: lastLogin,
             userStatus: userStatus,
-            detail: detail
+            detail: detail,
+            ret: ret
         }).then((res) => {
         }).catch((err) => {
             console.error(err)

@@ -1,19 +1,4 @@
-import {
-    Tables,
-    Store$,
-    Codes,
-    BizErr,
-    Trim,
-    Empty,
-    Model,
-    Keys,
-    Pick,
-    Omit,
-    StatusEnum,
-    RoleCodeEnum,
-    RoleDisplay,
-    RoleModels
-} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleDisplay, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { BaseModel } from './BaseModel'
@@ -52,7 +37,7 @@ export class AgentModel extends BaseModel {
             return [BizErr.UserExistErr(), 0]
         }
         // 保存用户，处理用户名前缀
-        const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}` }
+        const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.username}` }
         const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
             return [saveUserErr, 0]
@@ -95,8 +80,12 @@ export class AgentModel extends BaseModel {
             return [queryParentErr, 0]
         }
         // 检查下级洗码比
-        if (parentUser.level != 0 && (userInfo.vedioMix >= parentUser.vedioMix || userInfo.liveMix >= parentUser.liveMix)) {
+        if (parentUser.level != 0 && (userInfo.vedioMix > parentUser.vedioMix || userInfo.liveMix > parentUser.liveMix)) {
             return [BizErr.InparamErr('洗码比不能高于上级'), 0]
+        }
+        // 检查下级成数
+        if (parentUser.level != 0 && (userInfo.rate > parentUser.rate)) {
+            return [BizErr.InparamErr('成数比不能高于上级'), 0]
         }
         // 初始点数
         const initPoints = CheckUser.points
@@ -109,17 +98,24 @@ export class AgentModel extends BaseModel {
             return [BizErr.BalanceErr(), 0]
         }
 
+        // 层级处理
+        let levelIndex = Model.DefaultParent
+        if (parentUser.levelIndex && parentUser.levelIndex != '0' && parentUser.levelIndex != 0) {
+            levelIndex = parentUser.levelIndex + ',' + parentUser.userId
+        }
+
         // 保存用户，处理用户名前缀
         const User = {
             ...CheckUser,
             uname: `${CheckUser.username}`,
-            username: `${CheckUser.suffix}_${CheckUser.username}`,
+            username: `${CheckUser.username}`,
             parentName: parentUser.username,
+            parentRole: parentUser.role,
             parentDisplayName: parentUser.displayName,
             parentSuffix: parentUser.suffix,
             points: Model.NumberValue,
             level: parentUser.level + 1,
-            levelIndex: parentUser.levelIndex ? parentUser.levelIndex + ',' + parentUser.userId : Model.DefaultParent
+            levelIndex: levelIndex
         }
         const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
@@ -131,6 +127,8 @@ export class AgentModel extends BaseModel {
         const [depositErr, depositRet] = await new BillModel().billTransfer(parentUser, {
             toUser: saveUserRet.username,
             toRole: saveUserRet.role,
+            toLevel: saveUserRet.level,
+            toDisplayName: saveUserRet.displayName,
             amount: initPoints,
             operator: token.username,
             remark: '初始点数'
@@ -160,19 +158,11 @@ export class AgentModel extends BaseModel {
             ...userLoginInfo
         }, Keys(Role))
         const username = UserLoginInfo.username
-        const suffix = UserLoginInfo.suffix
         // 查询用户信息
-        const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(userLoginInfo.role, suffix, username)
+        const [queryUserErr, User] = await new UserModel().getUserByName(userLoginInfo.role, username)
         if (queryUserErr) {
             return [queryUserErr, 0]
         }
-        if (queryUserRet.Items.length === 0) {
-            return [BizErr.UserNotFoundErr(), 0]
-        }
-        if (queryUserRet.Items.length > 1) {
-            return [BizErr.DBErr(), 0]
-        }
-        const User = queryUserRet.Items[0]
         // 校验用户密码
         const valid = await Model.hashValidate(UserLoginInfo.password, User.passhash)
         if (!valid) {
@@ -189,11 +179,18 @@ export class AgentModel extends BaseModel {
         }
         // 更新用户信息
         User.lastIP = UserLoginInfo.lastIP
-        const [saveUserErr, saveUserRet] = await saveUser(User)
+        let [saveUserErr, saveUserRet] = await Store$('put', { TableName: Tables.ZeusPlatformUser, Item: User })
+        if (saveUserErr) {
+            return [saveUserErr, 0]
+        }
+        // const [saveUserErr, saveUserRet] = await saveUser(User)
         if (saveUserErr) {
             return [saveUserErr, User]
         }
         // 返回用户身份令牌
+        saveUserRet = Pick(User, RoleDisplay[User.role])
+        // 更新TOKEN
+        await Store$('put', { TableName: Tables.SYSToken, Item: { iat: Math.floor(Date.now() / 1000) - 30, ...saveUserRet } })
         return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
     }
 }

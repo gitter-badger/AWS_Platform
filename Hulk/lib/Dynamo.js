@@ -6,7 +6,6 @@ import { RoleCodeEnum } from './UserConsts'
 import _ from 'lodash'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
-const generatePassword = require('password-generator')
 AWS.config.update({ region: 'ap-southeast-1' })
 AWS.config.setPromisesDependency(require('bluebird'))
 
@@ -37,8 +36,14 @@ const DianaPlatformGame = 'DianaPlatformGame'
 const DianaPlatformCompany = 'DianaPlatformCompany'
 const DianaPlatformTool = 'DianaPlatformTool'
 const DianaPlatformPackage = 'DianaPlatformPackage'
+const DianaPlatformSeat = 'DianaPlatformSeat'
 
 const HulkPlatformAd = 'HulkPlatformAd'
+const HeraGamePlayer = 'HeraGamePlayer'
+const PushErrorModel = 'PushErrorModel'
+
+const SYSConfig = 'SYSConfig'
+const SYSToken = 'SYSToken'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -52,8 +57,14 @@ export const Tables = {
   DianaPlatformCompany,
   DianaPlatformTool,
   DianaPlatformPackage,
+  DianaPlatformSeat,
 
-  HulkPlatformAd
+  HulkPlatformAd,
+  HeraGamePlayer,
+  PushErrorModel,
+
+  SYSConfig,
+  SYSToken
 }
 
 export const Model = {
@@ -70,7 +81,8 @@ export const Model = {
   baseModel: function () {
     return {
       createdAt: (new Date()).getTime(),
-      updatedAt: (new Date()).getTime()
+      updatedAt: (new Date()).getTime(),
+      createdDate: new Date().Format("yyyy-MM-dd")
     }
   },
   /**
@@ -133,16 +145,16 @@ export const Model = {
   },
   currentToken: async (e) => {
     if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
+      throw BizErr.TokenErr()
     }
     return [0, e.requestContext.authorizer]
   },
   currentRoleToken: async (e, roleCode) => {
     if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
+      throw BizErr.TokenErr()
     } else {
       if (e.requestContext.authorizer.role != roleCode) {
-        return [BizErr.RoleTokenErr(), 0]
+        throw BizErr.RoleTokenErr()
       }
     }
     return [0, e.requestContext.authorizer]
@@ -156,16 +168,6 @@ export const Model = {
   hashValidate: async (pass, hash) => {
     const result = await bcrypt.compare(pass, hash)
     return result
-  },
-  genPassword: () => {
-    const minLength = 6
-    const maxLength = 16
-    let password = ''
-    let randomLength = Math.floor(Math.random() * (maxLength - minLength)) + minLength
-    while (!isStrongEnough(password)) {
-      password = generatePassword(randomLength, false, /[\w\d\?\-\.\@\#\$\%\^\&\*\(\)\+\~\!\:\{\}\;]/)
-    }
-    return password
   },
   /**
    * IP处理
@@ -245,29 +247,19 @@ export const Model = {
     return false
   }
 }
-
-// 判断密码强度
-function isStrongEnough(password) {
-  const maxLength = 16
-  const minLength = 6
-  const uppercaseMinCount = 1
-  const lowercaseMinCount = 1
-  const numberMinCount = 1
-  const specialMinCount = 1
-  const UPPERCASE_RE = /([A-Z])/g
-  const LOWERCASE_RE = /([a-z])/g
-  const NUMBER_RE = /([\d])/g
-  const SPECIAL_CHAR_RE = /([\?\-])/g
-  // const NON_REPEATING_CHAR_RE = /([\w\d\?\-])\1{2,}/g
-  const uc = password.match(UPPERCASE_RE)
-  const lc = password.match(LOWERCASE_RE)
-  const n = password.match(NUMBER_RE)
-  const sc = password.match(SPECIAL_CHAR_RE)
-  // const nr = password.match(NON_REPEATING_CHAR_RE)
-  return password.length >= minLength &&
-    // !nr &&
-    uc && uc.length >= uppercaseMinCount &&
-    lc && lc.length >= lowercaseMinCount &&
-    n && n.length >= numberMinCount &&
-    sc && sc.length >= specialMinCount
+// 私有日期格式化方法
+Date.prototype.Format = function (fmt) {
+  var o = {
+    "M+": this.getMonth() + 1, //月份 
+    "d+": this.getDate(), //日 
+    "h+": this.getHours(), //小时 
+    "m+": this.getMinutes(), //分 
+    "s+": this.getSeconds(), //秒 
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+    "S": this.getMilliseconds() //毫秒 
+  };
+  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return fmt;
 }

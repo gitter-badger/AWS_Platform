@@ -14,13 +14,14 @@ export class PackageCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
         if(!inparam.content || inparam.content.length < 1 || !inparam.content[0].toolId || !inparam.content[0].toolName){
-            return [{ "code": -1, "msg": "道具内容数据不合法", "params": ["content"] }, 'content']
+            throw { "code": -1, "msg": "道具内容数据不合法", "params": ["content"] }
         }
         if(!inparam.content[0].toolNum){
-            return [{ "code": -1, "msg": "道具数量不能为空", "params": ["content"] }, 'content']
+            throw { "code": -1, "msg": "道具数量不能为空", "params": ["content"] }
         }
 
         // 数据类型处理
@@ -44,7 +45,8 @@ export class PackageCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -70,10 +72,11 @@ export class PackageCheck {
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
         if(!inparam.content || inparam.content.length < 1 || !inparam.content[0].toolId || !inparam.content[0].toolName){
-            return [{ "code": -1, "msg": "道具内容数据不合法", "params": ["content"] }, 'content']
+            throw { "code": -1, "msg": "道具内容数据不合法", "params": ["content"] }
         }
 
         // 数据类型处理
@@ -97,7 +100,8 @@ export class PackageCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理

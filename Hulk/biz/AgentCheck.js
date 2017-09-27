@@ -5,17 +5,18 @@ export class AgentCheck {
      * 检查代理管理员
      */
     checkAdmin(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "hostContact", type: "S", min: 5, max: 40 },
-            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+
             // 代理
-            { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "hostContact", type: "S", min: 5, max: 40 },
+            // { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
 
             { name: "rate", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "vedioMix", type: "NREG", min: null, max: null, equal: athena.RegEnum.RATE },
@@ -30,44 +31,49 @@ export class AgentCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
         // 数据类型处理
-        // inparam.rate = inparam.rate.toString()
+        // inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(Model.PlatformAdminDefaultPoints)
         inparam.role = RoleCodeEnum.Agent
         inparam.suffix = 'Agent'
         inparam.displayName = '代理管理员'
         inparam.parent = Model.NoParent
+        inparam.parentName = Model.NoParentName
         inparam.contractPeriod = 0
         inparam.isforever = true
         inparam.level = 0
-        inparam.levelIndex = 0
-        
+        inparam.levelIndex = '0'
+        inparam.rate = 100.00
+        inparam.vedioMix = 1.00
+        inparam.liveMix = 1.00
+
         return [checkAttError, errorParams]
     }
     /**
      * 检查代理
      */
     check(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
-            { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
-            { name: "hostContact", type: "S", min: 5, max: 40 },
-            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             { name: "vedioMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "liveMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
-            
+
             // 代理
-            { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "hostContact", type: "S", min: 5, max: 40 },
+            // { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
 
             // 帐号管理员
             // { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
@@ -78,20 +84,25 @@ export class AgentCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
-        if (inparam.suffix == 'Agent') {
-            return [{ "code": -1, "msg": "该前缀已系统保留", "params": ["suffix"] }, 'suffix']
-        }
+        // if (inparam.suffix == 'Agent') {
+        //     throw { "code": -1, "msg": "该前缀已系统保留", "params": ["suffix"] }
+        // }
         if ((!inparam.contractPeriod && inparam.contractPeriod != 0) || (inparam.isforever !== true && inparam.isforever !== false)) {
-            return [{ "code": -1, "msg": "有效期不能为空", "params": ["contractPeriod"] }, 'contractPeriod']
+            throw { "code": -1, "msg": "有效期不能为空", "params": ["contractPeriod"] }
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
+        inparam.vedioMix = parseFloat(inparam.vedioMix)
+        inparam.liveMix = parseFloat(inparam.liveMix)
+        inparam.suffix = Model.StringValue
+
         return [checkAttError, errorParams]
     }
 
@@ -99,17 +110,15 @@ export class AgentCheck {
      * 检查代理更新
      */
     checkUpdate(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
-            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME_UPDATE },
+            { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
-            { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
-            { name: "hostContact", type: "S", min: 5, max: 40 },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "vedioMix", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
@@ -119,21 +128,27 @@ export class AgentCheck {
             // { name: "adminName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
             // { name: "adminEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
             // { name: "adminContact", type: "S", min: 1, max: 40 },
-            
+
             // 代理
-            { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
+            // { name: "hostName", type: "REG", min: null, max: null, equal: athena.RegEnum.HOSTNAME },
+            // { name: "hostContact", type: "S", min: 5, max: 40 },
 
             { name: "remark", type: "NS", min: 1, max: 200 }]
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
-        inparam.rate = inparam.rate.toString()
+        inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = RoleCodeEnum.Agent
+        inparam.vedioMix = parseFloat(inparam.vedioMix)
+        inparam.liveMix = parseFloat(inparam.liveMix)
+        inparam.suffix = Model.StringValue
 
         return [checkAttError, errorParams]
     }
@@ -146,13 +161,14 @@ export class AgentCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             { name: "password", type: "S", min: 6, max: 16 },
-            { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "captcha", type: "N", min: 1000, max: 9999 }
         ], inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -173,7 +189,8 @@ export class AgentCheck {
             , inparam)
 
         if (checkAttError) {
-            return [checkAttError, errorParams]
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
         }
 
         // 数据类型处理
@@ -187,13 +204,36 @@ export class AgentCheck {
      * @param {*} inparam 
      */
     checkPassword(inparam) {
-        if (passwordLevel(inparam.password) < 3) {
-            return [{ "code": -1, "msg": "密码强度不足", "params": ["password"] }, 'password']
+        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+            throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "userId", type: "S", min: 36, max: 36 },
             { name: "password", type: "S", min: 6, max: 16 }]
             , inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查查询代理列表
+     * @param {*} inparam 
+     */
+    checkQueryList(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "parent", type: "S", min: 2, max: 36 }]
+            , inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+        
         return [checkAttError, errorParams]
     }
 }

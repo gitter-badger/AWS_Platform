@@ -10,7 +10,7 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
+    constructor({gameId,originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
         this.userId = +userId
@@ -22,20 +22,21 @@ export class UserBillModel extends athena.BaseModel {
         this.fromUser = fromUser;
         this.toUser = toUser || Model.StringValue;
         this.merchantName = merchantName || Model.StringValue;
-        this.originalAmount = 0;
+        this.originalAmount = originalAmount || 0;
         this.operator = operator;
         this.createAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
         this.seatInfo = seatInfo;
-        this.kindId = kindId || -1;  //-1表示中心钱包的
+        this.kindId = kindId || -1;  //-1表示中心钱包的 -2初始点数 -3商城的
+        this.gameId = gameId || -1;
         this.toolId = toolId || -1;
         this.toolName = toolName || Model.StringValue;
         this.type = type;
         this.remark = remark || Model.StringValue;
         this.setAmount(amount);
         this.typeName = typeName;
-        this.gameType = gameType;
+        this.gameType = gameType || -1; //-1表示不在游戏里面
     }
     setAmount(amount){
         if(this.action ==-1) {
@@ -59,6 +60,7 @@ export class UserBillModel extends athena.BaseModel {
     async list(userName, gameId){
         let scanParams = {
             TableName : this.tableName,
+            ScanIndexForward : false,
             FilterExpression : "userName=:userName ",
             ExpressionAttributeValues : {
                 ":userName" : userName
@@ -118,4 +120,5 @@ export const Type = {
     withdrawals : 2, //平台转入中心钱包
     gameSettlement : 3, //游戏结算
     buyTool : 4,  //购买游戏道具
+    agentOper : 5,  //代理操作
 }

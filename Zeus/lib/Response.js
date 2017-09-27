@@ -1,8 +1,8 @@
 import { BizErr, Codes } from './Codes'
-import { TOKEN_SECRET } from './secret/TokenSecret'
 const Bluebird = require('bluebird')
 const jwt = require('jsonwebtoken')
 const jwtVerify = Bluebird.promisify(jwt.verify)
+const TOKEN_SECRET = process.env.TOKEN_SECRET
 
 // 返回模板
 const responseTemplate = (statusCode, body, code, headers = {}) => {
@@ -53,6 +53,7 @@ export const GeneratePolicyDocument = (principalId, effect, resource, userInfo) 
   authResponse.context.parent = userInfo.parent
   authResponse.context.suffix = userInfo.suffix
   authResponse.context.level = userInfo.level
+  authResponse.context.displayName = userInfo.displayName
   if (effect && resource) {
     var policyDocument = {}
     policyDocument.Version = '2012-10-17' // default version

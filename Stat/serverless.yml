@@ -1,0 +1,61 @@
+service: Stat
+plugins:
+  - serverless-webpack
+  - serverless-prune-plugin
+custom:
+  webpackIncludeModules: true
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
+      Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
+functions:
+  tokenAuth: #TOKEN验证
+    handler: api.jwtverify
+    integration: lambda
+  #统计开始
+  overview: #统计总览
+    handler: api_sys_sta.overview
+    events:
+      -
+        http:
+          path: /statistics/overview
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  gameConsumeStat: #游戏消耗
+    handler: api_sys_sta.gameConsumeStat
+    events:
+      -
+        http:
+          path: /statistics/consume
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  consumeAndIncome: #消耗与收益
+    handler: api_sys_sta.consumeAndIncome
+    events:
+      -
+        http:
+          path: /statistics/consumeAndIncome
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  

@@ -1,38 +1,7 @@
 
 {
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfdGVzdDAwMSIsInN1ZmZpeCI6IkNaU1kiLCJ1c2VySWQiOjk4NTg2NiwiaWF0IjoxNTAyMzM1ODY0fQ.sa5vv6HAQAgLSUNsvnxIygNW4OivplF5JHT11WUcinE"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfZGF5MDEwIiwic3VmZml4IjoiQ1pTWSIsInVzZXJJZCI6MzIxODI0LCJpYXQiOjE1MDQ3NzI3NDd9.VaFHdVduLJasHMr8KOSbU7CDS8RgCNAj_zmqrhl1zFU"
     },
-    "body":{
-        "userId" : "985866",
-        "gameId" : "30001",
-        "checkOutBalance" :21,
-
-    "records" : [
-        {
-            "amount" : 1,
-            "userId" : "397685",
-            "id":335369526361194500,
-            "gameId" : 21212,
-            "time":1499999926000,
-            "type":3
-        },
-        {
-            "amount" : 1,
-            "userId" : "397685",
-            "id":335369526361194500,
-            "gameId" : 21212,
-            "time":1499999926000,
-            "type":3
-        },
-        {
-            "amount" : 5,
-            "userId" : "397685",
-            "id":335369526361194500,
-            "gameId" : 21212,
-            "time":1499999926000,
-            "type":3
-        }
-    ]
-}
+    "body":{"userId":"582770","gameId":"40000","checkOutBalance":10005,"records":[{"amount":-25,"type":3},{"amount":35,"type":4},{"amount":-25,"type":3},{"amount":20,"type":4},{"amount":-25,"type":3},{"amount":0,"type":4},{"amount":-25,"type":3},{"amount":0,"type":4},{"amount":-25,"type":3},{"amount":30,"type":4},{"amount":-25,"type":3},{"amount":70,"type":4}]}
 }

@@ -2,10 +2,10 @@ import AWS from 'aws-sdk'
 import { Stream$ } from './Rx5'
 import { BizErr } from './Codes'
 import { JwtVerify, JwtSign } from './Response'
+import { RoleCodeEnum } from './UserConsts'
 import _ from 'lodash'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
-const generatePassword = require('password-generator')
 AWS.config.update({ region: 'ap-southeast-1' })
 AWS.config.setPromisesDependency(require('bluebird'))
 
@@ -28,7 +28,6 @@ export const Store$ = async (action, params) => {
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
-const HeraGamePlayer = 'HeraGamePlayer'
 const ZeusPlatformCaptcha = 'ZeusPlatformCaptcha'
 const ZeusPlatformLog = 'ZeusPlatformLog'
 const ZeusPlatformCode = 'ZeusPlatformCode'
@@ -36,6 +35,15 @@ const ZeusPlatformCode = 'ZeusPlatformCode'
 const DianaPlatformGame = 'DianaPlatformGame'
 const DianaPlatformCompany = 'DianaPlatformCompany'
 const DianaPlatformTool = 'DianaPlatformTool'
+const DianaPlatformPackage = 'DianaPlatformPackage'
+const DianaPlatformSeat = 'DianaPlatformSeat'
+
+const HulkPlatformAd = 'HulkPlatformAd'
+const HeraGamePlayer = 'HeraGamePlayer'
+const PushErrorModel = 'PushErrorModel'
+
+const SYSConfig = 'SYSConfig'
+const SYSToken = 'SYSToken'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -44,11 +52,19 @@ export const Tables = {
   ZeusPlatformCaptcha,
   ZeusPlatformLog,
   ZeusPlatformCode,
-  HeraGamePlayer,
 
   DianaPlatformGame,
   DianaPlatformCompany,
-  DianaPlatformTool
+  DianaPlatformTool,
+  DianaPlatformPackage,
+  DianaPlatformSeat,
+
+  HulkPlatformAd,
+  HeraGamePlayer,
+  PushErrorModel,
+
+  SYSConfig,
+  SYSToken
 }
 
 /**
@@ -106,16 +122,16 @@ export const Model = {
   timeStamp: () => (new Date()).getTime(),
   currentToken: async (e) => {
     if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
+      throw BizErr.TokenErr()
     }
     return [0, e.requestContext.authorizer]
   },
   currentRoleToken: async (e, roleCode) => {
     if (!e || !e.requestContext.authorizer) {
-      return [BizErr.TokenErr(), 0]
+      throw BizErr.TokenErr()
     } else {
       if (e.requestContext.authorizer.role != roleCode) {
-        return [BizErr.RoleTokenErr(), 0]
+        throw BizErr.RoleTokenErr()
       }
     }
     return [0, e.requestContext.authorizer]
@@ -129,7 +145,8 @@ export const Model = {
   baseModel: function () { // the db base model
     return {
       createdAt: (new Date()).getTime(),
-      updatedAt: (new Date()).getTime()
+      updatedAt: (new Date()).getTime(),
+      createdDate: new Date().Format("yyyy-MM-dd")
     }
   },
   hashGen: (pass) => {
@@ -151,9 +168,6 @@ export const Model = {
     } catch (err) {
       return [BizErr.ParamErr(err.toString()), 0]
     }
-  },
-  genPassword: () => {
-    return generatePassword()
   },
   addSourceIP: (e, info) => {
     const sourceIP = e && e.requestContext && e.requestContext.identity.sourceIp || '-100'
@@ -181,5 +195,85 @@ export const Model = {
       return result
     }, {})
     return values
+  },
+  // 判断用户是否为代理
+  isAgent(user) {
+    if (user.role == RoleCodeEnum['Agent']) {
+      return true
+    }
+    return false
+  },
+  // 判断用户是否为线路商
+  isManager(user) {
+    if (user.role == RoleCodeEnum['Manager']) {
+      return true
+    }
+    return false
+  },
+  // 判断用户是否为商户
+  isMerchant(user) {
+    if (user.role == RoleCodeEnum['Merchant']) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是代理管理员
+  isAgentAdmin(token) {
+    if (token.role == RoleCodeEnum['Agent'] && token.suffix == 'Agent') {
+      return true
+    }
+    return false
+  },
+  // 判断是否是平台管理员
+  isPlatformAdmin(token) {
+    if (token.role == RoleCodeEnum['PlatformAdmin']) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是自己
+  isSelf(token, user) {
+    if (token.userId == user.userId) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是下级
+  isChild(token, user) {
+    let parent = token.userId
+    if (token.role == RoleCodeEnum['PlatformAdmin'] || this.isAgentAdmin(token)) {
+      parent = this.DefaultParent
+    }
+    if (parent == user.parent) {
+      return true
+    }
+    return false
+  },
+  // 判断是否是祖孙
+  isSubChild(token, user) {
+    let parent = token.userId
+    if (token.role == RoleCodeEnum['PlatformAdmin'] || this.isAgentAdmin(token)) {
+      parent = this.DefaultParent
+    }
+    if (user.levelIndex.indexOf(parent) > 0) {
+      return true
+    }
+    return false
   }
+}
+// 私有日期格式化方法
+Date.prototype.Format = function (fmt) {
+  var o = {
+    "M+": this.getMonth() + 1, //月份 
+    "d+": this.getDate(), //日 
+    "h+": this.getHours(), //小时 
+    "m+": this.getMinutes(), //分 
+    "s+": this.getSeconds(), //秒 
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+    "S": this.getMilliseconds() //毫秒 
+  };
+  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return fmt;
 }

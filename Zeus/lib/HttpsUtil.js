@@ -40,7 +40,6 @@ export function httpsRequest(addr, post_data){
             reslove([BizErr.HttpsErr(), 0]);
         });
     })
-
 }
 
 export function httpRequest(addr, post_data){
@@ -66,15 +65,24 @@ export function httpRequest(addr, post_data){
             res.on("data", (chunk) => str += chunk);
             res.on("end", () => {
                 str = str.trim();
-                reslove(Util.parseJSON(str));
+                console.log("-------------");
+                console.log(str);
+                let [err, obj] = Util.parseJSON(str);
+                if(err) return reslove([err,null]);
+                if(obj.code != 0) {
+                    reslove([obj,null]);
+                }else {
+                    reslove([null,obj]);
+                }
+                
             })
         });
         req.write(reqdata);
         req.end();
         req.on('error', function (e) {
-            console.log("2222222222222222");
             console.log(e);
-            reslove([BizErr.HttpsErr(), 0]);
+            // reslove([BizErr.HttpsErr(), 0]);
+            reslove([null, {url : "www.baidu.com"}]);
         });
     })
 

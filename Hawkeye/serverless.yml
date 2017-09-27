@@ -1,19 +1,16 @@
-
-service: Hawkeye # NOTE: update this with your service name
-
-# Use the serverless-webpack plugin to transpile ES6
+service: Hawkeye
 plugins:
   - serverless-webpack
-
-# Enable auto-packing of external modules
+  - serverless-prune-plugin
 custom:
   webpackIncludeModules: true
-
-
 provider:
   name: aws
   runtime: nodejs6.10
   region: ap-southeast-1
+  memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -24,7 +21,14 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:ap-southeast-1:*:*"
+      Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"  
 functions:
   tokenVerify:
     handler: noticeApi.jwtverify
@@ -69,6 +73,14 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  playerList :  #玩家列表
+    handler: playerManagerApi.playerList
+    events:
+      - http:
+          path: /player/list
+          method: post
+          cors: true
+          authorizer: tokenVerify
   info :  #公告信息
     handler: openApi.info
     events:
@@ -107,6 +119,13 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  acceptMail:  #接收邮件
+    handler: openApi.acceptMail
+    events:
+      - http:
+          path: /email/accept
+          method: post
+          cors: true
   listEmail:  #邮件列表
     handler: emailApi.list
     events:
@@ -115,7 +134,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  toolList :  #道具列表
+  gameToolList :  #道具列表
     handler: emailApi.toolList
     events:
       - http:
@@ -123,3 +142,66 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  toolList:  #道具列表
+    handler: openApi_tool.toolList
+    events:
+      - http:
+          path: /game/tool/list
+          method: get
+          cors: true
+  seatList:  #席位列表
+    handler: openApi_tool.seatList
+    events:
+      - http:
+          path: /game/seat/list
+          method: get
+          cors: true
+  packageList:  #道具包列表
+    handler: openApi_tool.packageList
+    events:
+      - http:
+          path: /game/package/list
+          method: get
+          cors: true
+  buy:  #购买道具
+    handler: openApi_tool.playerBuyProp
+    events:
+      - http:
+          path: /game/prop/buy
+          method: post
+          cors: true
+  buyDiamonds:  #购买钻石
+    handler: openApi_tool.playerBuyDiamonds
+    events:
+      - http:
+          path: /game/diamonds/buy
+          method: post
+          cors: true
+  advertList:  #广告列表
+    handler: openApi_ad.advertList
+    events:
+      - http:
+          path: /game/advert/list
+          method: get
+          cors: true
+  gameState:  #游戏状态更新
+    handler: gameApi.updateState
+    events:
+      - http:
+          path: /game/status
+          method: post
+          cors: true
+  gameQueue:  #游戏玩家排队
+    handler: gameApi.gameAwait
+    events:
+      - http:
+          path: /game/queue
+          method: post
+          cors: true
+  playerOffline:  #玩家退出游戏
+    handler: gameApi.playerOffline
+    events:
+      - http:
+          path: /game/player/offline
+          method: post
+          cors: true
