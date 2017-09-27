@@ -11,8 +11,14 @@ export class BaseModel {
     constructor(tableName) {
         this.tableName = tableName;
         this.dbClient = dbClient;
+        this.createdDate = this.parseDay(new Date());
     }
-
+    parseDay(date){
+        return date.getFullYear()+"-"+ toNumber(date.getMonth()+1)+"-"+toNumber(date.getDate());
+        function toNumber(number) {
+            return number > 9 ? number+"" : "0"+number; 
+        }
+    }
     setProperties() {
         let item = {};
         for (let key in this) {
