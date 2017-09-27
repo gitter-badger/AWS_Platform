@@ -17,7 +17,7 @@ export const SeatStatusEnum = {
 }
 // 展位类型枚举
 export const SeatTypeEnum = {
-  '1': '钻石展位',
+  '1': 'N币展位',
   '2': '道具展位'
 }
 // 展位内容类型枚举
