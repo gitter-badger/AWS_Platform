@@ -67,6 +67,7 @@ custom:
         usage: 0.75
     - table: BillStat
       index:
+        - CreatedDateIndex
         - roleDateIndex
         - roleTypeIndex
         - userIdAndDate
@@ -245,6 +246,17 @@ resources:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         GlobalSecondaryIndexes:
+          -
+            IndexName: CreatedDateIndex
+            KeySchema:
+            -
+              AttributeName: createdDate
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
           -
             IndexName: roleDateIndex
             KeySchema:
