@@ -238,6 +238,9 @@ resources:
           -
             AttributeName: type
             AttributeType: N
+          -
+            AttributeName: createdDate
+            AttributeType: S
         KeySchema:
           -
             AttributeName: sn
