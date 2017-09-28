@@ -124,6 +124,9 @@ export const Model = {
     if (!e || !e.requestContext.authorizer) {
       throw BizErr.TokenErr()
     }
+    if (e.requestContext.authorizer.principalId == -1) {
+      throw BizErr.TokenExpire()
+    }
     return [0, e.requestContext.authorizer]
   },
   currentRoleToken: async (e, roleCode) => {
@@ -133,6 +136,9 @@ export const Model = {
       if (e.requestContext.authorizer.role != roleCode) {
         throw BizErr.RoleTokenErr()
       }
+    }
+    if (e.requestContext.authorizer.principalId == -1) {
+      throw BizErr.TokenExpire()
     }
     return [0, e.requestContext.authorizer]
   },

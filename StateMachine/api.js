@@ -1,5 +1,5 @@
-import { ResOK, ResFail, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
-
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, JwtVerify, GeneratePolicyDocument } from './lib/all'
+import { TokenModel } from './model/TokenModel'
 // ==================== 以下为内部方法 ====================
 
 // TOKEN验证
@@ -16,19 +16,24 @@ const jwtverify = async (e, c, cb) => {
     return c.fail('未授权')
   }
   // 有效期校验
-  console.info('解密')
-  console.info(Math.floor(new Date().getTime() / 1000))
-  console.info(userInfo.iat)
-  console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
-  // if(new Date().getTime - userInfo.iat > 100000){
-  //   return c.fail('Token expire')
-  // }
-  // TOKEN是否有效校验（判断密码是否一致）
-  // if(!userInfo.password){
-  //   return c.fail('Token locked')
-  // }
-  // 结果返回
-  return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  const [checkErr, checkRet] = await new TokenModel().checkExpire(userInfo)
+  if (checkErr) {
+    return c.succeed(GeneratePolicyDocument(-1, 'Allow', e.methodArn, userInfo))
+  } else {
+    // console.info('解密')
+    // console.info(Math.floor(new Date().getTime() / 1000))
+    // console.info(userInfo.iat)
+    // console.info(Math.floor((new Date().getTime() / 1000)) - userInfo.iat)
+    // if(new Date().getTime - userInfo.iat > 100000){
+    //   return c.fail('Token expire')
+    // }
+    // TOKEN是否有效校验（判断密码是否一致）
+    // if(!userInfo.password){
+    //   return c.fail('Token locked')
+    // }
+    // 结果返回
+    return c.succeed(GeneratePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
+  }
 }
 
 export {
