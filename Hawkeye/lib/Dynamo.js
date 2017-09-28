@@ -70,7 +70,7 @@ export const Model = {
       return [new CHeraErr(CODES.TokenError),0]
     }
     if (e.requestContext.authorizer.principalId == -1) {
-      throw BizErr.TokenExpire()
+      return [new CHeraErr(CODES.TokenExpire),0]
     }
     if(!e.headers.Authorization) {
       return [0, e.requestContext.authorizer]
