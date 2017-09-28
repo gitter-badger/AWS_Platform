@@ -257,7 +257,8 @@ export const jwtverify = async (e, c, cb) => {
   }
   const [checkErr, checkRet] = await new TokenModel(userInfo).checkExpire(userInfo);
   if (checkErr) {
-    return c.fail(checkErr.msg)
+    return c.succeed(Util.generatePolicyDocument(-1, 'Allow', e.methodArn, userInfo))
+    // return c.fail(checkErr.msg)
   } else {
     return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
   }

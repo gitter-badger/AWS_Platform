@@ -14,6 +14,7 @@ export const CODES = {
     palyerIns : 10008,
     TokenError : 11000,
     gameingError : 11001, //正在游戏中，不能转账
+    TokenExpire : 90001, //token过期
 
     playerRecordError : { //账单数据错误
       depositErr : 12000, //存点不正确
@@ -86,7 +87,8 @@ const errorMessage = {
   "14002" : "你的点数不足",
   "14003" : "昵称已存在",
   "14004" : "洗码比有误",
-  "15000" : "游戏key错误"
+  "15000" : "游戏key错误",
+  "90001" : "TOKEN已过期"
 }
 
 
