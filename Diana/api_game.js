@@ -41,6 +41,8 @@ const gameList = async (e, c, cb) => {
     // if (paramsErr) {
     //   return ResErr(cb, jsonParseErr)
     // }
+    // 身份令牌
+    const [tokenErr, token] = await Model.currentToken(e)
     const [jsonParseErr, gameParams] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new GameCheck().checkQuery(gameParams)

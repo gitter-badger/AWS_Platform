@@ -160,7 +160,8 @@ const seatDelete = async (e, c, cb) => {
  * 展位类别
  */
 const seatType = async (e, c, cb) => {
-    const res = { m: 'seatType' }
+    // 身份令牌
+    const [tokenErr, token] = await Model.currentToken(e)
     let seatTypeArr = []
     for (let code in SeatTypeEnum) {
         seatTypeArr.push({ 'code': code, 'name': SeatTypeEnum[code] })
