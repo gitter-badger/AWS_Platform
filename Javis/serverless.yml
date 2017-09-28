@@ -10,6 +10,7 @@ provider:
   memorySize: 256
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+      NA_CENTER: ${ssm:NA_CENTER~true}
   iamRoleStatements:
     - Effect: Allow
       Action:
