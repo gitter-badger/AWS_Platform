@@ -57,6 +57,9 @@ export const Model = {
     if (!e || (!e.requestContext.authorizer && !e.headers.Authorization)) {
       return [new CHeraErr(CODES.TokenError),0]
     }
+    if (e.requestContext.authorizer.principalId == -1) {
+      throw BizErr.TokenExpire()
+    }
     if(!e.headers.Authorization) {
       return [0, e.requestContext.authorizer]
     }else {

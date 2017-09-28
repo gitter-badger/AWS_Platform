@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, JwtVerify, GeneratePolicyDocument, BizErr } from './lib/all'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, JwtVerify, GeneratePolicyDocument } from './lib/all'
 import { TokenModel } from './model/TokenModel'
 // ==================== 以下为内部方法 ====================
 
@@ -18,7 +18,7 @@ const jwtverify = async (e, c, cb) => {
   // 有效期校验
   const [checkErr, checkRet] = await new TokenModel().checkExpire(userInfo)
   if (checkErr) {
-    return c.fail(checkErr.msg)
+    return c.succeed(GeneratePolicyDocument(-1, 'Allow', e.methodArn, userInfo))
   } else {
     // console.info('解密')
     // console.info(Math.floor(new Date().getTime() / 1000))
