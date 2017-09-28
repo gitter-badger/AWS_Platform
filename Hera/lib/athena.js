@@ -190,7 +190,59 @@ export class BaseModel{
             })
         })
     }
-
+    /**
+     * 1,搜索满足的所有记录(只返回排序键)
+     * 2，排好序后根据排序条件继续搜索
+     * @param {*} pageNumber 
+     * @param {*} pageSize 
+     * @param {*} conditions 
+     * @param {*} returnValues 
+     * @param {*} sortkey 
+     * @param {*} sort 
+     */
+    // async page(pageNumber, pageSize, conditions = {}, returnValues, sortkey, sort) {
+    //     let page = {
+    //         pageNumber : pageNumber,
+    //         pageSize : pageSize,
+    //         ProjectionExpression : [sortkey].join(",")
+    //     }
+    //     let opts = {
+    //     }
+    //     let keys = Object.keys(conditions);
+    //     if(keys.length > 0) {
+    //         opts.FilterExpression = "";
+    //         opts.ExpressionAttributeValues = {};
+    //         opts.ExpressionAttributeNames = {};
+    //     }
+    //     keys.forEach((k, index) => {
+    //         let properies = conditions[key];
+    //         if(typeof properies == "object"){
+    //             for(let key in properies) {
+    //                 switch(key) {
+    //                     case "$like" : {
+    //                         opts.FilterExpression += `contains(#${k},:${k}) and`
+    //                     }
+    //                 }
+    //             }
+    //         }else {
+    //             if(properies) {
+    //                 opts.FilterExpression += `#${k}=:${k} and`;
+    //                 opts.ExpressionAttributeValues[`:${k}`] = properies;
+    //             }
+    //         }
+    //         opts.ExpressionAttributeNames[`#${k}`] = `${k}`
+    //     })
+    //     if(keys.length>0) {
+    //         opts.FilterExpression = opts.FilterExpression.substring(0, opts.FilterExpression.length-4);
+    //     }
+    //     console.log(opts);
+    //     let [filterErr, list] = await this.scan(opts);
+    //     if(filterErr) {
+    //         return [filterErr, 0]
+    //     }
+    //     console.log(list.length);
+    //     return [filterErr, list]
+    // }
     async last({skip, conditions, returnValues, indexName,lastRecord}){
         let maxLimit = skip;
         let opts = {
@@ -202,7 +254,6 @@ export class BaseModel{
             KeyConditionExpression :"",
             ExpressionAttributeValues : {}
         }
-
         keys.forEach((k, index) => {
             let equalMode = " = ",
                 value = conditions[k];

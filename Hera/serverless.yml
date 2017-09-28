@@ -213,3 +213,9 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  # page:     #page
+  #   handler: managerApi.page
+  #   events:
+  #     - http:
+  #         method: post
+  #         cors: true
