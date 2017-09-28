@@ -20,13 +20,13 @@
         }
     },
     "body": {
-        "remark": "这是钻石",
+        "remark": "这是N币",
         "toolStatus": 1,
         "icon": "Diamond",
-        "toolName": "钻石",
+        "toolName": "N币",
         "updatedAt": 1503548612609,
         "createdAt": 1503548563105,
         "toolId": "100000",
-        "desc": "这是钻石test"
+        "desc": "这是N币test"
     }
 }

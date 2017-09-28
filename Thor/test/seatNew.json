@@ -24,18 +24,18 @@
         "order": "1",
         "sum": "60",
         "price": "6",
-        "prop": "钻石",
+        "prop": "N币",
         "seatStatus": "2",
         "contentType": 1,
         "content": {
-            "remark": "这是钻石",
+            "remark": "这是N币",
             "toolStatus": 1,
             "icon": "Diamond",
-            "toolName": "钻石",
+            "toolName": "N币",
             "updatedAt": 1503548612609,
             "createdAt": 1503548563105,
             "toolId": "100000",
-            "desc": "这是钻石"
+            "desc": "这是N币"
         },
         "icon": "Diamond1"
     }

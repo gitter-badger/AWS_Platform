@@ -133,7 +133,7 @@ const acceptMail = async(e, c, cb) => {
       if(recordSaveErr) {
         return errorHandle(cb, recordSaveErr);
       }
-      //用户钻石发生变化
+      //用户N币发生变化
       let userDiamondBillModel = new UserDiamondBillModel({
           userId : userId,
           action :1,
@@ -151,7 +151,7 @@ const acceptMail = async(e, c, cb) => {
   }
   // //玩家账单
   // if(sumDiamonds!=0) {
-  //   //用户钻石发生变化
+  //   //用户N币发生变化
   //   let userDiamondBillModel = new UserDiamondBillModel({
   //     userId : userId,
   //     action :1,
@@ -165,7 +165,7 @@ const acceptMail = async(e, c, cb) => {
   //     return errorHandle(cb, userDiamondsSaveErr);
   //   }
   // }
-  //获取用户钻石
+  //获取用户N币
   let [diamondsError, userDiamonds] = await new UserDiamondBillModel({userName:userInfo.userName}).getBalance();
   if(diamondsError) {
     return cb(null, ReHandler.fail(diamondsError));
@@ -197,7 +197,7 @@ async function handlerEmail(emailModel, userId) {
   }
   //接收邮件
   let tools = emailModel.tools || [];
-  //钻石数量
+  //N币数量
   let diamonds = 0;
   tools.forEach(function(element) {
     let toolList = [];

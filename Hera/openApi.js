@@ -528,7 +528,7 @@ async function gamePlayerA3Login(event, context, callback) {
   if (bError) {
     return callback(null, ReHandler.fail(updateError));
   }
-  //获取玩家钻石
+  //获取玩家N币
   let [diamondErr, diamonds] = await new UserDiamondBillModel({ userName }).getBalance();
   if (diamondErr) {
     return callback(null, ReHandler.fail(diamondErr));
@@ -592,7 +592,7 @@ async function getA3GamePlayerBalance(event, context, callback) {
 
   let [bError, balance] = await userBill.getBalance();
   if (bError) return callback(null, ReHandler.fail(bError));
-  //获取玩家钻石
+  //获取玩家N币
   let [diamondErr, diamonds] = await new UserDiamondBillModel({ userName }).getBalance();
   if (diamondErr) {
     return callback(null, ReHandler.fail(diamondErr));

@@ -170,7 +170,7 @@ functions:
           path: /game/prop/buy
           method: post
           cors: true
-  buyDiamonds:  #购买钻石
+  buyDiamonds:  #购买N币
     handler: openApi_tool.playerBuyDiamonds
     events:
       - http:
