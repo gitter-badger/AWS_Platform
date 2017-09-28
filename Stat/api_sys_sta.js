@@ -253,6 +253,9 @@ const gameConsumeStat = async function(event, context, callback) {
       }
   })
   //
+  returnObj.vedioSum = +(returnObj.vedioSum).toFixed(2);
+  returnObj.elecSum = +(returnObj.elecSum).toFixed(2);
+  returnObj.storeSum = +(returnObj.storeSum).toFixed(2);
   returnObj.sum = +(returnObj.sum).toFixed(2);
   filterNumber(returnObj.vedio);
   filterNumber(returnObj.elec);
