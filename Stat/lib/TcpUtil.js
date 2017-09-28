@@ -8,7 +8,8 @@ import {
 
 // const host = '192.168.3.11';
 // const host = '47.74.154.114';  //开发环境
-const host = '47.74.152.121';  //正式环境
+// const host = '47.74.152.121';  //正式环境
+const host = process.env.NA_CENTER;  //推送大厅地址
 
 export  const onlineUser = async(body) => {
     let client = new net.Socket();

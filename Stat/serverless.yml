@@ -10,7 +10,8 @@ provider:
   region: ap-southeast-1
   memorySize: 256
   environment:
-      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+    TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+    NA_CENTER: ${ssm:NA_CENTER~true}
   iamRoleStatements:
     - Effect: Allow
       Action:
