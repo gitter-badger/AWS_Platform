@@ -18,6 +18,8 @@ import {RoleCodeEnum} from "./lib/all";
 
 import {TimeUtil}  from "./lib/TimeUtil"
 
+import {onlineUser}  from "./lib/TcpUtil"
+
 
 import {Model} from "./lib/Dynamo"
 
@@ -90,24 +92,47 @@ const overview = async function(event, context, callback) {
         return callback(null, ReHandler.success({oneNum: -(sumTodayPoints).toFixed(2), twoNum:-(sumPoints).toFixed(2), type:type}));
       }
       case 3 : {  //玩家总数
-        let err, obj;
+        let err, sum =0, buIds = [],online=0;
         if(isAdmin) {
-            [err, obj] = await new PlayerModel().statCount();
+            [err, sum] = await new PlayerModel().sumCount();
+            if(err) {
+                return errorHandle(callback, ReHandler.fail(err));
+            }
         }else {
-            let buIds = [];
             if(role == RoleCodeEnum.Merchant) {
                 buIds = [userId];
             }
             if(role == RoleCodeEnum.Manager) {
                 buIds = await findChildrenMerchant(userId);
             }
-            [err, obj] = await new PlayerModel().statCount(buIds);
+            let [err, obj] = await new PlayerModel().statCount(buIds);
+            sum = obj.twoNum;
         }
-        if(err) {
-            return errorHandle(callback, ReHandler.fail(err));
+        console.log(buIds);
+        if(isAdmin || buIds.length != 0) {
+            [err, online] = await onlineUser(buIds);
+            if(err) {
+                return errorHandle(callback, ReHandler.fail(err));
+            }
         }
-        obj.type = type;
-        return callback(null, ReHandler.success(obj));
+        return callback(null, ReHandler.success({oneNum : online, twoNum:sum}));
+        // if(isAdmin) {
+        //     [err, obj] = await new PlayerModel().statCount();
+        // }else {
+        //     let buIds = [];
+        //     if(role == RoleCodeEnum.Merchant) {
+        //         buIds = [userId];
+        //     }
+        //     if(role == RoleCodeEnum.Manager) {
+        //         buIds = await findChildrenMerchant(userId);
+        //     }
+        //     [err, obj] = await new PlayerModel().statCount(buIds);
+        // }
+        // if(err) {
+        //     return errorHandle(callback, ReHandler.fail(err));
+        // }
+        // obj.type = type;
+        // return callback(null, ReHandler.success(obj));
       }
       case 4 : { //签约情况
         let buIds;

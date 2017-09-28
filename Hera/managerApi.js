@@ -353,7 +353,11 @@ export async function batchForzen(event, context, cb){
 //   ResOK(cb, {state});
 }
 
-
+// export async function page(event, context, cb){
+//     let [err, page] = await new UserModel().page(1,20,{}, [],"userName");
+//     console.log(err);
+//     console.log(page);
+// }
 // TOKEN验证
 export const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken

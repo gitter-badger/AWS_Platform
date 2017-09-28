@@ -53,6 +53,7 @@ export class UserBillModel extends athena.BaseModel {
         records.forEach(function(element) {
             sumMount += element.amount;
         });
+        sumMount = +(sumMount.toFixed(2));
         return [null, sumMount];
     }
     
@@ -85,6 +86,7 @@ export class UserBillModel extends athena.BaseModel {
         records.forEach(function(element) {
             sumMount += element.amount;
         });
+        sumMount = +(sumMount.toFixed(2));
         return [null, sumMount];
     }
     carryPoint(){

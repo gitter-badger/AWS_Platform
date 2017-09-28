@@ -263,12 +263,12 @@ async function playerBuyDiamonds(event, context, callback){
   userDiamondBillModel.originalDiamonds = userDiamonds;
   //更新余额
   let u = new UserModel(); 
-  let [updatebError] = await u.update({userName:userModel.userName},{balance : oriSumBalance-actualAmount});
+  let [updatebError] = await u.update({userName:userModel.userName},{balance : +(oriSumBalance-actualAmount).toFixed(2)});
   if(updatebError) return callback(null, ReHandler.fail(updatebError));
   //写入N币账单
   let [saveDiamondError] = await userDiamondBillModel.save();
   callback(null, ReHandler.success({
-      data :{balance : oriSumBalance-actualAmount, diamonds: userDiamonds+diamonds}
+      data :{balance : +(oriSumBalance-actualAmount).toFixed(2), diamonds: userDiamonds+diamonds}
   }));
 }
 

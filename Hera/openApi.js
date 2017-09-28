@@ -726,7 +726,7 @@ async function playerRecordValidate(event, context, callback) {
   }
   //更新余额
   let u = new UserModel();
-  let [updatebError] = await u.update({ userName: userModel.userName }, { balance: +(userSumAmount).toFixed(2) });
+  let [updatebError] = await u.update({ userName: userModel.userName }, { balance: userSumAmount });
   if (updatebError) return callback(null, ReHandler.fail(updatebError));
   //解除玩家状态
   if (userModel.gameState != GameState.offline) {
