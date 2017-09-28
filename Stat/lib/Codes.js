@@ -39,6 +39,9 @@ export const CODES = {
     mixError : 14004,//洗码比有误
     merchantForzen : 14005,  //商户已冻结
 
+    TokenExpire : 90001,  //token已过期
+    
+
 }
 
 const errorMessage = {
@@ -73,7 +76,8 @@ const errorMessage = {
   "14002" : "你的点数不足",
   "14003" : "昵称已存在",
   "14004" : "洗码比有误",
-  "14005" : "商户已冻结"
+  "14005" : "商户已冻结",
+  "90001" : "TOKEN已过期"
 }
 
 
