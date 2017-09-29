@@ -38,22 +38,22 @@ custom:
         - parentIdIndex
         - CreatedDateIndex
       read:
-        minimum: 1
+        minimum: 10
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 1
+        minimum: 10
         maximum: 10000
         usage: 0.75
     - table: HeraGamePlayer
       index:
         - userIdIndex
       read:
-        minimum: 1
+        minimum: 10
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 1
+        minimum: 10
         maximum: 10000
         usage: 0.75
     - table: SYSToken
@@ -148,8 +148,8 @@ resources:
             AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
         GlobalSecondaryIndexes:
           -
             IndexName: userIdIndex
@@ -160,8 +160,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
     HeraGameRecord:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -190,8 +190,8 @@ resources:
             AttributeName: betId
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
         GlobalSecondaryIndexes:
           -
             IndexName: parentIdIndex
@@ -205,8 +205,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
           -
             IndexName: CreatedDateIndex
             KeySchema:
@@ -216,8 +216,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
     BillStat:
       Type: AWS::DynamoDB::Table
       Properties:
