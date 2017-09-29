@@ -354,7 +354,7 @@ export async function batchForzen(event, context, cb){
 }
 
 // export async function page(event, context, cb){
-//     let [err, page] = await new UserModel().page(1,20,{}, [],"userName");
+//     let [err, page] = await new UserModel().page({userName:{"$like":"AWJ"}},2, 2, "userName","asc");
 //     console.log(err);
 //     console.log(page);
 // }

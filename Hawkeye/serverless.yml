@@ -198,6 +198,13 @@ functions:
           path: /game/queue
           method: post
           cors: true
+  merchantInfo:  #游戏玩家排队
+    handler: gameApi.merchantInfo
+    events:
+      - http:
+          path: /merchant/info
+          method: post
+          cors: true
   playerOffline:  #玩家退出游戏
     handler: gameApi.playerOffline
     events:

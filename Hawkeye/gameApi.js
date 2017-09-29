@@ -7,6 +7,8 @@ import {ReHandler, JwtVerify} from "./lib/Response";
 
 import {GameModel} from "./model/GameModel";
 
+import {MerchantModel} from "./model/MerchantModel";
+
 import {UserModel,GameState} from "./model/UserModel";
 
 import {SysConfigModel} from "./model/SysConfigModel";
@@ -137,8 +139,54 @@ const playerOffline = async(event, context, cb) => {
   return cb(null, ReHandler.success({}));
 }
 
+/**
+ * 商户信息
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} cb 
+ */
+const merchantInfo = async(event, context, cb) => {
+  console.log(event);
+  //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) return cb(null, ReHandler.fail(parserErr));
+  //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "parentId", type:"S"}
+  ], requestParams);
+  if(checkAttError){
+    Object.assign(checkAttError, {params: errorParams});
+    return cb(null, ReHandler.fail(checkAttError));
+  }
+  let [merErr, merchant] = await new MerchantModel().findByUserId(requestParams.parentId);
+  if(merErr) {
+      return cb(null, ReHandler.fail(merErr));
+  }
+  if(!merchant) {
+      return cb(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
+  }
+  let returnObj = {
+        username : merchant.username,
+        userId :merchant.userId,
+        role : merchant.role,
+        headPic : "NULL!",
+        parent : merchant.parent,
+        msn : merchant.msn,
+        gameList : merchant.gameList,
+        liveMix : typeof merchant.liveMix == "undefined" ? -1 : merchant.liveMix,
+        vedioMix : typeof merchant.vedioMix == "undefined" ? -1 : merchant.vedioMix,
+        rate :  typeof merchant.rate == "undefined" ? -1 : merchant.rate,
+        displayName : merchant.displayName || "NULL!",
+        suffix : merchant.suffix,
+        levelIndex : merchant.levelIndex + "",
+        merUrl : merchant.frontURL || "-1"
+    }
+  return cb(null, ReHandler.success({data: returnObj}));
+}
+
 export{
     updateState,
     gameAwait,
-    playerOffline
+    playerOffline,
+    merchantInfo
 }
