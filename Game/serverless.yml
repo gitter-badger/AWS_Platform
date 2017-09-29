@@ -38,31 +38,31 @@ custom:
         - parentIdIndex
         - CreatedDateIndex
       read:
-        minimum: 10
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 10
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
     - table: HeraGamePlayer
       index:
         - userIdIndex
       read:
-        minimum: 10
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 10
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
     - table: SYSToken
       read:
-        minimum: 1
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 1
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
     - table: BillStat
@@ -72,22 +72,22 @@ custom:
         - roleTypeIndex
         - userIdAndDate
       read:
-        minimum: 1
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 1
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
     - table: HawkeyePlayerEmailRecord
       index:
         - CreatedDateIndex
       read:
-        minimum: 1
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 1
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
 functions:
@@ -118,8 +118,8 @@ resources:
             AttributeName: emid
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: CreatedDateIndex
@@ -130,8 +130,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
     HeraGamePlayer:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -148,8 +148,8 @@ resources:
             AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: userIdIndex
@@ -160,8 +160,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
     HeraGameRecord:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -190,8 +190,8 @@ resources:
             AttributeName: betId
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: parentIdIndex
@@ -205,8 +205,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: CreatedDateIndex
             KeySchema:
@@ -216,8 +216,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
     BillStat:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -246,8 +246,8 @@ resources:
             AttributeName: sn
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: CreatedDateIndex
@@ -258,8 +258,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: roleDateIndex
             KeySchema:
@@ -272,8 +272,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: roleTypeIndex
             KeySchema:
@@ -286,8 +286,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: userIdAndDate
             KeySchema:
@@ -300,8 +300,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
     SYSToken:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -315,5 +315,5 @@ resources:
             AttributeName: userId
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
