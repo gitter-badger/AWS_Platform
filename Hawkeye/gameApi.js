@@ -167,21 +167,29 @@ const merchantInfo = async(event, context, cb) => {
   }
   let returnObj = {
         username : merchant.username,
-        userId :merchant.userId,
+        id :merchant.userId,
         role : merchant.role,
         headPic : "NULL!",
-        parent : merchant.parent,
-        msn : merchant.msn,
-        gameList : merchant.gameList,
+        parentId : merchant.parent,
+        msn : merchant.msn || "0",
+        gameList : setGameList(merchant.gameList),
         liveMix : typeof merchant.liveMix == "undefined" ? -1 : merchant.liveMix,
         vedioMix : typeof merchant.vedioMix == "undefined" ? -1 : merchant.vedioMix,
         rate :  typeof merchant.rate == "undefined" ? -1 : merchant.rate,
-        displayName : merchant.displayName || "NULL!",
+        nickname : merchant.displayName || "NULL!",
         suffix : merchant.suffix,
         levelIndex : merchant.levelIndex + "",
         merUrl : merchant.frontURL || "-1"
-    }
-  return cb(null, ReHandler.success({data: returnObj}));
+}
+ function setGameList(gameList){
+    gameList = gameList || [];
+    let list = gameList.map((game) => game.code);
+    return list;
+}
+if(merchant.role == RoleCodeEnum.SuperAdmin || merchant.role == RoleCodeEnum.PlatformAdmin || merchant.role == RoleCodeEnum.Agent) {
+    returnObj.gameList = ["10000", "30000","40000"]
+}
+  return cb(null, ReHandler.success(returnObj));
 }
 
 export{

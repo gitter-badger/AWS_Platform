@@ -220,14 +220,12 @@ export async function agentPlayerCudian(event, context, cb){
     }
     let userId = requestParams.fromUserId || tokenInfo.userId;
     const [queryMerchantError, merchantInfo] = await new MerchantModel().findByUserId(userId);
-
     if(queryMerchantError) {
         return ResFail(cb, queryMerchantError); 
     }
     if(!merchantInfo) {
         return ResFail(cb, new CHeraErr(CODES.AgentNotExist)); 
     }
-    
     let [cudianErr] = await cudian(userInfo, merchantInfo, requestParams, tokenInfo);
     if(cudianErr) {
         return ResFail(cb, cudianErr);
@@ -339,6 +337,8 @@ async function qudian(userInfo, merchantInfo, requestParams, tokenInfo) {
         action : 1,
         userId :merchantInfo.userId,
         username : merchantInfo.username,
+        fromDisplayName : serInfo.userName,
+        toDisplayName : merchantInfo.displayName,
         fromLevel : 10000,
         toLevel : merchantInfo.level,
     });
@@ -403,6 +403,8 @@ async function cudian(userInfo, merchantInfo, requestParams, tokenInfo){
         fromLevel : merchantInfo.level,
         toLevel : 10000,
         userId :merchantInfo.userId,
+        fromDisplayName : merchantInfo.displayName,
+        toDisplayName : userInfo.userName,
         username : merchantInfo.username,
     });
     let [mError] = await merchantBillModel.save();
@@ -646,8 +648,6 @@ export async function createPlayer(event, context, cb) {
       toUser : userName,
       msn : "000",
       amount : +requestParams.points,
-      fromDisplayName : merchantInfo.displayName,
-      toDisplayName : userInfo.nickName || userName,
       operator : tokenInfo.username,
       remark : requestParams.remark,
       originalAmount : 0,
@@ -671,6 +671,8 @@ export async function createPlayer(event, context, cb) {
         action : -1,
         userId :merchantInfo.userId,
         username : merchantInfo.username,
+        fromDisplayName : merchantInfo.displayName,
+        toDisplayName :  userName,
         fromLevel : merchantInfo.level,
         toLevel : 10000,
     });
