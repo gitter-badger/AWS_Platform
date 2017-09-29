@@ -121,73 +121,17 @@ export class BaseModel{
             });
         })
     }
-    async page({curPage, pageSize, conditions = {}, returnValues= [], scanIndexForward, indexName}){
-        let page = new Page(curPage, pageSize);
-        let opts = {
-            IndexName : indexName,
-            Limit : pageSize, 
-            ScanIndexForward : scanIndexForward,
-            ProjectionExpression : Object.is(returnValues.length, 0) ? "" : 
-                returnValues.join(", "),
-            FilterExpression :"",
-            ExpressionAttributeValues : {}
-        }
-        let keys = Object.keys(conditions);
-        keys.forEach((k, index) => {
-            let equalMode = " = ",
-                value = conditions[k];
-            if(Object.is(typeof conditions[k], "object")){
-                let pro = conditions[k];
-                for(let key in pro) {
-                    switch (key) {
-                        case "$gt": {
-                            equalMode = ">";
-                            break;
-                        }
-                        case "$lt" : {
-                            equalMode = "<";
-                            break;
-                        }
-                        case "$gte" :{
-                            equalMode = ">=";
-                            break;
-                        } 
-                        case "$lte" :{
-                             equalMode = "<=";
-                        }
-                        default:
-                            break;
-                    }
-                    console.log(33);
-                    console.log(key);
-                    console.log(equalMode);
-                    value = pro[key];
-                    opts.FilterExpression += `${k}${equalMode}:${k} and `;
-                    opts.ExpressionAttributeValues[`:${k}`] = value;
-                }
-            }else {
-                if(value) {
-                    opts.FilterExpression += `${k}=:${k} and`;
-                    opts.ExpressionAttributeValues[`:${k}`] = value;
-                }
-            }
-            console.log(opts.FilterExpression);
-            opts.FilterExpression = opts.FilterExpression.substring(0, opts.FilterExpression.length-4);
-        });
-        console.log(opts)
-        let [countError, count]= await this.count(opts.KeyConditionExpression, opts.ExpressionAttributeValues);
-        console.log("lengthErr:"+countError);
-        console.log(count);
-        if(countError) return [countError, page];
-        page.setTotal(count);
-        return new Promise((reslove, reject)=>{
-            this.db$("scan", opts).then((result) => {
-                page.setData(result.Items);
-                reslove([null, page])
+    async scanByOpts(scanOpts){
+        return new Promise((reslove, reject) => {
+            this.db$("scan", scanOpts).then((result) => {
+                result = result || {};
+                result.Items = result.Items || [];
+                return reslove([null, result.Items || []]);
             }).catch((err) => {
-                // console.log(err);
-                reslove([new AError(CODES.DB_ERROR, err.stack)], page);
-            })
+                console.log(111);
+                console.log(err);
+                return reslove([new AError(CODES.DB_ERROR, err.stack), []]);
+            });
         })
     }
     /**
@@ -200,49 +144,100 @@ export class BaseModel{
      * @param {*} sortkey 
      * @param {*} sort 
      */
-    // async page(pageNumber, pageSize, conditions = {}, returnValues, sortkey, sort) {
-    //     let page = {
-    //         pageNumber : pageNumber,
-    //         pageSize : pageSize,
-    //         ProjectionExpression : [sortkey].join(",")
-    //     }
-    //     let opts = {
-    //     }
-    //     let keys = Object.keys(conditions);
-    //     if(keys.length > 0) {
-    //         opts.FilterExpression = "";
-    //         opts.ExpressionAttributeValues = {};
-    //         opts.ExpressionAttributeNames = {};
-    //     }
-    //     keys.forEach((k, index) => {
-    //         let properies = conditions[key];
-    //         if(typeof properies == "object"){
-    //             for(let key in properies) {
-    //                 switch(key) {
-    //                     case "$like" : {
-    //                         opts.FilterExpression += `contains(#${k},:${k}) and`
-    //                     }
-    //                 }
-    //             }
-    //         }else {
-    //             if(properies) {
-    //                 opts.FilterExpression += `#${k}=:${k} and`;
-    //                 opts.ExpressionAttributeValues[`:${k}`] = properies;
-    //             }
-    //         }
-    //         opts.ExpressionAttributeNames[`#${k}`] = `${k}`
-    //     })
-    //     if(keys.length>0) {
-    //         opts.FilterExpression = opts.FilterExpression.substring(0, opts.FilterExpression.length-4);
-    //     }
-    //     console.log(opts);
-    //     let [filterErr, list] = await this.scan(opts);
-    //     if(filterErr) {
-    //         return [filterErr, 0]
-    //     }
-    //     console.log(list.length);
-    //     return [filterErr, list]
-    // }
+    async page(conditions = {}, pageNumber, pageSize,  sortkey, sort, returnValues = []) {
+        let page = {
+            pageNumber,
+            pageSize
+        }
+        let opts = this.buildQueryParams(conditions);
+        //得到总数
+        let [countError, count] = await this.pageCount(opts);
+        if(countError) return [countError, page];
+        page.total = count;
+        //找到满足所有条件的记录的排序键
+        opts.ProjectionExpression = sortkey;
+        let [sortKeysErr, sortList] = await this.scanByOpts(opts);
+        if(sortKeysErr)  return [sortKeysErr, null];
+        //排序
+        let sortKeys = sortList.map((item) => item[sortkey]);
+        sortKeys.sort();
+        if(sort == "des") { //降序
+            sortKeys.reverse();
+        }
+        let conditionKeys = sortKeys.slice((pageNumber-1)*pageSize, pageNumber*pageSize);
+        page.pageSize = conditionKeys.length;
+        if(conditionKeys.length > 0) conditions[sortkey] = {"$in": conditionKeys};
+        opts = this.buildQueryParams(conditions);
+        //找到满足所有条件的记录
+        if(returnValues.length > 0) {
+            opts.ProjectionExpression = returnValues.join(",");
+        }else {
+            delete opts.ProjectionExpression
+        }
+     
+        let [listErr, list] = await this.scanByOpts(opts);
+        if(listErr) {
+            return [listErr, page]
+        }
+        page.list = list;
+        return [sortKeysErr, page];
+    }
+    /**
+     * 组建查询参数
+     * @param {*} conditions 
+     */
+    buildQueryParams(conditions) {
+        let keys = Object.keys(conditions),
+            opts = {
+
+            };
+        if(keys.length > 0) {
+            opts.FilterExpression = "";
+            opts.ExpressionAttributeValues = {};
+            opts.ExpressionAttributeNames = {};
+        }
+        keys.forEach((k, index) => {
+            let pro = conditions[k];
+            let value = pro,
+                array = false;
+            if(Object.is(typeof pro, "object")){
+                for(let key in pro) {
+                    value = pro[key];
+                    switch (key) {
+                        case "$like": {
+                            opts.FilterExpression += `contains(#${k}, :${k})`;
+                            break;
+                        }
+                        case "$in" : {
+                            array = true;
+                            opts.ExpressionAttributeNames[`#${k}`] = k;
+                            for(let i = 0; i < value.length; i ++){
+                                if(i == 0)opts.FilterExpression += "(";
+                                opts.FilterExpression += `#${k} = :${k}${i}`;
+                                if(i != value.length -1) {
+                                    opts.FilterExpression += " or ";
+                                }
+                                if(i == value.length -1) {
+                                    opts.FilterExpression += ")";
+                                }
+                                opts.ExpressionAttributeValues[`:${k}${i}`] = value[i];
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }else {
+                opts.FilterExpression += `#${k} = :${k}`;
+            }
+            if(!array) {
+                opts.ExpressionAttributeValues[`:${k}`] = value;
+                opts.ExpressionAttributeNames[`#${k}`] = k;
+            }
+            if(index != keys.length -1) opts.FilterExpression += " and ";
+        });
+        return opts;
+    }
     async last({skip, conditions, returnValues, indexName,lastRecord}){
         let maxLimit = skip;
         let opts = {
@@ -271,7 +266,19 @@ export class BaseModel{
             })
         })
     }
-
+    pageCount(opts) {
+        opts.Select = "COUNT";
+        return new Promise((reslove, reject) => {
+            this.db$("scan", opts).then((result) => {
+                reslove([null, result.Count]);
+                delete opts.Select;
+            }).catch((err) => {
+                console.log(err);
+                delete opts.Select;
+                reslove([new AError(CODES.DB_ERROR, err.stack), null]);
+            });
+        })
+    }
     count(filterExpression, expressionAttributeValues){
         return new Promise((reslove, reject) => {
             this.db$("query", {

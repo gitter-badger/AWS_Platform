@@ -30,47 +30,54 @@ const userTrigger = async (e, c, cb) => {
     console.info(record.userId);
     let userId = record.userId.S;
     console.log("userID:"+userId)
-    let userModel = new PlatformUserModel();
-    let [error, userInfo] = await userModel.get({userId}, [], "UserIdIndex");
-    if(error) {
-        return console.info(error);
-    }
-    if(!userInfo){
-        console.info("没有找到用户信息")
-        return;
-    }
-    console.log(userInfo);
-    let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
-    msnInfo = msnInfo || {msn:"0"};
-    msnInfo.msn = msnInfo.msn || "0";
-    let pushModel = new PushModel({
-        username : userInfo.username,
-        userId :userInfo.userId,
-        role : userInfo.role,
-        headPic : "NULL!",
-        parent : userInfo.parent,
-        msn : msnInfo.msn,
-        gameList : userInfo.gameList,
-        liveMix : typeof userInfo.liveMix == "undefined" ? -1 : userInfo.liveMix,
-        vedioMix : typeof userInfo.vedioMix == "undefined" ? -1 : userInfo.vedioMix,
-        rate :  typeof userInfo.rate == "undefined" ? -1 : userInfo.rate,
-        displayName : userInfo.displayName || "NULL!",
-        suffix : userInfo.suffix,
-        levelIndex : userInfo.levelIndex + "",
-        merUrl : userInfo.frontURL || "-1"
-    })
-    if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Agent) {
-        pushModel.gameList = ["10000", "30000","40000"]
-    }
-    console.log("pushModel");
-    console.log(pushModel);
-    let [er] = await pushModel.pushMerchant();
+    let [er] = await new PushModel().pushMerchant(userId);
     if(er) {
         console.info("推送商户发生错误");
         console.info(er);
     }else {
         console.info("推送商户成功");
     }
+    // let userModel = new PlatformUserModel();
+    // let [error, userInfo] = await userModel.get({userId}, [], "UserIdIndex");
+    // if(error) {
+    //     return console.info(error);
+    // }
+    // if(!userInfo){
+    //     console.info("没有找到用户信息")
+    //     return;
+    // }
+    // console.log(userInfo);
+    // let [msnError, msnInfo] = await new MSNModel().get({userId: userInfo.userId},[], "UserIdIndex");
+    // msnInfo = msnInfo || {msn:"0"};
+    // msnInfo.msn = msnInfo.msn || "0";
+    // let pushModel = new PushModel({
+    //     username : userInfo.username,
+    //     userId :userInfo.userId,
+    //     role : userInfo.role,
+    //     headPic : "NULL!",
+    //     parent : userInfo.parent,
+    //     msn : msnInfo.msn,
+    //     gameList : userInfo.gameList,
+    //     liveMix : typeof userInfo.liveMix == "undefined" ? -1 : userInfo.liveMix,
+    //     vedioMix : typeof userInfo.vedioMix == "undefined" ? -1 : userInfo.vedioMix,
+    //     rate :  typeof userInfo.rate == "undefined" ? -1 : userInfo.rate,
+    //     displayName : userInfo.displayName || "NULL!",
+    //     suffix : userInfo.suffix,
+    //     levelIndex : userInfo.levelIndex + "",
+    //     merUrl : userInfo.frontURL || "-1"
+    // })
+    // if(userInfo.role == RoleCodeEnum.SuperAdmin || userInfo.role == RoleCodeEnum.PlatformAdmin || userInfo.role == RoleCodeEnum.Agent) {
+    //     pushModel.gameList = ["10000", "30000","40000"]
+    // }
+    // console.log("pushModel");
+    // console.log(pushModel);
+    // let [er] = await pushModel.pushMerchant();
+    // if(er) {
+    //     console.info("推送商户发生错误");
+    //     console.info(er);
+    // }else {
+    //     console.info("推送商户成功");
+    // }
 }
 
 const playerBalanceTrigger = async(e, c , cb) => {

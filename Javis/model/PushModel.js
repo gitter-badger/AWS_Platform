@@ -30,10 +30,11 @@ export class PushModel {
         this.gameList = this.setGameList(gameList);
         this.merUrl = merUrl;
     }
-    pushMerchant() {
+    pushMerchant(userId) {
         const proId = 9;  //协议
-        console.info(this);
-        return pushUserInfo(this, host, port, proId);
+        // console.info(this);
+        // return pushUserInfo(this, host, port, proId);
+        return pushId(userId, host, port, proId);
     }
     setGameList(gameList) {
         gameList = gameList || [];

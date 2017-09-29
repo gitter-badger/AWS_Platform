@@ -217,5 +217,6 @@ functions:
   #   handler: managerApi.page
   #   events:
   #     - http:
+  #         path: /player/page
   #         method: post
   #         cors: true

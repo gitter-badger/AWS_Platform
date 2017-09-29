@@ -28,6 +28,8 @@ export class TokenModel extends BaseModel{
             return [new CHeraErr(CODES.TokenError), 0]
         }
         let [err, userToken] = await this.get({userId:inparam.userId});
+        console.log("111111222222222");
+        console.log(userToken);
         if (err) {
             return [err, 0]
         }

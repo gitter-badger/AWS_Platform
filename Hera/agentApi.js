@@ -646,6 +646,8 @@ export async function createPlayer(event, context, cb) {
       toUser : userName,
       msn : "000",
       amount : +requestParams.points,
+      fromDisplayName : merchantInfo.displayName,
+      toDisplayName : userInfo.nickName || userName,
       operator : tokenInfo.username,
       remark : requestParams.remark,
       originalAmount : 0,
