@@ -11,7 +11,7 @@ import {Model} from "../lib/Dynamo"
 
 export class UserBillModel extends athena.BaseModel {
     constructor({gameId,originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, 
-        fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo, fromDisplayName, toDisplayName} = {}) {
+        fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.uuid();
         this.userId = +userId
@@ -24,8 +24,6 @@ export class UserBillModel extends athena.BaseModel {
         this.toUser = toUser || Model.StringValue;
         this.merchantName = merchantName || Model.StringValue;
         this.originalAmount = originalAmount || 0;
-        this.fromDisplayName = fromDisplayName;
-        this.toDisplayName = toDisplayName;
         this.operator = operator;
         this.createAt = Date.now();
         this.updateAt = Date.now();

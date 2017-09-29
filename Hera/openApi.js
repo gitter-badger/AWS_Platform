@@ -415,6 +415,8 @@ async function gamePlayerBalance(event, context, callback) {
     username: merchantInfo.username,
     userId: merchantInfo.userId,
     fromLevel: merchantInfo.level,
+    fromDisplayName : user.userName,
+    toDisplayName : user.userName,
     toLevel: 10000,
     action: -action,
   };
