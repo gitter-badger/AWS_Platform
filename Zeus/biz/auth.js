@@ -3,7 +3,7 @@ import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
 import { BillModel } from '../model/BillModel'
-import { PushModel } from '../model/PushModel'
+// import { PushModel } from '../model/PushModel'
 
 /**
  * 管理员注册
