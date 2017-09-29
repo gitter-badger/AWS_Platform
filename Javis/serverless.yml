@@ -576,8 +576,8 @@ resources:
             AttributeName: noid
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}  
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
     
@@ -630,8 +630,8 @@ resources:
             AttributeName: adId
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         GlobalSecondaryIndexes:
@@ -644,8 +644,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
     # 第二阶段部署
     DianaPlatformGame: #游戏表
@@ -688,8 +688,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
           -
             IndexName: GameTypeIndex
             KeySchema:
@@ -702,8 +702,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
           -
             IndexName: GameIdIndex
             KeySchema:
@@ -713,8 +713,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
           -
             IndexName: KindIdIndex
             KeySchema:
@@ -724,11 +724,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     ZeusPlatformMSN: #线路号表
       Type: AWS::DynamoDB::Table
@@ -758,11 +758,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     ZeusPlatformCode: #编码池表
       Type: AWS::DynamoDB::Table
@@ -827,8 +827,8 @@ resources:
             AttributeName: companyId
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     # 第三阶段部署
     DianaPlatformTool: #道具表
@@ -859,11 +859,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     DianaPlatformPackage: #道具包表
       Type: AWS::DynamoDB::Table
@@ -893,11 +893,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     DianaPlatformSeat: #席位表
       Type: AWS::DynamoDB::Table
@@ -918,8 +918,8 @@ resources:
             AttributeName: seatId
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
             IndexName: SeatTypeIndex
@@ -933,8 +933,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
     HeraGamePlayerBill: #玩家账单表
       Type: AWS::DynamoDB::Table
@@ -1058,5 +1058,5 @@ resources:
             AttributeName: code
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
