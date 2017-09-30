@@ -32,7 +32,8 @@ export class GameRecordModel extends BaseModel{
             }
             let saveArray = [];
             for(let j = i; j< i+25;j ++){
-                let item = records[j]
+                let item = records[j];
+                item.createdDate = this.parseDay(new Date(item.betTime));
                 if(item) {
                     saveArray.push({
                         PutRequest : {
@@ -103,7 +104,7 @@ export class GameRecordModel extends BaseModel{
             return [pageErr, page];
         }
         page.pageSize = page.list.length;
-        page.lastTime = (page.list[0] || {}).betTime || 0;
+        page.lastTime = (page.list[page.pageSize -1] || {}).betTime || 0;
         page.list.forEach((item, index) => {
             page.list[index] = page.list[index].record;
         })
