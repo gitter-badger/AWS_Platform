@@ -612,6 +612,7 @@ async function getA3GamePlayerBalance(event, context, callback) {
  */
 async function playerRecordValidate(event, context, callback) {
   console.log(event);
+  console.log("开始时间(进来时间):"+Date.now());
   let [validateError, params, userInfo, requestParams] = await validateGame(event, [
     { name: "gameId", type: "N" },
     { name: "records", type: "J" },
@@ -647,6 +648,7 @@ async function playerRecordValidate(event, context, callback) {
         return callback(null, ReHandler.fail(gameError));
       }
     }
+    console.log("处理完毕时间:"+Date.now());
     return callback(null, ReHandler.success({
       data: { balance: oriBalance }
     }));
@@ -737,6 +739,7 @@ async function playerRecordValidate(event, context, callback) {
       return callback(null, ReHandler.fail(gameError));
     }
   }
+  console.log("处理完毕时间:"+Date.now());
   callback(null, ReHandler.success({
     data: { balance: userSumAmount }
   }));
