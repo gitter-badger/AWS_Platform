@@ -137,6 +137,8 @@ const gameType = async (e, c, cb) => {
     // 刷新最新游戏类型内容
     for (let item of ret.gameList) {
       console.info(item)
+      console.info(item.code)
+      console.info(GameTypeEnum[item.code])
       item = GameTypeEnum[item.code]
       console.info(item)
     }
