@@ -135,13 +135,11 @@ const gameType = async (e, c, cb) => {
     if (err) { return ResErr(cb, err) }
     ret.gameList = ret.gameList || []
     // 刷新最新游戏类型内容
+    let newGameList = []
     for (let item of ret.gameList) {
-      console.info(item)
-      console.info(item.code)
-      console.info(GameTypeEnum[item.code])
-      item = GameTypeEnum[item.code]
-      console.info(item)
+      newGameList.push(GameTypeEnum[item.code])
     }
+    ret.gameList = newGameList
     return ResOK(cb, { payload: ret.gameList })
   } catch (error) {
     return ResErr(cb, error)
