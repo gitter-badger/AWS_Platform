@@ -3,7 +3,6 @@ import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
 import { BillModel } from '../model/BillModel'
-// import { PushModel } from '../model/PushModel'
 
 /**
  * 管理员注册
@@ -124,12 +123,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     level: parentUser.level + 1,
     levelIndex: levelIndex
   }
-  //推送给游戏服务器(A3)
-  // let pushModel = new PushModel(User);
-  // let [pushErr, data] = await pushModel.push();
-  // if(pushErr) {
-  //   return [pushErr, 0]
-  // }
+
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
     return [saveUserErr, 0]
