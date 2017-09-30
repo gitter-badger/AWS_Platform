@@ -3,7 +3,7 @@ plugins:
   - serverless-webpack
   - serverless-secrets-plugin
   - serverless-prune-plugin
-  # - serverless-step-functions
+  - serverless-step-functions
 provider:
   name: aws
   runtime: nodejs6.10
@@ -102,3 +102,20 @@ functions:
 #             Type: Task
 #             Resource: arn:aws:lambda:${opt:region}:${self:custom.secrets.ACCOUNT_ID}:function:${self:service}-${opt:stage}-backup
 #             End: true
+resources:
+  Resources:
+    TEST:
+        Type: AWS::DynamoDB::Table
+        Properties:
+          TableName: TEST
+          AttributeDefinitions:
+            -
+              AttributeName: testId
+              AttributeType: S
+          KeySchema:
+            -
+              AttributeName: testId
+              KeyType: HASH
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+            WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
