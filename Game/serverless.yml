@@ -148,7 +148,7 @@ resources:
             AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
           WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
@@ -160,7 +160,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
     HeraGameRecord:
       Type: AWS::DynamoDB::Table
@@ -190,8 +190,8 @@ resources:
             AttributeName: betId
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: parentIdIndex
@@ -205,8 +205,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
           -
             IndexName: CreatedDateIndex
             KeySchema:

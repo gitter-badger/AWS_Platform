@@ -16,6 +16,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "js-yaml": "^3.8.2",
     "serverless-prune-plugin": "^1.1.2",
+    "serverless-step-functions": "^1.2.0",
     "serverless-webpack": "^1.0.0-rc.4",
     "webpack": "^2.3.1",
     "webpack-node-externals": "^1.5.4"
@@ -32,8 +33,6 @@
     "moment": "^2.18.1",
     "rxjs": "^5.4.2",
     "safe-json-parse": "^4.0.0",
-    "serverless-secrets-plugin": "0.0.1",
-    "serverless-step-functions": "^1.1.0",
     "source-map-support": "^0.4.14",
     "uuid": "^3.1.0"
   }
