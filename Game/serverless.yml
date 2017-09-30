@@ -33,18 +33,18 @@ provider:
 custom:
   webpackIncludeModules: true
   capacities: #数据库自动扩容
-    - table: HeraGameRecord
-      index:
-        - parentIdIndex
-        - CreatedDateIndex
-      read:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
-      write:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
+    # - table: HeraGameRecord
+    #   index:
+    #     - parentIdIndex
+    #     - CreatedDateIndex
+    #   read:
+    #     minimum: ${ssm:MIN_STORE_UNIT}
+    #     maximum: 10000
+    #     usage: 0.75
+    #   write:
+    #     minimum: ${ssm:MIN_STORE_UNIT}
+    #     maximum: 10000
+    #     usage: 0.75
     - table: HeraGamePlayer
       index:
         - userIdIndex
@@ -190,8 +190,8 @@ resources:
             AttributeName: betId
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: parentIdIndex
@@ -205,8 +205,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
           -
             IndexName: CreatedDateIndex
             KeySchema:
