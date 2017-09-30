@@ -33,18 +33,18 @@ provider:
 custom:
   webpackIncludeModules: true
   capacities: #数据库自动扩容
-    - table: HeraGameRecord
-      index:
-        - parentIdIndex
-        - CreatedDateIndex
-      read:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
-      write:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
+    # - table: HeraGameRecord
+    #   index:
+    #     - parentIdIndex
+    #     - CreatedDateIndex
+    #   read:
+    #     minimum: ${ssm:MIN_STORE_UNIT}
+    #     maximum: 10000
+    #     usage: 0.75
+    #   write:
+    #     minimum: ${ssm:MIN_STORE_UNIT}
+    #     maximum: 10000
+    #     usage: 0.75
     - table: HeraGamePlayer
       index:
         - userIdIndex
@@ -162,62 +162,62 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-    HeraGameRecord:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGameRecord
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: betId
-            AttributeType: S
-          -
-            AttributeName: parentId
-            AttributeType: S
-          -
-            AttributeName: betTime
-            AttributeType: N
-          -
-            AttributeName: createdDate
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: userName
-            KeyType: HASH
-          -
-            AttributeName: betId
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-        GlobalSecondaryIndexes:
-          -
-            IndexName: parentIdIndex
-            KeySchema:
-              -
-                AttributeName: parentId
-                KeyType: HASH
-              -
-                AttributeName: betTime
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
-            IndexName: CreatedDateIndex
-            KeySchema:
-              -
-                AttributeName: createdDate
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+    # HeraGameRecord:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: HeraGameRecord
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: userName
+    #         AttributeType: S
+    #       -
+    #         AttributeName: betId
+    #         AttributeType: S
+    #       -
+    #         AttributeName: parentId
+    #         AttributeType: S
+    #       -
+    #         AttributeName: betTime
+    #         AttributeType: N
+    #       -
+    #         AttributeName: createdDate
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: userName
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: betId
+    #         KeyType: RANGE
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+    #       WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+    #     GlobalSecondaryIndexes:
+    #       -
+    #         IndexName: parentIdIndex
+    #         KeySchema:
+    #           -
+    #             AttributeName: parentId
+    #             KeyType: HASH
+    #           -
+    #             AttributeName: betTime
+    #             KeyType: RANGE
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+    #           WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+    #       -
+    #         IndexName: CreatedDateIndex
+    #         KeySchema:
+    #           -
+    #             AttributeName: createdDate
+    #             KeyType: HASH
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+    #           WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
     BillStat:
       Type: AWS::DynamoDB::Table
       Properties:
