@@ -93,21 +93,21 @@ functions:
 #             Type: Task
 #             Resource: arn:aws:lambda:${opt:region}:${self:custom.secrets.ACCOUNT_ID}:function:${self:service}-${opt:stage}-backup
 #             End: true
-resources:
-  Resources:
-    TEST:
-        Type: AWS::DynamoDB::Table
-        DeletionPolicy: Retain
-        Properties:
-          TableName: TEST
-          AttributeDefinitions:
-            -
-              AttributeName: testId
-              AttributeType: S
-          KeySchema:
-            -
-              AttributeName: testId
-              KeyType: HASH
-          ProvisionedThroughput:
-            ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-            WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+# resources:
+#   Resources:
+#     TEST:
+#         Type: AWS::DynamoDB::Table
+#         DeletionPolicy: Retain
+#         Properties:
+#           TableName: TEST
+#           AttributeDefinitions:
+#             -
+#               AttributeName: testId
+#               AttributeType: S
+#           KeySchema:
+#             -
+#               AttributeName: testId
+#               KeyType: HASH
+#           ProvisionedThroughput:
+#             ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+#             WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
