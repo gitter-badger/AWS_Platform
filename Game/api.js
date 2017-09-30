@@ -5,10 +5,10 @@
 // TOKEN验证
 const jwtverify = async (e, c, cb) => {
   // // get the token from event.authorizationToken
-  // const token = e.authorizationToken.split(' ')
-  // if (token[0] !== 'Bearer') {
-  //   return c.fail('授权类型错误')
-  // }
+  const token = e.authorizationToken.split(' ')
+  if (token[0] !== 'Bearer') {
+    return c.fail('授权类型错误')
+  }
   // // verify it and return the policy statements
   // const [err, userInfo] = await JwtVerify(token[1])
   // if (err || !userInfo) {
