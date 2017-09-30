@@ -33,7 +33,6 @@
     "moment": "^2.18.1",
     "rxjs": "^5.4.2",
     "safe-json-parse": "^4.0.0",
-    "serverless-secrets-plugin": "0.0.1",
     "source-map-support": "^0.4.14",
     "uuid": "^3.1.0"
   }
