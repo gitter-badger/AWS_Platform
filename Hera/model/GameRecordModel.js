@@ -33,8 +33,8 @@ export class GameRecordModel extends BaseModel{
             let saveArray = [];
             for(let j = i; j< i+25;j ++){
                 let item = records[j];
-                item.createdDate = this.parseDay(new Date(item.betTime));
                 if(item) {
+                    item.createdDate = this.parseDay(new Date(item.betTime));
                     saveArray.push({
                         PutRequest : {
                             Item : item
