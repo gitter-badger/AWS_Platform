@@ -59,16 +59,9 @@ export class EmailModel extends athena.BaseModel {
             expressionAttributeValues[`:emid${i}`] = emids[i];
         }
         filterExpression = filterExpression.substring(0, filterExpression.length -3);
-        return new Promise((reslove, reject) => {
-            this.db$("scan", {
-                TableName : this.tableName,
+        return this.promise("scan", {
                 FilterExpression : filterExpression,
                 ExpressionAttributeValues : expressionAttributeValues
-            }).then((result) => {
-                reslove([null, result.Items]);
-            }).catch((err) => {
-                reslove([err, 0]);
-            })
-        })
+            });
     }
 }

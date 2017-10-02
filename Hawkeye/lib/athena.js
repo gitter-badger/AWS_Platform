@@ -13,6 +13,20 @@ export class BaseModel{
         this.dbClient = dbClient;
         this.createdDate = this.parseDay(new Date());
     }
+    async promise(action, params, array = []) {
+        return this.db$(action, params).then((result)=>{
+            array = array.concat(result.Items);
+            if(result.LastEvaluatedKey) {
+                params.ExclusiveStartKey = result.LastEvaluatedKey;
+                return this.promise(action, params, array);
+            }else {
+                return [null, array];
+            }
+        }).catch((error) => {
+            console.log(error);
+            return [error, []];
+        })
+    }
     parseDay(date){
         return date.getFullYear()+"-"+ toNumber(date.getMonth()+1)+"-"+toNumber(date.getDate());
         function toNumber(number) {
@@ -80,7 +94,7 @@ export class BaseModel{
             });
         })
     }
-    get(conditions, returnValues = [],indexName,all){
+    async get(conditions, returnValues = [],indexName,all){
         console.log(conditions);
         let keyConditionExpression = "";
         let expressionAttributeValues = {};
@@ -89,22 +103,38 @@ export class BaseModel{
             expressionAttributeValues[`:${key}`] = conditions[key];
         }
         keyConditionExpression = keyConditionExpression.substr(0, keyConditionExpression.length-4);
-        return new Promise((reslove, reject) => {
-            this.db$("query",{
-                // Key:key,
-                KeyConditionExpression : keyConditionExpression,
-                ExpressionAttributeValues:expressionAttributeValues,
-                IndexName: indexName,
-                ReturnValues : returnValues.join(",")
-            }).then((result) => {
-                result = result || {};
-                result.Items = result.Items || [];
-                return reslove([null, (all ? result.Items : result.Items[0])]);
-            }).catch((err) => {
-                console.log(err);
-                return reslove([new AError(CODES.DB_ERROR, err.stack), null]);
-            });
-        })
+        let opts = {
+            // Key:key,
+            KeyConditionExpression : keyConditionExpression,
+            ExpressionAttributeValues:expressionAttributeValues,
+            IndexName: indexName,
+            ReturnValues : returnValues.join(",")
+        }
+        let [err, array] = await this.promise("query", opts);
+        if(err) {
+            return [err, array]
+        }
+        if(all) {
+            return [null, array];
+        }
+        return [null, array[0]];
+        // return new Promise((reslove, reject) => {
+        //     this.db$("query",{
+        //         // Key:key,
+        //         KeyConditionExpression : keyConditionExpression,
+        //         ExpressionAttributeValues:expressionAttributeValues,
+        //         IndexName: indexName,
+        //         ReturnValues : returnValues.join(",")
+        //     }).then((result) => {
+        //         result = result || {};
+        //         result.Items = result.Items || [];
+        //         return reslove([null, (all ? result.Items : result.Items[0])]);
+        //     }).catch((err) => {
+        //         console.log(err);
+        //         return reslove([new AError(CODES.DB_ERROR, err.stack), null]);
+        //     });
+        // })
+        
     }
  
     count(filterExpression, expressionAttributeValues){
@@ -112,7 +142,7 @@ export class BaseModel{
             this.db$("query", {
                 KeyConditionExpression : filterExpression,
                 ExpressionAttributeValues : expressionAttributeValues,
-                ReturnValues : "username"
+                Select : "COUNT",
             }).then((result) => {
                 reslove([null, result.Count])
             }).catch((err) => {
@@ -140,18 +170,7 @@ export class BaseModel{
                 ExpressionAttributeValues:expressionAttributeValues
             }
         }
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanOpts).then((result) => {
-                console.log(result);
-                result = result || {};
-                result.Items = result.Items || [];
-                return reslove([null, result.Items || []]);
-            }).catch((err) => {
-                console.log(111);
-                console.log(err);
-                return reslove([new AError(CODES.DB_ERROR, err.stack), []]);
-            });
-        })
+        return this.promise("scan", scanOpts);
     }
     isExist(key){
         return new Promise((reslove, reject) => {

@@ -63,23 +63,17 @@ export class UserBillModel extends athena.BaseModel {
         let scanParams = {
             TableName : this.tableName,
             ScanIndexForward : false,
-            FilterExpression : "userName=:userName ",
+            LastEvaluatedKey : null,
+            KeyConditionExpression : "userName=:userName",
             ExpressionAttributeValues : {
                 ":userName" : userName
             }
         }
         if(gameId) {
-            scanParams.FilterExpression +="and gameId=:gameId";
+            scanParams.FilterExpression ="gameId=:gameId";
             scanParams.ExpressionAttributeValues[":gameId"] = gameId;
         }
-        
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanParams).then((result)=>{
-                return reslove([null, result.Items]);
-            }).catch((error) => {
-                return reslove([error, 0]);
-            })
-        })
+        return this.promise("query", scanParams);
     }
     async getBalanceByUid(userId){
         let [err, records] = await this.get({userId}, ["userName","amount","userId"], "userIdIndex", true);
