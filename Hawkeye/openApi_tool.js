@@ -26,7 +26,10 @@ import {UserDiamondBillModel} from "./model/UserDiamondBillModel";
 
 import {ToolPackageModel} from "./model/ToolPackageModel";
 
+import {GameRecordModel} from "./model/GameRecordModel";
+
 import {Util} from "./lib/Util"
+
 
 /**
  * 购买前处理
@@ -117,6 +120,11 @@ async function playerBuyProp(event, context, callback) {
   if(!userModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
+  //查询商家信息
+  let [merError, merchantModel] = await new MerchantModel().findById(+userModel.buId);
+  if(merError) {
+      return callback(null, ReHandler.fail(merError));
+  }
   //获取玩家N币
   let [diamondErr, diamonds] = await new UserDiamondBillModel({userName}).getBalance();
   if(diamondErr) {
@@ -143,6 +151,19 @@ async function playerBuyProp(event, context, callback) {
   callback(null, ReHandler.success({
       data :{diamonds: diamonds-actualAmount}
   }));
+  let obj = {
+    userId : userId,
+    userName : userName,
+    gameId : "1",  //商城
+    gameType : 1,
+    betId : Util.uuid(),
+    betTime : Date.now(),
+    parentId : merchantModel.userId,
+    type : 2, //购买道具
+    amount : -actualAmount,
+    remark : "购买房卡"
+  }
+  saveGameRecord(obj);
 }
 
 /**
@@ -270,6 +291,26 @@ async function playerBuyDiamonds(event, context, callback){
   callback(null, ReHandler.success({
       data :{balance : +(oriSumBalance-actualAmount).toFixed(2), diamonds: userDiamonds+diamonds}
   }));
+  let obj = {
+    userId : userId,
+    userName : userModel.userName,
+    gameId : "1",  //商城
+    gameType : 1,
+    betId : Util.uuid(),
+    betTime : Date.now(),
+    parentId : merchantModel.userId,
+    type : 1, //购买钻石
+    number : diamonds,
+    amount : -actualAmount,
+    remark : "购买N币"
+  }
+  saveGameRecord(obj);
+}
+
+async function saveGameRecord(obj) {
+  let record = new GameRecordModel(obj);
+  let [err] = await record.save();
+  console.log(err);
 }
 
 /**
