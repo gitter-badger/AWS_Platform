@@ -35,7 +35,6 @@ if (!file || !table) {
         incRestore(IncBucket, file, table)
     }
 }
-// batchDelete()
 
 /**
  * 恢复数据表
@@ -95,58 +94,6 @@ async function incRestore(bucket, file, table) {
         console.error('全备份恢复捕获异常：' + error)
     }
 }
-
-/**
- * 批量删除数据
- */
-// async function batchDelete() {
-//     console.info('==========开始批量删除==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
-//     try {
-//         let isContinue = true
-//         let startKey = null
-//         let finalRet = []
-//         let tableName = 'HeraGameRecord'
-//         // 单表中每页数据遍历
-//         while (isContinue) {
-//             const [err, ret] = await Store$('scan', {
-//                 Limit: 100,
-//                 ExclusiveStartKey: startKey,
-//                 TableName: tableName
-//             })
-//             if (err) {
-//                 console.error('查询需要批量删除的表【' + tableName + '】发生错误：' + err)
-//                 return
-//             }
-//             console.info(ret.Items.length)
-//             // 累加结果
-//             finalRet.push(...ret.Items)
-//             // 重置起始key
-//             if (!_.isEmpty(ret.LastEvaluatedKey)) {
-//                 startKey = ret.LastEvaluatedKey
-//             }
-//             else {
-//                 isContinue = false
-//             }
-//             // 批量删除
-//             for (let item of ret.Items) {
-//                 const [err, ret] = await Store$('delete', {
-//                     TableName: tableName,
-//                     Key: {
-//                         'userName': item.userName,
-//                         'betId': item.betId
-//                     }
-//                 })
-//                 if (err) {
-//                     console.error('删除数据发生错误：' + err)
-//                     return
-//                 }
-//             }
-//         }
-//         console.info('==========批量删除完成==========:' + moment().format('YYYY-MM-DD_HH:mm:ss'))
-//     } catch (error) {
-//         console.error('批量删除捕获异常：' + error)
-//     }
-// }
 
 // 从S3获取数据
 function S3StoreGet$(bucket, key) {
