@@ -1,9 +1,9 @@
 {
-    "queryStringParameters": "{\"buId\":\"590867\", \"gamePlatform\":\"NA\"}",
+    "queryStringParameters": "{\"buId\":\"550510\", \"gamePlatform\":\"NA\"}",
     "pathParameters" : {
-            "userName" : "day0012"
+            "userName" : "chenwen"
         },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlR0dDAwOV9kYXkwMDEyIiwic3VmZml4IjoiVHR0MDA5IiwidXNlcklkIjoxOTI0NDUsImlhdCI6MTUwMzQ3MDc3MH0.qa0nM3IvjILRV3Fh176_WZrf1iZTSqnlizazwJ4dGyk"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlhZQ19jaGVud2VuIiwic3VmZml4IjoiWFlDIiwidXNlcklkIjo5OTcyMzEsImlhdCI6MTUwNjkxMTAzMn0.aL2jj6anZTtOYjnKFFa1DYeolKwY670VXuoSsqRaRw4"
     }
 }

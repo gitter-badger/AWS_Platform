@@ -13,6 +13,20 @@ export class BaseModel {
         this.dbClient = dbClient;
         this.createdDate = this.parseDay(new Date());
     }
+    async promise(action, params, array = []) {
+        return this.db$(action, params).then((result)=>{
+            array = array.concat(result.Items);
+            if(result.LastEvaluatedKey) {
+                params.ExclusiveStartKey = result.LastEvaluatedKey;
+                return this.promise(action, params, array);
+            }else {
+                return [null, array];
+            }
+        }).catch((error) => {
+            console.log(error);
+            return [error, []];
+        })
+    }
     parseDay(date){
         return date.getFullYear()+"-"+ toNumber(date.getMonth()+1)+"-"+toNumber(date.getDate());
         function toNumber(number) {

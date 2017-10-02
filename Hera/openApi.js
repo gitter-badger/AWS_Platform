@@ -137,7 +137,7 @@ async function successHandler(callback, data, type, merchantInfo, userInfo) {
  * @param {*} callback 
  */
 async function gamePlayerRegister(event, context, callback) {
-  //json转换
+  //json转换1
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
   if (parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
