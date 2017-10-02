@@ -83,13 +83,7 @@ export class UserModel extends athena.BaseModel {
             ExpressionAttributeNames : expressionAttributeNames
         }
         console.log(scanOpts);
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanOpts).then((result) => {
-                reslove([null, result.Items]);
-            }).catch((err) => {
-                reslove([err, 0]);
-            })
-        })
+        return this.promise("scan", scanOpts);
     }
     async getUserByNickname(nickname) {
         let [scanErr, userList] = await this.scan({nickname});
@@ -150,17 +144,7 @@ export class UserModel extends athena.BaseModel {
             }
         }
         console.log(scanOpts);
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanOpts).then((result) => {
-                result = result || {};
-                result.Items = result.Items || [];
-                return reslove([null, result.Items || []]);
-            }).catch((err) => {
-                console.log(111);
-                console.log(err);
-                return reslove([new CHeraErr(CODES.SystemError), []]);
-            });
-        })
+        return this.promise("scan", scanOpts);
     }
     list(buId){
         let scanParams = {
@@ -176,13 +160,7 @@ export class UserModel extends athena.BaseModel {
             }
             Object.assign(scanParams,{FilterExpression, ExpressionAttributeValues});
         }
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanParams).then((result)=>{
-                return reslove([null, result.Items]);
-            }).catch((error) => {
-                return reslove([error, 0]);
-            })
-        })
+        return this.promise("scan", scanParams);
     }
     vertifyPassword(password){
         this.userPwd = Util.sha256(this.userPwd);

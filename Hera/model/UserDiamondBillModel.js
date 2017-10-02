@@ -57,14 +57,14 @@ export class UserDiamondBillModel extends athena.BaseModel {
             scanParams.FilterExpression +="and gameId=:gameId";
             scanParams.ExpressionAttributeValues[":gameId"] = gameId;
         }
-        
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanParams).then((result)=>{
-                return reslove([null, result.Items]);
-            }).catch((error) => {
-                return reslove([error, 0]);
-            })
-        })
+        return this.promise("scan", scanParams);
+        // return new Promise((reslove, reject) => {
+        //     this.db$("scan", scanParams).then((result)=>{
+        //         return reslove([null, result.Items]);
+        //     }).catch((error) => {
+        //         return reslove([error, 0]);
+        //     })
+        // })
     }
     async getBalanceByUid(userId){
         let [err, records] = await this.get({userId}, ["userName","amount","userId"], "userIdIndex", true);
