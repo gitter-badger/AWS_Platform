@@ -38,6 +38,7 @@ import {Util} from "./lib/Util"
 async function playerBufBefore(event) {
   //json转换
   console.log(event);
+  
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if(parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
@@ -52,6 +53,7 @@ async function playerBufBefore(event) {
     Object.assign(checkAttError, {params: errorParams});
     return [checkAttError,null]
   } 
+  let packageFlag = false; //是否为礼包
   //变量
   let {userId, num, amount, seatId, kindId} = requestParams;
 
@@ -87,14 +89,85 @@ async function playerBufBefore(event) {
   if(seatType == SeatContentEnum.package) {
     //道具包里面的道具内容
     console.log("包");
+    packageFlag = true;
     toolContent = (seatInfo.content || {}).content || [];
   }else {
     console.log("daoju");
     toolContent = [seatInfo.content];
   }
   toolContent.actualAmount = actualAmount;
-  return [null, toolContent, requestParams, userInfo, actualAmount, seatInfo.sum, seatInfo]
+  return [null, toolContent, requestParams, userInfo, actualAmount, seatInfo.sum, seatInfo, packageFlag]
 }
+
+// /**
+//  * 玩家购买道具
+//  * @param {*} event 
+//  * @param {*} context 
+//  * @param {*} callback 
+//  */
+// async function playerBuyProp(event, context, callback) {
+//   let [beforeErr, toolContent, requestParams, userInfo, actualAmount, propNumber, seatInfo] = await playerBufBefore(event);
+//   if(beforeErr) {
+//     return callback(null, ReHandler.fail(beforeErr));
+//   }
+//   if(seatInfo.seatType != SeatTypeEnum.tool) {
+//     return callback(null, ReHandler.fail(new CHeraErr(CODES.notPros)));
+//   }
+ 
+//   let {userId, userName} = userInfo;
+//   //获取用户信息
+//   let [userErr, userModel] = await new UserModel().get({userName});
+//   if(userErr) {
+//     return callback(null, ReHandler.fail(new CHeraErr(userErr)));
+//   }
+//   if(!userModel) {
+//     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+//   }
+//   //查询商家信息
+//   let [merError, merchantModel] = await new MerchantModel().findById(+userModel.buId);
+//   if(merError) {
+//       return callback(null, ReHandler.fail(merError));
+//   }
+//   //获取玩家N币
+//   let [diamondErr, diamonds] = await new UserDiamondBillModel({userName}).getBalance();
+//   if(diamondErr) {
+//     return callback(null, ReHandler.fail(diamondErr));
+//   }
+//   //N币不足
+//   if(actualAmount > diamonds) {
+//     return callback(null, ReHandler.fail(new CHeraErr(CODES.DiamondsIns)));
+//   }
+//   //用户N币发生变化
+//   let userDiamondBillModel = new UserDiamondBillModel({
+//     seatId : requestParams.seatId,
+//     userId : userId,
+//     action :-1,
+//     msn : userModel.msn,
+//     userName : userName,
+//     diamonds : -actualAmount,
+//     toolId : 1,
+//     kindId : requestParams.kindId
+//   })
+
+//   userDiamondBillModel.originalDiamonds = diamonds;
+//   let [saveErr] = await userDiamondBillModel.save();
+//   callback(null, ReHandler.success({
+//       data :{diamonds: diamonds-actualAmount}
+//   }));
+//   let obj = {
+//     userId : userId,
+//     userName : userName,
+//     gameId : "1",  //商城
+//     gameType : 1,
+//     betId : Util.uuid(),
+//     betTime : Date.now(),
+//     parentId : merchantModel.userId,
+//     type : 2, //购买道具
+//     amount : -actualAmount,
+//     remark : "购买房卡"
+//   }
+//   saveGameRecord(obj);
+// }
 
 /**
  * 玩家购买道具
@@ -103,65 +176,121 @@ async function playerBufBefore(event) {
  * @param {*} callback 
  */
 async function playerBuyProp(event, context, callback) {
-  let [beforeErr, toolContent, requestParams, userInfo, actualAmount, propNumber, seatInfo] = await playerBufBefore(event);
+  let [beforeErr, toolContent, requestParams, userInfo, actualAmount, seatNumber, seatInfo, packageFlag] = await playerBufBefore(event);
   if(beforeErr) {
     return callback(null, ReHandler.fail(beforeErr));
   }
-  if(seatInfo.seatType != SeatTypeEnum.tool) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.notPros)));
+  let remark = "", userId = userInfo.userId;
+  console.log(seatInfo)
+  buildRemark();
+  function buildRemark(){
+    if(packageFlag) {
+      remark += `${seatInfo.prop}*${seatInfo.sum}[`
+    }
+    toolContent.forEach(function(element) {
+        remark += `${element.toolName}*${packageFlag ?element.toolNum : seatInfo.sum},`
+    }, this);
+    remark = remark.substring(0, remark.length-1);
+    if(packageFlag) {
+      remark += "]"
+    }
   }
- 
-  let {userId, userName} = userInfo;
+  console.log(remark);
   //获取用户信息
-  let [userErr, userModel] = await new UserModel().get({userName});
-  if(userErr) {
-    return callback(null, ReHandler.fail(new CHeraErr(userErr)));
+  let [userError, userModel] = await new UserModel().get({userId},[], "userIdIndex");
+  if(userError) {
+      return callback(null, ReHandler.fail(userError));
   }
   if(!userModel) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+  }
+  //判断是否正在游戏中
+  let game = new UserModel().isGames(userModel);
+  if(game) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
   }
   //查询商家信息
   let [merError, merchantModel] = await new MerchantModel().findById(+userModel.buId);
   if(merError) {
       return callback(null, ReHandler.fail(merError));
   }
-  //获取玩家N币
-  let [diamondErr, diamonds] = await new UserDiamondBillModel({userName}).getBalance();
-  if(diamondErr) {
-    return callback(null, ReHandler.fail(diamondErr));
+  if(!merchantModel) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
-  //N币不足
-  if(actualAmount > diamonds) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.DiamondsIns)));
+  //获取游戏
+  let gameType = -1;
+  if(requestParams.kindId!= -1) {
+    let [gameError, gameModel] = await new GameModel().findByKindId(requestParams.kindId);
+    if(gameError) {
+      return callback(null, ReHandler.fail(new CHeraErr(gameError)));
+    }
+    if(!gameModel) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
+    }
+    gameType = gameModel.gameType;
   }
-  //用户N币发生变化
-  let userDiamondBillModel = new UserDiamondBillModel({
-    seatId : requestParams.seatId,
-    userId : userId,
-    action :-1,
-    msn : userModel.msn,
-    userName : userName,
-    diamonds : -actualAmount,
-    toolId : 1,
-    kindId : requestParams.kindId
+  //获取玩家余额
+  let userBillModel = new UserBillModel({
+    userId : +userId,
+    action : -1,
+    userName : userModel.userName,
+    msn : userInfo.msn,
+    fromRole : userModel.role,
+    fromUser : userModel.userName,
+    merchantName : merchantModel.displayName,
+    msn : merchantModel.msn,
+    operator : userModel.userName,
+    amount : actualAmount,
+    kindId : -3,
+    gameType : gameType,
+    tool : toolContent,
+    seatInfo : seatInfo,
+    type : Type.buyTool,
+    toolName : toolContent.prop,
+    typeName : "商城",
+    remark : remark
   })
+  let [bErr, balance] = await userBillModel.getBalanceByUid(userId);
 
-  userDiamondBillModel.originalDiamonds = diamonds;
-  let [saveErr] = await userDiamondBillModel.save();
+  if(bErr) {
+      return callback(null, ReHandler.fail(new CHeraErr(bErr)));
+  }
+  //用户余额不足
+  if(actualAmount > balance) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
+  }
+
+  //查账
+  let [oriError, oriSumBalance] = await userBillModel.getBalance();
+  if(oriError) {
+    return callback(null, ReHandler.fail(oriError));
+  }
+  userBillModel.originalAmount = oriSumBalance;
+  //保存账单
+  let [uSaveErr] = await userBillModel.save();
+  if(uSaveErr) {
+    return callback(null, ReHandler.fail(uSaveErr));
+  }
+
+  //更新余额
+  let u = new UserModel(); 
+  let [updatebError] = await u.update({userName:userModel.userName},{balance : +(oriSumBalance-actualAmount).toFixed(2)});
+  if(updatebError) return callback(null, ReHandler.fail(updatebError));
+
   callback(null, ReHandler.success({
-      data :{diamonds: diamonds-actualAmount}
+      data :{balance : +(oriSumBalance-actualAmount).toFixed(2)}
   }));
   let obj = {
     userId : userId,
-    userName : userName,
+    userName : userModel.userName,
     gameId : "1",  //商城
     gameType : 1,
     betId : Util.uuid(),
     betTime : Date.now(),
     parentId : merchantModel.userId,
-    type : 2, //购买道具
+    type : 2, //购买钻石
     amount : -actualAmount,
-    remark : "购买房卡"
+    remark : remark
   }
   saveGameRecord(obj);
 }
