@@ -28,8 +28,6 @@ import { MerchantBillModel, Action } from "./model/MerchantBillModel";
 
 import { UserRecordModel } from "./model/UserRecordModel";
 
-import { UserDiamondBillModel } from "./model/UserDiamondBillModel";
-
 
 import { Util } from "./lib/Util"
 
@@ -530,11 +528,6 @@ async function gamePlayerA3Login(event, context, callback) {
   if (bError) {
     return callback(null, ReHandler.fail(updateError));
   }
-  //获取玩家N币
-  let [diamondErr, diamonds] = await new UserDiamondBillModel({ userName }).getBalance();
-  if (diamondErr) {
-    return callback(null, ReHandler.fail(diamondErr));
-  }
   if (!userInfo.liveMix && userInfo.liveMix != 0) {
     userInfo.liveMix = -1
   }
@@ -545,7 +538,6 @@ async function gamePlayerA3Login(event, context, callback) {
     data: {
       token: loginToken,
       balance: balance,
-      diamonds: diamonds,
       msn: userInfo.msn,
       createAt: userInfo.createAt,
       updateAt: userInfo.updateAt,
@@ -594,13 +586,9 @@ async function getA3GamePlayerBalance(event, context, callback) {
 
   let [bError, balance] = await userBill.getBalance();
   if (bError) return callback(null, ReHandler.fail(bError));
-  //获取玩家N币
-  let [diamondErr, diamonds] = await new UserDiamondBillModel({ userName }).getBalance();
-  if (diamondErr) {
-    return callback(null, ReHandler.fail(diamondErr));
-  }
+
   callback(null, ReHandler.success({
-    data: { balance: balance, diamonds }
+    data: { balance: balance }
   }));
 }
 

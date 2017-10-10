@@ -82,7 +82,7 @@ export class GameRecordModel extends BaseModel{
             }else {
                 opts.FilterExpression += "gameId=:gameId";
             }
-            opts.ExpressionAttributeValues[":gameId"] = gameId;
+            opts.ExpressionAttributeValues[":gameId"] = gameId+"";
         }
         let [countErr, count] = await this.count(opts);
         if(countErr) {
