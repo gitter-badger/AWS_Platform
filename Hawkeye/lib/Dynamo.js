@@ -27,6 +27,7 @@ const HeraGameDiamondBill = 'HeraGameDiamondBill'
 const HawkeyePlayerEmailRecord = "HawkeyePlayerEmailRecord"
 const HulkPlatformAd = "HulkPlatformAd"
 const SYSConfig = "SYSConfig"
+const HeraGameRecord = "HeraGameRecord"
 const SYSToken = 'SYSToken'
 
 export const Tables = {
@@ -43,6 +44,7 @@ export const Tables = {
   HawkeyePlayerEmailRecord,
   HulkPlatformAd,
   SYSConfig,
+  HeraGameRecord,
   SYSToken
 }
 
