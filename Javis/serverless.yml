@@ -120,17 +120,6 @@ custom:
         minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
-    - table: HeraGameDiamondBill
-      index:
-        - UserNameIndex
-      read:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
-      write:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
     # - table: DianaPlatformGame
     #   index:
     #     - GameNameIndex
@@ -983,51 +972,6 @@ resources:
             KeySchema:
               -
                 AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
-            IndexName: CreatedDateIndex
-            KeySchema:
-              -
-                AttributeName: createdDate
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-
-    HeraGameDiamondBill:  #N币账单
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: HeraGameDiamondBill
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: billId
-            AttributeType: S
-          -
-            AttributeName: createdDate
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: billId
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-        GlobalSecondaryIndexes:
-          -
-            IndexName: UserNameIndex
-            KeySchema:
-              -
-                AttributeName: userName
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
