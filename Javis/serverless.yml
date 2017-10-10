@@ -59,6 +59,7 @@ custom:
         - UserIdIndexSec
         - SnIndex
         - ActionIndex
+        - CreatedDateIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
