@@ -9,9 +9,10 @@ export {
   RoleDisplay,
   RoleEditProps
 } from './UserConsts'
+export { SubRolePermissionEnum } from './UserSubRolePermissionConsts'
 export {
   GameTypeEnum,
   GameStatusEnum,
   CompanyStatusEnum,
   ConfigStatusEnum
-}from './Consts'
+} from './Consts'
