@@ -8,7 +8,7 @@ import {Util} from "../lib/Util";
 
 export class ToolModel extends athena.BaseModel {
     constructor({} = {}) {
-        super(Tables.DianaPlatformTool);
+        super(Tables.DianaPlatformTool); 
     }
     findByIds(tollIds) {
         let filterExpression = "",
