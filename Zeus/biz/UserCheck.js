@@ -60,7 +60,7 @@ export class UserCheck {
 
             // 线路商
             { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "limit", type: "NN", min: 1, max: 10 },
+            // { name: "limit", type: "NN", min: 1, max: 10 },
 
             // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
@@ -85,9 +85,9 @@ export class UserCheck {
         inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
-        if (inparam.limit) {
-            inparam.limit = parseInt(inparam.limit)
-        }
+        // if (inparam.limit) {
+        //     inparam.limit = parseInt(inparam.limit)
+        // }
         if (!inparam.parent) {
             inparam.parent = Model.DefaultParent
         }
@@ -119,7 +119,7 @@ export class UserCheck {
 
             // 线路商
             { name: "managerEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
-            { name: "limit", type: "NN", min: 1, max: 10 },
+            // { name: "limit", type: "NN", min: 1, max: 10 },
 
             // 商户
             { name: "merchantEmail", type: "NREG", min: null, max: null, equal: athena.RegEnum.EMAIL },
@@ -136,9 +136,9 @@ export class UserCheck {
         inparam.rate = parseFloat(inparam.rate)
         inparam.points = parseFloat(inparam.points)
         inparam.role = inparam.role.toString()
-        if (inparam.limit) {
-            inparam.limit = parseInt(inparam.limit)
-        }
+        // if (inparam.limit) {
+        //     inparam.limit = parseInt(inparam.limit)
+        // }
         if (!inparam.parent) {
             inparam.parent = Model.DefaultParent
         }
