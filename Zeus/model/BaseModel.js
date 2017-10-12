@@ -1,4 +1,4 @@
-import {Store$,Codes,BizErr,Empty,Model,Keys,Pick,Omit} from '../lib/all'
+import { Store$, Codes, BizErr, Empty, Model, Keys, Pick, Omit } from '../lib/all'
 
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
@@ -158,4 +158,63 @@ export class BaseModel {
         })
     }
 
+    /**
+     * 构建搜索条件
+     * @param {*} conditions 查询条件对象
+     * @param {*} isDefault 是否默认全模糊搜索
+     */
+    buildQueryParams(conditions, isDefault) {
+        // 默认设置搜索条件，所有查询模糊匹配
+        if (isDefault) {
+            for (let key in conditions) {
+                conditions[key] = { '$like': conditions[key] }
+            }
+        }
+        let keys = Object.keys(conditions), opts = {}
+        if (keys.length > 0) {
+            opts.FilterExpression = ''
+            opts.ExpressionAttributeValues = {}
+            opts.ExpressionAttributeNames = {}
+        }
+        keys.forEach((k, index) => {
+            let item = conditions[k]
+            let value = item, array = false
+            if (Object.is(typeof item, "object")) {
+                for (let key in item) {
+                    value = item[key]
+                    switch (key) {
+                        case "$like": {
+                            opts.FilterExpression += `contains(#${k}, :${k})`
+                            break
+                        }
+                        case "$in": {
+                            array = true
+                            opts.ExpressionAttributeNames[`#${k}`] = k
+                            for (let i = 0; i < value.length; i++) {
+                                if (i == 0) opts.FilterExpression += "("
+                                opts.FilterExpression += `#${k} = :${k}${i}`
+                                if (i != value.length - 1) {
+                                    opts.FilterExpression += " or "
+                                }
+                                if (i == value.length - 1) {
+                                    opts.FilterExpression += ")"
+                                }
+                                opts.ExpressionAttributeValues[`:${k}${i}`] = value[i]
+                            }
+                            break
+                        }
+                    }
+                    break
+                }
+            } else {
+                opts.FilterExpression += `#${k} = :${k}`
+            }
+            if (!array) {
+                opts.ExpressionAttributeValues[`:${k}`] = value
+                opts.ExpressionAttributeNames[`#${k}`] = k
+            }
+            if (index != keys.length - 1) opts.FilterExpression += " and "
+        })
+        return opts
+    }
 }

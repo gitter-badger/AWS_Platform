@@ -148,7 +148,7 @@ functions:
       -
         http:
           path: managers
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   managerOne: #获取线路商信息
