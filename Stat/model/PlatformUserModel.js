@@ -34,7 +34,7 @@ export class PlatformUserModel extends athena.BaseModel {
         })
     }
     //商户数量
-    merchantCount(startTime, buIds){
+    merchantCount(startTime, buIds, role){
         let opts = {
             TableName : this.tableName,
             FilterExpression : "#role=:role",
@@ -42,7 +42,7 @@ export class PlatformUserModel extends athena.BaseModel {
                 "#role" : "role"
             },
             ExpressionAttributeValues : {
-                ":role" : RoleCodeEnum.Merchant
+                ":role" : role || RoleCodeEnum.Merchant
             }
         }
         if(startTime) {
