@@ -1,6 +1,6 @@
 import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, S3Store$ } from './lib/all'
 const AWS = require('aws-sdk')
-const BUCKET_NAME = process.env.AWS_BUCKET_NAME
+const IMG_BUCKET = process.env.IMG_BUCKET
 
 /**
  * 上传图片至S3
@@ -18,7 +18,7 @@ const upload = async (e, c, cb) => {
             return ResErr(cb, BizErr.InparamErr('Missing filePath'))
         }
         const params = {
-            Bucket: BUCKET_NAME,
+            Bucket: IMG_BUCKET,
             Key: inparam.filePath,
             Expires: 3600,
             ContentType: inparam.contentType

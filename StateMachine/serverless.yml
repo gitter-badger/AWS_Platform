@@ -12,6 +12,7 @@ provider:
   memorySize: 256
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+      IMG_BUCKET: ${ssm:IMG_BUCKET}
   timeout: 300
   iamRoleStatements:
     - Effect: Allow
@@ -47,9 +48,7 @@ functions:
             path: upload
             method: post
             cors: true
-            # authorizer: tokenAuth
-    environment:
-      AWS_BUCKET_NAME: image-na-dev
+            # authorizer: tokenAuth      
   # backup: #备份数据库
   #   handler: api_backup.backup
   #   events:
