@@ -279,7 +279,7 @@ const userBillTrigger = async(e, c, cb) => {
             allUserId = "ALL_ADMIN"
         }
         if(isAgentAdmin) {
-            allUserId = "All_AGENT_ADMIN"
+            allUserId = "ALL_AGENT_ADMIN"
         }
         saveStatRecord(userId, userInfo.role, billInfo.amount, "-1", {}, allUserId);
     }

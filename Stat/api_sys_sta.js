@@ -66,7 +66,7 @@ const overview = async function(event, context, callback) {
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints(role ,isAdmin || (isAdmin || isAgentAdmin) ? allUserId : userId);
+        let [sumErr, sumPoints] = await saleSumPoints(role ,(isAdmin || isAgentAdmin) ? allUserId : userId);
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
