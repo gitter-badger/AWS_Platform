@@ -107,6 +107,7 @@ export class LogModel extends BaseModel {
                 }
             }
         }
+        inparam.LastEvaluatedKeyTemplate = ['createdAt', 'role', 'sn', 'userId']
         return await this.page(query, inparam)
 
         // let log = { Items: [], LastEvaluatedKey: {} }

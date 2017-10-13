@@ -26,10 +26,10 @@
     }
   },
   "body": {
-    "role": "1000",
-    "type": "login",
-    "pageSize": "20",
-    "startKey": null,
-    "level": 0
+    "role": "1",
+    "type": "operate",
+    "level": 0,
+    "pageSize": 20,
+    "startKey": null
   }
 }
