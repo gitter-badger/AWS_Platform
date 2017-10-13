@@ -5,7 +5,7 @@
 // TOKEN验证
 const jwtverify = async (e, c, cb) => {
   // // get the token from event.authorizationToken
-  // const token = e.authorizationToken.split(' ')
+  const token = e.authorizationToken.split(' ')
   // if (token[0] !== 'Bearer') {
   //   return c.fail('授权类型错误')
   // }
