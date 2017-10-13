@@ -32,13 +32,16 @@ export class TokenModel extends BaseModel {
                 ':userId': inparam.userId
             }
         })
+        console.info(123)
         if (err) {
             return [err, 0]
         }
         // 存在，则判断是否过期
         if (ret.Items.length > 0) {
+            console.info(456)
             // 超过30分钟过期
             if (Math.floor((new Date().getTime() / 1000)) - ret.Items[0].iat > 7200) {
+                console.info(789)
                 return [BizErr.TokenExpire(), 0]
             }
             // 更新过期时间
@@ -52,8 +55,10 @@ export class TokenModel extends BaseModel {
         }
         // 不存在，返回错误
         else{
+            console.info(273838)
             return [BizErr.TokenErr(), 0]
         }
+        console.info('asdasdasd')
         return [0, inparam]
     }
 }
