@@ -40,7 +40,7 @@ functions:
       -
         http:
           path: admins
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   adminCenter: #管理员个人中心

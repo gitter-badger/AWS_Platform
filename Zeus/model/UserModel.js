@@ -61,33 +61,6 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 查询管理员列表
-     * @param {*} token 
-     */
-    async listAllAdmins(token) {
-        const [queryErr, adminRet] = await this.query({
-            KeyConditionExpression: '#role = :role',
-            ExpressionAttributeNames: {
-                '#role': 'role'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['PlatformAdmin']
-            }
-        })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        // 去除敏感数据
-        adminRet.Items = _.map(adminRet.Items, (item) => {
-            item.passhash = null
-            return item
-        })
-        // 按照时间排序
-        const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
-        return [0, sortResult]
-    }
-
-    /**
      * 查询用户
      * @param {*} userId 
      * @param {*} role 

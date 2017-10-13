@@ -1,6 +1,7 @@
 import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, SubRoleEnum, SubRoleNameEnum, StatusEnum, Model, Codes, Pick } from './lib/all'
 import { RegisterAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
+import { AdminModel } from './model/AdminModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
@@ -224,10 +225,12 @@ const checkNickExist = async (e, c, cb) => {
  */
 const adminList = async (e, c, cb) => {
     try {
+        // 入参转换
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 只有管理员角色可操作
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
         // 业务操作
-        const [err, admins] = await new UserModel().listAllAdmins(token)
+        const [err, admins] = await new AdminModel().page(token, inparam)
         // 查询每个用户余额
         for (let user of admins) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
