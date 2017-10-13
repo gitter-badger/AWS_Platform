@@ -41,14 +41,14 @@ functions:
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
     integration: lambda
-  # upload: #上传文件至S3
-  #   handler: api_upload.upload
-  #   events:
-  #       - http:
-  #           path: upload
-  #           method: post
-  #           cors: true
-  #           authorizer: tokenAuth      
+  upload: #上传文件至S3
+    handler: api_upload.upload
+    events:
+        - http:
+            path: upload
+            method: post
+            cors: true
+            authorizer: tokenAuth      
   # backup: #备份数据库
   #   handler: api_backup.backup
   #   events:
