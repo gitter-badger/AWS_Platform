@@ -74,8 +74,8 @@ const overview = async function(event, context, callback) {
       case 2 : {  //收益情况
         let uids = [];
         //管理员
-        if(isAdmin) uids = ["ALL_PLAYER"];
-        if(isAgentAdmin) uids = ["ALL_AGENT_PLAYER"];
+        if(isAdmin) uids = "ALL_PLAYER";
+        if(isAgentAdmin) uids = "ALL_AGENT_PLAYER";
         //商户
         if(role == RoleCodeEnum.Merchant) uids = [userId];
         //线路商
@@ -312,12 +312,21 @@ const consumeAndIncome = async function(event, context, callback) {
   let isAgentAdmin = role == RoleCodeEnum.Agent && tokenInfo.parent == "00";
   let isAgent = role == RoleCodeEnum.Agent && tokenInfo.parent != "00";
   let queryAllUserId = "ALL_PLAYER";
-  if(isAgentAdmin) queryAllUserId = "ALL_AGENT_PLAYER";
+  let queryAllAdmin = "ALL_ADMIN";
+  let queryRole = "1";
+  if(isAgentAdmin){
+       queryAllUserId = "ALL_AGENT_PLAYER";
+       queryAllAdmin = "ALL_AGENT_ADMIN";
+       
+  }
+  if(isAgentAdmin || isAgent) {
+      queryRole = "1000"
+  }
   //游戏消耗
   if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin || isAgentAdmin) {  //平台管理员
     [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "10000", 3, queryAllUserId);
     //售出点数
-  [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "1", 3, queryAllUserId);
+    [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, queryRole, 3, queryAllAdmin);
   }else if(role == RoleCodeEnum.Manager || isAgent) {  //线路商
     //找到该线路商下所有商户
     let [merErr, merchantList] = await new PlatformUserModel().childrenMerchant(userId);
@@ -329,7 +338,7 @@ const consumeAndIncome = async function(event, context, callback) {
         [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1, uids);
     }
     //售出点数
-  [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, "1", 1, userId);
+    [saldeErr, saleList] = await new BillStatModel().findGameConsume(+startTime, +endTime, queryRole, 1, userId);
   }else if(role == RoleCodeEnum.Merchant) {  //商户
     [consumeErr, consumeList] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1, userId);
   }
