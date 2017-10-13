@@ -46,6 +46,7 @@ export class MerchantModel extends BaseModel {
         // 条件搜索
         if (!_.isEmpty(inparam.query)) {
             if (inparam.query.suffix) { inparam.query.suffix = { $like: inparam.query.suffix } }
+            if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
             const queryParams = this.buildQueryParams(inparam.query, false)
             query.FilterExpression = queryParams.FilterExpression
             query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }

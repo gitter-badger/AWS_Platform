@@ -16,7 +16,8 @@
     },
     "body": {
         "query": {
-            "uname": "Y12345"
+            "uname": "Y12345",
+            "adminName": "a"
         },
         "sortkey": "createdAt",
         "sort": "desc"

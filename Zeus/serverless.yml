@@ -39,7 +39,7 @@ functions:
     events:
       -
         http:
-          path: admins
+          path: adminList
           method: post
           cors: true
           authorizer: tokenAuth
