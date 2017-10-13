@@ -34,6 +34,7 @@ export class TokenModel extends BaseModel {
         })
         console.info(123)
         if (err) {
+            console.info(err)
             return [err, 0]
         }
         // 存在，则判断是否过期
