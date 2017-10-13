@@ -10,7 +10,7 @@ const upload = async (e, c, cb) => {
         // 入参转换和校验
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 身份令牌
-        // const [tokenErr, token] = await Model.currentToken(e)
+        const [tokenErr, token] = await Model.currentToken(e)
         if (!inparam.contentType) {
             return ResErr(cb, BizErr.InparamErr('Missing contentType'))
         }
