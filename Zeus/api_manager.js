@@ -11,7 +11,7 @@ import { UserCheck } from './biz/UserCheck'
  */
 const managerList = async (e, c, cb) => {
   try {
-    // 入参转换÷
+    // 入参转换
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)

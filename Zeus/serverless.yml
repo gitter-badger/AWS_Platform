@@ -185,7 +185,7 @@ functions:
       -
         http:
           path: merchants
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   merchantOne: #获取商户信息

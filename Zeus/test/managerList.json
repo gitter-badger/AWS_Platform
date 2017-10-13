@@ -19,6 +19,7 @@
       "suffix": "a",
       "displayName": "a"
     },
-    "sort": "createdAt"
+    "sortkey": "createdAt",
+    "sort":"desc"
   }
 }

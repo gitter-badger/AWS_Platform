@@ -1,7 +1,7 @@
 import { Tables, Store$, Codes, BizErr, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
-export class ManagerModel extends BaseModel {
+export class MerchantModel extends BaseModel {
     constructor() {
         super()
         // 设置表名
@@ -28,7 +28,7 @@ export class ManagerModel extends BaseModel {
             },
             ExpressionAttributeValues: {
                 ':parent': token.userId,
-                ':role': RoleCodeEnum.Manager
+                ':role': RoleCodeEnum.Merchant
             }
         }
         if (Model.isPlatformAdmin(token)) {
@@ -39,13 +39,14 @@ export class ManagerModel extends BaseModel {
                     '#role': 'role'
                 },
                 ExpressionAttributeValues: {
-                    ':role': RoleCodeEnum.Manager
+                    ':role': RoleCodeEnum.Merchant
                 }
             }
         }
         // 条件搜索
         if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.buildQueryParams(inparam.query, true)
+            if (inparam.query.suffix) { inparam.query.suffix = { $like: inparam.query.suffix } }
+            const queryParams = this.buildQueryParams(inparam.query, false)
             query.FilterExpression = queryParams.FilterExpression
             query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
             query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
@@ -67,4 +68,6 @@ export class ManagerModel extends BaseModel {
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
         return [0, sortResult]
     }
+
+
 }
