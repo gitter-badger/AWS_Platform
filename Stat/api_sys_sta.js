@@ -61,12 +61,11 @@ const overview = async function(event, context, callback) {
       case 1 : {
         let date = TimeUtil.formatDay(new Date());
         //获取当天的售出点数
-        console.log(role+"     "+date);
         let [currErr, sumTodayPoints] = await salePointsByDate(role, date, (isAdmin || isAgentAdmin) ? allUserId : userId);
         if(currErr) {
             return errorHandle(callback, ReHandler.fail(checkAttError));
         }
-        let [sumErr, sumPoints] = await saleSumPoints(role ,isAdmin || (isAdmin || isAgentAdmin) ? allUserId : userId);
+        let [sumErr, sumPoints] = await saleSumPoints(role ,(isAdmin || isAgentAdmin) ? allUserId : userId, isAgentAdmin);
         if(sumErr) {
             return errorHandle(callback, ReHandler.fail(sumErr));
         }
@@ -390,13 +389,13 @@ async function salePointsByDate(role, date, uids){
 /**
  * 售出点数总和
  */
-async function saleSumPoints(role, userId){
+async function saleSumPoints(role, userId, isAgentAdmin){
     console.log("role:"+role)
     let billStatModel = new BillStatModel();
     let conditions = {
         role : role
     }
-    if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
+    if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin || isAgentAdmin) {
         conditions.type = 3;
     }else {
         conditions.type = 1;
