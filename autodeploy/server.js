@@ -3,7 +3,7 @@ const exec = require('child_process').exec
 const app = express()
 
 const PORT = 80
-const ROOT_DIR = '/usr/dev/'
+const ROOT_DIR = '/usr/dev'
 
 app.post('/deploy/na', function (req, res) {
     //req.headers['x-gitlab-token'] == 'j9hb5ydtetfbRGQy42tNhztmJe1qSvC'
