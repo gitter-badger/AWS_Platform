@@ -20,6 +20,37 @@ function deploy(path, servername) {
     var commands = [
         'cd ' + path,
         'git pull',
+
+        'cd /usr/dev/NA/rotta-admin',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test --acl public-read --delete',
+        
+        'cd /usr/dev/NA/rotta-agent',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-agent/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-agent --acl public-read --delete',
+        
+        'cd /usr/dev/NA/rotta-manager',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-manager/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-manager --acl public-read --delete',
+        
+        'cd /usr/dev/NA/rotta-merchant',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-merchant/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-merchant --acl public-read --delete',
+        
+        'cd /usr/dev/NA/rotta-game',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-game/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-game --acl public-read --delete',
+        
     ].join(' && ')
     console.log('开始自动构建...')
     exec(commands, function (error, stdout, stderr) {
