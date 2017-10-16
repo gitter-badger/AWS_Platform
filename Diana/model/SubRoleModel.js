@@ -99,6 +99,7 @@ export class SubRoleModel extends BaseModel {
             return [new BizErr.ItemNotExistErr(), 0]
         }
         ret.permissions = inparam.permissions
+        ret.memo = inparam.memo
         ret.updatedAt = Model.timeStamp()
         const [putErr, putRet] = await this.putItem(ret)
         if (putErr) {
