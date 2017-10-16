@@ -15,43 +15,44 @@ app.post('/deploy/na', function (req, res) {
 console.log('autodeploy自动部署服务启动，端口：' + PORT)
 app.listen(PORT)
 
-function deploy(path) {
+function deploy(path, servername) {
     console.log('进入目录：' + path)
     var commands = [
         'cd ' + path,
         'git pull',
-    ].join(' && ')
-    console.log('1、开始拉取代码...')
-    exec(commands, function (error, stdout, stderr) {
-        if (error) {
-            console.error(`exec error: ${error}`)
-            return
-        }
-        if (stdout) {
-            console.log(`stdout: ${stdout}`)
-            console.log('2、开始自动构建...')
-            deployProject(ROOT_DIR + '/NA/', 'rotta-admin', 'rotta-test')
-            deployProject(ROOT_DIR + '/NA/', 'rotta-agent', 'rotta-test-agent')
-            deployProject(ROOT_DIR + '/NA/', 'rotta-manager', 'rotta-test-manager')
-            deployProject(ROOT_DIR + '/NA/', 'rotta-merchant', 'rotta-test-merchant')
-            deployProject(ROOT_DIR + '/NA/', 'rotta-game', 'rotta-test-game')
-        }
-        if (stderr) {
-            console.error(`stderr: ${stderr}`)
-        }
-    })
-}
 
-function deployProject(path, projectname, bucketname) {
-    console.log('进入目录：' + path + projectname)
-    var commands = [
-        'cd /usr/dev/NA/' + projectname,
+        'cd /usr/dev/NA/rotta-admin',
         'npm run test',
         'cd dist',
-        '/usr/local/bin/aws s3 rm s3://' + bucketname + '/*',
-        '/usr/local/bin/aws s3 sync . s3://' + bucketname + ' --acl public-read --delete',
+        '/usr/local/bin/aws s3 rm s3://rotta-test/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test --acl public-read --delete',
+
+        'cd /usr/dev/NA/rotta-agent',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-agent/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-agent --acl public-read --delete',
+
+        'cd /usr/dev/NA/rotta-manager',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-manager/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-manager --acl public-read --delete',
+
+        'cd /usr/dev/NA/rotta-merchant',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-merchant/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-merchant --acl public-read --delete',
+
+        'cd /usr/dev/NA/rotta-game',
+        'npm run test',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://rotta-test-game/*',
+        '/usr/local/bin/aws s3 sync . s3://rotta-test-game --acl public-read --delete',
+
     ].join(' && ')
-    console.log('开始自动构建【' + projectname + '】工程...')
+    console.log('开始自动构建...')
     exec(commands, function (error, stdout, stderr) {
         if (error) {
             console.error(`exec error: ${error}`)
