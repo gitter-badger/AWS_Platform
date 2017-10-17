@@ -133,15 +133,6 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  subRoleList: #二级权限列表
-    handler: api_admin.subRoleList
-    events:
-      -
-        http:
-          path: subRoleList
-          method: get
-          cors: true
-          authorizer: tokenAuth
   #==================== 以下是线路商接口 ====================
   managerList: #线路商列表
     handler: api_manager.managerList
