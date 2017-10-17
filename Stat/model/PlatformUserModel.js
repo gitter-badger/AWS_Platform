@@ -34,7 +34,7 @@ export class PlatformUserModel extends athena.BaseModel {
         })
     }
     //商户数量
-    merchantCount(startTime, buIds){
+    merchantCount(startTime, buIds, role){
         let opts = {
             TableName : this.tableName,
             FilterExpression : "#role=:role",
@@ -42,7 +42,7 @@ export class PlatformUserModel extends athena.BaseModel {
                 "#role" : "role"
             },
             ExpressionAttributeValues : {
-                ":role" : RoleCodeEnum.Merchant
+                ":role" : role || RoleCodeEnum.Merchant
             }
         }
         if(startTime) {
@@ -50,7 +50,16 @@ export class PlatformUserModel extends athena.BaseModel {
             opts.ExpressionAttributeValues[":createdAt"] = startTime
         }
         return new Promise((reslove, reject) => {
-            this.db$("scan", opts, ["msn,userId"]).then((result) => {
+            this.db$("scan", opts, ["msn,userId","parent"]).then((result) => {
+                if(role == RoleCodeEnum.Agent) {
+                    for(let i = 0; i < result.Items.length; i++) {
+                        let item = result.Items[i];
+                        if(item.parent == "00") {
+                            result.Items.splice(i, 1);
+                            i --;
+                        }
+                    }
+                }
                 if(!buIds) {
                     return reslove([null,  result.Items.length]);
                 } else {

@@ -16,6 +16,13 @@ export class PlayerModel extends athena.BaseModel {
         }
         return [null, sum - agentCount];
     }
+    async agentCount(){
+        let [agentErr, agentCount] = await this.count("msn=:msn",{":msn":"000"});
+        if(agentErr) {
+            return [agentErr, 0];
+        }
+        return [null, agentCount];
+    }
     async online(){
         let [agentErr, agentCount] = await this.count("(gameState=:state1 or gameState =:state2) and msn=:msn",
         {":msn":"000",":state1" : 2, ":state2" : 3});

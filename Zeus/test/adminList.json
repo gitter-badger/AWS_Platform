@@ -16,8 +16,9 @@
     },
     "body": {
         "query": {
-            "suffix": "a",
-            "msn": "881"
+            "createdAt":[1504840477750,1504840477755],
+            "uname": "NAtest",
+            "adminName": "初始管理员"
         },
         "sortkey": "createdAt",
         "sort": "desc"

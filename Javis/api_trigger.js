@@ -270,10 +270,17 @@ const userBillTrigger = async(e, c, cb) => {
     }
     let levelArr = toUserInfo.levelIndex.split(",");
     let isAdmin = fromRole == RoleCodeEnum.SuperAdmin || fromRole == RoleCodeEnum.PlatformAdmin;
+    let isAgentAdmin = fromRole == RoleCodeEnum.Agent;
     let parentUid = levelArr.pop();
-    if((parentUid == userId || (isAdmin && parentUid == "01")) && amount < 0) { //只管直属上级对下级存钱
+    if((parentUid == userId || (isAdmin && parentUid == "01") || (isAgentAdmin && parentUid == "01") ) && amount < 0) { //只管直属上级对下级存钱
         console.log("是直属");
-        let allUserId = isAdmin ? "ALL_ADMIN" : null;
+        let allUserId = null;
+        if(isAdmin) {
+            allUserId = "ALL_ADMIN"
+        }
+        if(isAgentAdmin) {
+            allUserId = "ALL_AGENT_ADMIN"
+        }
         saveStatRecord(userId, userInfo.role, billInfo.amount, "-1", {}, allUserId);
     }
 }

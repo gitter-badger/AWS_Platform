@@ -9,6 +9,7 @@ provider:
   memorySize: 256
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+  timeout: 30
   iamRoleStatements:
       - Effect: Allow
         Action:
@@ -39,8 +40,8 @@ functions:
     events:
       -
         http:
-          path: admins
-          method: get
+          path: adminList
+          method: post
           cors: true
           authorizer: tokenAuth
   adminCenter: #管理员个人中心
@@ -148,7 +149,7 @@ functions:
       -
         http:
           path: managers
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   managerOne: #获取线路商信息
@@ -185,7 +186,7 @@ functions:
       -
         http:
           path: merchants
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   merchantOne: #获取商户信息

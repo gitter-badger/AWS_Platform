@@ -46,9 +46,9 @@ export class UserModel extends BaseModel {
             if (err) {
                 return [err, 0]
             }
-            else if (childs.length < user.limit) {
+            // else if (childs.length < user.limit) {
                 userArr.push(user)
-            }
+            // }
         }
 
         const viewList = _.map(userArr, (item) => {
@@ -58,33 +58,6 @@ export class UserModel extends BaseModel {
             }
         })
         return [0, viewList]
-    }
-
-    /**
-     * 查询管理员列表
-     * @param {*} token 
-     */
-    async listAllAdmins(token) {
-        const [queryErr, adminRet] = await this.query({
-            KeyConditionExpression: '#role = :role',
-            ExpressionAttributeNames: {
-                '#role': 'role'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['PlatformAdmin']
-            }
-        })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        // 去除敏感数据
-        adminRet.Items = _.map(adminRet.Items, (item) => {
-            item.passhash = null
-            return item
-        })
-        // 按照时间排序
-        const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
-        return [0, sortResult]
     }
 
     /**
