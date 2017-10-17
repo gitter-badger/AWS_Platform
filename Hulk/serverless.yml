@@ -103,8 +103,8 @@ functions:
     events:
       -
         http:
-          path: agentList/{parent}
-          method: get
+          path: agentList
+          method: post
           cors: true
           authorizer: tokenAuth
   agentOne: # 单个代理

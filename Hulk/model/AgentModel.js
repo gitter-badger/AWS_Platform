@@ -193,9 +193,51 @@ export class AgentModel extends BaseModel {
         await Store$('put', { TableName: Tables.SYSToken, Item: { iat: Math.floor(Date.now() / 1000) - 30, ...saveUserRet } })
         return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
     }
+
+    /**
+     * 查询代理列表
+     * @param {*} token
+     * @param {*} inparam
+     */
+    async page(token, inparam) {
+        let query = {
+            IndexName: 'RoleParentIndex',
+            KeyConditionExpression: '#role = :role and parent = :parent',
+            ExpressionAttributeNames: {
+                '#role': 'role'
+            },
+            ExpressionAttributeValues: {
+                ':parent': inparam.parent,
+                ':role': RoleCodeEnum.Agent
+            }
+        }
+        // 条件搜索
+        if (!_.isEmpty(inparam.query)) {
+            const queryParams = this.buildQueryParams(inparam.query, true)
+            query.FilterExpression = queryParams.FilterExpression
+            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+        }
+        const [queryErr, queryRet] = await this.query(query)
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        // 去除敏感数据
+        const users = _.map(queryRet.Items, (item) => {
+            item.passhash = null
+            if (!Model.isAgentAdmin(token)) {
+                item.password = '********'
+            }
+            return item
+        })
+        // 排序输出
+        let sortResult = _.sortBy(users, [inparam.sortkey || 'createdAt'])
+        if (inparam.sort == 'desc') { sortResult = sortResult.reverse() }
+        return [0, sortResult]
+    }
 }
 
-// 查询用户上级
+// 私有方法：查询用户上级
 const queryParent = async (token, parent) => {
     var id = 0
     if (!parent || Model.DefaultParent == parent) {
@@ -210,7 +252,7 @@ const queryParent = async (token, parent) => {
     return [0, user]
 }
 
-// 保存用户
+// 私有方法：保存用户
 const saveUser = async (userInfo) => {
     // 从编码池获取新编码
     let [uucodeErr, uucodeRet] = [0, 0]
