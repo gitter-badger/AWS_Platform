@@ -7,7 +7,7 @@ export class SubRoleCheck {
     checkSubRole(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "name", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYNAME },
-            { name: "memo", type: "NS", min: 1, max: 200 }
+            { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
         // 检查子对象
