@@ -231,11 +231,11 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [saveUserErr, User]
   // }
   // 获取二级权限
-  const [subRoleErr, subRole] = new SubRoleModel().getOne({ name: User.subRole })
-  if (subRoleErr) {
-    return [saveUserErr, 0]
-  }
-  User.subRolePermission = subRole.permissions
+  // const [subRoleErr, subRole] = new SubRoleModel().getOne({ name: User.subRole })
+  // if (subRoleErr) {
+  //   return [saveUserErr, 0]
+  // }
+  // User.subRolePermission = subRole.permissions
   // 返回用户身份令牌
   saveUserRet = Pick(User, RoleDisplay[User.role])
   saveUserRet.subRolePermission = User.subRolePermission
