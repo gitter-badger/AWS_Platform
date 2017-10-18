@@ -62,6 +62,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  adminUpdate: #更新管理员
+    handler: api_admin.adminUpdate
+    events:
+      -
+        http:
+          path: adminUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
   userNew: #注册新用户
     handler: api_admin.userNew
     events:

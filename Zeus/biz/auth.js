@@ -35,6 +35,21 @@ export const RegisterAdmin = async (userInfo) => {
 }
 
 /**
+ * 更新管理员
+ * @param {*} userInfo 输入用户信息
+ */
+export const UpdateAdmin = async (userInfo) => {
+  // 密码HASH
+  const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
+  // 保存更新用户
+  const [saveUserErr, saveUserRet] = await saveUser(CheckUser)
+  if (saveUserErr) {
+    return [saveUserErr, 0]
+  }
+  return [0, saveUserRet]
+}
+
+/**
  * 建站商/商户注册
  * @param {*} token 身份令牌
  * @param {*} userInfo 输入用户信息
@@ -231,11 +246,11 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [saveUserErr, User]
   // }
   // 获取二级权限
-  // const [subRoleErr, subRole] = new SubRoleModel().getOne({ name: User.subRole })
-  // if (subRoleErr) {
-  //   return [saveUserErr, 0]
-  // }
-  // User.subRolePermission = subRole.permissions
+  const [subRoleErr, subRole] = new SubRoleModel().getOne({ name: User.subRole })
+  if (subRoleErr) {
+    return [saveUserErr, 0]
+  }
+  User.subRolePermission = subRole.permissions
   // 返回用户身份令牌
   saveUserRet = Pick(User, RoleDisplay[User.role])
   saveUserRet.subRolePermission = User.subRolePermission
