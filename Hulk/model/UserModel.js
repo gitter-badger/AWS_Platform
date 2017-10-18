@@ -76,36 +76,6 @@ export class UserModel extends BaseModel {
         return [0, sortResult]
     }
 
-    /**
-     * 查询代理管理员列表
-     * @param {*} token 
-     */
-    async listAllAdmins(token) {
-        const [queryErr, adminRet] = await this.query({
-            KeyConditionExpression: '#role = :role',
-            FilterExpression: '#suffix = :suffix',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#suffix': 'suffix'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Agent'],
-                ':suffix': 'Agent'
-            }
-        })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        // 去除敏感数据
-        adminRet.Items = _.map(adminRet.Items, (item) => {
-            item.passhash = null
-            return item
-        })
-        // 按照时间排序
-        const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
-        return [0, sortResult]
-    }
-
     // 检查代理用户是否重复
     async checkUserBySuffix(role, suffix, username) {
         let [err, ret] = [0, 0]

@@ -134,13 +134,13 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  agentAdminList: # 代理更新
+  agentAdminList: # 代理列表
     handler: api_agent.agentAdminList
     events:
       -
         http:
           path: agentAdminList
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是公告管理接口服务 ====================
