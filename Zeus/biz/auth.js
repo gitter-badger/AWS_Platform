@@ -246,7 +246,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [saveUserErr, User]
   // }
   // 获取二级权限
-  const [subRoleErr, subRole] = new SubRoleModel().getOne({ name: User.subRole })
+  const [subRoleErr, subRole] = await new SubRoleModel().getOne({ name: User.subRole })
   if (subRoleErr) {
     return [saveUserErr, 0]
   }

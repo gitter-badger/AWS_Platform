@@ -22,10 +22,10 @@ export class SubRoleModel extends BaseModel {
         const [err, ret] = await this.query({
             KeyConditionExpression: '#name = :name',
             ExpressionAttributeNames: {
-                '#name': 'name',
+                '#name': 'name'
             },
             ExpressionAttributeValues: {
-                ':name': inparam.name,
+                ':name': inparam.name
             }
         })
         if (err) {
