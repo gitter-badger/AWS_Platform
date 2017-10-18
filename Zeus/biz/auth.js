@@ -36,13 +36,17 @@ export const RegisterAdmin = async (userInfo) => {
 
 /**
  * 更新管理员
- * @param {*} userInfo 输入用户信息
+ * @param {*} inparam 输入用户信息
  */
-export const UpdateAdmin = async (userInfo) => {
-  // 密码HASH
-  const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
+export const UpdateAdmin = async (inparam) => {
+  // 获取管理员
+  const [queryUserErr, queryUserRet] = await new UserModel().queryUserById(inparam.userId)
+  if (queryUserErr) {
+    return [queryUserErr, 0]
+  }
+  queryUserRet.subRole = inparam.subRole
   // 保存更新用户
-  const [saveUserErr, saveUserRet] = await saveUser(CheckUser)
+  const [saveUserErr, saveUserRet] = await saveUser(queryUserRet)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
