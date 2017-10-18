@@ -360,6 +360,7 @@ const updatePassword = async (e, c, cb) => {
 export {
     userAuth,                     // 用户登录
     adminNew,                     // 新管理员
+    adminUpdate,                  // 更新管理员
     adminList,                    // 管理员列表
     adminCenter,                  // 管理员个人中心
     userNew,                      // 创建新用户
