@@ -145,15 +145,6 @@ functions:
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是系统子角色配置接口服务 ====================
-  subRolePermissionList: #子角色权限集合
-    handler: api_subrole.subRolePermissionList
-    events:
-      -
-        http:
-          path: subRolePermissionList
-          method: get
-          cors: true
-          authorizer: tokenAuth
   subRoleNew: #创建子角色
     handler: api_subrole.subRoleNew
     events:
