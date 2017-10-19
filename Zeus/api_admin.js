@@ -39,7 +39,7 @@ const adminUpdate = async (e, c, cb) => {
         // 入参转换
         const [jsonParseErr, userInfo] = JSONParser(e && e.body)
         //检查参数是否合法
-        const [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
+        // const [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
         // 要求管理员角色
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
         // 业务操作
