@@ -15,7 +15,6 @@ const db$ = (action, params) => {
   return dbClient[action](params).promise()
 }
 export const Store$ = async (action, params) => {
-  console.log(action, params);
   try {
     const result = await db$(action, params)
     return [0, result]
