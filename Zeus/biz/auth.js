@@ -40,7 +40,7 @@ export const RegisterAdmin = async (userInfo) => {
  */
 export const UpdateAdmin = async (inparam) => {
   // 获取管理员
-  const [queryUserErr, queryUserRet] = await new UserModel().queryUserById(inparam.userId)
+  let [queryUserErr, queryUserRet] = await new UserModel().queryUserById(inparam.userId)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }
