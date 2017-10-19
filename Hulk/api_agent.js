@@ -210,6 +210,40 @@ const agentAdminList = async (e, c, cb) => {
     }
 }
 
+/**
+ * 更新代理密码
+ */
+const updateAgentPassword = async (e, c, cb) => {
+    try {
+        // 入参转换和校验
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
+        // 检查参数是否合法
+        const [checkAttError, errorParams] = new AgentCheck().checkPassword(inparam)
+        // 身份令牌
+        const [tokenErr, token] = await Model.currentToken(e)
+        // 只有代理管理员/自己有权限
+        if (!Model.isAgentAdmin(token) && !Model.isSelf(token, inparam)) {
+            return ResErr(cb, BizErr.TokenErr('只有代理管理员/自己可以操作'))
+        }
+        // 查询用户
+        const [queryErr, user] = await new UserModel().queryUserById(inparam.userId)
+        if (queryErr) { return ResErr(cb, queryErr) }
+        // 更新用户密码
+        user.password = inparam.password
+        user.passhash = Model.hashGen(user.password)
+        const [err, ret] = await new UserModel().userUpdate(user)
+        // 操作日志记录
+        inparam.operateAction = '修改密码'
+        inparam.operateToken = token
+        new LogModel().addOperate(inparam, err, ret)
+        // 结果返回
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
 // ==================== 以下为内部方法 ====================
 
 export {
@@ -220,5 +254,6 @@ export {
     agentOne,                  // 代理
     agentUpdate,               // 代理更新
     availableAgents,           // 可用代理列表
-    agentAdminList             // 代理管理员列表
+    agentAdminList,            // 代理管理员列表
+    updateAgentPassword        // 更新代理密码
 }
