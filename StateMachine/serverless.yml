@@ -48,7 +48,14 @@ functions:
             path: upload
             method: post
             cors: true
-            authorizer: tokenAuth      
+            authorizer: tokenAuth
+  test:
+    handler: api_test.test
+    events:
+        - http:
+            path: test
+            method: get
+            cors: true
   # backup: #备份数据库
   #   handler: api_backup.backup
   #   events:

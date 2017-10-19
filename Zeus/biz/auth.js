@@ -1,8 +1,9 @@
-import { Store$, Tables, Codes, BizErr, Model, Pick, Keys, Omit, StatusEnum, RoleCodeEnum, SubRoleEnum, RoleModels, RoleDisplay, MSNStatusEnum } from '../lib/all'
+import { Store$, Tables, Codes, BizErr, Model, Pick, Keys, Omit, StatusEnum, RoleCodeEnum, RoleModels, RoleDisplay, MSNStatusEnum } from '../lib/all'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
 import { BillModel } from '../model/BillModel'
+import { SubRoleModel } from '../model/SubRoleModel'
 
 /**
  * 管理员注册
@@ -27,6 +28,25 @@ export const RegisterAdmin = async (userInfo) => {
   // 保存用户，处理用户名前缀
   const User = { ...CheckUser, uname: `${CheckUser.username}`, username: `${CheckUser.suffix}_${CheckUser.username}`, rate: 100.00 }
   const [saveUserErr, saveUserRet] = await saveUser(User)
+  if (saveUserErr) {
+    return [saveUserErr, 0]
+  }
+  return [0, saveUserRet]
+}
+
+/**
+ * 更新管理员
+ * @param {*} inparam 输入用户信息
+ */
+export const UpdateAdmin = async (inparam) => {
+  // 获取管理员
+  let [queryUserErr, queryUserRet] = await new UserModel().queryUserById(inparam.userId)
+  if (queryUserErr) {
+    return [queryUserErr, 0]
+  }
+  queryUserRet.subRole = inparam.subRole
+  // 保存更新用户
+  const [saveUserErr, saveUserRet] = await saveUser(queryUserRet)
   if (saveUserErr) {
     return [saveUserErr, 0]
   }
@@ -230,7 +250,11 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [saveUserErr, User]
   // }
   // 获取二级权限
-  User.subRolePermission = SubRoleEnum[User.subRole]
+  const [subRoleErr, subRole] = await new SubRoleModel().getOne({ name: User.subRole })
+  if (subRoleErr) {
+    return [saveUserErr, 0]
+  }
+  User.subRolePermission = subRole.permissions
   // 返回用户身份令牌
   saveUserRet = Pick(User, RoleDisplay[User.role])
   saveUserRet.subRolePermission = User.subRolePermission

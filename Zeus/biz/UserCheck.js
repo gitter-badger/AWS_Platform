@@ -33,7 +33,6 @@ export class UserCheck {
         inparam.level = 0
         inparam.levelIndex = '0'
         inparam.rate = 100.00
-
         return [checkAttError, errorParams]
     }
     /**

@@ -15,7 +15,6 @@ const db$ = (action, params) => {
   return dbClient[action](params).promise()
 }
 export const Store$ = async (action, params) => {
-  console.log(action, params);
   try {
     const result = await db$(action, params)
     return [0, result]
@@ -44,6 +43,7 @@ const PushErrorModel = 'PushErrorModel'
 
 const SYSConfig = 'SYSConfig'
 const SYSToken = 'SYSToken'
+const SYSRolePermission = 'SYSRolePermission'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -64,7 +64,8 @@ export const Tables = {
   PushErrorModel,
 
   SYSConfig,
-  SYSToken
+  SYSToken,
+  SYSRolePermission
 }
 
 export const Model = {
@@ -251,6 +252,26 @@ export const Model = {
       return true
     }
     return false
+  },
+  getInparamRanges(inparams) {
+    let ranges = _.map(inparams, (v, i) => {
+      if (v === null) {
+        return null
+      }
+      return `${i} = :${i}`
+    })
+    _.remove(ranges, (v) => v === null)
+    ranges = _.join(ranges, ' AND ')
+    return ranges
+  },
+  getInparamValues(inparams) {
+    const values = _.reduce(inparams, (result, v, i) => {
+      if (v !== null) {
+        result[`:${i}`] = v
+      }
+      return result
+    }, {})
+    return values
   }
 }
 // 私有日期格式化方法

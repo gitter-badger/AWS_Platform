@@ -1,22 +1,8 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, SubRolePermissionEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { LogModel } from './model/LogModel'
 import { SubRoleModel } from './model/SubRoleModel'
 
 import { SubRoleCheck } from './biz/SubRoleCheck'
-
-/**
- * 子角色权限集合
- */
-const subRolePermissionList = async (e, c, cb) => {
-  try {
-    // 获取令牌，只有管理员有权限
-    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-    // 结果返回
-    return ResOK(cb, { payload: SubRolePermissionEnum })
-  } catch (error) {
-    return ResErr(cb, error)
-  }
-}
 
 /**
  * 创建子角色
@@ -120,7 +106,6 @@ const subRoleDelete = async (e, c, cb) => {
 // ==================== 以下为内部方法 ====================
 
 export {
-  subRolePermissionList,        // 子角色权限列表
   subRoleNew,                   // 新建子角色
   subRoleList,                  // 子角色列表  
   subRoleUpdate,                // 子角色变更

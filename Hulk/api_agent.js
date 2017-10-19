@@ -110,16 +110,15 @@ const agentOne = async (e, c, cb) => {
  */
 const agentList = async (e, c, cb) => {
     try {
-        // 入参校验
-        const [paramsErr, inparam] = Model.pathParams(e)
-        if (paramsErr) { return ResErr(cb, paramsErr) }
+        // 入参数据
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 获取令牌，只有代理有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         //检查参数是否合法
         inparam.token = token
         const [checkAttError, errorParams] = new AgentCheck().checkQueryList(inparam)
         // 业务操作
-        const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Agent, inparam)
+        const [err, ret] = await new AgentModel().page(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of ret) {
@@ -188,13 +187,16 @@ const availableAgents = async (e, c, cb) => {
  */
 const agentAdminList = async (e, c, cb) => {
     try {
+        // 入参转换
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 只有代理管理员角色可操作
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['Agent'])
         if (!Model.isAgentAdmin(token)) {
             return ResErr(cb, BizErr.TokenErr('只有代理管理员有权限'))
         }
         // 业务操作
-        const [err, admins] = await new UserModel().listAllAdmins(token)
+        const [err, admins] = await new AgentModel().adminPage(token, inparam)
+        if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of admins) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
@@ -202,7 +204,6 @@ const agentAdminList = async (e, c, cb) => {
             user.lastBill = lastBill
         }
         // 结果返回
-        if (err) { return ResErr(cb, err) }
         return ResOK(cb, { payload: admins })
     } catch (error) {
         return ResErr(cb, error)

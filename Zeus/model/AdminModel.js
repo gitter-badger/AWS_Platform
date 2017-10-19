@@ -13,9 +13,11 @@ export class AdminModel extends BaseModel {
             ...this.baseitem
         }
     }
+
     /**
      * 查询管理员列表
      * @param {*} token 
+     * @param {*} inparam 
      */
     async page(token, inparam) {
         let query = {

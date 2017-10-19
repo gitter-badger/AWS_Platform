@@ -1,5 +1,5 @@
-import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, SubRoleEnum, SubRoleNameEnum, StatusEnum, Model, Codes, Pick } from './lib/all'
-import { RegisterAdmin, RegisterUser, LoginUser } from './biz/auth'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, SubRoleNameEnum, StatusEnum, Model, Codes, Pick } from './lib/all'
+import { RegisterAdmin, UpdateAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { AdminModel } from './model/AdminModel'
 import { LogModel } from './model/LogModel'
@@ -22,6 +22,30 @@ const adminNew = async (e, c, cb) => {
         const [registAdminErr, adminUser] = await RegisterAdmin(Model.addSourceIP(e, userInfo))
         // 操作日志记录
         userInfo.operateAction = '创建管理员帐号'
+        userInfo.operateToken = token
+        new LogModel().addOperate(Model.addSourceIP(e, userInfo), registAdminErr, adminUser)
+        // 结果返回
+        if (registAdminErr) { return ResErr(cb, registAdminErr) }
+        return ResOK(cb, { payload: adminUser })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+/**
+ * 更新管理员帐号
+ */
+const adminUpdate = async (e, c, cb) => {
+    try {
+        // 入参转换
+        const [jsonParseErr, userInfo] = JSONParser(e && e.body)
+        //检查参数是否合法
+        // const [checkAttError, errorParams] = new UserCheck().checkAdmin(userInfo)
+        // 要求管理员角色
+        const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+        // 业务操作
+        const [registAdminErr, adminUser] = await UpdateAdmin(Model.addSourceIP(e, userInfo))
+        // 操作日志记录
+        userInfo.operateAction = '更新管理员帐号'
         userInfo.operateToken = token
         new LogModel().addOperate(Model.addSourceIP(e, userInfo), registAdminErr, adminUser)
         // 结果返回
@@ -331,34 +355,17 @@ const updatePassword = async (e, c, cb) => {
     }
 }
 
-/**
- * 二级权限列表
- */
-const subRoleList = async (e, c, cb) => {
-    try {
-        // 要求管理员角色
-        const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-        // 业务操作
-        let subRoleArr = []
-        for (let item in SubRoleEnum) {
-            subRoleArr.push(SubRoleNameEnum[item])
-        }
-        return ResOK(cb, { payload: subRoleArr })
-    } catch (error) {
-        return ResErr(cb, error)
-    }
-}
 // ==================== 以下为内部方法 ====================
 
 export {
     userAuth,                     // 用户登录
     adminNew,                     // 新管理员
+    adminUpdate,                  // 更新管理员
     adminList,                    // 管理员列表
     adminCenter,                  // 管理员个人中心
     userNew,                      // 创建新用户
     userChangeStatus,             // 变更用户状态
     childList,                    // 下级用户列表
-    subRoleList,                  // 二级权限列表
 
     checkUserExist,               // 检查用户是否被占用
     checkSuffixExist,             // 检查前缀是否被占用

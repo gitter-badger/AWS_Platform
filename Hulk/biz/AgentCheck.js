@@ -5,13 +5,13 @@ export class AgentCheck {
      * 检查代理管理员
      */
     checkAdmin(inparam) {
-        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+        if (passwordLevel(inparam.password) < 2 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
-            { name: "password", type: "S", min: 6, max: 16 },
+            { name: "password", type: "S", min: 8, max: 16 },
 
             // 代理
             // { name: "agentEmail", type: "REG", min: null, max: null, equal: athena.RegEnum.EMAIL },
@@ -56,14 +56,14 @@ export class AgentCheck {
      * 检查代理
      */
     check(inparam) {
-        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+        if (passwordLevel(inparam.password) < 2 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
             // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
-            { name: "password", type: "S", min: 6, max: 16 },
+            { name: "password", type: "S", min: 8, max: 16 },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
             { name: "points", type: "REG", min: null, max: null, equal: athena.RegEnum.PRICE },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
@@ -110,13 +110,13 @@ export class AgentCheck {
      * 检查代理更新
      */
     checkUpdate(inparam) {
-        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+        if (passwordLevel(inparam.password) < 2 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
-            { name: "password", type: "S", min: 6, max: 16 },
+            { name: "password", type: "S", min: 8, max: 16 },
             // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "displayName", type: "REG", min: null, max: null, equal: athena.RegEnum.DISPLAYNAME },
             { name: "rate", type: "REG", min: null, max: null, equal: athena.RegEnum.RATE },
@@ -160,7 +160,7 @@ export class AgentCheck {
     checkLogin(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
-            { name: "password", type: "S", min: 6, max: 16 },
+            { name: "password", type: "S", min: 8, max: 16 },
             // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "captcha", type: "N", min: 1000, max: 9999 }
@@ -204,12 +204,12 @@ export class AgentCheck {
      * @param {*} inparam 
      */
     checkPassword(inparam) {
-        if (passwordLevel(inparam.password) < 3 || inparam.password == '********') {
+        if (passwordLevel(inparam.password) < 2 || inparam.password == '********') {
             throw { "code": -1, "msg": "密码强度不足", "params": ["password"] }
         }
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "userId", type: "S", min: 36, max: 36 },
-            { name: "password", type: "S", min: 6, max: 16 }]
+            { name: "password", type: "S", min: 8, max: 16 }]
             , inparam)
 
         if (checkAttError) {

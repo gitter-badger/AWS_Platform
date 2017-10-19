@@ -7,15 +7,20 @@ export class SubRoleCheck {
     checkSubRole(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "name", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYNAME },
-            { name: "memo", type: "NS", min: 1, max: 200 }
+            { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
         // 检查子对象
         if (!inparam.permissions || inparam.permissions.length == 0) {
             throw { "code": -1, "msg": "角色权限不能为空", "params": ["permissions"] }
         }
-        if (!inparam.permissions[0].code || !inparam.permissions[0].name) {
-            throw { "code": -1, "msg": "角色权限内容不完整", "params": ["permissions"] }
+
+        // 数据过滤
+        for (let i in inparam.permissions) {
+            if (inparam.permissions[i] == '所有权限') {
+                inparam.permissions.splice(i, 1)
+                break
+            }
         }
 
         if (checkAttError) {
