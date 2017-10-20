@@ -250,7 +250,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
   //   return [saveUserErr, User]
   // }
   // 平台管理员，获取二级权限
-  if (Model.isPlatformAdmin(userLoginInfo.role)) {
+  if (Model.isPlatformAdmin(userLoginInfo)) {
     const [subRoleErr, subRole] = await new SubRoleModel().getOne({ name: User.subRole })
     if (subRoleErr) {
       return [saveUserErr, 0]
