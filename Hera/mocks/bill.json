@@ -1,7 +1,8 @@
 
 {
-    "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNaU1lfZGF5MDEwIiwic3VmZml4IjoiQ1pTWSIsInVzZXJJZCI6MzIxODI0LCJpYXQiOjE1MDQ3NzI3NDd9.VaFHdVduLJasHMr8KOSbU7CDS8RgCNAj_zmqrhl1zFU"
-    },
-    "body":{"userId":"582770","gameId":"40000","checkOutBalance":10005,"records":[{"amount":-25,"type":3},{"amount":35,"type":4},{"amount":-25,"type":3},{"amount":20,"type":4},{"amount":-25,"type":3},{"amount":0,"type":4},{"amount":-25,"type":3},{"amount":0,"type":4},{"amount":-25,"type":3},{"amount":30,"type":4},{"amount":-25,"type":3},{"amount":70,"type":4}]}
+    "body":{ "gameType": "40000",
+             "timestamp": "123",
+                "records": "eJyLrlZKzM0vzStRstI1MtVRKqksSFWyMq7VQYgbw4VNkIVRlMcCAELZFp0=",
+  "userId": "467075",
+  "sign": "2a28785add3c173e0241676ac94a69e38697812bacf97a3f95784d7b3300588e" }
 }

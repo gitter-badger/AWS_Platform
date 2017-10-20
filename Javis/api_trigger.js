@@ -56,8 +56,7 @@ const playerBalanceTrigger = async(e, c , cb) => {
         return;
     }
     let userId = playerInfo.userId;
-    let pushModel = new PushModel();
-    let [er] = await pushModel.pushUserBalance(userId);
+     let [er] = await pushModel.pushUserBalance(userId);  
     if(er) {
         console.info("玩家余额变更推送失败");
         console.info(er);
