@@ -42,7 +42,7 @@ const upload = async (e, c, cb) => {
 const ipquery = async (e, c, cb) => {
     try {
         // 请求IP查询
-        axios.get('http://ip.taobao.com/service/getIpInfo.php?ip=myip')
+        axios.get('http://ip.taobao.com/service/getIpInfo.php?ip=' + (e.requestContext.identity.sourceIp || 'myip'))
             .then(function (res) {
                 return ResOK(cb, { payload: res.data })
             })
