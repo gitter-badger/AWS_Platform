@@ -125,6 +125,13 @@ functions:
           path: /game/bill/verify
           method: post
           cors: true
+  settlement:  #玩家游戏结算
+    handler: openApi.settlement
+    events:
+      - http:
+          path: /game/settlement
+          method: post
+          cors: true
   getGameRecord:  #获取玩家游戏记录
     handler: openApi.getPlayerGameRecord
     events:
