@@ -249,12 +249,14 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // if (saveUserErr) {
   //   return [saveUserErr, User]
   // }
-  // 获取二级权限
-  const [subRoleErr, subRole] = await new SubRoleModel().getOne({ name: User.subRole })
-  if (subRoleErr) {
-    return [saveUserErr, 0]
+  // 平台管理员，获取二级权限
+  if (Model.isPlatformAdmin(userLoginInfo)) {
+    const [subRoleErr, subRole] = await new SubRoleModel().getOne({ name: User.subRole })
+    if (subRoleErr) {
+      return [saveUserErr, 0]
+    }
+    User.subRolePermission = subRole.permissions
   }
-  User.subRolePermission = subRole.permissions
   // 返回用户身份令牌
   saveUserRet = Pick(User, RoleDisplay[User.role])
   saveUserRet.subRolePermission = User.subRolePermission

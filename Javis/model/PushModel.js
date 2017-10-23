@@ -41,9 +41,10 @@ export class PushModel {
         let list = gameList.map((game) => game.code);
         return list;
     }
-    pushUserBalance(userId) {
+    pushUserBalance(userId, balance) {
         const proId = 8;  //协议
-        return pushUserBalance(userId, host, port, proId);
+        pushId(userId, host, port, proId);  //正式环境上线注释此条代码
+        return pushUserInfo({userId, balance}, host, port, proId);
     }
     //公告推送
     pushGameNotice(noid) {

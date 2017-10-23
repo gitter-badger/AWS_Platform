@@ -49,38 +49,13 @@ functions:
             method: post
             cors: true
             authorizer: tokenAuth
-  test:
-    handler: api_test.test
+  ipquery: #ip查询
+    handler: api_upload.ipquery
     events:
         - http:
-            path: test
+            path: ipquery
             method: get
             cors: true
-  # backup: #备份数据库
-  #   handler: api_backup.backup
-  #   events:
-  #       - http:
-  #           path: /backup
-  #           method: post
-  #           cors: true
-  #           authorizer: tokenAuth
-  # restore: #恢复数据库
-  #   handler: api_backup.restore
-  #   events:
-  #       - http:
-  #           path: /restore
-  #           method: post
-  #           cors: true
-  #           authorizer: tokenAuth
-  # incBackup: #增量备份数据库
-  #   memorySize: 1536
-  #   handler: api_backup.incBackup
-  #   events:
-  #       - http:
-  #           path: /incBackup
-  #           method: post
-  #           cors: true
-  #           authorizer: tokenAuth
 # stepFunctions:
 #   stateMachines:
 #     backup:

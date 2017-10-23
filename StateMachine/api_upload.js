@@ -1,5 +1,6 @@
 import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, S3Store$ } from './lib/all'
 const AWS = require('aws-sdk')
+const axios = require('axios')
 const IMG_BUCKET = process.env.IMG_BUCKET
 
 /**
@@ -36,8 +37,27 @@ const upload = async (e, c, cb) => {
 }
 
 /**
+ * IP查询
+ */
+const ipquery = async (e, c, cb) => {
+    try {
+        // 请求IP查询
+        axios.get('http://ip.taobao.com/service/getIpInfo.php?ip=myip')
+            .then(function (res) {
+                return ResOK(cb, { payload: res.data })
+            })
+            .catch(function (error) {
+                return ResErr(cb, error)
+            })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
+/**
  * 对外方法
  */
 export {
-    upload
+    upload,
+    ipquery
 }

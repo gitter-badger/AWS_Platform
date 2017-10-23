@@ -54,52 +54,18 @@ export class UserRecordModel extends athena.BaseModel {
      * @param {*} recoreds 
      */
     validateRecords(){
-        //获取转入数据
         let playerRecordError = CODES.playerRecordError;
-        // let depositArr = this.findRecordByType(TypeEnum.deposit);
-
-        // //转入数据只允许有一条，超过视为不合法
-        // if(depositArr.length != 1){
-        //     this.remark = "转入数据大于一条"
-        //     return [new CHeraErr(playerRecordError.depositErr), false, 0];
+        // let singlieUser = this.isSingleUser();
+        // if(!singlieUser) {
+        //     this.remark = "数据非同一用户"
+        //     return [new CHeraErr(playerRecordError.takeErr), 0]
         // }
-        // let depositRecord = depositArr[0];
-
-        // let takeArr = this.findRecordByType(TypeEnum.take);
-        // console.log(takeArr);
-        // if(takeArr.length != 1){
-        //     this.remark = "转出数据大于一条"
-        //     return [new CHeraErr(playerRecordError.takeErr), false, 0]
-        // }
-        // let takeRecord = takeArr[0]
-
-        //检查所有的数据是否为同一用户
-        let singlieUser = this.isSingleUser();
-        if(!singlieUser) {
-            this.remark = "数据非同一用户"
-            return [new CHeraErr(playerRecordError.takeErr), 0]
-        }
-        // let depositAmount = +(+depositRecord.amount).toFixed(2) //存入多少金额
-        // let takeAmount = +(+takeRecord.amount).toFixed(2);   //取出多少金额
 
         //获取玩家游戏累计收益（除去转入转出）
         let income = +(this.settlementIncome(this.records)).toFixed(2);
-
-        // this.depositAmount = depositAmount;
-        // this.takeAmount = takeAmount;
         this.income = income;
         this.state = SettlementState.success;
         return [0, income]
-
-        
-        //转入+消费+返奖+转出 =0
-        if(takeAmount + depositAmount+income == 0) { //如果相等，视为账单合法
-            this.state = SettlementState.success;
-            return [0, true, {depositAmount, takeAmount, income}]
-        }else { //否则不合法
-            this.remark = "账单金额不匹配"
-            return [0, false, {depositAmount, takeAmount, income}]
-        }
     } 
     isSingleUser(){
         if(this.records.length == 0) return false;

@@ -3,11 +3,14 @@ let athena = require("./lib/athena");
 
 let zlib = require('zlib');
 
+let crypto = require("crypto");
+
 import { CODES, CHeraErr } from "./lib/Codes";
 
 import { ReHandler } from "./lib/Response";
 
 import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
+
 
 
 import { MerchantModel } from "./model/MerchantModel";
@@ -732,6 +735,193 @@ async function playerRecordValidate(event, context, callback) {
     data: { balance: userSumAmount }
   }));
 }
+
+function getSign(secret, args, msg) {
+    var paramArgs = [];
+    if (args instanceof Array) {
+        paramArgs = args;
+    } else {
+        for (var key in args) {
+            paramArgs.push(key);
+        }
+    }
+    var signValue = '';
+    var paramNameAndValueArray = [];
+    for (var i = 0, l = paramArgs.length; i < l; i++) {
+        var msgValue = msg[paramArgs[i]];
+        paramNameAndValueArray[i] = paramArgs[i] + msgValue;
+    }
+    paramNameAndValueArray.sort();
+    for (var i = 0, l = paramNameAndValueArray.length; i < l; i++) {
+        signValue += paramNameAndValueArray[i];
+    }
+    console.log(signValue);
+    //首尾加上秘钥
+
+    signValue = encodeURIComponent(signValue);
+    signValue = secret + signValue + secret;
+    signValue = crypto.createHash('sha256').update(signValue).digest('hex');
+    return signValue;
+}
+
+/**
+ * 玩家结算
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+async function settlement(event, context, callback) {
+   //json转换
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  if (parserErr) return callback(null, ReHandler.fail(parserErr));
+  //检查参数是否合法
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+    { name: "gameType", type: "N" },
+    { name: "userId", type: "N" },
+    { name: "records", type: "S" },
+    { name: "sign", type: "S" },
+    {name : "timestamp", type : "N"}
+  ], requestParams);
+
+  if (checkAttError) {
+    Object.assign(checkAttError, { params: errorParams });
+    return callback(null, ReHandler.fail(checkAttError));
+  }
+  let {gameType, userId, sign, records, timestamp} = requestParams;
+  //获取用户数据
+  let [uError, userModel] = await new UserModel().get({userId}, [], "userIdIndex");
+  if (uError) {
+    return callback(null, ReHandler.fail(uError));
+  }
+
+  if (!userModel) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+  }
+
+  //找到游戏厂商的gameKey
+  let gameModel = new GameModel();
+  let [gameError, game] = await gameModel.findSingleByType(gameType+"");
+  if (gameError) {
+    return callback(null, ReHandler.fail(error));
+  }
+  if (!game) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
+  }
+  let company = game.company || {};
+  let gameKey = company.companyKey;
+  console.log("gameKey:"+gameKey);
+  let serverSign = getSign(gameKey, ["userId", "timestamp","records","gameType"], requestParams);
+  if(sign != serverSign) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  }
+  //解压账单数据
+  let buffer = Buffer.from(records, 'base64');
+  let str = zlib.unzipSync(buffer).toString();
+  let [parseRecordErr, list] = athena.Util.parseJSON(str);
+  if (parseRecordErr) {
+    return callback(null, ReHandler.fail(parseRecordErr));
+  }
+  requestParams.records = records = list;
+  console.log(records);
+  console.log(records.length);
+  //获取玩家余额
+  let [playerErr, oriBalance] = await new UserBillModel().getBalanceByUid(userId);
+  if (playerErr) {
+    return callback(null, ReHandler.fail(playerErr));
+  }
+  //如果记录没有，直接跳过
+  if (records.length == 0) { //如果记录为null
+    //解除玩家状态
+    if (userModel.gameState != GameState.offline) {
+      let [gameError] = await new UserModel().updateGameState(userModel.userName, GameState.online);
+      if (gameError) {
+        return callback(null, ReHandler.fail(gameError));
+      }
+    }
+    console.log("处理完毕时间:"+Date.now());
+    return callback(null, ReHandler.success({
+      data: { balance: oriBalance }
+    }));
+  }
+  //获取游戏
+  let gameInfo = GameTypeEnum[gameType + ""];
+
+  if (!gameInfo) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
+  }
+  let typeName = gameInfo.name;
+  let userRecordModel = new UserRecordModel(requestParams);
+  
+  let [validErr, income] = userRecordModel.validateRecords(records);
+  if (validErr) {
+    return callback(null, ReHandler.fail(err));
+  }
+  console.log("账单消耗:" + income);
+  let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1 
+
+  //获取商家
+  let merchantId = userModel.buId;
+  let parentId = userModel.parent;
+  let [meError, merchantModel] = await new MerchantModel().findByUserId(parentId);
+  if (meError) {
+    return callback(null, ReHandler.fail(meError));
+  }
+  if (!merchantModel) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
+  }
+  let billBase = {
+    fromRole: RoleCodeEnum.Player,
+    toRole: RoleCodeEnum.Merchant,
+    fromUser: userModel.userName,
+    toUser: merchantModel.username,
+    operator: userModel.userName,
+    merchantName: merchantModel.displayName,
+    kindId: gameType,
+    gameType: gameType,
+    msn: merchantModel.msn,
+    type: Type.gameSettlement,
+    typeName: typeName,
+    list : records,
+    remark: "游戏结算"
+  }
+
+  //玩家点数发生变化
+  let userBillModel = new UserBillModel({
+    userId: +userModel.userId,
+    action: userAction,
+    userName: userModel.userName,
+    amount: +(income.toFixed(2))
+  })
+
+  userBillModel.originalAmount = oriBalance;
+  Object.assign(userBillModel, billBase);
+
+  let [uSaveErr] = await userBillModel.save();
+  if (uSaveErr) {
+    return callback(null, ReHandler.fail(uSaveErr));
+  }
+
+  //查账
+  let [getError, userSumAmount] = await userBillModel.getBalance();
+  if (getError) {
+    return callback(null, ReHandler.fail(getError));
+  }
+  //更新余额
+  let u = new UserModel();
+  let [updatebError] = await u.update({ userName: userModel.userName }, { balance: userSumAmount });
+  if (updatebError) return callback(null, ReHandler.fail(updatebError));
+  //解除玩家状态
+  if (userModel.gameState != GameState.offline) {
+    let [gameError] = await u.updateGameState(userModel.userName, GameState.online);
+    if (gameError) {
+      return callback(null, ReHandler.fail(gameError));
+    }
+  }
+  callback(null, ReHandler.success({
+    data: { balance: userSumAmount }
+  }));
+}
+
 /**
  * 玩家进入游戏
  * @param {*} event 
@@ -1017,6 +1207,7 @@ export {
   getGamePlayerBalance,  //用户余额
   gamePlayerBalance,  //玩家充值提现
   gamePlayerA3Login, //A3游戏登陆
+  settlement, //账单验证
   getA3GamePlayerBalance, //用户余额（A3）
   playerRecordValidate,  //玩家账单验证
   joinGame, //进入游戏
