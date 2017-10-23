@@ -335,5 +335,5 @@ resources:
             AttributeName: name
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
