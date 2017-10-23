@@ -49,6 +49,14 @@ functions:
             method: post
             cors: true
             authorizer: tokenAuth
+  ipquery: #ip查询
+    handler: api_upload.ipquery
+    events:
+        - http:
+            path: ipquery
+            method: get
+            cors: true
+            authorizer: tokenAuth
 # stepFunctions:
 #   stateMachines:
 #     backup:
