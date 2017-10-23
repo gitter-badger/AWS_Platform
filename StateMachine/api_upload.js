@@ -41,13 +41,8 @@ const upload = async (e, c, cb) => {
  */
 const ipquery = async (e, c, cb) => {
     try {
-        // 入参校验
-        const [paramErr, inparam] = Model.pathParams(e)
-        if (paramErr || !inparam || !inparam.ip) {
-            return ResErr(cb, paramErr)
-        }
         // 请求IP查询
-        axios.get('http://ip.taobao.com/service/getIpInfo.php?ip=' + inparam.ip)
+        axios.get('http://ip.taobao.com/service/getIpInfo.php?ip=' + (e.requestContext.identity.sourceIp || 'myip'))
             .then(function (res) {
                 return ResOK(cb, { payload: res.data })
             })

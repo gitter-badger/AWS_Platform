@@ -53,7 +53,7 @@ functions:
     handler: api_upload.ipquery
     events:
         - http:
-            path: ipquery/{ip}
+            path: ipquery
             method: get
             cors: true
 # stepFunctions:
