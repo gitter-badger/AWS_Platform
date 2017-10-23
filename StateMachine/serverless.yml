@@ -56,7 +56,6 @@ functions:
             path: ipquery
             method: get
             cors: true
-            authorizer: tokenAuth
 # stepFunctions:
 #   stateMachines:
 #     backup:

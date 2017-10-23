@@ -40,10 +40,6 @@ const upload = async (e, c, cb) => {
  */
 const ipquery = async (e, c, cb) => {
     try {
-        // 入参转换和校验
-        const [jsonParseErr, inparam] = JSONParser(e && e.body)
-        // 身份令牌
-        const [tokenErr, token] = await Model.currentToken(e)
         // 请求IP查询
         axios.get('http://ip.taobao.com/service/getIpInfo.php?ip=myip')
             .then(function (res) {
