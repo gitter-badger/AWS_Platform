@@ -44,7 +44,7 @@ const ipquery = async (e, c, cb) => {
         // 请求IP查询
         axios.get('http://ip.taobao.com/service/getIpInfo.php?ip=myip')
             .then(function (res) {
-                return ResOK(cb, { payload: res })
+                return ResOK(cb, { payload: res.data })
             })
             .catch(function (error) {
                 return ResErr(cb, error)
