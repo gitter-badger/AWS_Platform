@@ -291,6 +291,6 @@ export class BaseModel {
      * @param {*} obj 
      */
     parseZip(obj) {
-        return zlib.gzipSync(JSON.stringify(obj)).toString('base64')
+        return zlib.deflateSync(JSON.stringify(obj)).toString('base64')
     }
 }
