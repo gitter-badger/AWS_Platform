@@ -69,7 +69,7 @@ export class UserModel extends BaseModel {
             }
             // 代理非管理员
             if (!Model.isAgentAdmin(inparam.token)) {
-                let agentQuery = {
+                agentQuery = {
                     KeyConditionExpression: '#role = :role',
                     FilterExpression: '#level <> :level AND contains(#levelIndex,:levelIndex)',
                     ExpressionAttributeNames: {

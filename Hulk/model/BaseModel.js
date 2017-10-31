@@ -128,23 +128,23 @@ export class BaseModel {
      * 查询数据
      */
     query(conditions = {}) {
-        // const params = {
-        //     ...this.params,
-        //     ...conditions
-        // }
-        // return this.queryInc(params, null)
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
-            }
-            this.db$('query', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
-        })
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.queryInc(params, null)
+        // return new Promise((reslove, reject) => {
+        //     const params = {
+        //         ...this.params,
+        //         ...conditions
+        //     }
+        //     this.db$('query', params)
+        //         .then((res) => {
+        //             return reslove([0, res])
+        //         }).catch((err) => {
+        //             return reslove([BizErr.DBErr(err.toString()), false])
+        //         })
+        // })
     }
 
     /**
@@ -201,11 +201,9 @@ export class BaseModel {
     // 内部增量查询，用于结果集超过1M的情况
     queryInc(params, result) {
         return this.db$('query', params).then((res) => {
-            console.info(res)
             if (!result) {
                 result = res
             } else {
-                console.info(res.Items)
                 result.Items.push(...res.Items)
             }
             if (res.LastEvaluatedKey) {

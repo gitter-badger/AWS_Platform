@@ -4,30 +4,29 @@
   },
   "requestContext": {
     "authorizer": {
-      "userId": "270787db-7260-4653-b5af-cd53c6857585",
-      "role": "10",
-      "suffix": "Test53",
-      "username": "Test53_Test530",
-      "parent": "fb3aaa2a-84de-4de9-8797-3b346c26d973",
-      "parentName": "Tgxx01_Tgxx01",
-      "parentRole": "10",
-      "displayName": "Test53",
+      "userId": "aee9f9ac-1a37-4eb2-95bf-812bd26b9180",
+      "role": "1000",
+      "suffix": "NULL!",
+      "username": "YYNO2",
+      "parent": "a799310e-ca39-47c1-a3ae-487212ba071e",
+      "parentName": "YYNO1",
+      "parentDisplayName": "歪歪一号",
+      "parentRole": "1000",
+      "displayName": "歪歪二号",
       "level": 2,
-      "displayId": 474681,
-      "contractPeriod": [
-        1504627200000,
-        1506700800000
-      ],
-      "isforever": false,
-      "updatedAt": 1504681887490,
-      "remark": null,
-      "iat": 1504690051
+      "vedioMix": 1,
+      "liveMix": 1,
+      "displayId": 639842,
+      "contractPeriod": 0,
+      "isforever": true,
+      "updatedAt": 1508743849721,
+      "iat": 1509440783
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "type": "admin"
+    "type": "agent"
   }
 }

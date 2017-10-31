@@ -192,7 +192,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
     return [queryUserErr, 0]
   }
   if (queryUserRet.Items.length === 0) {
-    return [BizErr.UserNotFoundErr('创建人不存在'), 0]
+    return [BizErr.UserNotFoundErr('用户不存在'), 0]
   }
   const User = queryUserRet.Items[0]
   // 校验用户密码

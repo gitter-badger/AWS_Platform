@@ -4,28 +4,52 @@
     },
     "requestContext": {
         "authorizer": {
-            "userId": "1070d03e-1652-428f-9a55-81b77ef4e8ed",
-            "role": "10",
-            "suffix": "YongA1",
-            "username": "YongA1_一二三四五六七八九十一二三四五六",
-            "parent": "01",
-            "parentName": "Platform_Yongtest001",
-            "displayName": "直属XLS01",
-            "level": 1,
-            "displayId": 156735,
-            "contractPeriod": 0,
-            "isforever": true,
-            "updatedAt": 1503304378954
+            "userId": "242b5dac-5b60-49bf-b1fa-c3f1c16006ad",
+            "role": "1",
+            "suffix": "Platform",
+            "username": "Platform_NAtest",
+            "parent": "00",
+            "parentName": "SuperAdmin",
+            "parentRole": "00",
+            "displayName": "平台管理员",
+            "level": 0,
+            "subRole": "平台管理员",
+            "subRolePermission": [
+                "看板",
+                "个人中心",
+                "线路商列表",
+                "创建线路商",
+                "商户列表",
+                "创建商户",
+                "玩家列表",
+                "游戏列表",
+                "游戏后台",
+                "游戏公告列表",
+                "跑马灯列表",
+                "游戏邮件列表",
+                "展位列表",
+                "电子游戏风控",
+                "线路商登录日志",
+                "商户登录日志",
+                "管理员操作日志",
+                "管理员列表",
+                "添加管理员",
+                "管理员角色列表",
+                "新增管理员角色",
+                "线路号列表",
+                "层级关系"
+            ],
+            "iat": 1509417369
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "fromUserId": "f2b57bd5-8be2-49ad-8ce7-5eca7ade5e5c",
+        "fromUserId": "242b5dac-5b60-49bf-b1fa-c3f1c16006ad",
         "toRole": "10",
-        "toUser": "FZSA01_FZStest001",
-        "amount": "1",
+        "toUser": "A1001_shiyue",
+        "amount": "22",
         "remark": ""
     }
 }
