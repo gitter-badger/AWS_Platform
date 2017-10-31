@@ -45,7 +45,7 @@ export class BillModel extends BaseModel {
                 balance: balance
             }
         })
-        return [0, waterfall.reverse()]
+        return [0, this.parseZip(waterfall.reverse())]
     }
 
     /**
