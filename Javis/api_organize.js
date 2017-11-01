@@ -17,6 +17,7 @@ const organize = async (e, c, cb) => {
         if (queryErr) { return ResErr(cb, queryErr) }
         return ResOK(cb, { payload: queryRet })
     } catch (error) {
+        console.error(error)
         return ResErr(cb, error)
     }
 }
