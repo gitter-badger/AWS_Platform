@@ -81,54 +81,54 @@ export class BillModel extends BaseModel {
         let initPoint = user.points
         let [cacheErr, cacheRet] = await Store$('query', {
             TableName: Tables.SYSCacheBalance,
-            KeyConditionExpression: 'userId = :userId',
+            KeyConditionExpression: 'userId = :userId AND #type = :type',
+            ExpressionAttributeNames: {
+                '#type': 'type'
+            },
             ExpressionAttributeValues: {
                 ':userId': user.userId,
+                ':type': 'ALL'
             }
         })
         if (cacheErr) { return [cacheErr, 0] }
-        // 2、根据缓存是否存在进行不同处理
-        let [queryErr, bills] = [0, 0]
-        if (!cacheRet || _.isEmpty(cacheRet.Items)) {
-            [queryErr, bills] = await this.query({
-                IndexName: 'UserIdIndex',
-                KeyConditionExpression: 'userId = :userId',
-                ExpressionAttributeValues: {
-                    ':userId': user.userId
-                }
-            })
-            console.info('缓存不存在，查询所有流水：' + bills.Items.length)
+        // 2、根据缓存是否存在进行不同处理，默认没有缓存查询所有
+        let query = {
+            IndexName: 'UserIdIndex',
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeValues: {
+                ':userId': user.userId
+            }
         }
-        // 缓存存在
-        else {
+        // 3、缓存存在，只查询后续流水
+        if (cacheRet && !_.isEmpty(cacheRet.Items)) {
             // 获取缓存余额
             initPoint = cacheRet.Items[0].balance
+            let lastTime = cacheRet.Items[0].lastTime
             // 根据最后缓存时间查询后续账单
-            [queryErr, bills] = await this.query({
+            query = {
                 IndexName: 'UserIdIndex',
                 KeyConditionExpression: 'userId = :userId AND createdAt > :createdAt',
                 ExpressionAttributeValues: {
                     ':userId': user.userId,
-                    ':createdAt': cacheRet.Items[0].lastTime
+                    ':createdAt': lastTime
                 }
-            })
-            console.info('缓存存在，查询部分流水：' + bills.Items.length)
+            }
         }
+        let [queryErr, bills] = await this.query(query)
         if (queryErr) { return [queryErr, 0] }
-        // 3、账单汇总
+        // 4、账单汇总
         const sums = _.reduce(bills.Items, (sum, bill) => {
             return sum + bill.amount
         }, 0.0)
-        // 4、更新用户余额缓存
+        // 5、更新用户余额缓存
         if (!_.isEmpty(bills.Items)) {
             [cacheErr, cacheRet] = await Store$('put', {
                 TableName: Tables.SYSCacheBalance,
-                Item: { userId: user.userId, balance: initPoint + sums, lastTime: bills.Items[bills.Items.length - 1].createdAt }
+                Item: { userId: user.userId, type: 'ALL', balance: initPoint + sums, lastTime: bills.Items[bills.Items.length - 1].createdAt }
             })
             if (cacheErr) { return [cacheErr, 0] }
         }
-        console.info('最后余额：' + initPoint + sums)
-        // 5、返回最后余额
+        // 6、返回最后余额
         return [0, initPoint + sums]
     }
 
@@ -137,25 +137,69 @@ export class BillModel extends BaseModel {
      * @param {*} user 
      */
     async checkUserOut(user) {
-        const [queryErr, bills] = await this.query({
-            IndexName: 'ActionIndex',
-            KeyConditionExpression: 'userId = :userId AND #action = :action',
+        // 1、从缓存获取用户出账
+        let initPoint = user.points
+        let [cacheErr, cacheRet] = await Store$('query', {
+            TableName: Tables.SYSCacheBalance,
+            KeyConditionExpression: 'userId = :userId AND #type = :type',
             ExpressionAttributeNames: {
-                '#action': 'action',
+                '#type': 'type'
+            },
+            ExpressionAttributeValues: {
+                ':userId': user.userId,
+                ':type': 'OUT'
+            }
+        })
+        if (cacheErr) { return [cacheErr, 0] }
+        // 2、根据缓存是否存在进行不同处理，默认没有缓存查询所有
+        let query = {
+            IndexName: 'UserIdIndex',
+            KeyConditionExpression: 'userId = :userId',
+            FilterExpression: '#action = :action',
+            ExpressionAttributeNames: {
+                '#action': 'action'
             },
             ExpressionAttributeValues: {
                 ':userId': user.userId,
                 ':action': -1
             }
-        })
-        if (queryErr) {
-            return [queryErr, 0]
         }
+        // 3、缓存存在，只查询后续流水
+        if (cacheRet && !_.isEmpty(cacheRet.Items)) {
+            // 获取缓存出账
+            initPoint = cacheRet.Items[0].balance
+            let lastTime = cacheRet.Items[0].lastTime
+            // 根据最后缓存时间查询后续账单
+            query = {
+                IndexName: 'UserIdIndex',
+                KeyConditionExpression: 'userId = :userId AND createdAt > :createdAt',
+                FilterExpression: '#action = :action',
+                ExpressionAttributeNames: {
+                    '#action': 'action'
+                },
+                ExpressionAttributeValues: {
+                    ':userId': user.userId,
+                    ':createdAt': lastTime,
+                    ':action': -1
+                }
+            }
+        }
+        let [queryErr, bills] = await this.query(query)
+        if (queryErr) { return [queryErr, 0] }
+        // 4、账单汇总
         const sums = _.reduce(bills.Items, (sum, bill) => {
             return sum + bill.amount
         }, 0.0)
-
-        return [0, user.points + sums * -1]
+        // 5、更新用户出账缓存
+        if (!_.isEmpty(bills.Items)) {
+            [cacheErr, cacheRet] = await Store$('put', {
+                TableName: Tables.SYSCacheBalance,
+                Item: { userId: user.userId, type: 'OUT', balance: initPoint + sums, lastTime: bills.Items[bills.Items.length - 1].createdAt }
+            })
+            if (cacheErr) { return [cacheErr, 0] }
+        }
+        // 6、返回最后出账
+        return [0, initPoint + sums * -1]
     }
 
     /**

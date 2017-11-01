@@ -346,10 +346,16 @@ resources:
           -
             AttributeName: userId
             AttributeType: S
+          -
+            AttributeName: type
+            KeyType: S
         KeySchema:
           -
             AttributeName: userId
             KeyType: HASH
+          -
+            AttributeName: type
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
