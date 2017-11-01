@@ -53,22 +53,23 @@ export class BillModel extends BaseModel {
      * @param {*} user 
      */
     async checkUserLastBill(user) {
+        // 查询最后一条账单记录
         const [queryErr, bills] = await this.query({
             IndexName: 'UserIdIndex',
+            ScanIndexForward: false,
+            Limit: 1,
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
                 ':userId': user.userId
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        const sums = _.reduce(bills.Items, (sum, bill) => {
-            return sum + bill.amount
-        }, 0.0)
-        let lastBill = bills.Items[bills.Items.length - 1]
+        if (queryErr) { return [queryErr, 0] }
+        // 内部方法查询余额
+        const [err, ret] = await this.checkUserBalance(user)
+        // 返回最后一条账单记录和余额
+        let lastBill = bills.Items[0]
         lastBill = lastBill || {}
-        lastBill.lastBalance = user.points + sums
+        lastBill.lastBalance = ret
         return [0, lastBill]
     }
 
