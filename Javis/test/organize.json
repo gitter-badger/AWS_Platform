@@ -4,23 +4,23 @@
   },
   "requestContext": {
     "authorizer": {
-      "userId": "aee9f9ac-1a37-4eb2-95bf-812bd26b9180",
+      "userId": "28c0278d-e3ee-47ce-8a6c-6cb0cdf8c9e2",
       "role": "1000",
       "suffix": "NULL!",
-      "username": "YYNO2",
-      "parent": "a799310e-ca39-47c1-a3ae-487212ba071e",
-      "parentName": "YYNO1",
-      "parentDisplayName": "歪歪一号",
+      "username": "YYYagent01",
+      "parent": "eec9baae-ba38-4ff7-ba3b-d6c0c75115de",
+      "parentName": "YYYagent",
+      "parentDisplayName": "歪歪墙静怒",
       "parentRole": "1000",
-      "displayName": "歪歪二号",
+      "displayName": "歪歪大西几",
       "level": 2,
       "vedioMix": 1,
-      "liveMix": 1,
-      "displayId": 639842,
+      "liveMix": 0.99,
+      "displayId": 897943,
       "contractPeriod": 0,
       "isforever": true,
-      "updatedAt": 1508743849721,
-      "iat": 1509440783
+      "updatedAt": 1509438301369,
+      "iat": 1509531092
     },
     "identity": {
       "sourceIp": "127.0.0.1"

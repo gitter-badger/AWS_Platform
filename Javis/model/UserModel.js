@@ -84,6 +84,8 @@ export class UserModel extends BaseModel {
                     }
                 }
             }
+            console.info('测试数据')
+            console.info(agentQuery)
             [queryErr, queryRet] = await this.query(agentQuery)
         }
         if (queryErr) {
