@@ -293,4 +293,11 @@ export class BaseModel {
     parseZip(obj) {
         return zlib.deflateSync(JSON.stringify(obj)).toString('base64')
     }
+    /**
+     * 解压
+     * @param {*} str 
+     */
+    unZip(str) {
+        return zlib.unzipSync(Buffer.from(str, 'base64')).toString()
+    }
 }
