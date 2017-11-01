@@ -348,7 +348,7 @@ resources:
             AttributeType: S
           -
             AttributeName: type
-            KeyType: S
+            AttributeType: S
         KeySchema:
           -
             AttributeName: userId
