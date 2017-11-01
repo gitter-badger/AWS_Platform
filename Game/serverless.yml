@@ -337,3 +337,19 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+
+    SYSCacheBalance: #用户余额缓存表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSCacheBalance
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
