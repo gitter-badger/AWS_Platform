@@ -32,7 +32,7 @@ const billOne = async (e, c, cb) => {
         const [balanceErr, balance] = await new BillModel().checkUserBalance(user)
         if (balanceErr) { return ResErr(cb, balanceErr) }
         // 查询出账
-        const [outErr, out] = await new BillModel().checkUserOut(user)
+        const [outErr, out] = await new BillModel().checkUserOutIn(user, -1)
         // 结果返回
         if (outErr) { return ResErr(cb, outErr) }
         return ResOK(cb, { payload: { balance: balance, out: out, rate: user.rate, vedioMix: user.vedioMix, liveMix: user.liveMix, userId: params.userId } })
@@ -113,7 +113,7 @@ const billTransfer = async (e, c, cb) => {
         })
         // 结果返回
         if (depositBillErr) { return ResErr(cb, depositBillErr) }
-        return ResOK(cb, {  payload: depositBillRet })
+        return ResOK(cb, { payload: depositBillRet })
     } catch (error) {
         return ResErr(cb, error)
     }
@@ -154,7 +154,7 @@ const logList = async (e, c, cb) => {
         const [err, ret] = await new LogModel().logPage(inparam)
         // 结果返回
         if (err) { return ResErr(cb, err) }
-        return ResOK(cb, {  payload: ret })
+        return ResOK(cb, { payload: ret })
     } catch (error) {
         return ResErr(cb, error)
     }

@@ -133,12 +133,14 @@ export class BillModel extends BaseModel {
     }
 
     /**
-     * 查询用户出账金额
-     * @param {*} user 
+     * 查询用户出账/入账金额
+     * @param {*} user
+     * @param {*} action 
      */
-    async checkUserOut(user) {
-        // 1、从缓存获取用户出账
-        let initPoint = user.points
+    async checkUserOutIn(user, action) {
+        // 1、从缓存获取用户出账/入账
+        let initPoint = 0
+        let type = action == -1 ? 'OUT' : 'IN'
         let [cacheErr, cacheRet] = await Store$('query', {
             TableName: Tables.SYSCacheBalance,
             KeyConditionExpression: 'userId = :userId AND #type = :type',
@@ -147,7 +149,7 @@ export class BillModel extends BaseModel {
             },
             ExpressionAttributeValues: {
                 ':userId': user.userId,
-                ':type': 'OUT'
+                ':type': type
             }
         })
         if (cacheErr) { return [cacheErr, 0] }
@@ -161,12 +163,12 @@ export class BillModel extends BaseModel {
             },
             ExpressionAttributeValues: {
                 ':userId': user.userId,
-                ':action': -1
+                ':action': action
             }
         }
         // 3、缓存存在，只查询后续流水
         if (cacheRet && !_.isEmpty(cacheRet.Items)) {
-            // 获取缓存出账
+            // 获取缓存出账/入账
             initPoint = cacheRet.Items[0].balance
             let lastTime = cacheRet.Items[0].lastTime
             // 根据最后缓存时间查询后续账单
@@ -180,7 +182,7 @@ export class BillModel extends BaseModel {
                 ExpressionAttributeValues: {
                     ':userId': user.userId,
                     ':createdAt': lastTime,
-                    ':action': -1
+                    ':action': action
                 }
             }
         }
@@ -194,12 +196,12 @@ export class BillModel extends BaseModel {
         if (!_.isEmpty(bills.Items)) {
             [cacheErr, cacheRet] = await Store$('put', {
                 TableName: Tables.SYSCacheBalance,
-                Item: { userId: user.userId, type: 'OUT', balance: initPoint + sums, lastTime: bills.Items[bills.Items.length - 1].createdAt }
+                Item: { userId: user.userId, type: type, balance: initPoint + sums, lastTime: bills.Items[bills.Items.length - 1].createdAt }
             })
             if (cacheErr) { return [cacheErr, 0] }
         }
         // 6、返回最后出账
-        return [0, initPoint + sums * -1]
+        return [0, (initPoint + sums) * -1]
     }
 
     /**
