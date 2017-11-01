@@ -97,6 +97,7 @@ export class BillModel extends BaseModel {
                     ':userId': user.userId
                 }
             })
+            console.info('缓存不存在，查询所有流水：' + bills.Items.length)
         }
         // 缓存存在
         else {
@@ -111,6 +112,7 @@ export class BillModel extends BaseModel {
                     ':createdAt': cacheRet.Items[0].lastTime
                 }
             })
+            console.info('缓存存在，查询部分流水：' + bills.Items.length)
         }
         if (queryErr) { return [queryErr, 0] }
         // 3、账单汇总
@@ -125,6 +127,7 @@ export class BillModel extends BaseModel {
             })
             if (cacheErr) { return [cacheErr, 0] }
         }
+        console.info('最后余额：' + initPoint + sums)
         // 5、返回最后余额
         return [0, initPoint + sums]
     }
