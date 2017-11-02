@@ -15,6 +15,7 @@ export const CODES = {
     ipError : 10009,  //ip不正确
     TokenError : 11000,
     gameingError : 11001, //正在游戏中，不能转账
+    notGameing : 11005,   //玩家不在游戏中
 
     playerRecordError : { //账单数据错误
       depositErr : 12000, //存点不正确
@@ -57,6 +58,7 @@ const errorMessage = {
   "10008" : "玩家点数不足",
   "10009" : "无效的请求IP",
   "11001" : "玩家正在游戏中,不能进行转账",
+  "11005" : "玩家不在游戏中!",
   "12000" : "存点不正确",
   "12001" : "取点不正确",
   "12002" : "账单不匹配",

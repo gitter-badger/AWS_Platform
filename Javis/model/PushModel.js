@@ -43,7 +43,6 @@ export class PushModel {
     }
     pushUserBalance(userId, balance) {
         const proId = 8;  //协议
-        pushId(userId, host, port, proId);  //正式环境上线注释此条代码
         return pushUserInfo({userId, balance}, host, port, proId);
     }
     //公告推送

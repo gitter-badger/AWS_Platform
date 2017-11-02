@@ -337,7 +337,7 @@ async function qudian(userInfo, merchantInfo, requestParams, tokenInfo) {
         action : 1,
         userId :merchantInfo.userId,
         username : merchantInfo.username,
-        fromDisplayName : serInfo.userName,
+        fromDisplayName : userInfo.userName,
         toDisplayName : merchantInfo.displayName,
         fromLevel : 10000,
         toLevel : merchantInfo.level,
