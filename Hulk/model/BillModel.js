@@ -67,7 +67,6 @@ export class BillModel extends BaseModel {
         // 内部方法查询余额
         const [err, ret] = await this.checkUserBalance(user)
         // 返回最后一条账单记录和余额
-        console.info(bills)
         let lastBill = bills.Items[0]
         lastBill = lastBill || {}
         lastBill.lastBalance = ret
