@@ -258,6 +258,7 @@ export const RoleEditProps = {
   '1000': [// 代理
     'password',
     'rate',
+    'gameList',
     'contractPeriod',
     'isforever',
 
