@@ -144,3 +144,40 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  # ==================== 以下是系统子角色配置接口服务 ====================
+  subRoleNew: #创建子角色
+    handler: api_subrole.subRoleNew
+    events:
+      -
+        http:
+          path: subRoleNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  subRoleUpdate: #更新子角色
+    handler: api_subrole.subRoleUpdate
+    events:
+      -
+        http:
+          path: subRoleUpdate
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  subRoleList: #子角色列表
+    handler: api_subrole.subRoleList
+    events:
+      -
+        http:
+          path: subRoleList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  subRoleDelete: #删除子角色
+    handler: api_subrole.subRoleDelete
+    events:
+      -
+        http:
+          path: subRoleDelete
+          method: post
+          cors: true
+          authorizer: tokenAuth

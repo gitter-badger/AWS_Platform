@@ -17,13 +17,13 @@
         "HulkPlatformAd",
         "HeraGamePlayer",
         "SYSConfig",
+        "SYSRolePermission",
         "HawkeyeGameNotice"
     ],
     "incBackupTables": [
         "HeraGameRecord",
         "ZeusPlatformLog",
         "HeraGamePlayerBill",
-        "HeraGameDiamondBill",
         "ZeusPlatformBill",
         "HawkeyeGameEmail",
         "HawkeyePlayerEmailRecord",

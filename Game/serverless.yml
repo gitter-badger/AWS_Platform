@@ -96,7 +96,7 @@ functions:
     integration: lambda
 resources:
   Resources:
-    HawkeyePlayerEmailRecord: #玩家接收邮件记录
+    HawkeyePlayerEmailRecord: #玩家接收邮件记录表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: HawkeyePlayerEmailRecord
@@ -132,7 +132,8 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-    HeraGamePlayer:
+
+    HeraGamePlayer: #玩家表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: HeraGamePlayer
@@ -162,7 +163,8 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-    HeraGameRecord:
+
+    HeraGameRecord: #游戏战绩表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: HeraGameRecord
@@ -218,7 +220,8 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-    BillStat:
+
+    BillStat: #统计表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: BillStat
@@ -302,7 +305,8 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-    SYSToken:
+
+    SYSToken: #用户登录令牌表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: SYSToken
@@ -317,7 +321,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-    UserOnlineRecord:
+    UserOnlineRecord: #用户在线记录表
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: UserOnlineRecord
@@ -325,10 +329,54 @@ resources:
           -
             AttributeName: userName
             AttributeType: S
+          -
+            AttributeName: createdAt
+            AttributeType: N
         KeySchema:
           -
             AttributeName: userName
             KeyType: HASH
+          -
+            AttributeName: createdAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+
+    SYSRolePermission: #子角色权限表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSRolePermission
+        AttributeDefinitions:
+          -
+            AttributeName: name
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+
+    SYSCacheBalance: #用户余额缓存表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSCacheBalance
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+          -
+            AttributeName: type
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+          -
+            AttributeName: type
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}

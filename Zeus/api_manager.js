@@ -1,29 +1,31 @@
 import { ResOK, ResErr, Codes, JSONParser, Model, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { UserModel } from './model/UserModel'
+import { ManagerModel } from './model/ManagerModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
 
 /**
- * 建站商列表
+ * 线路商列表
  */
 const managerList = async (e, c, cb) => {
   try {
-    // 入参校验
+    // 入参转换
+    const [jsonParseErr, inparam] = JSONParser(e && e.body)
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 只有管理员/线路商有权限
     if (!Model.isPlatformAdmin(token) && !Model.isManager(token)) {
       return ResErr(cb, BizErr.TokenErr('只有管理员/线路商有权限'))
     }
-    // 业务操作
-    const [err, ret] = await new UserModel().listChildUsers(token, RoleCodeEnum.Manager)
+    // 列表页搜索和排序查询
+    const [err, ret] = await new ManagerModel().page(token, inparam)
     // 结果返回
     if (err) { return ResErr(cb, err) }
-    // 查询每个用户余额
+    // 查询每个用户余额 
     for (let user of ret) {
-      const [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+      const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
       user.balance = lastBill.lastBalance
       user.lastBill = lastBill
       // 查询已用商户已用数量

@@ -555,6 +555,8 @@ async function gamePlayerA3Login(event, context, callback) {
       parentId: merchantInfo.userId,
       liveMix: userInfo.liveMix,
       vedioMix: userInfo.vedioMix,
+      gameId : userInfo.gameId || "0",
+      sid : userInfo.sid || "0",
     }
   }
   callback(null, ReHandler.success(callObj));
@@ -817,6 +819,16 @@ async function settlement(event, context, callback) {
   if (!userModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
+  async function saveOnlineRecord(){
+    //保存游戏状态
+    let [onlineErr] = await new UserOnlineRecord({
+      userName : userModel.userName,
+      userId : userModel.userId,
+      type : 2
+    }).save();
+    return onlineErr;
+    
+  }
   //获取玩家余额
   let [playerErr, oriBalance] = await new UserBillModel().getBalanceByUid(userId);
   if (playerErr) {
@@ -827,7 +839,6 @@ async function settlement(event, context, callback) {
       data: { balance: oriBalance }
     }));
   }
-  
   //解压账单数据
   let buffer = Buffer.from(records, 'base64');
   let str = zlib.unzipSync(buffer).toString();
@@ -842,9 +853,14 @@ async function settlement(event, context, callback) {
   if (records.length == 0) { //如果记录为null
     //解除玩家状态
     if (userModel.gameState != GameState.offline) {
-      let [gameError] = await new UserModel().updateGameState(userModel.userName, GameState.online);
+
+      let [gameError] = await new UserModel().update({userName:userModel.userName}, {gameState:GameState.online, gameId:"0",sid:"0"});
       if (gameError) {
         return callback(null, ReHandler.fail(gameError));
+      }
+      let onlineErr = await saveOnlineRecord();
+      if(onlineErr) {
+        return callback(null, ReHandler.fail(onlineErr));
       }
     }
     console.log("处理完毕时间:"+Date.now());
@@ -894,7 +910,6 @@ async function settlement(event, context, callback) {
     list : records,
     remark: "游戏结算"
   }
-
   //玩家点数发生变化
   let userBillModel = new UserBillModel({
     userId: +userModel.userId,
@@ -910,7 +925,6 @@ async function settlement(event, context, callback) {
   if (uSaveErr) {
     return callback(null, ReHandler.fail(uSaveErr));
   }
-
   //查账
   let [getError, userSumAmount] = await userBillModel.getBalance();
   if (getError) {
@@ -922,10 +936,14 @@ async function settlement(event, context, callback) {
   if (updatebError) return callback(null, ReHandler.fail(updatebError));
   //解除玩家状态
   if (userModel.gameState != GameState.offline) {
-    let [gameError] = await u.updateGameState(userModel.userName, GameState.online);
+    let [gameError] = await new UserModel().update({userName:userModel.userName}, {gameState:GameState.online, gameId:"0",sid:"0"});
     if (gameError) {
       return callback(null, ReHandler.fail(gameError));
     }
+  }
+  let onlineErr = await saveOnlineRecord();
+  if(onlineErr) {
+    return callback(null, ReHandler.fail(onlineErr));
   }
   callback(null, ReHandler.success({
     data: { balance: userSumAmount }
@@ -945,10 +963,16 @@ async function joinGame(event, context, callback) {
   //检查参数是否合法
   let [checkAttError, errorParams] = athena.Util.checkProperties([
     { name: "userId", type: "N" },
-    { name: "gameId", type: "S" }
+    { name: "gameId", type: "S" },
+    { name: "sid", type: "S" },  //服务器id
   ], requestParams);
+  if(checkAttError) {
+    Object.assign(checkAttError, { params: errorParams });
+    return callback(null, ReHandler.fail(checkAttError));
+  }
   let userId = +requestParams.userId;
   let gameId = requestParams.gameId;
+  let sid = requestParams.sid;
   //验证token
   let [err, userInfo] = await Util.jwtVerify(event.headers.Authorization);
   if (err || !userInfo || !Object.is(+userId, +userInfo.userId)) {
@@ -964,13 +988,38 @@ async function joinGame(event, context, callback) {
   if (!userObj) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
+  
+  let [merchantErr, merchant] = await new MerchantModel().findById(userObj.buId);
+  if(merchantErr) {
+    return callback(null, ReHandler.fail(merchantErr));
+  }
+  merchant = merchant || {};
+  let gameList = merchant.gameList || [];
+  let i = 0;
+  for(;i < gameList.length; i++) {
+    let game = gameList[i];
+    if(game.code == gameId) {
+      break;
+    }
+  }
+  if(i == gameList.length) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotGame)));
+  }
+  let userBill = new UserBillModel(userObj);
+  let [bError, balance] = await userBill.getBalance();
+  if (bError) return callback(null, ReHandler.fail(bError));
   //判断是否正在游戏中
   let game = userModel.isGames(userObj);
-  if (game) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.gameingError)));
+  if (game && userObj.gameId!= gameId) {
+    let gameName = GameTypeEnum[gameId+""].name;
+    let gamingError = new CHeraErr(CODES.gameingError);
+    gamingError.msg = `您正在${gameName}游戏中,不能进入其他游戏!`
+    return callback(null, ReHandler.fail(gamingError));
   }
+
+  let sendSid = userObj.gameId == gameId ? userObj.sid : sid;
   //修改游戏状态（不能进行转账操作）
-  let [updateError] = await userModel.updateGameState(userObj.userName, GameState.gameing);
+  let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:GameState.gameing, gameId:gameId, sid : sendSid});
   if (updateError) {
     return callback(null, ReHandler.fail(updateError));
   }
@@ -979,16 +1028,13 @@ async function joinGame(event, context, callback) {
     userName : userObj.userName,
     userId : userObj.userId,
     type : 1,
+    gameId: gameId
   }).save();
   if(onlineErr) {
     return callback(null, ReHandler.fail(onlineErr));
   }
-
-  let userBill = new UserBillModel(userObj);
-  let [bError, balance] = await userBill.getBalance();
-  if (bError) return callback(null, ReHandler.fail(bError));
   callback(null, ReHandler.success({
-    data: { balance: balance }
+    data: { balance: balance, gameId:gameId,sid:sendSid}
   }));
 }
 

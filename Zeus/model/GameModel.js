@@ -16,7 +16,7 @@ const State = {
 
 export class GameModel extends BaseModel{
     constructor({gameId} = {}) {
-        super(Tables.ZeusPlatformGame);
+        super(Tables.DianaPlatformGame);
         this.gameId = gameId
     }
 

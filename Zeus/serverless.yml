@@ -9,6 +9,7 @@ provider:
   memorySize: 256
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+  timeout: 30
   iamRoleStatements:
       - Effect: Allow
         Action:
@@ -39,8 +40,8 @@ functions:
     events:
       -
         http:
-          path: admins
-          method: get
+          path: adminList
+          method: post
           cors: true
           authorizer: tokenAuth
   adminCenter: #管理员个人中心
@@ -58,6 +59,15 @@ functions:
       -
         http:
           path: admins
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  adminUpdate: #更新管理员
+    handler: api_admin.adminUpdate
+    events:
+      -
+        http:
+          path: adminUpdate
           method: post
           cors: true
           authorizer: tokenAuth
@@ -132,15 +142,6 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  subRoleList: #二级权限列表
-    handler: api_admin.subRoleList
-    events:
-      -
-        http:
-          path: subRoleList
-          method: get
-          cors: true
-          authorizer: tokenAuth
   #==================== 以下是线路商接口 ====================
   managerList: #线路商列表
     handler: api_manager.managerList
@@ -148,7 +149,7 @@ functions:
       -
         http:
           path: managers
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   managerOne: #获取线路商信息
@@ -185,7 +186,7 @@ functions:
       -
         http:
           path: merchants
-          method: get
+          method: post
           cors: true
           authorizer: tokenAuth
   merchantOne: #获取商户信息

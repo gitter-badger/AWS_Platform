@@ -10,6 +10,7 @@ provider:
   memorySize: 256
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+  timeout: 30
   iamRoleStatements:
       - Effect: Allow
         Action:
@@ -103,8 +104,8 @@ functions:
     events:
       -
         http:
-          path: agentList/{parent}
-          method: get
+          path: agentList
+          method: post
           cors: true
           authorizer: tokenAuth
   agentOne: # 单个代理
@@ -134,13 +135,22 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  agentAdminList: # 代理更新
+  agentAdminList: # 代理列表
     handler: api_agent.agentAdminList
     events:
       -
         http:
           path: agentAdminList
-          method: get
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  updateAgentPassword: #重置代理密码
+    handler: api_agent.updateAgentPassword
+    events:
+      -
+        http:
+          path: updateAgentPassword
+          method: post
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是公告管理接口服务 ====================

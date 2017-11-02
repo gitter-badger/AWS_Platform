@@ -95,7 +95,7 @@ export const RoleModels = {
     return { // 线路商
       ...PlatformBaseBizRole(),
       gameList: [],                         // 游戏类型列表
-      limit: Model.NumberValue,             // 可用名额
+      // limit: Model.NumberValue,             // 可用名额
       managerEmail: Model.StringValue,      // 线路商邮箱
       hostName: Model.StringValue,          // 负责人姓名
       hostContact: Model.StringValue        // 负责人联系方式
@@ -232,7 +232,7 @@ export const RoleEditProps = {
     'rate',
     'gameList',
 
-    'limit',          // 线路商可用名额
+    // 'limit',          // 线路商可用名额
 
     'contractPeriod',
     'isforever',

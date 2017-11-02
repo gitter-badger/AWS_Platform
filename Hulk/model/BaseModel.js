@@ -1,5 +1,6 @@
 import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit } from '../lib/all'
-
+import _ from 'lodash'
+import zlib from 'zlib'
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
 // AWS.config.setPromisesDependency(require('bluebird'))
@@ -128,23 +129,23 @@ export class BaseModel {
      * 查询数据
      */
     query(conditions = {}) {
-        // const params = {
-        //     ...this.params,
-        //     ...conditions
-        // }
-        // return this.queryInc(params, null)
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
-            }
-            this.db$('query', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
-        })
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.queryInc(params, null)
+        // return new Promise((reslove, reject) => {
+        //     const params = {
+        //         ...this.params,
+        //         ...conditions
+        //     }
+        //     this.db$('query', params)
+        //         .then((res) => {
+        //             return reslove([0, res])
+        //         }).catch((err) => {
+        //             return reslove([BizErr.DBErr(err.toString()), false])
+        //         })
+        // })
     }
 
     /**
@@ -172,6 +173,11 @@ export class BaseModel {
             }
             inparam.startKey = ret.LastEvaluatedKey
         }
+        // 最后数据超过指定长度，则截取指定长度
+        if (pageData.Items.length > inparam.pageSize) {
+            pageData.Items = _.slice(pageData.Items, 0, inparam.pageSize)
+            pageData.LastEvaluatedKey = _.pick(pageData.Items[pageData.Items.length - 1], inparam.LastEvaluatedKeyTemplate)
+        }
         return [err, pageData]
     }
 
@@ -196,11 +202,9 @@ export class BaseModel {
     // 内部增量查询，用于结果集超过1M的情况
     queryInc(params, result) {
         return this.db$('query', params).then((res) => {
-            console.info(res)
             if (!result) {
                 result = res
             } else {
-                console.info(res.Items)
                 result.Items.push(...res.Items)
             }
             if (res.LastEvaluatedKey) {
@@ -214,4 +218,86 @@ export class BaseModel {
         })
     }
 
+    /**
+     * 构建搜索条件
+     * @param {*} conditions 查询条件对象
+     * @param {*} isDefault 是否默认全模糊搜索
+     */
+    buildQueryParams(conditions = {}, isDefault) {
+        // 默认设置搜索条件，所有查询模糊匹配
+        if (isDefault) {
+            for (let key in conditions) {
+                if (!_.isArray(conditions[key])) {
+                    conditions[key] = { '$like': conditions[key] }
+                }
+            }
+        }
+        let keys = Object.keys(conditions), opts = {}
+        if (keys.length > 0) {
+            opts.FilterExpression = ''
+            opts.ExpressionAttributeValues = {}
+            opts.ExpressionAttributeNames = {}
+        }
+        keys.forEach((k, index) => {
+            let item = conditions[k]
+            let value = item, array = false
+            if (_.isArray(item)) {
+                opts.FilterExpression += `${k} between :${k}0 and :${k}1`
+                // opts.FilterExpression += `${k} > :${k}0 and ${k} < :${k}1`
+                opts.ExpressionAttributeValues[`:${k}0`] = item[0]
+                opts.ExpressionAttributeValues[`:${k}1`] = item[1] + 86399999
+            }
+            else if (Object.is(typeof item, "object")) {
+                for (let key in item) {
+                    value = item[key]
+                    switch (key) {
+                        case "$like": {
+                            opts.FilterExpression += `contains(#${k}, :${k})`
+                            break
+                        }
+                        case "$in": {
+                            array = true
+                            opts.ExpressionAttributeNames[`#${k}`] = k
+                            for (let i = 0; i < value.length; i++) {
+                                if (i == 0) opts.FilterExpression += "("
+                                opts.FilterExpression += `#${k} = :${k}${i}`
+                                if (i != value.length - 1) {
+                                    opts.FilterExpression += " or "
+                                }
+                                if (i == value.length - 1) {
+                                    opts.FilterExpression += ")"
+                                }
+                                opts.ExpressionAttributeValues[`:${k}${i}`] = value[i]
+                            }
+                            break
+                        }
+                    }
+                    break
+                }
+            } else {
+                opts.FilterExpression += `#${k} = :${k}`
+            }
+            if (!array && !_.isArray(value)) {
+                opts.ExpressionAttributeValues[`:${k}`] = value
+                opts.ExpressionAttributeNames[`#${k}`] = k
+            }
+            if (index != keys.length - 1) opts.FilterExpression += " and "
+        })
+        return opts
+    }
+
+    /**
+     * 压缩
+     * @param {*} obj 
+     */
+    parseZip(obj) {
+        return zlib.deflateSync(JSON.stringify(obj)).toString('base64')
+    }
+    /**
+     * 解压
+     * @param {*} str 
+     */
+    unZip(str) {
+        return zlib.unzipSync(Buffer.from(str, 'base64')).toString()
+    }
 }

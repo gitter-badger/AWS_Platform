@@ -14,4 +14,4 @@ export {
   GameStatusEnum,
   CompanyStatusEnum,
   ConfigStatusEnum
-}from './Consts'
+} from './Consts'

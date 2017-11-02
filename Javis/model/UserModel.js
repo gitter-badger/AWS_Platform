@@ -21,7 +21,7 @@ export class UserModel extends BaseModel {
      * @param {*} inparam 
      */
     async organize(inparam) {
-        let [queryErr, queryRet] = [0, 0]
+        let finalRet = {}
         if (inparam.type == 'admin') {
             // 默认查询平台组织架构（排除平台管理员，代理）
             let platfromQuery = {
@@ -51,7 +51,9 @@ export class UserModel extends BaseModel {
                     }
                 }
             }
-            [queryErr, queryRet] = await this.scan(platfromQuery)
+            let [queryErr, queryRet] = await this.scan(platfromQuery)
+            if (queryErr) { return [queryErr, 0] }
+            finalRet = queryRet
         }
         // 查询代理组织架构
         if (inparam.type == 'agent') {
@@ -69,7 +71,7 @@ export class UserModel extends BaseModel {
             }
             // 代理非管理员
             if (!Model.isAgentAdmin(inparam.token)) {
-                let agentQuery = {
+                agentQuery = {
                     KeyConditionExpression: '#role = :role',
                     FilterExpression: '#level <> :level AND contains(#levelIndex,:levelIndex)',
                     ExpressionAttributeNames: {
@@ -84,15 +86,15 @@ export class UserModel extends BaseModel {
                     }
                 }
             }
-            [queryErr, queryRet] = await this.query(agentQuery)
+            let [queryErr, queryRet] = await this.query(agentQuery)
+            if (queryErr) { return [queryErr, 0] }
+            finalRet = queryRet
         }
-        if (queryErr) {
-            return [queryErr, 0]
-        }
+
         // 组装组织架构的树状结构
         let organizeTree = []
         let childTree = []
-        for (let item of queryRet.Items) {
+        for (let item of finalRet.Items) {
             // 第一层
             if (item.level == parseInt(inparam.token.level) + 1) {
                 let treeNode = { id: item.userId, parent: item.parent, name: item.displayName, username: item.username, children: [], role: item.role, level: item.level, status: item.status }

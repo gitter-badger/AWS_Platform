@@ -1,8 +1,10 @@
 {
     "body": {
-        "userId" : "100346"
+        "userId" : "343086",
+        "gameId" : "30000",
+        "sid" : "13"
     },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNIMDFfUGxheTAzMCIsInN1ZmZpeCI6IlNIMDEiLCJ1c2VySWQiOjEwMDM0NiwiaWF0IjoxNTA1NzkxNjQ4fQ.xVfibiV5WY8Be1dFp4C2jVaOIiFdVdTvGkKBkYj0YFc"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNIMDFfUGxheTA2OSIsInN1ZmZpeCI6IlNIMDEiLCJ1c2VySWQiOjM0MzA4NiwiaWF0IjoxNTA5NTk1NjgyfQ.HN9MXUb9_Hw1rQbADu0WNCfsMDCkyoyfflz3jQErL6M"
     }
 }

@@ -16,6 +16,7 @@ export const CODES = {
     TokenError : 11000,
     gameingError : 11001, //正在游戏中，不能转账
     notGameing : 11005,   //玩家不在游戏中
+    merchantNotGame : 11006,  //商家没有游戏权限
 
     playerRecordError : { //账单数据错误
       depositErr : 12000, //存点不正确
@@ -79,7 +80,8 @@ const errorMessage = {
   "14004" : "洗码比有误",
   "14005" : "商户已冻结",
   "90001" : "TOKEN已过期",
-  "90002" : "签名错误"
+  "90002" : "签名错误",
+  "11006" : "您的代理商/商户没有购买此游戏"
 }
 
 

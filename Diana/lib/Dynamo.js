@@ -2,6 +2,7 @@ import AWS from 'aws-sdk'
 import { Stream$ } from './Rx5'
 import { BizErr } from './Codes'
 import { JwtVerify, JwtSign } from './Response'
+import { RoleCodeEnum } from './UserConsts'
 import _ from 'lodash'
 const bcrypt = require('bcryptjs')
 const uid = require('uuid/v4')
@@ -14,7 +15,6 @@ const db$ = (action, params) => {
   return dbClient[action](params).promise()
 }
 export const Store$ = async (action, params) => {
-  console.log(action, params);
   try {
     const result = await db$(action, params)
     return [0, result]
@@ -43,6 +43,7 @@ const PushErrorModel = 'PushErrorModel'
 
 const SYSConfig = 'SYSConfig'
 const SYSToken = 'SYSToken'
+const SYSRolePermission = 'SYSRolePermission'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -63,12 +64,10 @@ export const Tables = {
   PushErrorModel,
 
   SYSConfig,
-  SYSToken
+  SYSToken,
+  SYSRolePermission
 }
 
-/**
- * 基础Model
- */
 export const Model = {
   StringValue: 'NULL!',
   NumberValue: 0.0,
@@ -78,8 +77,33 @@ export const Model = {
   NoParent: '00', // 没有
   NoParentName: 'SuperAdmin',
   /**
+   * 所有实体基类
+   */
+  baseModel: function () {
+    return {
+      createdAt: (new Date()).getTime(),
+      updatedAt: (new Date()).getTime(),
+      createdDate: new Date().Format("yyyy-MM-dd")
+    }
+  },
+  /**
+   * 获取路径参数
+   */
+  pathParams: (e) => {
+    try {
+      const params = e.pathParameters
+      if (Object.keys(params).length) {
+        return [0, params]
+      }
+    } catch (err) {
+      return [BizErr.ParamErr(err.toString()), 0]
+    }
+  },
+  /**
    * 生成唯一编号
    */
+  uuid: () => uid(),
+  timeStamp: () => (new Date()).getTime(),
   uucode: async (type, size) => {
     const ret = await db$('query', {
       TableName: Tables.ZeusPlatformCode,
@@ -107,18 +131,19 @@ export const Model = {
       randomCode = Math.floor((Math.random() + Math.floor(Math.random() * 9 + 1)) * Math.pow(10, size - 1))
     }
     // 编号插入
-    // await db$('put', {
-    //   TableName: Tables.ZeusPlatformCode,
-    //   Item: {
-    //     type: type,
-    //     code: randomCode.toString()
-    //   }
-    // })
+    // await db$('put', {TableName: Tables.ZeusPlatformCode,Item: {type: type,code: randomCode.toString()}})
     // 返回编号
     return [0, randomCode.toString()]
   },
-  uuid: () => uid(),
-  timeStamp: () => (new Date()).getTime(),
+  /**
+   * token处理
+   */
+  token: (userInfo) => {
+    return JwtSign({
+      ...userInfo,
+      iat: Math.floor(Date.now() / 1000) - 30
+    })
+  },
   currentToken: async (e) => {
     if (!e || !e.requestContext.authorizer) {
       throw BizErr.TokenErr()
@@ -141,19 +166,9 @@ export const Model = {
     }
     return [0, e.requestContext.authorizer]
   },
-  token: (userInfo) => {
-    return JwtSign({
-      ...userInfo,
-      iat: Math.floor(Date.now() / 1000) - 30
-    })
-  },
-  baseModel: function () { // the db base model
-    return {
-      createdAt: (new Date()).getTime(),
-      updatedAt: (new Date()).getTime(),
-      createdDate: new Date().Format("yyyy-MM-dd")
-    }
-  },
+  /**
+   * 密码处理
+   */
   hashGen: (pass) => {
     return bcrypt.hashSync(pass, 10)
   },
@@ -161,18 +176,11 @@ export const Model = {
     const result = await bcrypt.compare(pass, hash)
     return result
   },
+  /**
+   * IP处理
+   */
   sourceIP: (e) => {
     return e && e.requestContext.identity.sourceIp
-  },
-  pathParams: (e) => {
-    try {
-      const params = e.pathParameters
-      if (Object.keys(params).length) {
-        return [0, params]
-      }
-    } catch (err) {
-      return [BizErr.ParamErr(err.toString()), 0]
-    }
   },
   addSourceIP: (e, info) => {
     const sourceIP = e && e.requestContext && e.requestContext.identity.sourceIp || '-100'

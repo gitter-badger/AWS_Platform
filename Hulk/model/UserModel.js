@@ -15,75 +15,7 @@ export class UserModel extends BaseModel {
             userId: Model.StringValue
         }
     }
-
-    /**
-     * 查看所有下级用户
-     * @param {*} token 
-     * @param {*} roleCode 
-     */
-    async listChildUsers(token, roleCode, inparam) {
-        // 查询用户的所有可用代理
-        let query = {
-            // IndexName: 'RoleSuffixIndex',
-            // KeyConditionExpression: '#role = :role',
-            // FilterExpression: 'contains(#levelIndex,:levelIndex)',
-            // ExpressionAttributeNames: {
-            //     '#role': 'role',
-            //     '#levelIndex': 'levelIndex'
-            // },
-            // ExpressionAttributeValues: {
-            //     ':role': RoleCodeEnum['Agent'],
-            //     ':levelIndex': token.userId
-            // }
-        }
-        // 代理管理员查询所有
-        // if (Model.isAgentAdmin(token)) {
-        //     query = {
-        //         IndexName: 'RoleParentIndex',
-        //         KeyConditionExpression: '#role = :role',
-        //         FilterExpression: 'suffix <> :suffix',
-        //         ExpressionAttributeNames: {
-        //             '#role': 'role',
-        //         },
-        //         ExpressionAttributeValues: {
-        //             ':role': roleCode,
-        //             ':suffix': 'Agent'
-        //         }
-        //     }
-        // }
-        // 查询用户直属代理
-        if (inparam.parent && inparam.parent != '0' && inparam.parent != 'false') {
-            query = {
-                IndexName: 'RoleParentIndex',
-                KeyConditionExpression: '#role = :role and parent = :parent',
-                ExpressionAttributeNames: {
-                    '#role': 'role'
-                },
-                ExpressionAttributeValues: {
-                    ':parent': inparam.parent,
-                    ':role': roleCode
-                }
-            }
-        }
-        const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        // 去除敏感数据
-        const users = _.map(queryRet.Items, (item) => {
-            item.passhash = null
-            if (!Model.isAgentAdmin(token)) {
-                item.password = '********'
-            }
-            return item
-        })
-        // 按照层级排序
-        // const sortResult = _.sortBy(users, ['level'])
-        // 按照创建时间排序
-        const sortResult = _.sortBy(users, ['createdAt'])
-        return [0, sortResult]
-    }
-
+    
     /**
      * 查看可用代理
      */
@@ -141,36 +73,6 @@ export class UserModel extends BaseModel {
         })
         // 按照层级排序
         const sortResult = _.sortBy(queryRet.Items, ['level'])
-        return [0, sortResult]
-    }
-
-    /**
-     * 查询代理管理员列表
-     * @param {*} token 
-     */
-    async listAllAdmins(token) {
-        const [queryErr, adminRet] = await this.query({
-            KeyConditionExpression: '#role = :role',
-            FilterExpression: '#suffix = :suffix',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#suffix': 'suffix'
-            },
-            ExpressionAttributeValues: {
-                ':role': RoleCodeEnum['Agent'],
-                ':suffix': 'Agent'
-            }
-        })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
-        // 去除敏感数据
-        adminRet.Items = _.map(adminRet.Items, (item) => {
-            item.passhash = null
-            return item
-        })
-        // 按照时间排序
-        const sortResult = _.sortBy(adminRet.Items, ['createdAt']).reverse()
         return [0, sortResult]
     }
 
