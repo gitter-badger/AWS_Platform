@@ -7,7 +7,7 @@
             "username": "Agent_NAagent",
             "parent": "00",
             "role": "1000",
-            "userId": "cbfaa49d-6bb2-40c8-bc8f-3d768f6f3a04"
+            "userId": "1b78317b-3c6e-4244-9487-61ba6fa44e3e"
         },
         "identity": {
             "sourceIp": "127.0.0.1"
@@ -15,20 +15,40 @@
     },
     "body": {
         "role": "1000",
-        "suffix": "First",
-        "displayName": "asddsa",
-        "rate": "100",
-        "liveMix": "100",
-        "vedioMix": "100",
+        "displayName": "雍晶晶是猪2",
+        "rate": "1",
+        "liveMix": "1",
+        "vedioMix": "1",
         "parent": "01",
-        "remark": "safsadfasdfdas",
+        "remark": "我是一头猪",
         "contractPeriod": 0,
         "isforever": true,
-        "points": "10000",
-        "agentEmail": "sdafsdf@asdfsad.as",
-        "hostName": "sadfsdafas",
-        "hostContact": "asdfasdfas",
-        "username": "asdfasfa",
-        "password": "@3@?FYpS"
+        "points": "1",
+        "agentEmail": "",
+        "username": "YYtestaaa2",
+        "password": "Ab123456",
+        "gameList": [
+            {
+                "code": "10000",
+                "name": "棋牌游戏",
+                "url": "http://tablegame.na12345.com/admin/api/checkLoginAccess",
+                "desc": "网络棋牌游戏正在被大家慢慢接受和喜欢我们把传统的棋牌游戏进行重新定义加上全新的呈现技术灵活的运营模式，推出了NA棋牌的产品序列",
+                "imgurl": "http://ouef62ous.bkt.clouddn.com/2.png"
+            },
+            {
+                "code": "30000",
+                "name": "真人视讯",
+                "url": "http://52.221.134.197:8080/gate/player/login",
+                "desc": "我们集合了当下最流行的真人视讯游戏类型整合了全新的互联网直播技术通过更逼真的赌场还原以及更流畅的服务，为客户提供全新的体验",
+                "imgurl": "http://ouef62ous.bkt.clouddn.com/1.png"
+            },
+            {
+                "code": "40000",
+                "name": "电子游戏",
+                "url": "http://tigergame.na12345.com/admin/api/checkLoginAccess",
+                "desc": "NA电子游戏融合了传统的经典电子游戏加入了更加多元化的题材以及更加具有娱乐性的玩法让更多的玩家有丰富的游戏体验",
+                "imgurl": "http://ouef62ous.bkt.clouddn.com/4.png"
+            }
+        ]
     }
 }
