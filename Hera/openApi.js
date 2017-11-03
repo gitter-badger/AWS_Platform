@@ -15,7 +15,6 @@ import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
 
 import { MerchantModel } from "./model/MerchantModel";
 
-import { UserOnlineRecord } from "./model/UserOnlineRecord";
 
 import { UserModel, GameState, State } from "./model/UserModel";
 
@@ -525,8 +524,9 @@ async function gamePlayerA3Login(event, context, callback) {
   let flag = user.vertifyPassword(userInfo.userPwd);
   if (!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let suffix = userInfo.userName.split("_")[0];
+  let gameState = userInfo.gameState == GameState.gameing ? GameState.gameing : GameState.online;
   let loginToken = Util.createTokenJWT({ userName: userInfo.userName, suffix: suffix, userId: +userInfo.userId });
-  let [updateError] = await user.update({ userName: userInfo.userName }, { updateAt: Date.now(), gameState: GameState.online });
+  let [updateError] = await user.update({ userName: userInfo.userName }, { updateAt: Date.now(), gameState: gameState});
   if (updateError) return callback(null, ReHandler.fail(updateError));
   //获取余额
   let userBill = new UserBillModel(userInfo);
@@ -819,16 +819,7 @@ async function settlement(event, context, callback) {
   if (!userModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
-  async function saveOnlineRecord(){
-    //保存游戏状态
-    let [onlineErr] = await new UserOnlineRecord({
-      userName : userModel.userName,
-      userId : userModel.userId,
-      type : 2
-    }).save();
-    return onlineErr;
-    
-  }
+ 
   //获取玩家余额
   let [playerErr, oriBalance] = await new UserBillModel().getBalanceByUid(userId);
   if (playerErr) {
@@ -852,15 +843,12 @@ async function settlement(event, context, callback) {
   //如果记录没有，直接跳过
   if (records.length == 0) { //如果记录为null
     //解除玩家状态
+    console.log("没有账单");
     if (userModel.gameState != GameState.offline) {
-
+      console.log("没有账单清算");
       let [gameError] = await new UserModel().update({userName:userModel.userName}, {gameState:GameState.online, gameId:"0",sid:"0"});
       if (gameError) {
         return callback(null, ReHandler.fail(gameError));
-      }
-      let onlineErr = await saveOnlineRecord();
-      if(onlineErr) {
-        return callback(null, ReHandler.fail(onlineErr));
       }
     }
     console.log("处理完毕时间:"+Date.now());
@@ -942,10 +930,6 @@ async function settlement(event, context, callback) {
       return callback(null, ReHandler.fail(gameError));
     }
   }
-  let onlineErr = await saveOnlineRecord();
-  if(onlineErr) {
-    return callback(null, ReHandler.fail(onlineErr));
-  }
   callback(null, ReHandler.success({
     data: { balance: userSumAmount }
   }));
@@ -1018,25 +1002,16 @@ async function joinGame(event, context, callback) {
     return callback(null, ReHandler.fail(gamingError));
   }
   let joinTime = Date.now();
-  let gameState = gameId == "10000" ? GameState.online : GameState.gameing;
+  let gameState = gameId == "10000" ? GameState.online : GameState.gameing; //如果是棋牌游戏，还是标记为在线
   let sendSid = userObj.gameId == gameId ? userObj.sid : sid;
+  let state = userObj.gameState == GameState.gameing ? "0" : "1"; //0 未清账，1，已清账
   //修改游戏状态（不能进行转账操作）
   let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:gameState, gameId:gameId, sid : sendSid, joinTime});
   if (updateError) {
     return callback(null, ReHandler.fail(updateError));
   }
-  //保存游戏状态
-  let [onlineErr] = await new UserOnlineRecord({
-    userName : userObj.userName,
-    userId : userObj.userId,
-    type : 1,
-    gameId: gameId
-  }).save();
-  if(onlineErr) {
-    return callback(null, ReHandler.fail(onlineErr));
-  }
   callback(null, ReHandler.success({
-    data: { balance: balance, gameId:gameId,sid:sendSid}
+    data: { balance: balance, gameId:gameId,sid:sendSid, state}
   }));
 }
 
