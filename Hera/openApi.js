@@ -524,8 +524,9 @@ async function gamePlayerA3Login(event, context, callback) {
   let flag = user.vertifyPassword(userInfo.userPwd);
   if (!flag) return callback(null, ReHandler.fail(new CHeraErr(CODES.passwordError)));
   let suffix = userInfo.userName.split("_")[0];
+  let gameState = userInfo.gameState == GameState.gameing ? GameState.gameing : GameState.online;
   let loginToken = Util.createTokenJWT({ userName: userInfo.userName, suffix: suffix, userId: +userInfo.userId });
-  let [updateError] = await user.update({ userName: userInfo.userName }, { updateAt: Date.now(), gameState: GameState.online });
+  let [updateError] = await user.update({ userName: userInfo.userName }, { updateAt: Date.now(), gameState: gameState});
   if (updateError) return callback(null, ReHandler.fail(updateError));
   //获取余额
   let userBill = new UserBillModel(userInfo);
@@ -842,8 +843,9 @@ async function settlement(event, context, callback) {
   //如果记录没有，直接跳过
   if (records.length == 0) { //如果记录为null
     //解除玩家状态
+    console.log("没有账单");
     if (userModel.gameState != GameState.offline) {
-
+      console.log("没有账单清算");
       let [gameError] = await new UserModel().update({userName:userModel.userName}, {gameState:GameState.online, gameId:"0",sid:"0"});
       if (gameError) {
         return callback(null, ReHandler.fail(gameError));
@@ -1000,15 +1002,16 @@ async function joinGame(event, context, callback) {
     return callback(null, ReHandler.fail(gamingError));
   }
   let joinTime = Date.now();
-  let gameState = gameId == "10000" ? GameState.online : GameState.gameing;
+  let gameState = gameId == "10000" ? GameState.online : GameState.gameing; //如果是棋牌游戏，还是标记为在线
   let sendSid = userObj.gameId == gameId ? userObj.sid : sid;
+  let state = userObj.gameState == GameState.gameing ? "0" : "1"; //0 未清账，1，已清账
   //修改游戏状态（不能进行转账操作）
   let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:gameState, gameId:gameId, sid : sendSid, joinTime});
   if (updateError) {
     return callback(null, ReHandler.fail(updateError));
   }
   callback(null, ReHandler.success({
-    data: { balance: balance, gameId:gameId,sid:sendSid}
+    data: { balance: balance, gameId:gameId,sid:sendSid, state}
   }));
 }
 
