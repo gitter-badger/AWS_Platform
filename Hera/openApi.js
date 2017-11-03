@@ -15,7 +15,6 @@ import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
 
 import { MerchantModel } from "./model/MerchantModel";
 
-import { UserOnlineRecord } from "./model/UserOnlineRecord";
 
 import { UserModel, GameState, State } from "./model/UserModel";
 
@@ -819,16 +818,7 @@ async function settlement(event, context, callback) {
   if (!userModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
-  async function saveOnlineRecord(){
-    //保存游戏状态
-    let [onlineErr] = await new UserOnlineRecord({
-      userName : userModel.userName,
-      userId : userModel.userId,
-      type : 2
-    }).save();
-    return onlineErr;
-    
-  }
+ 
   //获取玩家余额
   let [playerErr, oriBalance] = await new UserBillModel().getBalanceByUid(userId);
   if (playerErr) {
@@ -857,10 +847,6 @@ async function settlement(event, context, callback) {
       let [gameError] = await new UserModel().update({userName:userModel.userName}, {gameState:GameState.online, gameId:"0",sid:"0"});
       if (gameError) {
         return callback(null, ReHandler.fail(gameError));
-      }
-      let onlineErr = await saveOnlineRecord();
-      if(onlineErr) {
-        return callback(null, ReHandler.fail(onlineErr));
       }
     }
     console.log("处理完毕时间:"+Date.now());
@@ -942,10 +928,6 @@ async function settlement(event, context, callback) {
       return callback(null, ReHandler.fail(gameError));
     }
   }
-  let onlineErr = await saveOnlineRecord();
-  if(onlineErr) {
-    return callback(null, ReHandler.fail(onlineErr));
-  }
   callback(null, ReHandler.success({
     data: { balance: userSumAmount }
   }));
@@ -1024,16 +1006,6 @@ async function joinGame(event, context, callback) {
   let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:gameState, gameId:gameId, sid : sendSid, joinTime});
   if (updateError) {
     return callback(null, ReHandler.fail(updateError));
-  }
-  //保存游戏状态
-  let [onlineErr] = await new UserOnlineRecord({
-    userName : userObj.userName,
-    userId : userObj.userId,
-    type : 1,
-    gameId: gameId
-  }).save();
-  if(onlineErr) {
-    return callback(null, ReHandler.fail(onlineErr));
   }
   callback(null, ReHandler.success({
     data: { balance: balance, gameId:gameId,sid:sendSid}

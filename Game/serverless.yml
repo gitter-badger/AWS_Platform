@@ -321,28 +321,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-    UserOnlineRecord: #用户在线记录表
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: UserOnlineRecord
-        AttributeDefinitions:
-          -
-            AttributeName: userName
-            AttributeType: S
-          -
-            AttributeName: createdAt
-            AttributeType: N
-        KeySchema:
-          -
-            AttributeName: userName
-            KeyType: HASH
-          -
-            AttributeName: createdAt
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-
     SYSRolePermission: #子角色权限表
       Type: AWS::DynamoDB::Table
       Properties:
