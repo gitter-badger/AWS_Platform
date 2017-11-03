@@ -33,16 +33,16 @@ export class BillModel extends BaseModel {
         })
         if (queryErr) { return [queryErr, 0] }
         // 直接在内存里面做列表了. 如果需要进行缓存,以后实现
-        let balance = 0
+        let balanceSum = initPoint
         const waterfall = _.map(bills.Items, (item, index) => {
             // let balance = _.reduce(_.slice(bills.Items, 0, index + 1), (sum, item) => {
             //     return sum + item.amount
             // }, 0.0) + initPoint
-            balance += bills.Items[index].amount
+            balanceSum += bills.Items[index].amount
             return {
                 ...bills.Items[index],
-                oldBalance: balance - bills.Items[index].amount,
-                balance: balance
+                oldBalance: balanceSum - bills.Items[index].amount,
+                balance: balanceSum
             }
         })
         return [0, waterfall.reverse()]
