@@ -126,7 +126,7 @@ export class BaseModel {
         // return [queryErr, queryRet]
     }
     /**
-     * 查询数据
+     * 递归查询所有数据
      */
     query(conditions = {}) {
         const params = {
@@ -134,18 +134,25 @@ export class BaseModel {
             ...conditions
         }
         return this.queryInc(params, null)
-        // return new Promise((reslove, reject) => {
-        //     const params = {
-        //         ...this.params,
-        //         ...conditions
-        //     }
-        //     this.db$('query', params)
-        //         .then((res) => {
-        //             return reslove([0, res])
-        //         }).catch((err) => {
-        //             return reslove([BizErr.DBErr(err.toString()), false])
-        //         })
-        // })
+    }
+
+    /**
+     * 单次查询
+     * @param {*} conditions 
+     */
+    queryOnce(conditions = {}) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                ...conditions
+            }
+            this.db$('query', params)
+                .then((res) => {
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), false])
+                })
+        })
     }
 
     /**
@@ -157,7 +164,7 @@ export class BaseModel {
         let pageData = { Items: [], LastEvaluatedKey: {} }
         let [err, ret] = [0, 0]
         while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
-            [err, ret] = await this.query({
+            [err, ret] = await this.queryOnce({
                 ...query,
                 ExclusiveStartKey: inparam.startKey
             })
