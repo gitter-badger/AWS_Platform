@@ -907,6 +907,7 @@ async function settlement(event, context, callback) {
     msn: merchantModel.msn,
     type: Type.gameSettlement,
     typeName: typeName,
+    joinTime : userModel.joinTime,
     list : records,
     remark: "游戏结算"
   }
@@ -1011,15 +1012,16 @@ async function joinGame(event, context, callback) {
   //判断是否正在游戏中
   let game = userModel.isGames(userObj);
   if (game && userObj.gameId!= gameId) {
-    let gameName = GameTypeEnum[gameId+""].name;
+    let gameName = GameTypeEnum[userObj.gameId+""].name;
     let gamingError = new CHeraErr(CODES.gameingError);
     gamingError.msg = `您正在${gameName}游戏中,不能进入其他游戏!`
     return callback(null, ReHandler.fail(gamingError));
   }
-
+  let joinTime = Date.now();
+  let gameState = gameId == "10000" ? GameState.online : GameState.gameing;
   let sendSid = userObj.gameId == gameId ? userObj.sid : sid;
   //修改游戏状态（不能进行转账操作）
-  let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:GameState.gameing, gameId:gameId, sid : sendSid});
+  let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:gameState, gameId:gameId, sid : sendSid, joinTime});
   if (updateError) {
     return callback(null, ReHandler.fail(updateError));
   }
@@ -1313,6 +1315,9 @@ async function getPlayerGameRecord(event, context, callback) {
   let { buId, apiKey, pageSize, startTime, endTime, userName, lastTime, gameId } = requestParams;
   if (endTime < lastTime) {
     lastTime = endTime;
+  }
+  if(startTime > endTime) {
+    startTime = endTime;
   }
   //检查商户信息是否正确
   const merchant = new MerchantModel();

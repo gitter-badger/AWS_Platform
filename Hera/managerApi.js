@@ -230,10 +230,7 @@ export async function gamePlayerInfo(event, context, cb) {
     if(billError) {
         return ResFail(cb, billError)
     }
-    // billList = billList.sort((a, b) => {
-    //     return +a.createAt - +b.createAt > 0
-    // });
-    sort(billList);
+    // sort(billList);
     user.list = billList;
 
     delete user.token;
