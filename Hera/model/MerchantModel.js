@@ -10,7 +10,6 @@ export class MerchantModel extends athena.BaseModel {
         this.userId = userId;
         this.msn = msn;
     }
-
     findById(displayId){
         if(!displayId) {
             return [null, null];
