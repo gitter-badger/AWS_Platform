@@ -122,17 +122,18 @@ export class UserModel extends athena.BaseModel {
         let expressionAttributeValues = {};
         let expressionAttributeNames = {};
         for(let key in conditions){
-            if(key == "userName" || key == "merchantName" || key=="nickname") {
-                if(conditions[key]) {
+            if(conditions[key]) {
+                if(key == "userName" || key == "merchantName" || key=="nickname") {
                     filterExpression += `contains(#${key},:${key}) and `
                     expressionAttributeValues[`:${key}`] = conditions[key];
                     expressionAttributeNames[`#${key}`]  = key;
+                }else {
+                    filterExpression += `#${key}=:${key} and `;
+                    expressionAttributeValues[`:${key}`] = conditions[key];
+                    expressionAttributeNames[`#${key}`]  = key;
                 }
-            }else {
-                filterExpression += `#${key}=:${key} and `;
-                expressionAttributeValues[`:${key}`] = conditions[key];
-                expressionAttributeNames[`#${key}`]  = key;
             }
+            
         }
         let scanOpts = {};
         if(filterExpression.length!=0){

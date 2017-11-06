@@ -321,7 +321,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-
     SYSRolePermission: #子角色权限表
       Type: AWS::DynamoDB::Table
       Properties:
@@ -334,6 +333,28 @@ resources:
           -
             AttributeName: name
             KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+
+    SYSCacheBalance: #用户余额缓存表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSCacheBalance
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+          -
+            AttributeName: type
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+          -
+            AttributeName: type
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}

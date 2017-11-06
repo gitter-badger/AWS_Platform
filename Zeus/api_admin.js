@@ -311,7 +311,7 @@ const childList = async (e, c, cb) => {
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of ret) {
-            const [balanceErr, lastBill] = await new BillModel().checkUserBalance(user)
+            const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
         }

@@ -37,7 +37,7 @@ const overview = async function(event, context, callback) {
 
   let [tokenErr, tokenInfo] = await validateToken(event);
   if(tokenErr) {
-      return callback(null, ReHandler.fail(tokenErr));
+      return errorHandle(callback, tokenErr);
   }
   //检查参数是否合法
   let [checkAttError, errorParams] = Util.checkProperties([
@@ -63,11 +63,11 @@ const overview = async function(event, context, callback) {
         //获取当天的售出点数
         let [currErr, sumTodayPoints] = await salePointsByDate(role, date, (isAdmin || isAgentAdmin) ? allUserId : userId);
         if(currErr) {
-            return errorHandle(callback, ReHandler.fail(checkAttError));
+            return errorHandle(callback, checkAttError);
         }
         let [sumErr, sumPoints] = await saleSumPoints(role ,(isAdmin || isAgentAdmin) ? allUserId : userId, isAgentAdmin);
         if(sumErr) {
-            return errorHandle(callback, ReHandler.fail(sumErr));
+            return errorHandle(callback, sumErr);
         }
         return callback(null, ReHandler.success({oneNum: -(sumTodayPoints).toFixed(2), twoNum:-(sumPoints).toFixed(2), type:type}));
       }
@@ -87,11 +87,11 @@ const overview = async function(event, context, callback) {
         let date = TimeUtil.formatDay(new Date());
         let [currErr, sumTodayPoints] = await salePointsByDate("10000",date, uids);
         if(currErr) {
-            return errorHandle(callback, ReHandler.fail(checkAttError));
+            return errorHandle(callback, checkAttError);
         }
         let [sumErr, sumPoints] = await consumeSumPoints("10000",  uids);
         if(sumErr) {
-            return errorHandle(callback, ReHandler.fail(sumErr));
+            return errorHandle(callback, sumErr);
         }
         return callback(null, ReHandler.success({oneNum: -(sumTodayPoints).toFixed(2), twoNum:-(sumPoints).toFixed(2), type:type}));
       }
@@ -100,12 +100,12 @@ const overview = async function(event, context, callback) {
         if(isAdmin) {
             [err, sum] = await new PlayerModel().sumCount();
             if(err) {
-                return errorHandle(callback, ReHandler.fail(err));
+                return errorHandle(callback, err);
             }
         }else if(isAgentAdmin){
             [err, sum] = await new PlayerModel().agentCount();
             if(err) {
-                return errorHandle(callback, ReHandler.fail(err));
+                return errorHandle(callback, err);
             }
         }else {
             if(role == RoleCodeEnum.Merchant || role == RoleCodeEnum.Agent) {
@@ -122,7 +122,7 @@ const overview = async function(event, context, callback) {
             if(isAgentAdmin) buIds = ["1"];
             [err, online] = await onlineUser(buIds);
             if(err) {
-                return errorHandle(callback, ReHandler.fail(err));
+                return errorHandle(callback, err);
             }
         }
         return callback(null, ReHandler.success({oneNum : online, twoNum:sum}));
@@ -155,11 +155,11 @@ const overview = async function(event, context, callback) {
         let queryRole = role == RoleCodeEnum.Agent ? RoleCodeEnum.Agent : RoleCodeEnum.Merchant;
         let [todayErr, todayMerchantCount] = await new PlatformUserModel().merchantCount(startTime.getTime(), buIds, role);
         if(todayErr) {
-            return errorHandle(callback, ReHandler.fail(todayErr));
+            return errorHandle(callback, todayErr);
         }
         let [sumErr, sumCount] = await new PlatformUserModel().merchantCount(null, buIds, role);
         if(sumErr) {
-            return errorHandle(callback, ReHandler.fail(sumErr));
+            return errorHandle(callback, sumErr);
         }
         return callback(null, ReHandler.success({oneNum: todayMerchantCount, twoNum:sumCount, type:type}));
         }
@@ -206,7 +206,7 @@ const gameConsumeStat = async function(event, context, callback) {
   }
   let [tokenErr, tokenInfo] = await validateToken(event);
   if(tokenErr) {
-      return callback(null, ReHandler.fail(tokenErr));
+      return errorHandle(callback, tokenErr);
   }
   let {startTime, endTime} = requestParams;
   let {userId, role} = tokenInfo;
@@ -221,7 +221,7 @@ const gameConsumeStat = async function(event, context, callback) {
     //找到该线路商下所有商户
     let [merErr, merchantList] = await new PlatformUserModel().childrenMerchant(userId);
     if(merErr) {
-        return callback(null, ReHandler.fail(merErr));
+        return errorHandle(null, merErr);
     }
     if(merchantList.length > 0) {
         let uids = merchantList.map((item) => item.userId);
@@ -231,7 +231,7 @@ const gameConsumeStat = async function(event, context, callback) {
     [listErr, list] = await new BillStatModel().findGameConsume(+startTime, +endTime,"10000",1, userId);
   } 
   if(listErr) {
-    return callback(null, ReHandler.fail(listErr));
+      return errorHandle(null, listErr);
   }
   let sum = 0;
   list.forEach((item) => sum -= item.amount);
@@ -303,7 +303,7 @@ const consumeAndIncome = async function(event, context, callback) {
 
   let [tokenErr, tokenInfo] = await validateToken(event);
   if(tokenErr) {
-      return callback(null, ReHandler.fail(tokenErr));
+      return errorHandle(null, tokenErr);
   }
   let {startTime, endTime} = requestParams;
   let {userId, role} = tokenInfo;
@@ -331,7 +331,7 @@ const consumeAndIncome = async function(event, context, callback) {
     //找到该线路商下所有商户
     let [merErr, merchantList] = await new PlatformUserModel().childrenMerchant(userId);
     if(merErr) {
-        return callback(null, ReHandler.fail(merErr));
+        return errorHandle(null, merErr);
     }
     if(merchantList.length > 0) {
         let uids = merchantList.map((item) => item.userId);
@@ -344,11 +344,11 @@ const consumeAndIncome = async function(event, context, callback) {
   }
   
   if(consumeErr) {
-      return callback(null, ReHandler.fail(consumeErr));
+      return errorHandle(null, consumeErr);
   }
   
   if(saldeErr) {
-      return callback(null, ReHandler.fail(saldeErr));
+      return errorHandle(null, saldeErr);
   }
   let returnObj = {
       keys : [], 

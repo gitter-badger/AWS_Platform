@@ -230,10 +230,7 @@ export async function gamePlayerInfo(event, context, cb) {
     if(billError) {
         return ResFail(cb, billError)
     }
-    // billList = billList.sort((a, b) => {
-    //     return +a.createAt - +b.createAt > 0
-    // });
-    sort(billList);
+    // sort(billList);
     user.list = billList;
 
     delete user.token;
@@ -350,14 +347,8 @@ export async function batchForzen(event, context, cb){
   }
   let type = state == State.normal ?  "jiesuo" : "suoding";
   successHandler(cb, {state}, type, tokenInfo, {});
-//   ResOK(cb, {state});
 }
 
-// export async function page(event, context, cb){
-//     let [err, page] = await new UserModel().page({userName:{"$like":"AWJ"}},2, 2, "userName","asc");
-//     console.log(err);
-//     console.log(page);
-// }
 // TOKEN验证
 export const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken

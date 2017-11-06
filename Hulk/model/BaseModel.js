@@ -1,5 +1,6 @@
 import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit } from '../lib/all'
 import _ from 'lodash'
+import zlib from 'zlib'
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
 // AWS.config.setPromisesDependency(require('bluebird'))
@@ -125,7 +126,7 @@ export class BaseModel {
         // return [queryErr, queryRet]
     }
     /**
-     * 查询数据
+     * 递归查询所有数据
      */
     query(conditions = {}) {
         const params = {
@@ -133,18 +134,25 @@ export class BaseModel {
             ...conditions
         }
         return this.queryInc(params, null)
-        // return new Promise((reslove, reject) => {
-        //     const params = {
-        //         ...this.params,
-        //         ...conditions
-        //     }
-        //     this.db$('query', params)
-        //         .then((res) => {
-        //             return reslove([0, res])
-        //         }).catch((err) => {
-        //             return reslove([BizErr.DBErr(err.toString()), false])
-        //         })
-        // })
+    }
+
+    /**
+     * 单次查询
+     * @param {*} conditions 
+     */
+    queryOnce(conditions = {}) {
+        return new Promise((reslove, reject) => {
+            const params = {
+                ...this.params,
+                ...conditions
+            }
+            this.db$('query', params)
+                .then((res) => {
+                    return reslove([0, res])
+                }).catch((err) => {
+                    return reslove([BizErr.DBErr(err.toString()), false])
+                })
+        })
     }
 
     /**
@@ -156,7 +164,7 @@ export class BaseModel {
         let pageData = { Items: [], LastEvaluatedKey: {} }
         let [err, ret] = [0, 0]
         while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
-            [err, ret] = await this.query({
+            [err, ret] = await this.queryOnce({
                 ...query,
                 ExclusiveStartKey: inparam.startKey
             })
@@ -283,5 +291,20 @@ export class BaseModel {
             if (index != keys.length - 1) opts.FilterExpression += " and "
         })
         return opts
+    }
+
+    /**
+     * 压缩
+     * @param {*} obj 
+     */
+    parseZip(obj) {
+        return zlib.deflateSync(JSON.stringify(obj)).toString('base64')
+    }
+    /**
+     * 解压
+     * @param {*} str 
+     */
+    unZip(str) {
+        return zlib.unzipSync(Buffer.from(str, 'base64')).toString()
     }
 }
