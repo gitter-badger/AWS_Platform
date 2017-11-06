@@ -17,6 +17,7 @@ export const CODES = {
     gameingError : 11001, //正在游戏中，不能转账
     notGameing : 11005,   //玩家不在游戏中
     merchantNotGame : 11006,  //商家没有游戏权限
+    timeError : 12001, //时间间隔错误
 
     playerRecordError : { //账单数据错误
       depositErr : 12000, //存点不正确
@@ -63,7 +64,8 @@ const errorMessage = {
   "12000" : "存点不正确",
   "12001" : "取点不正确",
   "12002" : "账单不匹配",
-  "notSingleUser" : "不是同一个用户提交",
+  "12001" : "startTime不能大于endTime",
+  "12003" : "不是同一个用户提交",
   "12004" : "记录不存在",
   "13000" : "道具不存在",
   "13001" : "金额不正确",

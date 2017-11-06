@@ -2,10 +2,5 @@
     "headers":{
         "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BODhBX2RheTAwMiIsInN1ZmZpeCI6Ik5BODhBIiwidXNlcklkIjoxODg0NDQsImlhdCI6MTUwMjg1NjUzM30.xthLmbQx6vX-nj17zfCW4uzEx5iCGnvoPWP3gFt8MSU"
     },
-    "body" : {
-        "records":"eJx1Uk1P4zAQ/S8+18h2/JFw24JArHY5ABIHwmGajIulkFSJA4eq/30nTgplEVE01rw3Hy/Oe9qzDcabmp2z3FuxsUrwAkFxKdHxIkfJnZTOm9pZqB1bsXHAPtVnpsi0IGQLr3iJEUJD6L5kbwHfr/tQl+z8qWRSlWxVMpfikkiRjixFdRJNinou+l76JclL9kzHUEGM2B8Xcrk6eaeCLcYrhDj2ePECbYVU5aEZkKj30B77psrYRWiuu2YCxEzfdjUOR57yP/iGDeUlSxqmy1hDs4ylr1BGSGHPxCw0DVxjTFyRG3Ek/CzoEiIQt/8AZoUX3djGRYPvEe93ob3DVwjtF2Zu+Ts2MeyagD3hkvDN6H1ayOXprjtqrZePI6HSmf/ErLt2HD4VbX++0OWGDofD4odbcgD9+1+Pv6XQhsAd9NjOtjLK0lMrrrPKc11VioOjNBMFIdpMNqIOcuFDmKZII0yRC2tzo+1srjRHCyHUtC9Mmc1BOQ+nZt0453hVaClcpqqsrtjh+R8yLNQ7",
-        "gameType" : "40000",
-        "timestamp" : "5655225",
-        "sign" : "15f13dc547980efd5a96b48c3c5a98b95e33cf48a919fb6ad36aadc44139b1a1"
-    }
+    "body" : {"gameType":"30000","records":"H4sIAAAAAAAAANVSu07DMBT9F89J5Edsx90KEwIiBN0QQm5zqSKlSZU4RRXiC1jYED/BwIDE0q8pQvwFjh0kWiakDjCec++5vvf4nN8gPYXSpHoGaIDS4WU6NNAYFCA9q9rSoAHBOMI4QGMwB5ntYVJaCic4SQQjEnOJfHFui0TRiIgkwhHxbNrOLE1DJjwe5d1DhGOlYkUFx/3o0XIObrzTVZVpeqWFGSzyCXQdaMACNLW7dq3MaomH/frvj6u3p5f16z3y9EiPiw3+GHfzcgOzQ1jawkmPev3Hw7Ml5rq2jrhlgMpEKarCK0Z5GHOBQ0WpDBWBTHKIFU94p6hhTxe6nICzS1DvWG0NzNwcwVAP/VXOjQaMKeBUG6uiTuCZDYsYI84i053ir6Y98oZYB9oGaveMwlIxjDzz/UtxYsmFLvJsuPWr13l5VDXmiw63+DOjTdvY9ttgB0kR/zgp+z+isl7d7SIt8vdpiSP+x9Ny8QnOka9BWQQAAA==","sign":"bc6bc2b9101f7f555ade4df88392d209198dd64d00167e39a8c489d80c337df0","timestamp":1509949331000}
 }

@@ -118,13 +118,6 @@ functions:
           path: /game/player/join
           method: post
           cors: true
-  # playerRecord:  #玩家记录验证
-  #   handler: openApi.playerRecordValidate
-  #   events:
-  #     - http:
-  #         path: /game/bill/verify
-  #         method: post
-  #         cors: true
   settlement:  #玩家游戏结算
     handler: openApi.settlement
     events:
@@ -220,10 +213,3 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  # page:     #page
-  #   handler: managerApi.page
-  #   events:
-  #     - http:
-  #         path: /player/page
-  #         method: post
-  #         cors: true
