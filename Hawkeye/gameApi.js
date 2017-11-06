@@ -186,7 +186,7 @@ const merchantInfo = async(event, context, cb) => {
     let list = gameList.map((game) => game.code);
     return list;
 }
-if(merchant.role == RoleCodeEnum.SuperAdmin || merchant.role == RoleCodeEnum.PlatformAdmin) {
+if(merchant.level == 0) {
     returnObj.gameList = ["10000", "30000","40000"]
 }
   return cb(null, ReHandler.success(returnObj));

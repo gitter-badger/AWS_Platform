@@ -1121,57 +1121,6 @@ async function updateUserInfo(event, context, callback) {
   callback(null, ReHandler.success());
 }
 
-/**
- * 玩家游戏记录
- * @param {*} event 
- * @param {*} context 
- * @param {*} callback 
- */
-// async function playerGameRecord(event, context, callback) {
-//   console.log(event);
-//   //json转换
-//   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
-//   if (parserErr) {
-//     return callback(null, ReHandler.fail(parserErr));
-//   }
-//   let [checkAttError, errorParams] = athena.Util.checkProperties([
-//     { name: "records", type: "S" }
-//   ], requestParams);
-//   if (checkAttError) {
-//     Object.assign(checkAttError, { params: errorParams });
-//     return callback(null, ReHandler.fail(checkAttError));
-//   }
-//   let { records } = requestParams;
-//   let buffer = Buffer.from(records, 'base64');
-//   let str = zlib.unzipSync(buffer).toString();
-//   let [parseRecordErr, list] = athena.Util.parseJSON(str);
-//   if (parseRecordErr) {
-//     return callback(null, ReHandler.fail(parseRecordErr));
-//   }
-//   records = list;
-//   let batchSaveArr = [];
-//   for (let i = 0; i < records.length; i++) {
-//     let record = records[i];
-//     let { userId, userName, betId, betTime, parentId, gameId } = record;
-//     batchSaveArr.push({
-//       userId: +userId,
-//       userName,
-//       betId: betId + "",
-//       parentId: parentId,
-//       gameId: gameId + "",
-//       gameType: (+gameId) - (+gameId) % 10000 || 100000,
-//       betTime: new Date(betTime).getTime(),
-//       record
-//     })
-//   }
-//   console.log(batchSaveArr);
-//   let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
-//   if (batchSaveErr) {
-//     return callback(null, ReHandler.fail(batchSaveErr));
-//   }
-//   callback(null, ReHandler.success({}));
-// }
-
 
 /**
  * 玩家游戏记录

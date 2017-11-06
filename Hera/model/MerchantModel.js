@@ -61,17 +61,6 @@ export class MerchantModel extends athena.BaseModel {
                 FilterExpression : filterExpression,
                 ExpressionAttributeValues : expressionAttributeValues
             });
-        // return new Promise((reslove, reject) => {
-        //     this.db$("scan", {
-        //         TableName : this.tableName,
-        //         FilterExpression : filterExpression,
-        //         ExpressionAttributeValues : expressionAttributeValues
-        //     }).then((result) => {
-        //         reslove([null, result.Items]);
-        //     }).catch((err) => {
-        //         reslove([err, []]);
-        //     })
-        // })
     }
     async findParentCommission(intoArray, userId, parent){
         if(Object.is(parent, "00") || Object.is(parent, "01")) {
