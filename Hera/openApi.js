@@ -864,6 +864,7 @@ async function joinGame(event, context, callback) {
   let joinTime = Date.now();
   let gameState = gameId == "10000" ? GameState.online : GameState.gameing; //如果是棋牌游戏，还是标记为在线
   let sendSid = userObj.gameId == gameId ? userObj.sid : sid;
+  if(gameId =="10000") sendSid = sid;
   let state = userObj.gameState == GameState.gameing ? "0" : "1"; //0 未清账，1，已清账
   //修改游戏状态（不能进行转账操作）
   let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:gameState, gameId:gameId, sid : sendSid, joinTime});
