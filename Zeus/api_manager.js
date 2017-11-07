@@ -171,7 +171,7 @@ function getGameListDifference(userBefore, userAfter) {
  * @param {*} isChangeRate 
  * @param {*} user 
  */
-function relatedChange(isChangeGameList, isChangeRate, user) {
+async function relatedChange(isChangeGameList, isChangeRate, user) {
   if (isChangeGameList || isChangeRate) {
     const [allChildErr, allChildRet] = await new UserModel().listAllChildUsers(user)
     for (let child of allChildRet) {
