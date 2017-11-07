@@ -5,7 +5,7 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { AgentCheck } from './biz/AgentCheck'
-
+import _ from 'lodash'
 /**
  * 代理管理员注册
  */
