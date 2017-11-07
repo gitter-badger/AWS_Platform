@@ -100,7 +100,6 @@ const managerUpdate = async (e, c, cb) => {
     if (managerErr) {
       return ResErr(cb, managerErr)
     }
-
     // 判断是否变更了游戏或者抽成比
     let gameListDifference = getGameListDifference(manager, managerInfo)
     let isChangeGameList = gameListDifference.length > 0 ? false : true
@@ -112,10 +111,8 @@ const managerUpdate = async (e, c, cb) => {
     // 业务操作
     const [updateErr, updateRet] = await new UserModel().userUpdate(Manager)
     if (updateErr) { return ResErr(cb, updateErr) }
-
     // 判断是否更新所有子用户的游戏或者抽成比
-    relatedChange(isChangeGameList, isChangeRate, manager)
-
+    relatedChange(isChangeGameList, isChangeRate, gameListDifference, manager)
     // 操作日志记录
     params.operateAction = '更新线路商信息'
     params.operateToken = token
@@ -169,9 +166,10 @@ function getGameListDifference(userBefore, userAfter) {
  * 变更子用户的游戏和抽成比等
  * @param {*} isChangeGameList 
  * @param {*} isChangeRate 
+ * @param {*} gameListDifference 
  * @param {*} user 
  */
-async function relatedChange(isChangeGameList, isChangeRate, user) {
+async function relatedChange(isChangeGameList, isChangeRate, gameListDifference, user) {
   if (isChangeGameList || isChangeRate) {
     const [allChildErr, allChildRet] = await new UserModel().listAllChildUsers(user)
     for (let child of allChildRet) {
