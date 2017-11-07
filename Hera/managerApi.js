@@ -363,7 +363,7 @@ export async function handlerBill(event, context, cb){
         return {
             userId : user.userId,
             amount : user.balance,
-            createAt : Date.now(),
+            createdAt : Date.now(),
             remark : "系统升级原账结余",
             sn : Util.uuid(),
             billId : Util.uuid(),

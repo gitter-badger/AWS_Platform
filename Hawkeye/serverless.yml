@@ -21,6 +21,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
       Resource:
           Fn::Join:
           - ''
@@ -170,13 +171,6 @@ functions:
           path: /game/prop/buy
           method: post
           cors: true
-  # buyDiamonds:  #购买N币
-  #   handler: openApi_tool.playerBuyDiamonds
-  #   events:
-  #     - http:
-  #         path: /game/diamonds/buy
-  #         method: post
-  #         cors: true
   advertList:  #广告列表
     handler: openApi_ad.advertList
     events:
