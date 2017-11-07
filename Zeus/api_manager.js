@@ -100,19 +100,20 @@ const managerUpdate = async (e, c, cb) => {
     if (managerErr) {
       return ResErr(cb, managerErr)
     }
-    // 判断是否变更了游戏或者抽成比
-    let gameListDifference = getGameListDifference(manager, managerInfo)
-    let isChangeGameList = gameListDifference.length > 0 ? false : true
-    let isChangeRate = manager.rate == managerInfo.rate ? false : true
-
     // 获取更新属性和新密码HASH
     const Manager = { ...manager, ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']]) }
     Manager.passhash = Model.hashGen(Manager.password)
     // 业务操作
     const [updateErr, updateRet] = await new UserModel().userUpdate(Manager)
     if (updateErr) { return ResErr(cb, updateErr) }
+
+    // 判断是否变更了游戏或者抽成比
+    let gameListDifference = getGameListDifference(manager, managerInfo)
+    let isChangeGameList = gameListDifference.length > 0 ? false : true
+    let isChangeRate = manager.rate == managerInfo.rate ? false : true
     // 判断是否更新所有子用户的游戏或者抽成比
-    relatedChange(isChangeGameList, isChangeRate, gameListDifference, manager)
+    relatedChange(isChangeGameList, isChangeRate, gameListDifference, Manager)
+    
     // 操作日志记录
     params.operateAction = '更新线路商信息'
     params.operateToken = token
@@ -175,8 +176,8 @@ async function relatedChange(isChangeGameList, isChangeRate, gameListDifference,
     for (let child of allChildRet) {
       let isNeedUpdate = false
       // 如果变更了抽成比，且小于子用户抽成比，同步子用户抽成比
-      if (isChangeRate && managerInfo.rate < child.rate) {
-        child.rate = managerInfo.rate
+      if (isChangeRate && user.rate < child.rate) {
+        child.rate = user.rate
         isNeedUpdate = true
       }
       // 如果减少游戏，则同步子用户游戏
@@ -192,7 +193,7 @@ async function relatedChange(isChangeGameList, isChangeRate, gameListDifference,
       }
       // 如果需要，则同步更新子用户
       if (isNeedUpdate) {
-        new UserModel().userUpdate(child)
+        await new UserModel().userUpdate(child)
       }
     }
   }
