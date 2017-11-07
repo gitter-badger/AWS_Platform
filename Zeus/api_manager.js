@@ -109,7 +109,7 @@ const managerUpdate = async (e, c, cb) => {
 
     // 判断是否变更了游戏或者抽成比
     let gameListDifference = getGameListDifference(manager, managerInfo)
-    let isChangeGameList = gameListDifference.length > 0 ? false : true
+    let isChangeGameList = gameListDifference.length == 0 ? false : true
     let isChangeRate = manager.rate == managerInfo.rate ? false : true
     // 判断是否更新所有子用户的游戏或者抽成比
     relatedChange(isChangeGameList, isChangeRate, gameListDifference, Manager)

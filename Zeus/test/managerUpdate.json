@@ -35,10 +35,10 @@
         "displayId": 403767,
         "parentName": "Platform_NAtest",
         "hostContact": "nanana",
-        "rate": "96",
+        "rate": 100,
         "adminContact": "123123123213",
         "createdDate": "2017-11-06",
-        "passhash": "$2a$10$Nv26PVOftlUa0b3TS4BG5uRWuKyOn6nYXBOle9On74xScaglYsJdW",
+        "passhash": "$2a$10$n.YQR6A6IwdUfC9.HiauWu1LOpkJpx6GMAP0KMw/s31kw6vTsOIG2",
         "createdAt": 1509942050277,
         "levelIndex": "01",
         "gender": 2,
@@ -49,18 +49,11 @@
         "role": "10",
         "level": 1,
         "points": 0,
-        "updatedAt": 1510042410508,
+        "updatedAt": 1510046310313,
         "adminEmail": "NA@NA.COM",
         "parent": "01",
         "username": "na_nagame",
         "gameList": [
-            {
-                "code": "10000",
-                "name": "棋牌游戏",
-                "url": "http://tablegame.na12345.com/admin/api/checkLoginAccess",
-                "desc": "网络棋牌游戏正在被大家慢慢接受和喜欢我们把传统的棋牌游戏进行重新定义加上全新的呈现技术灵活的运营模式，推出了NA棋牌的产品序列",
-                "imgurl": "http://ouef62ous.bkt.clouddn.com/2.png"
-            },
             {
                 "code": "30000",
                 "name": "真人视讯",
