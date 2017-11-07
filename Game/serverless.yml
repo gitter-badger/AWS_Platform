@@ -358,3 +358,42 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+    PlayerBillDetail: #玩家账单明细表
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: PlayerBillDetail
+        AttributeDefinitions:
+          -
+            AttributeName: billId
+            AttributeType: S
+          -
+            AttributeName: userId
+            AttributeType: N
+          -
+            AttributeName: createdAt
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: billId
+            KeyType: HASH
+          -
+            AttributeName: createdAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
+        GlobalSecondaryIndexes:
+          -
+            IndexName: UserIdIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}

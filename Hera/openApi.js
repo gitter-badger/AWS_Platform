@@ -856,7 +856,7 @@ async function joinGame(event, context, callback) {
   //判断是否正在游戏中
   let game = userModel.isGames(userObj);
   if (game && userObj.gameId!= gameId) {
-    let gameName = GameTypeEnum[userObj.gameId+""].name;
+    let gameName = (GameTypeEnum[userObj.gameId+""] || {}).name || "";
     let gamingError = new CHeraErr(CODES.gameingError);
     gamingError.msg = `您正在${gameName}游戏中,不能进入其他游戏!`
     return callback(null, ReHandler.fail(gamingError));

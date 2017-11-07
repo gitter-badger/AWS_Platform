@@ -1,5 +1,6 @@
 let  athena  = require("../lib/athena");
 import {TABLE_NAMES} from "../config";
+import {UserBillDetailModel} from "./UserBillDetailModel"
 import {Util} from "../lib/Util"
 
 
@@ -87,7 +88,27 @@ export class UserBillModel extends athena.BaseModel {
         return [null, sumMount];
     }
     carryPoint(){
-        return this.save();
+        return super.save();
+    }
+    save(){
+        //写入账单明细
+        let list = this.list || [];
+        if(list.length ==0) {
+            list = [
+                {
+                    ...this,
+                    createdAt : this.createAt,
+                    type : this.type + 10
+                }
+            ]
+        }
+        list.map((item) => {
+            item.billId = this.billId;
+            item.createdAt = +item.createdAt;
+            item.userId = +item.userId;
+        })
+        UserBillDetailModel.batchWrite(list);
+        return super.save();
     }
     async handlerPoint(){
         if(this.action === Action.recharge){ //玩家充值(中心钱包转入平台钱包) 玩家平台钱数对应增加

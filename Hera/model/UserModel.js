@@ -54,7 +54,7 @@ export class UserModel extends athena.BaseModel {
     }
     findByBuIds(buIds, conditions = {}) {
         console.log("111111111111111111111111");
-        let {userName, merchantName, nickname} = conditions;
+        let {userName, merchantName, nickname, msn} = conditions;
         let filterExpression = "(",
             expressionAttributeValues = {},
             expressionAttributeNames = {};
@@ -75,7 +75,11 @@ export class UserModel extends athena.BaseModel {
                 }
             }
         }
-       
+       if(msn) {
+           filterExpression += ` and #msn=:msn`;
+            expressionAttributeNames[`#msn`] = "msn";
+            expressionAttributeValues[`:msn`] = msn;
+       }
         let scanOpts = {
             TableName : this.tableName,
             FilterExpression : filterExpression,

@@ -213,3 +213,5 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
+  handlerBill:  #账单明细处理
+    handler: managerApi.handlerBill
