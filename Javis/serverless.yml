@@ -219,15 +219,15 @@ functions:
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
     integration: lambda
-  upToken: #七牛云上传TOKEN
-    handler: api_qiniu.upToken
-    events:
-      -
-        http:
-          path: /upToken
-          method: post
-          cors: true
-          authorizer: tokenAuth
+  # upToken: #七牛云上传TOKEN
+  #   handler: api_qiniu.upToken
+  #   events:
+  #     -
+  #       http:
+  #         path: /upToken
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
   organize: #组织架构
     handler: api_organize.organize
     events:
