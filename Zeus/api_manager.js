@@ -5,7 +5,7 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
-
+import _ from 'lodash'
 /**
  * 线路商列表
  */
@@ -105,14 +105,20 @@ const managerUpdate = async (e, c, cb) => {
     Manager.passhash = Model.hashGen(Manager.password)
     // 业务操作
     const [updateErr, updateRet] = await new UserModel().userUpdate(Manager)
+    if (updateErr) { return ResErr(cb, updateErr) }
+
+    // 判断是否变更了游戏或者抽成比
+    let gameListDifference = getGameListDifference(manager, managerInfo)
+    let isChangeGameList = gameListDifference.length == 0 ? false : true
+    let isChangeRate = manager.rate == managerInfo.rate ? false : true
+    // 判断是否更新所有子用户的游戏或者抽成比
+    relatedChange(isChangeGameList, isChangeRate, gameListDifference, Manager)
+    
     // 操作日志记录
     params.operateAction = '更新线路商信息'
     params.operateToken = token
     new LogModel().addOperate(params, updateErr, updateRet)
     // 结果返回
-    if (updateErr) {
-      return ResErr(cb, updateErr)
-    }
     return ResOK(cb, { payload: updateRet })
   } catch (error) {
     return ResErr(cb, error)
@@ -141,7 +147,57 @@ const avalibleManagers = async (e, c, cb) => {
 }
 
 // ==================== 以下为内部方法 ====================
-
+/**
+ * 获取减少的游戏数组
+ * @param {*} userBefore 
+ * @param {*} userAfter 
+ */
+function getGameListDifference(userBefore, userAfter) {
+  let gameListBefore = []
+  let gameListAfter = []
+  for (let i of userBefore.gameList) {
+    gameListBefore.push(i.code)
+  }
+  for (let j of userAfter.gameList) {
+    gameListAfter.push(j.code)
+  }
+  return _.difference(gameListBefore, gameListAfter)
+}
+/**
+ * 变更子用户的游戏和抽成比等
+ * @param {*} isChangeGameList 
+ * @param {*} isChangeRate 
+ * @param {*} gameListDifference 
+ * @param {*} user 
+ */
+async function relatedChange(isChangeGameList, isChangeRate, gameListDifference, user) {
+  if (isChangeGameList || isChangeRate) {
+    const [allChildErr, allChildRet] = await new UserModel().listAllChildUsers(user)
+    for (let child of allChildRet) {
+      let isNeedUpdate = false
+      // 如果变更了抽成比，且小于子用户抽成比，同步子用户抽成比
+      if (isChangeRate && user.rate < child.rate) {
+        child.rate = user.rate
+        isNeedUpdate = true
+      }
+      // 如果减少游戏，则同步子用户游戏
+      if (isChangeGameList) {
+        let subGameList = []
+        for (let item of child.gameList) {
+          if (_.indexOf(gameListDifference, item.code) == -1) {
+            subGameList.push(item)
+          }
+        }
+        child.gameList = subGameList
+        isNeedUpdate = true
+      }
+      // 如果需要，则同步更新子用户
+      if (isNeedUpdate) {
+        await new UserModel().userUpdate(child)
+      }
+    }
+  }
+}
 /**
   api export
 **/
