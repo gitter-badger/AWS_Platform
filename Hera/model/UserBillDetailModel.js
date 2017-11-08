@@ -21,7 +21,6 @@ export class UserBillDetailModel extends athena.BaseModel {
      * @param {*} records 
      */
     batchWrite(records) {
-        console.log(records);
         let sumBatch= [];
         for(let i =0; i < records.length; i += 25) {
             let batch = {

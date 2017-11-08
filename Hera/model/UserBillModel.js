@@ -29,7 +29,7 @@ export class UserBillModel extends athena.BaseModel {
         this.createAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
-        this.seatInfo = seatInfo;
+        this.seatInfo = seatInfo || Model.StringValue;
         this.kindId = kindId || -1;  //-1表示中心钱包的 -2初始点数 -3商城的
         this.gameId = gameId || -1;
         this.toolId = toolId || -1;
@@ -47,6 +47,9 @@ export class UserBillModel extends athena.BaseModel {
         if(this.action == 1){
             if(amount < 0) this.amount = -amount;
         }
+    }
+    setBillId(userId) {
+        this.billId = Util.billSerial(userId);
     }
     async getBalance(){
         let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], "userNameIndex", true);
@@ -106,14 +109,14 @@ export class UserBillModel extends athena.BaseModel {
         
         list.map((item) => {
             item.billId = this.billId;
-            item.createdAt = +item.createdAt;
+            item.createdAt = +item.createdAt || 0;
             item.userName = this.userName;
             item.rate = this.rate || 0,
             item.mix = this.mix || -1;
         })
-        console.log("账单明细");
-        console.log(list);
-        new UserBillDetailModel().batchWrite(list);
+        console.log(this.setProperties());
+        console.log("111111111111111111111111");
+        // new UserBillDetailModel().batchWrite(list);
         return super.save();
     }
     async handlerPoint(){

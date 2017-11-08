@@ -102,7 +102,8 @@ export class UserBillModel extends athena.BaseModel {
             prop : seatInfo.prop,
             price : seatInfo.price,
             seatId : seatInfo.seatId,
-            amount : seatInfo.price,
+            preBalance : this.originalAmount,
+            amount : this.amount,
             type : this.type + 10,
             sn : this.sn || Util.uuid(),
             createdAt : +this.createAt
