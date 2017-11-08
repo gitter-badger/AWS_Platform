@@ -14,7 +14,7 @@ export class UserBillModel extends athena.BaseModel {
     constructor({gameId,originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, 
         fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
-        this.billId = Util.uuid();
+        this.billId = Util.billSerial(userId);
         this.userId = +userId
         this.action = +action;
         this.userName = userName;
@@ -99,17 +99,20 @@ export class UserBillModel extends athena.BaseModel {
                     ...this.setProperties(),
                     createdAt : this.createAt,
                     type : this.type + 10,
-                    sn : this.sn || Util.uuid()
+                    billId : this.sn || Util.uuid()
                 }
             ]
         }
-        console.log("账单明细");
-        console.log(list);
+        
         list.map((item) => {
             item.billId = this.billId;
             item.createdAt = +item.createdAt;
-            item.userId = +item.userId;
+            item.userName = this.userName;
+            item.rate = this.rate || 0,
+            item.mix = this.mix || -1;
         })
+        console.log("账单明细");
+        console.log(list);
         new UserBillDetailModel().batchWrite(list);
         return super.save();
     }

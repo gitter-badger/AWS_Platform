@@ -10,11 +10,15 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserBillDetailModel extends athena.BaseModel {
-    constructor({sn, gameId, billId} = {}) {
+    constructor({betId, billId, amount, betAmount, betTime, time, preBalance} = {}) {
         super(TABLE_NAMES.PlayerBillDetail);
-        this.sn = sn;
-        this.gameId = gameId;
+        this.betId = betId;
         this.billId = billId;
+        this.amount = amount;
+        this.betAmount = betAmount;
+        this.betTime = betTime;
+        this.time = time;
+        this.preBalance = preBalance;
     }
     /**
      * 批量保存

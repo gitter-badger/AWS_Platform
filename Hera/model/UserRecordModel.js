@@ -102,10 +102,18 @@ export class UserRecordModel extends athena.BaseModel {
         for(let i = 0; i < this.records.length; i++) {
             let record = this.records[i];
             let amount = record.amount;
-            if(record.type != TypeEnum.deposit && record.type != TypeEnum.take){
-                income += +amount
-            }
+            let betAmount = record.betAmount;
+            income += (+amount + (+betAmount));
         }
         return income;
+        // let income = 0;
+        // for(let i = 0; i < this.records.length; i++) {
+        //     let record = this.records[i];
+        //     let amount = record.amount;
+        //     if(record.type != TypeEnum.deposit && record.type != TypeEnum.take){
+        //         income += +amount
+        //     }
+        // }
+        // return income;
     }
 }
