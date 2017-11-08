@@ -8,6 +8,7 @@ export const TABLE_NAMES = {
     TABLE_MSN : "ZeusPlatformMSN",
     GAME_TOOL : "DianaPlatformTool",
     TOOL_SEAT : "DianaPlatformSeat",
+    PlayerBillDetail : "PlayerBillDetail",
     TABLE_PALYER_RECORD : "HeraGameRecord",
     TOOL_PACKAGE : "DianaPlatformPackage"
 }

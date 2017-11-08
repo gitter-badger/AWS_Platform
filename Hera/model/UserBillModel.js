@@ -92,22 +92,25 @@ export class UserBillModel extends athena.BaseModel {
     }
     save(){
         //写入账单明细
-        let list = this.list || [];
+        let list = this.records || [];
         if(list.length ==0) {
             list = [
                 {
-                    ...this,
+                    ...this.setProperties(),
                     createdAt : this.createAt,
-                    type : this.type + 10
+                    type : this.type + 10,
+                    sn : this.sn || Util.uuid()
                 }
             ]
         }
+        console.log("账单明细");
+        console.log(list);
         list.map((item) => {
             item.billId = this.billId;
             item.createdAt = +item.createdAt;
             item.userId = +item.userId;
         })
-        UserBillDetailModel.batchWrite(list);
+        new UserBillDetailModel().batchWrite(list);
         return super.save();
     }
     async handlerPoint(){

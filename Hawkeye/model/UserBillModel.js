@@ -1,5 +1,6 @@
 let  athena  = require("../lib/athena");
 import {TABLE_NAMES} from "../config";
+import {UserBillDetailModel} from "./UserBillDetailModel"
 import {Util} from "../lib/Util"
 
 
@@ -90,7 +91,33 @@ export class UserBillModel extends athena.BaseModel {
         return [null, sumMount];
     }
     carryPoint(){
-        return this.save();
+        return super.save();
+    }
+    async save(){
+        //写入账单明细
+        let seatInfo = this.seatInfo;
+        let item = {
+            ...this.setProperties(),
+            createdAt : this.createAt,
+            num : seatInfo.sum,
+            prop : seatInfo.prop,
+            price : seatInfo.price,
+            seatId : seatInfo.seatId,
+            amount : seatInfo.price,
+            type : this.type + 10,
+            sn : this.sn || Util.uuid(),
+            createdAt : +this.createAt,
+            userId : +this.userId
+        }
+        delete this.seatInfo;
+        let userBillDetailModel = new UserBillDetailModel();
+        Object.assign(userBillDetailModel, item);
+        let [detailErr] = await userBillDetailModel.save();
+        if(detailErr) {
+            console.log("购买房卡写入明细发生错误");
+            console.log(detailErr);
+        }
+        return super.save();
     }
     async handlerPoint(){
         if(this.action === Action.recharge){ //玩家充值(中心钱包转入平台钱包) 玩家平台钱数对应增加

@@ -1,9 +1,9 @@
 {
-    "body": "{ \"amount\":\"2\",  \"action\":\"-1\", \"buId\":\"676424\"}",
+    "body": "{ \"amount\":\"2\",  \"action\":\"-1\", \"buId\":\"769036\"}",
     "pathParameters" : {
-            "userName" : "Play030"
+            "userName" : "NA01"
     },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNIMDFfUGxheTAzMCIsInN1ZmZpeCI6IlNIMDEiLCJ1c2VySWQiOjEwMDM0NiwiaWF0IjoxNTA1NzkxNjQ4fQ.xVfibiV5WY8Be1dFp4C2jVaOIiFdVdTvGkKBkYj0YFc"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNUMDFfTkEwMSIsInN1ZmZpeCI6IkNUMDEiLCJ1c2VySWQiOjI4NzU1MywiaWF0IjoxNTEwMDI4MzAzfQ.SnVubB9yOE1ONwDoMZUuWU2grKQL5CPj7UuTLK70xPw"
     }
 }

@@ -369,11 +369,11 @@ async function gamePlayerBalance(event, context, callback) {
 
   if (merError) return callback(null, ReHandler.fail(merError));
   if (!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
-  //验证白名单
-  let white = validateIp(event, merchantInfo);
-  if(!white) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
-  }
+  // //验证白名单
+  // let white = validateIp(event, merchantInfo);
+  // if(!white) {
+  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  // }
   userName = `${merchantInfo.suffix}_${userName}`;
   requestParams.userName = userName;
   let baseModel = {
@@ -730,7 +730,7 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(err));
   }
   console.log("账单消耗:" + income);
-  let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1 
+  let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
 
   //获取商家
   let merchantId = userModel.buId;
@@ -756,8 +756,8 @@ async function settlement(event, context, callback) {
     type: Type.gameSettlement,
     typeName: typeName,
     joinTime : userModel.joinTime,
-    list : records,
-    remark: "游戏结算"
+    records : records,
+    remark: `游戏结算[${game.gameName}]`
   }
   //玩家点数发生变化
   let userBillModel = new UserBillModel({
@@ -1024,8 +1024,16 @@ async function playerGameRecord(event, context, callback) {
   if(sign != serverSign  && sign != gameKey) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
   }
-  let buffer = Buffer.from(records, 'base64');
-  let str = zlib.unzipSync(buffer).toString();
+  let str = "";
+  try{
+    let buffer = Buffer.from(records, 'base64');
+    str = zlib.unzipSync(buffer).toString();
+  }catch(err) {
+    let dataErr = new CHeraErr(CODES.DataError);
+    dataErr.msg = "压缩数据错误"
+    return callback(null, ReHandler.fail(dataErr));
+  }
+
   let [parseRecordErr, list] = athena.Util.parseJSON(str);
   if (parseRecordErr) {
     return callback(null, ReHandler.fail(parseRecordErr));
