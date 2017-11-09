@@ -98,6 +98,14 @@ export class UserRecordModel extends athena.BaseModel {
      * @param {*} records 
      */
     settlementIncome() {
+        // let income = 0;
+        // for(let i = 0; i < this.records.length; i++) {
+        //     let record = this.records[i];
+        //     let amount = record.amount;
+        //     let betAmount = record.betAmount;
+        //     income += (+amount + (+betAmount));
+        // }
+        // return income;
         let income = 0;
         for(let i = 0; i < this.records.length; i++) {
             let record = this.records[i];

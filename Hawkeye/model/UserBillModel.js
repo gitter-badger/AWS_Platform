@@ -13,7 +13,7 @@ import {Model} from "../lib/Dynamo"
 export class UserBillModel extends athena.BaseModel {
     constructor({originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
-        this.billId = Util.uuid();
+        this.billId = Util.billSerial(userId);
         this.userId = +userId
         this.action = +action;
         this.userName = userName;
@@ -98,16 +98,15 @@ export class UserBillModel extends athena.BaseModel {
         let seatInfo = this.seatInfo;
         let item = {
             ...this.setProperties(),
-            createdAt : this.createAt,
             num : seatInfo.sum,
             prop : seatInfo.prop,
             price : seatInfo.price,
             seatId : seatInfo.seatId,
-            amount : seatInfo.price,
+            preBalance : this.originalAmount,
+            amount : this.amount,
             type : this.type + 10,
             sn : this.sn || Util.uuid(),
-            createdAt : +this.createAt,
-            userId : +this.userId
+            createdAt : +this.createAt
         }
         delete this.seatInfo;
         let userBillDetailModel = new UserBillDetailModel();

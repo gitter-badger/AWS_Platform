@@ -369,11 +369,11 @@ async function gamePlayerBalance(event, context, callback) {
 
   if (merError) return callback(null, ReHandler.fail(merError));
   if (!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
-  // //验证白名单
-  // let white = validateIp(event, merchantInfo);
-  // if(!white) {
-  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
-  // }
+  // // //验证白名单
+  let white = validateIp(event, merchantInfo);
+  if(!white) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  }
   userName = `${merchantInfo.suffix}_${userName}`;
   requestParams.userName = userName;
   let baseModel = {
@@ -440,6 +440,7 @@ async function gamePlayerBalance(event, context, callback) {
     merchantName: merchantInfo.displayName,
     type: action > 0 ? Type.recharge : Type.withdrawals
   })
+  userBillModel.setBillId(user.userId);
   userBillModel.setAmount(userBillModel.amount);
   let [saveError] = await userBillModel.save();
   if (saveError) {
@@ -697,7 +698,6 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(parseRecordErr));
   }
   requestParams.records = records = list;
-
   
   //如果记录没有，直接跳过
   if (records.length == 0) { //如果记录为null
@@ -742,6 +742,9 @@ async function settlement(event, context, callback) {
   if (!merchantModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
+  let mix = -1;
+  if(gameType == "30000") mix = merchantModel.vedioMix;
+  if(gameType == "40000") mix = merchantModel.liveMix;
   let billBase = {
     fromRole: RoleCodeEnum.Player,
     toRole: RoleCodeEnum.Merchant,
@@ -756,6 +759,8 @@ async function settlement(event, context, callback) {
     type: Type.gameSettlement,
     typeName: typeName,
     joinTime : userModel.joinTime,
+    rate : merchantModel.rate,
+    mix :mix,
     records : records,
     remark: `游戏结算[${game.gameName}]`
   }
@@ -776,6 +781,7 @@ async function settlement(event, context, callback) {
   }
   //查账
   let [getError, userSumAmount] = await userBillModel.getBalance();
+  console.log("用户余额："+userSumAmount);
   if (getError) {
     return callback(null, ReHandler.fail(getError));
   }
@@ -1143,7 +1149,6 @@ export {
   gamePlayerA3Login, //A3游戏登陆
   settlement, //账单验证
   getA3GamePlayerBalance, //用户余额（A3）
-  // playerRecordValidate,  //玩家账单验证
   joinGame, //进入游戏
   updatePassword, //修改密码
   updateUserInfo,  //修改用户基本信息

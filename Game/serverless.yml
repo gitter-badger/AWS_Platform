@@ -367,8 +367,8 @@ resources:
             AttributeName: billId
             AttributeType: S
           -
-            AttributeName: userId
-            AttributeType: N
+            AttributeName: userName
+            AttributeType: S
           -
             AttributeName: createdAt
             AttributeType: N
@@ -384,10 +384,10 @@ resources:
           WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
-            IndexName: UserIdIndex
+            IndexName: UserNameIndex
             KeySchema:
               -
-                AttributeName: userId
+                AttributeName: userName
                 KeyType: HASH
               -
                 AttributeName: createdAt
