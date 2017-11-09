@@ -95,9 +95,8 @@ export class UserBillModel extends athena.BaseModel {
     }
     save(){
         //写入账单明细
-        let list = this.records || [], serial = true;
+        let list = this.records || [];
         if(list.length ==0) {
-            serial = false;
             list = [
                 {
                     ...this.setProperties(),
@@ -115,46 +114,9 @@ export class UserBillModel extends athena.BaseModel {
             item.rate = this.rate || 0,
             item.mix = this.mix || -1;
         })
-        console.log("排序前");
-        console.log(list);
-        list.sort((a, b) => {
-            return a.createdAt - b.createdAt;
-        })
-        console.log("排序后");
-        console.log(list);
-        //小汇总
-        let  betArray = [], reArray= [];
-        if(serial) {
-            list.forEach((item) => {
-                if(item.type == 3) {
-                    let p = betArray.find((b) => {
-                        b.businessKey == item.businessKey;
-                    })
-                    if(!p) {
-                        betArray.push({
-                            ...item,
-                            sn : Util.billSerial(this.userId),
-                            type : 21
-                        })
-                        let reItem = list.find((p) => p.type == 4 && p.businessKey == item.businessKey) || {
-                            reAmount : 0,
-                            reTime : 0
-                        };
-                        Object.assign(item, {
-                            reAmount : reItem.amount,
-                            reTime : reItem.createdAt,
-                            setAmont : item.preBalance+ item.amount + reItem.amount //结算余额=带入余额
-                        })
-                    }else {
-                       p.amount += item.amount
-                    }
-
-                }
-             
-            })
-        }
-        console.log(betArray);
-        new UserBillDetailModel().batchWrite(list.concat(betArray));
+        console.log(this.setProperties());
+        console.log("111111111111111111111111");
+        // new UserBillDetailModel().batchWrite(list);
         return super.save();
     }
     async handlerPoint(){

@@ -367,6 +367,9 @@ resources:
             AttributeName: billId
             AttributeType: S
           -
+            AttributeName: sn
+            AttributeType: S
+          -
             AttributeName: userName
             AttributeType: S
           -
@@ -374,26 +377,5 @@ resources:
             AttributeType: N
         KeySchema:
           -
-            AttributeName: billId
+            AttributeName: sn
             KeyType: HASH
-          -
-            AttributeName: createdAt
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
-        GlobalSecondaryIndexes:
-          -
-            IndexName: UserNameIndex
-            KeySchema:
-              -
-                AttributeName: userName
-                KeyType: HASH
-              -
-                AttributeName: createdAt
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}

@@ -10,16 +10,11 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserBillDetailModel extends athena.BaseModel {
-    constructor({sn, type, billId, userId, userName, amount, createdAt, businessKey, preBalance} = {}) {
+    constructor({sn, gameId, billId} = {}) {
         super(TABLE_NAMES.PlayerBillDetail);
-        this.sn = sn || Util.billSerial(userId);
-        this.type = type;
+        this.sn = sn;
+        this.gameId = gameId;
         this.billId = billId;
-        this.userName = userName,
-        this.amount = amount,
-        this.createdAt = createdAt;
-        this.businessKey = businessKey;
-        this.preBalance = preBalance;
     }
     /**
      * 批量保存
