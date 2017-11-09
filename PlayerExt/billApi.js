@@ -9,6 +9,14 @@ import {Model} from "./lib/Dynamo"
 
 import {UserBillDetailModel} from "./model/UserBillDetailModel"
 
+import {UserBillModel} from "./model/UserBillModel"
+
+import {Util} from "./lib/Util"
+
+import {TokenModel} from "./model/TokenModel"
+
+import {UserRecordModel} from "./model/UserRecordModel"
+
 const ResOK = (callback, res) => callback(null, ReHandler.success(res))
 const ResFail = (callback, res) => {
     let errObj = {};
@@ -17,7 +25,13 @@ const ResFail = (callback, res) => {
     callback(null, ReHandler.fail(errObj))
 }
 
-const billFlow = async(e, c, cb) => {
+/**
+ * 账单流水
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const billFlow = async(event, context, cb) => {
   const [tokenErr, token] = await Model.currentToken(event);
   if (tokenErr) {
     return ResFail(cb, tokenErr)
@@ -27,14 +41,20 @@ const billFlow = async(e, c, cb) => {
     return ResFail(cb, e)
   }
    //检查参数是否合法
+  console.log(event.body);
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) {
+      return ResFail(cb, parserErr);
+  }
   let [checkAttError, errorParams] = athena.Util.checkProperties([
-      {name : "userName", type:"S"},
+      {name : "userName", type:"S"}
   ], requestParams);
   if(checkAttError){
       Object.assign(checkAttError, {params: errorParams});
       return cb(null, ReHandler.fail(checkAttError));
   }
-  let {userName,startTime, endTime} = requestParams;
+
+  let {userName,startTime, endTime, type, action} = requestParams;
   if(!startTime) {
     startTime = 0;
   }
@@ -45,7 +65,124 @@ const billFlow = async(e, c, cb) => {
     startTime = endTime;
   }
   let billDetail = new UserBillDetailModel();
-  let queryParamsStr = billDetail.buildQueryParams();
+  let [detailErr, list] = await billDetail.billFlow(userName, startTime, endTime, type, action);
+  if(detailErr) {
+    return cb(null, ReHandler.fail(detailErr));
+  }
+  for(let i = 0; i < list.length; i++) {
+    let item = list[i];
+    if(item.type == 21) {
+      list.splice(i, 1);
+      i --;
+    }
+  }
+  ResOK(cb, {list:list});
+}
+/**
+ * 账单明细
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const billDetail = async(event, context, cb) => {
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) {
+      return ResFail(cb, parserErr);
+  }
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "billId", type:"S"},
+  ], requestParams);
+  if(checkAttError){
+      Object.assign(checkAttError, {params: errorParams});
+      return cb(null, ReHandler.fail(checkAttError));
+  }
+  let {billId} = requestParams;
+  let billDetail = new UserBillDetailModel();
+  let [detailErr, list] = await billDetail.billDetail(billId);
+  console.log(list);
+  if(detailErr) {
+    console.log("11111111111111");
+    return cb(null, ReHandler.fail(detailErr));
+  }
+  //洗马量和argPTR没有写
+  let sumAmount = 0, reSumAmount= 0, depSumAmount =0,mixNum=0;
+  for(let i = 0; i < list.length; i++) {
+    let item = list[i];
+    item.joinTime = item.createdAt;
+    if(item.type >=1 && item.type<=4) {
+      list.splice(i, 1);
+      i --;
+    }else {
+      sumAmount += item.amount;
+      reSumAmount += item.reAmount || 0;
+    }
+  }
+  depSumAmount = sumAmount + reSumAmount;
+  //根据billId查询账单
+  let billModel = new UserBillModel();
+  let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt"], "billIdIndex");
+  if(billInfoErr) {
+    return cb(null, ReHandler.fail(billInfoErr));
+  }
+  if(!billInfo) {
+    return cb(null, ReHandler.fail(CODES.billNotExist));
+  }
+  Object.assign(billInfo, {
+    reSumAmount,
+    sumAmount,
+    depSumAmount,
+    mix
+  })
+  let obj = {
+    billInfo,
+    list
+  }
+  ResOK(cb, obj);
+}
+
+/**
+ * 账单流水战绩
+ * @param {*} e 
+ * @param {*} c 
+ * @param {*} cb 
+ */
+const billGameRecord = async(event, context, cb) => {
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
+
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
+  if(parserErr) {
+      return ResFail(cb, parserErr);
+  }
+  let [checkAttError, errorParams] = athena.Util.checkProperties([
+      {name : "userName", type:"S"},
+      {name : "betId", type:"S"},
+  ], requestParams);
+  if(checkAttError){
+      Object.assign(checkAttError, {params: errorParams});
+      return cb(null, ReHandler.fail(checkAttError));
+  }
+  let {userName, betId} = requestParams;
+  let [recordErr, recordInfo] = await new UserRecordModel().get({userName, betId});
+  if(recordErr) {
+    return cb(null, ReHandler.fail(recordErr));
+  }
+  recordInfo =recordInfo || null;
+  ResOK(cb, {data:recordInfo});
 }
 
 // TOKEN验证
@@ -74,5 +211,7 @@ export const jwtverify = async (e, c, cb) => {
 }
 
 export{
-  billFlow
+  billFlow,
+  billDetail,
+  billGameRecord
 }

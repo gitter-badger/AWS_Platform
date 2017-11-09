@@ -29,16 +29,6 @@ export class Util{
             iat: Math.floor(Date.now() / 1000) - 30
         })
     }
-    static generatorPassword(len){
-        len = len || 10;
-    　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
-    　　var maxPos = $chars.length;
-    　　var pwd = '';
-    　　for (let i = 0; i < len; i++) {
-    　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
-    　　}
-    　　return pwd;
-    }
     static  async jwtVerify(token){
         try {
             const decoded = await verify(token, TOKEN_SECRET)

@@ -360,13 +360,15 @@ export async function handlerBill(event, context, cb){
     let date = Date.now();
     //写入账单明细
     let saveArray = userList.map((user) => {
+        let uuid = Util.billSerial(user.userId);
         return {
             userId : user.userId,
             amount : user.balance,
             createdAt : Date.now(),
+            action : 1,
             remark : "系统升级原账结余",
-            sn : Util.uuid(),
-            billId : Util.uuid(),
+            sn : uuid,
+            billId : uuid,
             type : 10
         }
     })

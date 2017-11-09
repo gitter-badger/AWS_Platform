@@ -938,6 +938,9 @@ resources:
             AttributeName: userId
             AttributeType: N
           -
+            AttributeName: billId
+            AttributeType: S
+          -
             AttributeName: createAt
             AttributeType: N
           -
@@ -972,6 +975,17 @@ resources:
             KeySchema:
               -
                 AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          -
+            IndexName: billIdIndex
+            KeySchema:
+              -
+                AttributeName: billId
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

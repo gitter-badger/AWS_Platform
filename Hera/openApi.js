@@ -369,7 +369,7 @@ async function gamePlayerBalance(event, context, callback) {
 
   if (merError) return callback(null, ReHandler.fail(merError));
   if (!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
-  // // //验证白名单
+  // //验证白名单
   let white = validateIp(event, merchantInfo);
   if(!white) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
@@ -685,11 +685,11 @@ async function settlement(event, context, callback) {
   if (playerErr) {
     return callback(null, ReHandler.fail(playerErr));
   }
-  // if(!user.isGames(userModel)) { //如果不在游戏中就无效
-  //   return callback(null, ReHandler.success({
-  //     data: { balance: oriBalance }
-  //   }));
-  // }
+  if(!user.isGames(userModel)) { //如果不在游戏中就无效
+    return callback(null, ReHandler.success({
+      data: { balance: oriBalance }
+    }));
+  }
   //解压账单数据
   let buffer = Buffer.from(records, 'base64');
   let str = zlib.unzipSync(buffer).toString();

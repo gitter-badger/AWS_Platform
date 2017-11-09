@@ -1,4 +1,4 @@
-service: Hawkeye
+service: PlayerExt
 plugins:
   - serverless-webpack
   - serverless-prune-plugin
@@ -34,11 +34,27 @@ functions:
   tokenVerify:
     handler: billApi.jwtverify
     integration: lambda
-  addNotice:  #添加公告
-    handler: noticeApi.add
+  billFlow:  #玩家流水
+    handler: billApi.billFlow
     events:
       - http:
-          path: /notice/add
+          path: /player/bill/flow
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  billDetail:  #玩家账单详情
+    handler: billApi.billDetail
+    events:
+      - http:
+          path: /player/bill/detail
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  billGameRecord:  #玩家流水战绩
+    handler: billApi.billGameRecord
+    events:
+      - http:
+          path: /player/bill/record
           method: post
           cors: true
           authorizer: tokenVerify

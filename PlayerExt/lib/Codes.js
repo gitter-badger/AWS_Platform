@@ -12,12 +12,9 @@ export const CODES = {
     Frozen : 10006,
     merBalIns : 10007,
     palyerIns : 10008,
-    ipError : 10009,  //ip不正确
     TokenError : 11000,
     gameingError : 11001, //正在游戏中，不能转账
-    notGameing : 11005,   //玩家不在游戏中
-    merchantNotGame : 11006,  //商家没有游戏权限
-    timeError : 12001, //时间间隔错误
+    TokenExpire : 90001, //token过期
 
     playerRecordError : { //账单数据错误
       depositErr : 12000, //存点不正确
@@ -35,15 +32,21 @@ export const CODES = {
     DiamondsIns : 13006,   //N币不足
     notPros : 13007,   //不是道具包
 
+    noticeNotExist : 13100, //公告不存在
+    notAuth : 13101,  //没有权限
+    toolNotExist : 13102, //道具不存在
+    toolMoreThan : 13103,  //道具超过12个
+    emailNotExist : 13104, //邮件不存在
+    emailUpdateError:13105,  //邮件已经发送，不能修改
+    emailAlreadyAcceptError:13106,  //该邮件已经领取
+
     AgentNotExist : 14000,  //代理不存在
     NotAuth : 14001,  //没有权限
     AgentBalanceIns : 14002, //代理点数不足
     nicknameAlreadyExist : 14003,  //昵称已存在
     mixError : 14004,//洗码比有误
-    merchantForzen : 14005,  //商户已冻结
-    TokenExpire : 90001,  //token已过期
-    SignError : 90002,   //签名错误
-
+    gameKeyError : 15000, //游戏key错误
+    billNotExist : 15001, //bill不存在
 }
 
 const errorMessage = {
@@ -59,13 +62,11 @@ const errorMessage = {
   "10007" : "商家点数不足",
   "10008" : "玩家点数不足",
   "10009" : "无效的请求IP",
-  "11001" : "玩家正在游戏中,不能进行转账",
-  "11005" : "玩家不在游戏中!",
+  "11001" : "玩家正在游戏中",
   "12000" : "存点不正确",
   "12001" : "取点不正确",
   "12002" : "账单不匹配",
-  "12001" : "startTime不能大于endTime",
-  "12003" : "不是同一个用户提交",
+  "notSingleUser" : "不是同一个用户提交",
   "12004" : "记录不存在",
   "13000" : "道具不存在",
   "13001" : "金额不正确",
@@ -75,21 +76,27 @@ const errorMessage = {
   "13005" : "购买的不是N币",
   "13006" : "N币不足",
   "13007" : "购买的不是道具",
-  "14000" : "代理不存在",
+  "13100" : "公告不存在",
+  "13101" : "没有权限",
+  "13102" : "道具不存在",
+  "13103" : "道具超过12个",
+  "13104" : "邮件不存在",
+  "13105" : "邮件已经发送，不能修改",
+  "13106" : "该邮件已经领取",
+   "14000" : "代理不存在",
   "14001" : "你没有权限",
   "14002" : "你的点数不足",
   "14003" : "昵称已存在",
   "14004" : "洗码比有误",
-  "14005" : "商户已冻结",
+  "15000" : "游戏key错误",
   "90001" : "TOKEN已过期",
-  "90002" : "签名错误",
-  "11006" : "您的代理商/商户没有购买此游戏"
+  "15001" : "账单不存在"
 }
 
 
 export class CHeraErr{
   constructor(code){
-    this.code = code;
+    this.code = code || -1;
     this.msg = errorMessage[code.toString()];
   }
 }

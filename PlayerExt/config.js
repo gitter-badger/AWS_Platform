@@ -1,6 +1,6 @@
 export const TABLE_NAMES = {
     TABLE_USER : "HeraGamePlayer",
-    HeraGameRecord : "HeraGameRecord",
+    "HeraGameRecord" : "HeraGameRecord",
     BILL_USER : "HeraGamePlayerBill",
     BILL_DIAMOND_USER : "HeraGameDiamondBill",
     PLATFORM_BILL : "ZeusPlatformBill",
@@ -10,6 +10,5 @@ export const TABLE_NAMES = {
     TOOL_SEAT : "DianaPlatformSeat",
     PlayerBillDetail : "PlayerBillDetail",
     TABLE_PALYER_RECORD : "HeraGameRecord",
-    TOOL_PACKAGE : "DianaPlatformPackage",
-    ZeusPlatformLog :  "ZeusPlatformLog"
+    TOOL_PACKAGE : "DianaPlatformPackage"
 }

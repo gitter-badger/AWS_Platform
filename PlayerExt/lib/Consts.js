@@ -19,8 +19,18 @@ export const MSNStatusEnum ={
   Locked:2,
   Free: 0
 }
-export const ToolIdEnum = {
-  diamonds : "165353"
+export const ToolIdEnum  = {
+  diamonds : "100000"
+}
+// 展位类型枚举
+export const SeatTypeEnum = {
+  diamonds : "1",
+  tool : "2"
+}
+//展位内容枚举
+export const SeatContentEnum = {
+  package : "2",
+  tool : "1"
 }
 
 export const BillModel = {
@@ -34,12 +44,12 @@ export const BillModel = {
   operator: Model.StringValue
 }
 export const RoleCodeEnum = {
-  'SuperAdmin': '0',  //超级管理员
-  'PlatformAdmin': '1', //平台管理员
-  'Manager': '10',  //线路商
-  'Merchant': '100',  //商家
-  'Agent': '1000',   //代理
-  'Player': '10000'  //玩家
+  'SuperAdmin': '0',
+  'PlatformAdmin': '1',
+  'Manager': '10',
+  'Merchant': '100',
+  'Agent': '1000',
+  'Player': '10000'
 }
 
 // 游戏类型枚举
@@ -47,16 +57,6 @@ export const GameTypeEnum = {
   '10000': { code: '10000', name: '棋牌游戏', url: 'http://192.168.3.131/webadmin/public/admin/api/checkLoginAccess' },
   '40000': { code: '40000', name: '电子游戏', url: 'http://test.com' },
   '30000': { code: '30000', name: '真人视讯', url: 'http://146.88.71.30:8011/player/login' }
-}
-
-// 展位类型枚举
-export const SeatTypeEnum = {
-  diamonds : "1",
-  tool : "2"
-}
-export const SeatContentEnum = {
-  package : "2",
-  tool : "1"
 }
 const UserRole = {
   userId:Model.uuid(),

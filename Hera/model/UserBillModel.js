@@ -106,6 +106,11 @@ export class UserBillModel extends athena.BaseModel {
                     billId : this.sn || Util.uuid()
                 }
             ]
+        }else {
+            list.forEach((item) => {
+                item.originalAmount = item.preBalance,
+                delete item.preBalance
+            })
         }
         
         list.map((item) => {
@@ -113,48 +118,56 @@ export class UserBillModel extends athena.BaseModel {
             item.createdAt = +item.createdAt || 0;
             item.userName = this.userName;
             item.rate = this.rate || 0,
+            item.action = item.amount >=0 ? 1 : -1,
             item.mix = this.mix || -1;
         })
-        console.log("排序前");
-        console.log(list);
+ 
         list.sort((a, b) => {
             return a.createdAt - b.createdAt;
         })
-        console.log("排序后");
         console.log(list);
         //小汇总
-        let  betArray = [], reArray= [];
+        let  betArray = [], reArray= [], notDep = true;
         if(serial) {
+            console.log("1111111111111");
             list.forEach((item) => {
                 if(item.type == 3) {
                     let p = betArray.find((b) => {
-                        b.businessKey == item.businessKey;
+                        return b.businessKey == item.businessKey;
                     })
                     if(!p) {
-                        betArray.push({
+                        p = {
                             ...item,
                             sn : Util.billSerial(this.userId),
-                            type : 21
-                        })
-                        let reItem = list.find((p) => p.type == 4 && p.businessKey == item.businessKey) || {
-                            reAmount : 0,
-                            reTime : 0
-                        };
-                        Object.assign(item, {
-                            reAmount : reItem.amount,
-                            reTime : reItem.createdAt,
-                            setAmont : item.preBalance+ item.amount + reItem.amount //结算余额=带入余额
-                        })
+                            type : 21,
+                        }
+                        betArray.push(p)
+                        let reItem = list.find((p) => p.type == 4 && p.businessKey == item.businessKey);
+                        if(!reItem){
+                             notDep = false;
+                        }else {
+                            p.reAmount = reItem.amount; //返奖金额
+                            p.reTime = reItem.createdAt;//返奖时间
+                            p.balance = reItem.originalAmount + reItem.amount;
+                        }
+                        
                     }else {
-                       p.amount += item.amount
+                        console.log(66666);
+                       p.amount += item.amount; //下注金额
+                       if(!notDep) {
+                         p.reTime = item.createdAt; //返奖时间
+                         p.reAmount = 0;  //返奖金额
+                         p.balance = item.originalAmount + item.amount //结算金额
+                       }
                     }
 
                 }
              
             })
         }
-        console.log(betArray);
+        console.log("222222222222");
         new UserBillDetailModel().batchWrite(list.concat(betArray));
+        delete this.records;
         return super.save();
     }
     async handlerPoint(){

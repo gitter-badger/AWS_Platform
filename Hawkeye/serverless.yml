@@ -134,7 +134,6 @@ functions:
           path: /email/list
           method: post
           cors: true
-          authorizer: tokenVerify
   gameToolList :  #道具列表
     handler: emailApi.toolList
     events:
@@ -142,7 +141,6 @@ functions:
           path: /email/tool/list
           method: post
           cors: true
-          authorizer: tokenVerify
   toolList:  #道具列表
     handler: openApi_tool.toolList
     events:

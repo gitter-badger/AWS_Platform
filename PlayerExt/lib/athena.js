@@ -37,7 +37,9 @@ export class BaseModel{
         let item = {};
         for(let key in this){
             if(!Object.is(key, "dbClient") && !Object.is(key, "tableName")){
-                item[key] = this[key];
+                if(this[key] || this[key] ==0){
+                    item[key] = this[key];
+                }
             }
         }
         return item;
@@ -53,30 +55,6 @@ export class BaseModel{
             })
         })
     }
-    async get(conditions, returnValues = [],indexName,all){
-        let keyConditionExpression = "";
-        let expressionAttributeValues = {};
-        for(let key in conditions){
-            keyConditionExpression += `${key}=:${key} and `;
-            expressionAttributeValues[`:${key}`] = conditions[key];
-        }
-        keyConditionExpression = keyConditionExpression.substr(0, keyConditionExpression.length - 4);
-        let opts = {
-            KeyConditionExpression : keyConditionExpression,
-            ExpressionAttributeValues:expressionAttributeValues,
-            IndexName: indexName,
-            ReturnValues : returnValues.join(",")
-        }
-        let [err, array] = await this.promise("query", opts);
-        if(err) {
-            return [err, array]
-        }
-        if(all) {
-            return [null, array];
-        }
-        return [null, array[0]];
-    }
-
     update(key, updates){
         let keys = Object.keys(updates);
         let values = Object.values(updates);
@@ -103,185 +81,44 @@ export class BaseModel{
             });
         })
     }
-    async scan(conditions){
-        let filterExpression = "";
-        let expressionAttributeValues = {};
-        let expressionAttributeNames = {};
-        for(let key in conditions){
-            filterExpression += `#${key}=:${key} and `;
-            expressionAttributeValues[`:${key}`] = conditions[key];
-            expressionAttributeNames[`#${key}`]  = key;
-        }
-        let scanOpts = {};
-        if(filterExpression.length!=0){
-            filterExpression = filterExpression.substr(0, filterExpression.length-4);
-            scanOpts = {
-                FilterExpression : filterExpression,
-                ExpressionAttributeNames : expressionAttributeNames,
-                ExpressionAttributeValues:expressionAttributeValues
-            }
-        }
-        return this.promise("scan", scanOpts);
-    }
-    async scanByOpts(scanOpts){
-        return this.promise("scan", scanOpts);
-        // return new Promise((reslove, reject) => {
-        //     this.db$("scan", scanOpts).then((result) => {
-        //         result = result || {};
-        //         result.Items = result.Items || [];
-        //         return reslove([null, result.Items || []]);
-        //     }).catch((err) => {
-        //         console.log(111);
-        //         console.log(err);
-        //         return reslove([new AError(CODES.DB_ERROR, err.stack), []]);
-        //     });
-        // })
-    }
-    /**
-     * 1,搜索满足的所有记录(只返回排序键)
-     * 2，排好序后根据排序条件继续搜索
-     * @param {*} pageNumber 
-     * @param {*} pageSize 
-     * @param {*} conditions 
-     * @param {*} returnValues 
-     * @param {*} sortkey 
-     * @param {*} sort 
-     */
-    async page(conditions = {}, pageNumber, pageSize,  sortkey, sort, returnValues = []) {
-        let page = {
-            pageNumber,
-            pageSize
-        }
-        let opts = this.buildQueryParams(conditions);
-        //得到总数
-        let [countError, count] = await this.pageCount(opts);
-        if(countError) return [countError, page];
-        page.total = count;
-        //找到满足所有条件的记录的排序键
-        opts.ProjectionExpression = sortkey;
-        let [sortKeysErr, sortList] = await this.scanByOpts(opts);
-        if(sortKeysErr)  return [sortKeysErr, null];
-        //排序
-        let sortKeys = sortList.map((item) => item[sortkey]);
-        sortKeys.sort();
-        if(sort == "des") { //降序
-            sortKeys.reverse();
-        }
-        let conditionKeys = sortKeys.slice((pageNumber-1)*pageSize, pageNumber*pageSize);
-        page.pageSize = conditionKeys.length;
-        if(conditionKeys.length > 0) conditions[sortkey] = {"$in": conditionKeys};
-        opts = this.buildQueryParams(conditions);
-        //找到满足所有条件的记录
-        if(returnValues.length > 0) {
-            opts.ProjectionExpression = returnValues.join(",");
-        }else {
-            delete opts.ProjectionExpression
-        }
-     
-        let [listErr, list] = await this.scanByOpts(opts);
-        if(listErr) {
-            return [listErr, page]
-        }
-        page.list = list;
-        return [sortKeysErr, page];
-    }
-    /**
-     * 组建查询参数
-     * @param {*} conditions 
-     */
-    buildQueryParams(conditions) {
-        let keys = Object.keys(conditions),
-            opts = {
-
-            };
-        if(keys.length > 0) {
-            opts.FilterExpression = "";
-            opts.ExpressionAttributeValues = {};
-            opts.ExpressionAttributeNames = {};
-        }
-        keys.forEach((k, index) => {
-            let pro = conditions[k];
-            let value = pro,
-                array = false;
-            if(Object.is(typeof pro, "object")){
-                for(let key in pro) {
-                    value = pro[key];
-                    switch (key) {
-                        case "$like": {
-                            opts.FilterExpression += `contains(#${k}, :${k})`;
-                            break;
-                        }
-                        case "$in" : {
-                            array = true;
-                            opts.ExpressionAttributeNames[`#${k}`] = k;
-                            for(let i = 0; i < value.length; i ++){
-                                if(i == 0)opts.FilterExpression += "(";
-                                opts.FilterExpression += `#${k} = :${k}${i}`;
-                                if(i != value.length -1) {
-                                    opts.FilterExpression += " or ";
-                                }
-                                if(i == value.length -1) {
-                                    opts.FilterExpression += ")";
-                                }
-                                opts.ExpressionAttributeValues[`:${k}${i}`] = value[i];
-                            }
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }else {
-                opts.FilterExpression += `#${k} = :${k}`;
-            }
-            if(!array) {
-                opts.ExpressionAttributeValues[`:${k}`] = value;
-                opts.ExpressionAttributeNames[`#${k}`] = k;
-            }
-            if(index != keys.length -1) opts.FilterExpression += " and ";
-        });
-        return opts;
-    }
-    async last({skip, conditions, returnValues, indexName,lastRecord}){
-        let maxLimit = skip;
+    remove(key) {
         let opts = {
-            IndexName : indexName,
-            LastEvaluatedKey : lastRecord,
-            Limit : skip, 
-            ProjectionExpression : Object.is(returnValues.length, 0) ? "" : 
-                returnValues.join(", "),
-            KeyConditionExpression :"",
-            ExpressionAttributeValues : {}
-        }
-        keys.forEach((k, index) => {
-            let equalMode = " = ",
-                value = conditions[k];
-            opts.KeyConditionExpression += `${k}${equalMode}:${k}`;
-            opts.ExpressionAttributeValues[`:${k}`] = value;
-            if(index != keys.length -1) opts.KeyConditionExpression += " and ";
-        });
-
-        return new Promise((reslove, reject)=>{
-            this.db$("query", opts).then((result) => {
-                reslove([null, result.LastEvaluatedKey])
-            }).catch((err) => {
-                console.log(err);
-                reslove([new AError(CODES.DB_ERROR, err.stack)], null);
-            })
-        })
-    }
-    pageCount(opts) {
-        opts.Select = "COUNT";
+            Key:key,
+        };
         return new Promise((reslove, reject) => {
-            this.db$("scan", opts).then((result) => {
-                reslove([null, result.Count]);
-                delete opts.Select;
+            this.db$("delete", opts).then((result) =>{
+                reslove([null, result]);
             }).catch((err) => {
                 console.log(err);
-                delete opts.Select;
-                reslove([new AError(CODES.DB_ERROR, err.stack), null]);
+                return reslove([new AError(CODES.DB_ERROR, err.stack), null]);
             });
         })
     }
+    async get(conditions, returnValues = [],indexName,all){
+        let keyConditionExpression = "";
+        let expressionAttributeValues = {};
+        for(let key in conditions){
+            keyConditionExpression += `${key}=:${key} and `;
+            expressionAttributeValues[`:${key}`] = conditions[key];
+        }
+        keyConditionExpression = keyConditionExpression.substr(0, keyConditionExpression.length-4);
+        let opts = {
+            // Key:key,
+            KeyConditionExpression : keyConditionExpression,
+            ExpressionAttributeValues:expressionAttributeValues,
+            IndexName: indexName,
+            ProjectionExpression : returnValues.join(",")
+        }
+        let [err, array] = await this.promise("query", opts);
+        if(err) {
+            return [err, array]
+        }
+        if(all) {
+            return [null, array];
+        }
+        return [null, array[0]];
+    }
+ 
     count(filterExpression, expressionAttributeValues){
         return new Promise((reslove, reject) => {
             this.db$("query", {
@@ -297,7 +134,26 @@ export class BaseModel{
         })
        
     }
-   
+    async scan(conditions){
+        let filterExpression = "";
+        let expressionAttributeNames = {};
+        let expressionAttributeValues = {};
+        for(let key in conditions){
+            filterExpression += `#${key}=:${key} and `;
+            expressionAttributeNames[`#${key}`] = `${key}`;
+            expressionAttributeValues[`:${key}`] = conditions[key];
+        }
+        let scanOpts = {};
+        if(filterExpression.length!=0){
+            filterExpression = filterExpression.substr(0, filterExpression.length-4);
+            scanOpts = {
+                FilterExpression : filterExpression,
+                ExpressionAttributeNames : expressionAttributeNames,
+                ExpressionAttributeValues:expressionAttributeValues
+            }
+        }
+        return this.promise("scan", scanOpts);
+    }
     isExist(key){
         return new Promise((reslove, reject) => {
             this.db$("get",{Key:key}).then((result) => {
@@ -316,8 +172,8 @@ export class BaseModel{
 }
 
 class Page{
-    constructor(curPage, pageSize){
-        this.curPage = curPage;
+    constructor(pageNumber, pageSize){
+        this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.total = 0;
         this.data = [];
@@ -350,7 +206,7 @@ export class Util{
                 if (min && strLength < min) error = true;
                 if (max && strLength > max) error = true;
                 if (equal) error = !Object.is(value, equal);
-                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, value];
+                return error ? [new AError(CODES.INPARAM_ERROR), null] : [null, value.toString().trim()];
             }
             case "N": {
                 if (!value && value !== 0) return [new AError(CODES.INPARAM_ERROR), null];

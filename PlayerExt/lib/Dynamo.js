@@ -16,24 +16,36 @@ const db$ = (action,params)=>{
 // table names
 const ZeusPlatformUser = 'ZeusPlatformUser'
 const ZeusPlatformRole = 'ZeusPlatformRole'
-const ZeusPlatformPlayer = 'ZeusPlatformPlayer'
+const HeraGamePlayer = 'HeraGamePlayer'
 const ZeusPlatformBill = 'ZeusPlatformBill'
 const ZeusPlatformGame = 'DianaPlatformGame'
 const ZeusPlatformMSN = 'ZeusPlatformMSN'
+const HawkeyeGameNotice = 'HawkeyeGameNotice'
+const DianaPlatformTool = 'DianaPlatformTool'
+const HawkeyeGameEmail = 'HawkeyeGameEmail'
+const HeraGameDiamondBill = 'HeraGameDiamondBill'
+const HawkeyePlayerEmailRecord = "HawkeyePlayerEmailRecord"
+const HulkPlatformAd = "HulkPlatformAd"
+const SYSConfig = "SYSConfig"
 const HeraGameRecord = "HeraGameRecord"
 const SYSToken = 'SYSToken'
-const UserOnlineRecord = "UserOnlineRecord"
 
 export const Tables = {
   ZeusPlatformUser,
+  HeraGameDiamondBill,
   ZeusPlatformRole,
-  ZeusPlatformPlayer,
+  HeraGamePlayer,
   ZeusPlatformBill,
   ZeusPlatformGame,
   ZeusPlatformMSN,
+  HawkeyeGameNotice,
+  DianaPlatformTool,
+  HawkeyeGameEmail,
+  HawkeyePlayerEmailRecord,
+  HulkPlatformAd,
+  SYSConfig,
   HeraGameRecord,
-  SYSToken,
-  UserOnlineRecord
+  SYSToken
 }
 
 
@@ -59,9 +71,9 @@ export const Model = {
     if (!e || (!e.requestContext.authorizer && !e.headers.Authorization)) {
       return [new CHeraErr(CODES.TokenError),0]
     }
-    // if (e.requestContext.authorizer.principalId == -1) {
-    //   return [new CHeraErr(CODES.TokenExpire),0]
-    // }
+    if (e.requestContext.authorizer.principalId == -1) {
+      return [new CHeraErr(CODES.TokenExpire),0]
+    }
     if(!e.headers.Authorization) {
       return [0, e.requestContext.authorizer]
     }else {
