@@ -82,7 +82,7 @@ export class Util{
     static uuid(){
         return uid();
     }
-    static billSerial(userId){
+    static billSerial(userId, num =0){
         let date = new Date();
         function twoNumber(num){
             return num>9 ? num +"" : "0"+num;
@@ -92,6 +92,6 @@ export class Util{
             timestramp += "0" + timestramp;
         }
         date.setHours(date.getHours()+8)
-        return date.getFullYear()+twoNumber(date.getMonth()+1)+twoNumber(date.getDate()) + userId+ timestramp
+        return date.getFullYear()+twoNumber(date.getMonth()+1)+twoNumber(date.getDate()) + userId+ (timestramp+num)
     }
 }

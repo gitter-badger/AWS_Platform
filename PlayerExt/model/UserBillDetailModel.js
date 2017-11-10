@@ -91,6 +91,8 @@ export class UserBillDetailModel extends athena.BaseModel {
                     opts.FilterExpression = "amount<:amount2"
                     opts.ExpressionAttributeValues[":amount2"] = 0;
                 }
+            }else {
+                opts.FilterExpression = opts.FilterExpression.substring(0, opts.FilterExpression.length-4);
             }
         }
         return new Promise((reslove, reject) => {
@@ -111,9 +113,12 @@ export class UserBillDetailModel extends athena.BaseModel {
             IndexName : "BillIdIndex",
             ScanIndexForward :false,
             KeyConditionExpression : "billId=:billId",
-            ProjectionExpression : ["sn", "createdAt","originalAmount","amount","reAmount","reTime","rat","mix","balance"].join(","),
+            ProjectionExpression : ["sn", "createdAt","originalAmount","amount","reAmount","reTime","rat","mix","balance","#type","businessKey"].join(","),
             ExpressionAttributeValues : {
                 ":billId":billId
+            },
+            ExpressionAttributeNames : {
+                "#type":"type"
             }
         }
         return new Promise((reslove, reject) => {
