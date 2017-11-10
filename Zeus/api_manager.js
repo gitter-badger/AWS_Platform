@@ -39,9 +39,11 @@ const managerList = async (e, c, cb) => {
     // 是否需要按照余额排序
     if (inparam.sortkey && inparam.sortkey == 'balance') {
       ret = _.sortBy(ret, [inparam.sortkey])
+      if (inparam.sort == "desc") { ret = ret.reverse() }
     }
     return ResOK(cb, { payload: ret })
   } catch (error) {
+    console.info(error)
     return ResErr(cb, error)
   }
 }
