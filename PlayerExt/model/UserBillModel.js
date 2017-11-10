@@ -11,7 +11,8 @@ import {Model} from "../lib/Dynamo"
 
 
 export class UserBillModel extends athena.BaseModel {
-    constructor({originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
+    constructor({gameId,originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, 
+        fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
         this.billId = Util.billSerial(userId);
         this.userId = +userId
@@ -28,8 +29,9 @@ export class UserBillModel extends athena.BaseModel {
         this.createAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
-        this.seatInfo = seatInfo;
-        this.kindId = kindId || -1;  //-1表示中心钱包的 -2代理操作点数 -3购买N币
+        this.seatInfo = seatInfo || Model.StringValue;
+        this.kindId = kindId || -1;  //-1表示中心钱包的 -2初始点数 -3商城的
+        this.gameId = gameId || -1;
         this.toolId = toolId || -1;
         this.toolName = toolName || Model.StringValue;
         this.type = type;
@@ -46,6 +48,9 @@ export class UserBillModel extends athena.BaseModel {
             if(amount < 0) this.amount = -amount;
         }
     }
+    setBillId(userId) {
+        this.billId = Util.billSerial(userId);
+    }
     async getBalance(){
         let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], "userNameIndex", true);
         if(err) return [err, 0];
@@ -61,23 +66,18 @@ export class UserBillModel extends athena.BaseModel {
     async list(userName, gameId){
         let scanParams = {
             TableName : this.tableName,
-            FilterExpression : "userName=:userName ",
+            ScanIndexForward : false,
+            LastEvaluatedKey : null,
+            KeyConditionExpression : "userName=:userName",
             ExpressionAttributeValues : {
                 ":userName" : userName
             }
         }
         if(gameId) {
-            scanParams.FilterExpression +="and gameId=:gameId";
+            scanParams.FilterExpression ="gameId=:gameId";
             scanParams.ExpressionAttributeValues[":gameId"] = gameId;
         }
-        
-        return new Promise((reslove, reject) => {
-            this.db$("scan", scanParams).then((result)=>{
-                return reslove([null, result.Items]);
-            }).catch((error) => {
-                return reslove([error, 0]);
-            })
-        })
+        return this.promise("query", scanParams);
     }
     async getBalanceByUid(userId){
         let [err, records] = await this.get({userId}, ["userName","amount","userId"], "userIdIndex", true);
@@ -93,29 +93,30 @@ export class UserBillModel extends athena.BaseModel {
     carryPoint(){
         return super.save();
     }
-    async save(){
+    save(){
         //写入账单明细
-        let seatInfo = this.seatInfo;
-        let item = {
-            ...this.setProperties(),
-            num : seatInfo.sum,
-            prop : seatInfo.prop,
-            price : seatInfo.price,
-            seatId : seatInfo.seatId,
-            businessKey : this.billId,
-            amount : this.amount,
-            type : this.type + 10,
-            sn : this.sn || Util.billSerial(this.userId),
-            createdAt : +this.createAt
+        let list = this.records || [];
+        if(list.length ==0) {
+            list = [
+                {
+                    ...this.setProperties(),
+                    createdAt : this.createAt,
+                    type : this.type + 10,
+                    billId : this.sn || Util.uuid()
+                }
+            ]
         }
-        delete this.seatInfo;
-        let userBillDetailModel = new UserBillDetailModel();
-        Object.assign(userBillDetailModel, item);
-        let [detailErr] = await userBillDetailModel.save();
-        if(detailErr) {
-            console.log("购买房卡写入明细发生错误");
-            console.log(detailErr);
-        }
+        
+        list.map((item) => {
+            item.billId = this.billId;
+            item.createdAt = +item.createdAt || 0;
+            item.userName = this.userName;
+            item.rate = this.rate || 0,
+            item.mix = this.mix || -1;
+        })
+        console.log(this.setProperties());
+        console.log("111111111111111111111111");
+        // new UserBillDetailModel().batchWrite(list);
         return super.save();
     }
     async handlerPoint(){

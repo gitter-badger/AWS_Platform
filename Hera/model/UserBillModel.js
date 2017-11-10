@@ -95,8 +95,9 @@ export class UserBillModel extends athena.BaseModel {
     }
     save(){
         //写入账单明细
-        let list = this.records || [];
+        let list = this.records || [], serial = true;
         if(list.length ==0) {
+            serial = false;
             list = [
                 {
                     ...this.setProperties(),
@@ -105,6 +106,11 @@ export class UserBillModel extends athena.BaseModel {
                     billId : this.sn || Util.uuid()
                 }
             ]
+        }else {
+            list.forEach((item) => {
+                item.originalAmount = item.preBalance,
+                delete item.preBalance
+            })
         }
         
         list.map((item) => {
@@ -112,11 +118,56 @@ export class UserBillModel extends athena.BaseModel {
             item.createdAt = +item.createdAt || 0;
             item.userName = this.userName;
             item.rate = this.rate || 0,
+            item.action = item.amount >=0 ? 1 : -1,
             item.mix = this.mix || -1;
         })
-        console.log(this.setProperties());
-        console.log("111111111111111111111111");
-        // new UserBillDetailModel().batchWrite(list);
+ 
+        list.sort((a, b) => {
+            return a.createdAt - b.createdAt;
+        })
+        console.log(list);
+        //小汇总
+        let  betArray = [], reArray= [], notDep = true;
+        if(serial) {
+            console.log("1111111111111");
+            list.forEach((item) => {
+                if(item.type == 3) {
+                    let p = betArray.find((b) => {
+                        return b.businessKey == item.businessKey;
+                    })
+                    if(!p) {
+                        p = {
+                            ...item,
+                            sn : Util.billSerial(this.userId),
+                            type : 21,
+                        }
+                        betArray.push(p)
+                        let reItem = list.find((p) => p.type == 4 && p.businessKey == item.businessKey);
+                        if(!reItem){
+                             notDep = false;
+                        }else {
+                            p.reAmount = reItem.amount; //返奖金额
+                            p.reTime = reItem.createdAt;//返奖时间
+                            p.balance = reItem.originalAmount + reItem.amount;
+                        }
+                        
+                    }else {
+                        console.log(66666);
+                       p.amount += item.amount; //下注金额
+                       if(!notDep) {
+                         p.reTime = item.createdAt; //返奖时间
+                         p.reAmount = 0;  //返奖金额
+                         p.balance = item.originalAmount + item.amount //结算金额
+                       }
+                    }
+
+                }
+             
+            })
+        }
+        console.log("222222222222");
+        new UserBillDetailModel().batchWrite(list.concat(betArray));
+        delete this.records;
         return super.save();
     }
     async handlerPoint(){

@@ -191,12 +191,8 @@ async function playerBuyProp(event, context, callback) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.palyerIns)));
   }
 
-  //查账
-  let [oriError, oriSumBalance] = await userBillModel.getBalance();
-  if(oriError) {
-    return callback(null, ReHandler.fail(oriError));
-  }
-  userBillModel.originalAmount = oriSumBalance;
+  userBillModel.originalAmount = balance;
+  userBillModel.balance = balance - actualAmount;
   //保存账单
   let [uSaveErr] = await userBillModel.save();
   if(uSaveErr) {
@@ -205,21 +201,21 @@ async function playerBuyProp(event, context, callback) {
 
   //更新余额
   let u = new UserModel(); 
-  let [updatebError] = await u.update({userName:userModel.userName},{balance : +(oriSumBalance-actualAmount).toFixed(2)});
+  let [updatebError] = await u.update({userName:userModel.userName},{balance : +(balance-actualAmount).toFixed(2)});
   if(updatebError) return callback(null, ReHandler.fail(updatebError));
 
   callback(null, ReHandler.success({
-      data :{balance : +(oriSumBalance-actualAmount).toFixed(2)}
+      data :{balance : +(balance-actualAmount).toFixed(2)}
   }));
   let obj = {
     userId : userId,
     userName : userModel.userName,
     gameId : "1",  //商城
     gameType : 1,
-    betId : Util.uuid(),
+    betId : userBillModel.billId,
     betTime : Date.now(),
     parentId : merchantModel.userId,
-    type : 2, //购买钻石
+    type : 2, //购买房卡
     amount : -actualAmount,
     remark : remark
   }

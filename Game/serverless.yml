@@ -364,7 +364,7 @@ resources:
         TableName: PlayerBillDetail
         AttributeDefinitions:
           -
-            AttributeName: billId
+            AttributeName: sn
             AttributeType: S
           -
             AttributeName: userName
@@ -372,13 +372,13 @@ resources:
           -
             AttributeName: createdAt
             AttributeType: N
-        KeySchema:
           -
             AttributeName: billId
-            KeyType: HASH
+            AttributeType: S
+        KeySchema:
           -
-            AttributeName: createdAt
-            KeyType: RANGE
+            AttributeName: sn
+            KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
           WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
@@ -388,6 +388,20 @@ resources:
             KeySchema:
               -
                 AttributeName: userName
+                KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          -
+            IndexName: BillIdIndex
+            KeySchema:
+              -
+                AttributeName: billId
                 KeyType: HASH
               -
                 AttributeName: createdAt
