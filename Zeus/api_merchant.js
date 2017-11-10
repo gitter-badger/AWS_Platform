@@ -16,7 +16,7 @@ const merchantList = async (e, c, cb) => {
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 列表页搜索和排序查询
-    const [err, ret] = await new MerchantModel().page(token, inparam)
+    let [err, ret] = await new MerchantModel().page(token, inparam)
     if (err) { return ResErr(cb, err) }
     // 查询每个用户余额
     for (let user of ret) {

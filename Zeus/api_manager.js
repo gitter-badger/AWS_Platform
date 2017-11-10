@@ -20,7 +20,7 @@ const managerList = async (e, c, cb) => {
       return ResErr(cb, BizErr.TokenErr('只有管理员/线路商有权限'))
     }
     // 列表页搜索和排序查询
-    const [err, ret] = await new ManagerModel().page(token, inparam)
+    let [err, ret] = await new ManagerModel().page(token, inparam)
     // 结果返回
     if (err) { return ResErr(cb, err) }
     // 查询每个用户余额 
