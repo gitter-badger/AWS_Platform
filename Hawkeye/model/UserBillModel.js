@@ -104,6 +104,7 @@ export class UserBillModel extends athena.BaseModel {
             seatId : seatInfo.seatId,
             businessKey : this.billId,
             amount : this.amount,
+            balance : this.originalAmount + this.amount,
             type : this.type + 10,
             sn : this.sn || Util.billSerial(this.userId),
             createdAt : +this.createAt
@@ -111,6 +112,7 @@ export class UserBillModel extends athena.BaseModel {
         delete this.seatInfo;
         let userBillDetailModel = new UserBillDetailModel();
         Object.assign(userBillDetailModel, item);
+        console.log(userBillDetailModel);
         let [detailErr] = await userBillDetailModel.save();
         if(detailErr) {
             console.log("购买房卡写入明细发生错误");

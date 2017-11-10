@@ -1,6 +1,6 @@
 {
-    "body": {"userId":"145537","seatId":"3b6eba8d-5ed5-487a-9640-28227c329385","num":"1","amount":"1350.000000","kindId":"-1"},
+    "body": {"userId":"317410","seatId":"3b6eba8d-5ed5-487a-9640-28227c329385","num":"1","amount":"1350.000000","kindId":"-1"},
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNUMDFfUk9UVEEyOSIsInN1ZmZpeCI6IkNUMDEiLCJ1c2VySWQiOjE0NTUzNywiaWF0IjoxNTEwMDM3ODU4fQ.dCiAkSJ8aqSkh1O0yfFCSsZUEaPoKm6GpK5j4pamXok"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNUMDFfY2hlbndlbiIsInN1ZmZpeCI6IkNUMDEiLCJ1c2VySWQiOjMxNzQxMCwiaWF0IjoxNTEwMjIzMTUxfQ.QKR7IKB7OPsJqDSuYnPijHkOmOxLwLFvv7cKZBKOuqU"
     }
 }

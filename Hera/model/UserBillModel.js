@@ -103,7 +103,9 @@ export class UserBillModel extends athena.BaseModel {
                     ...this.setProperties(),
                     createdAt : this.createAt,
                     type : this.type + 10,
-                    billId : this.sn || Util.uuid()
+                    sn : this.sn || Util.billSerial(this.userId),
+                    balance : this.originalAmount + this.amount,
+                    createdAt : +this.createAt
                 }
             ]
         }else {
@@ -117,9 +119,10 @@ export class UserBillModel extends athena.BaseModel {
             item.billId = this.billId;
             item.createdAt = +item.createdAt || 0;
             item.userName = this.userName;
-            item.rate = this.rate || 0,
-            item.action = item.amount >=0 ? 1 : -1,
+            item.rate = this.rate || 0;
+            item.action = item.amount >=0 ? 1 : -1;
             item.mix = this.mix || -1;
+            item.balance = item.originalAmount + item.amount;
         })
  
         list.sort((a, b) => {
@@ -129,7 +132,6 @@ export class UserBillModel extends athena.BaseModel {
         //小汇总
         let  betArray = [], reArray= [], notDep = true;
         if(serial) {
-            console.log("1111111111111");
             list.forEach((item) => {
                 if(item.type == 3) {
                     let p = betArray.find((b) => {
@@ -166,6 +168,8 @@ export class UserBillModel extends athena.BaseModel {
             })
         }
         console.log("222222222222");
+        console.log(list);
+        console.log(betArray);
         new UserBillDetailModel().batchWrite(list.concat(betArray));
         delete this.records;
         return super.save();

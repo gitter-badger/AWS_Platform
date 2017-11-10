@@ -363,7 +363,10 @@ export async function handlerBill(event, context, cb){
         let uuid = Util.billSerial(user.userId);
         return {
             userId : user.userId,
+            userName : user.userName,
             amount : user.balance,
+            balance : user.balance,
+            originalAmount : user.originalAmount,
             createdAt : Date.now(),
             action : 1,
             remark : "系统升级原账结余",

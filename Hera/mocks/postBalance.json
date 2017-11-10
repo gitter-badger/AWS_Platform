@@ -1,9 +1,13 @@
 {
-    "body": "{ \"amount\":\"2\",  \"action\":\"-1\", \"buId\":\"769036\"}",
+    "body": { 
+        "buId" : "769036",  
+        "amount": "1",
+        "action" : "-1"
+    },
     "pathParameters" : {
-            "userName" : "ROTTA29"
+            "userName" : "chenwen"
     },
     "headers":{
-        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNUMDFfUk9UVEEyOSIsInN1ZmZpeCI6IkNUMDEiLCJ1c2VySWQiOjE0NTUzNywiaWF0IjoxNTEwMjE3MjM4fQ.xEnRrmxViyqq3Ppy5Grgled0LUg8QoahxN8BIIpJZx4"
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkNUMDFfY2hlbndlbiIsInN1ZmZpeCI6IkNUMDEiLCJ1c2VySWQiOjMxNzQxMCwiaWF0IjoxNTEwMjIzMTUxfQ.QKR7IKB7OPsJqDSuYnPijHkOmOxLwLFvv7cKZBKOuqU"
     }
 }
