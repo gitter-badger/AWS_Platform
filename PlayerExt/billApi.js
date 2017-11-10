@@ -154,11 +154,11 @@ const billDetail = async(event, context, cb) => {
       userName : billInfo.userName,  //用户名
       joinTime : billInfo.joinTime || 0,  //进入时间
       createdAt : billInfo.createAt,   //退出时间（结算时间）
-      avgRTP : 0,  
+      avgRTP : +depSumAmount/(-sumAmount).toFixed(2),  
       sumAmount : sumAmount , //下注总额
       reSumAmount, //返还金额
       depSumAmount, //利润总额
-      mixNum   //洗马量
+      mixNum :reSumAmount  //洗马量
     }
   }
   let returnArr = list.map((item) => {

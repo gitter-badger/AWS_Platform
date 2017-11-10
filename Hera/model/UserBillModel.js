@@ -110,11 +110,10 @@ export class UserBillModel extends athena.BaseModel {
             ]
         }else {
             list.forEach((item) => {
-                item.originalAmount = item.preBalance,
+                item.originalAmount = +((+item.preBalance).toFixed(2)),
                 delete item.preBalance
             })
         }
-        
         list.map((item) => {
             item.billId = this.billId;
             item.createdAt = +item.createdAt || 0;
@@ -122,25 +121,33 @@ export class UserBillModel extends athena.BaseModel {
             item.rate = this.rate || 0;
             item.action = item.amount >=0 ? 1 : -1;
             item.mix = this.mix || -1;
-            item.balance = item.originalAmount + item.amount;
+            item.balance = +(item.originalAmount + item.amount).toFixed(2);
         })
  
         list.sort((a, b) => {
             return a.createdAt - b.createdAt;
         })
-        console.log(list);
         //小汇总
         let  betArray = [], reArray= [], notDep = true;
+        function findBet(array, b) {
+            for(let i =0; i <array.length;i ++) {
+                let item = array[i];
+                if(item.businessKey == b.businessKey) {
+                    return item;
+                }
+            }
+        }
+      
         if(serial) {
-            list.forEach((item) => {
+            list.forEach((item, index) => {
                 if(item.type == 3) {
-                    let p = betArray.find((b) => {
-                        return b.businessKey == item.businessKey;
-                    })
+                    console.log(betArray);
+                    // let p = findBet(betArray, item);
+                    let p = betArray.find((b) => b.businessKey == item.businessKey)
                     if(!p) {
                         p = {
                             ...item,
-                            sn : Util.billSerial(this.userId),
+                            sn : Util.billSerial(this.userId, index),
                             type : 21,
                         }
                         betArray.push(p)
@@ -150,27 +157,23 @@ export class UserBillModel extends athena.BaseModel {
                         }else {
                             p.reAmount = reItem.amount; //返奖金额
                             p.reTime = reItem.createdAt;//返奖时间
-                            p.balance = reItem.originalAmount + reItem.amount;
+                            p.balance = +(reItem.originalAmount + reItem.amount).toFixed(2);
                         }
                         
                     }else {
-                        console.log(66666);
                        p.amount += item.amount; //下注金额
                        if(!notDep) {
                          p.reTime = item.createdAt; //返奖时间
                          p.reAmount = 0;  //返奖金额
-                         p.balance = item.originalAmount + item.amount //结算金额
+                         p.balance = +(item.originalAmount + item.amount).toFixed(2) //结算金额
                        }
                     }
-
                 }
              
             })
         }
-        console.log("222222222222");
-        console.log(list);
-        console.log(betArray);
-        new UserBillDetailModel().batchWrite(list.concat(betArray));
+        list = list.concat(betArray);
+        new UserBillDetailModel().batchWrite(list);
         delete this.records;
         return super.save();
     }
