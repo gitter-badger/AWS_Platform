@@ -85,16 +85,17 @@ export class UserBillDetailModel extends athena.BaseModel {
             if(action) {
                 action += action;
                 if(action > 0) {
-                    opts.FilterExpression = "amount>:amount1";
+                    opts.FilterExpression += "amount>:amount1";
                     opts.ExpressionAttributeValues[":amount1"] = -0.00001;
                 }else {
-                    opts.FilterExpression = "amount<:amount2"
+                    opts.FilterExpression += "amount<:amount2"
                     opts.ExpressionAttributeValues[":amount2"] = 0;
                 }
             }else {
                 opts.FilterExpression = opts.FilterExpression.substring(0, opts.FilterExpression.length-4);
             }
         }
+        console.log(opts);
         return new Promise((reslove, reject) => {
             this.db$("query", opts).then((result) => {
                 reslove([null, result.Items]);
