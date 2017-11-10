@@ -32,14 +32,14 @@ const ResFail = (callback, res) => {
  * @param {*} cb 
  */
 const billFlow = async(event, context, cb) => {
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-    return ResFail(cb, tokenErr)
-  }
-  const [e, tokenInfo] = await JwtVerify(token[1])
-  if(e) {
-    return ResFail(cb, e)
-  }
+  // const [tokenErr, token] = await Model.currentToken(event);
+  // if (tokenErr) {
+  //   return ResFail(cb, tokenErr)
+  // }
+  // const [e, tokenInfo] = await JwtVerify(token[1])
+  // if(e) {
+  //   return ResFail(cb, e)
+  // }
    //检查参数是否合法
   console.log(event.body);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
@@ -71,9 +71,21 @@ const billFlow = async(event, context, cb) => {
   }
   for(let i = 0; i < list.length; i++) {
     let item = list[i];
-    if(item.type == 21) {
+    list[i] = buildObj(item);
+    if(item.type == 21 || item.type ==1 || item.type==2) {
       list.splice(i, 1);
       i --;
+    }
+  }
+  function buildObj(item) {
+    return {
+      sn : item.sn,
+      createdAt : item.createdAt,
+      type : item.type,
+      businessKey : item.businessKey || "",
+      originalAmount : item.originalAmount || "",
+      balance : item.balance || "",
+      amount : item.amount
     }
   }
   ResOK(cb, {list:list});
@@ -85,14 +97,14 @@ const billFlow = async(event, context, cb) => {
  * @param {*} cb 
  */
 const billDetail = async(event, context, cb) => {
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-    return ResFail(cb, tokenErr)
-  }
-  const [e, tokenInfo] = await JwtVerify(token[1])
-  if(e) {
-    return ResFail(cb, e)
-  }
+  // const [tokenErr, token] = await Model.currentToken(event);
+  // if (tokenErr) {
+  //   return ResFail(cb, tokenErr)
+  // }
+  // const [e, tokenInfo] = await JwtVerify(token[1])
+  // if(e) {
+  //   return ResFail(cb, e)
+  // }
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
   if(parserErr) {
       return ResFail(cb, parserErr);
@@ -128,22 +140,45 @@ const billDetail = async(event, context, cb) => {
   depSumAmount = sumAmount + reSumAmount;
   //根据billId查询账单
   let billModel = new UserBillModel();
-  let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt"], "billIdIndex");
+  let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt","amount"], "billIdIndex");
   if(billInfoErr) {
     return cb(null, ReHandler.fail(billInfoErr));
   }
   if(!billInfo) {
-    return cb(null, ReHandler.fail(CODES.billNotExist));
+    return cb(null, ReHandler.fail(new CHeraErr(CODES.billNotExist)));
   }
-  Object.assign(billInfo, {
-    reSumAmount,
-    sumAmount,
-    depSumAmount,
-    mix
+  billInfo = buildBillInfo();
+  function buildBillInfo(){
+    return {
+      billId: billInfo.billId,  //账单ID
+      userName : billInfo.userName,  //用户名
+      joinTime : billInfo.joinTime || 0,  //进入时间
+      createdAt : billInfo.createAt,   //退出时间（结算时间）
+      avgRTP : 0,  
+      sumAmount : sumAmount , //下注总额
+      reSumAmount, //返还金额
+      depSumAmount, //利润总额
+      mixNum   //洗马量
+    }
+  }
+  let returnArr = list.map((item) => {
+    return {
+      sn : item.sn,
+      createdAt : item.createdAt,
+      originalAmount : item.originalAmount,  //账前余额
+      amount : item.amount,   //下注金额
+      rate : item.rate || null, //成数
+      balance : item.balance,  //结算金额
+      mix : item.mix || null,  //洗马比
+      reAmount : item.reAmount || 0,  //返还金额
+      deAmount : (item.amount + item.reAmount || 0),  //净利
+      balance : item.balance || null,   //返还后余额
+      businessKey : item.businessKey || ''  //betId
+    }
   })
   let obj = {
     billInfo,
-    list
+    list : returnArr
   }
   ResOK(cb, obj);
 }
@@ -155,14 +190,14 @@ const billDetail = async(event, context, cb) => {
  * @param {*} cb 
  */
 const billGameRecord = async(event, context, cb) => {
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-    return ResFail(cb, tokenErr)
-  }
-  const [e, tokenInfo] = await JwtVerify(token[1])
-  if(e) {
-    return ResFail(cb, e)
-  }
+  // const [tokenErr, token] = await Model.currentToken(event);
+  // if (tokenErr) {
+  //   return ResFail(cb, tokenErr)
+  // }
+  // const [e, tokenInfo] = await JwtVerify(token[1])
+  // if(e) {
+  //   return ResFail(cb, e)
+  // }
 
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
   if(parserErr) {

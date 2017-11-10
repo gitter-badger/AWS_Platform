@@ -106,8 +106,10 @@ export class BaseModel{
             // Key:key,
             KeyConditionExpression : keyConditionExpression,
             ExpressionAttributeValues:expressionAttributeValues,
-            IndexName: indexName,
-            ProjectionExpression : returnValues.join(",")
+            IndexName: indexName
+        }
+        if(returnValues.length> 0) {
+            opts.ProjectionExpression = returnValues.join(",")
         }
         let [err, array] = await this.promise("query", opts);
         if(err) {

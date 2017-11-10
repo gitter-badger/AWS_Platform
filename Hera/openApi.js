@@ -370,7 +370,7 @@ async function gamePlayerBalance(event, context, callback) {
   if (merError) return callback(null, ReHandler.fail(merError));
   if (!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   // //验证白名单
-  let white = validateIp(event, merchantInfo);
+  // let white = validateIp(event, merchantInfo);
   if(!white) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
   }
@@ -1112,9 +1112,10 @@ async function getPlayerGameRecord(event, context, callback) {
   }
   let { buId, apiKey, startTime, endTime, userName, lastTime, gameId } = requestParams;
   let pageSize = +requestParams.pageSize || 20;
-  if (endTime < lastTime) { 
+  if(startTime >= endTime || startTime >= lastTime) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.timeError)));
   }
+  
   //检查商户信息是否正确
   const merchant = new MerchantModel();
   const [queryMerchantError, merchantInfo] = await merchant.findById(+buId); 
