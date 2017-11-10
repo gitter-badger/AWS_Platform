@@ -36,6 +36,10 @@ const managerList = async (e, c, cb) => {
         user.merchantUsedCount = 0
       }
     }
+    // 是否需要按照余额排序
+    if (inparam.sortkey && inparam.sortkey == 'balance') {
+      ret = _.sortBy(ret, [inparam.sortkey])
+    }
     return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)

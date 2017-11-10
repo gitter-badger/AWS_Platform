@@ -24,6 +24,10 @@ const merchantList = async (e, c, cb) => {
       user.balance = lastBill.lastBalance
       user.lastBill = lastBill
     }
+    // 是否需要按照余额排序
+    if (inparam.sortkey && inparam.sortkey == 'balance') {
+      ret = _.sortBy(ret, [inparam.sortkey])
+    }
     // 结果返回
     if (err) { return ResErr(cb, err) }
     return ResOK(cb, { payload: ret })
