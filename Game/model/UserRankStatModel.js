@@ -26,7 +26,7 @@ export class UserRankStatModel extends BaseModel {
                 '#userId': 'userId'
             },
             ExpressionAttributeValues: {
-                ':userId': inparam.userId
+                ':userId': inparam.userId.toString()
             }
         }
         const [err, ret] = await this.query(query)
