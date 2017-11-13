@@ -1,5 +1,5 @@
 {
-    "body" : {"userName":"CT01_chenwen","type":"12","action":"","startTime":1507651200000,"endTime":1510329599999},
+    "body" : {"userName":"CT01_chenwen","type":"12","action":"1","startTime":1507651200000,"endTime":1510329599999},
     "headers" : {
         "Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxYjc4MzE3Yi0zYzZlLTQyNDQtOTQ4Ny02MWJhNmZhNDRlM2UiLCJyb2xlIjoiMTAwMCIsInN1ZmZpeCI6IkFnZW50IiwidXNlcm5hbWUiOiJOQWFnZW50IiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInBhcmVudFJvbGUiOiIwMCIsImRpc3BsYXlOYW1lIjoi5Luj55CG566h55CG5ZGYIiwibGV2ZWwiOjAsInZlZGlvTWl4IjoxMDAsImxpdmVNaXgiOjEwMCwiZGlzcGxheUlkIjo5NDk1NjYsImNvbnRyYWN0UGVyaW9kIjowLCJpc2ZvcmV2ZXIiOnRydWUsInVwZGF0ZWRBdCI6MTUwNDg0MDQ4MjkzOSwicmVtYXJrIjoiTlVMTCEiLCJpYXQiOjE1MDUwOTk5OTl9.vyk0lRJMv98LCaIIBa_79EX8xrGqW95R88d1peNom38"
     }
