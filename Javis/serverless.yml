@@ -219,15 +219,15 @@ functions:
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
     integration: lambda
-  upToken: #七牛云上传TOKEN
-    handler: api_qiniu.upToken
-    events:
-      -
-        http:
-          path: /upToken
-          method: post
-          cors: true
-          authorizer: tokenAuth
+  # upToken: #七牛云上传TOKEN
+  #   handler: api_qiniu.upToken
+  #   events:
+  #     -
+  #       http:
+  #         path: /upToken
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
   organize: #组织架构
     handler: api_organize.organize
     events:
@@ -938,6 +938,9 @@ resources:
             AttributeName: userId
             AttributeType: N
           -
+            AttributeName: billId
+            AttributeType: S
+          -
             AttributeName: createAt
             AttributeType: N
           -
@@ -972,6 +975,17 @@ resources:
             KeySchema:
               -
                 AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          -
+            IndexName: billIdIndex
+            KeySchema:
+              -
+                AttributeName: billId
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

@@ -1,5 +1,6 @@
 let  athena  = require("../lib/athena");
 import {TABLE_NAMES} from "../config";
+import {UserBillDetailModel} from "./UserBillDetailModel"
 import {Util} from "../lib/Util"
 
 
@@ -13,7 +14,7 @@ export class UserBillModel extends athena.BaseModel {
     constructor({gameId,originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, 
         fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
-        this.billId = Util.uuid();
+        this.billId = Util.billSerial(userId);
         this.userId = +userId
         this.action = +action;
         this.userName = userName;
@@ -28,7 +29,7 @@ export class UserBillModel extends athena.BaseModel {
         this.createAt = Date.now();
         this.updateAt = Date.now();
         this.amount = +amount;
-        this.seatInfo = seatInfo;
+        this.seatInfo = seatInfo || Model.StringValue;
         this.kindId = kindId || -1;  //-1表示中心钱包的 -2初始点数 -3商城的
         this.gameId = gameId || -1;
         this.toolId = toolId || -1;
@@ -46,6 +47,9 @@ export class UserBillModel extends athena.BaseModel {
         if(this.action == 1){
             if(amount < 0) this.amount = -amount;
         }
+    }
+    setBillId(userId) {
+        this.billId = Util.billSerial(userId);
     }
     async getBalance(){
         let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], "userNameIndex", true);
@@ -87,7 +91,91 @@ export class UserBillModel extends athena.BaseModel {
         return [null, sumMount];
     }
     carryPoint(){
-        return this.save();
+        return super.save();
+    }
+    save(){
+        //写入账单明细
+        let list = this.records || [], serial = true;
+        if(list.length ==0) {
+            serial = false;
+            list = [
+                {
+                    ...this.setProperties(),
+                    createdAt : this.createAt,
+                    type : this.type + 10,
+                    sn : this.sn || Util.billSerial(this.userId),
+                    balance : this.originalAmount + this.amount,
+                    createdAt : +this.createAt
+                }
+            ]
+        }else {
+            list.forEach((item) => {
+                item.originalAmount = +((+item.preBalance).toFixed(2)),
+                delete item.preBalance
+            })
+        }
+        list.map((item) => {
+            item.billId = this.billId;
+            item.createdAt = +item.createdAt || 0;
+            item.userName = this.userName;
+            item.rate = this.rate || 0;
+            item.action = item.amount >=0 ? 1 : -1;
+            item.mix = this.mix || -1;
+            item.balance = +(item.originalAmount + item.amount).toFixed(2);
+        })
+ 
+        list.sort((a, b) => {
+            return a.createdAt - b.createdAt;
+        })
+        //小汇总
+        let  betArray = [], reArray= [], notDep = true;
+        function findBet(array, b) {
+            for(let i =0; i <array.length;i ++) {
+                let item = array[i];
+                if(item.businessKey == b.businessKey) {
+                    return item;
+                }
+            }
+        }
+      
+        if(serial) {
+            list.forEach((item, index) => {
+                if(item.type == 3) {
+                    console.log(betArray);
+                    // let p = findBet(betArray, item);
+                    let p = betArray.find((b) => b.businessKey == item.businessKey)
+                    if(!p) {
+                        p = {
+                            ...item,
+                            sn : Util.billSerial(this.userId, index),
+                            type : 21,
+                        }
+                        betArray.push(p)
+                        let reItem = list.find((p) => p.type == 4 && p.businessKey == item.businessKey);
+                        if(!reItem){
+                             notDep = false;
+                        }else {
+                            p.reAmount = reItem.amount; //返奖金额
+                            p.reTime = reItem.createdAt;//返奖时间
+                            p.balance = +(reItem.originalAmount + reItem.amount).toFixed(2);
+                        }
+                        
+                    }else {
+                       p.amount += item.amount; //下注金额
+                       if(!notDep) {
+                         p.reTime = item.createdAt; //返奖时间
+                         p.reAmount = 0;  //返奖金额
+                         p.balance = +(item.originalAmount + item.amount).toFixed(2) //结算金额
+                       }
+                    }
+                }
+             
+            })
+        }
+        list = list.concat(betArray);
+        new UserBillDetailModel().batchWrite(list);
+        delete this.records;
+        return super.save();
     }
     async handlerPoint(){
         if(this.action === Action.recharge){ //玩家充值(中心钱包转入平台钱包) 玩家平台钱数对应增加

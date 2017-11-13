@@ -18,6 +18,8 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantBillModel} from "./model/MerchantBillModel";
 
+import {UserBillDetailModel} from "./model/UserBillDetailModel";
+
 import {Util} from "./lib/Util"
 
 import {RoleCodeEnum} from "./lib/Consts";
@@ -347,6 +349,33 @@ export async function batchForzen(event, context, cb){
   }
   let type = state == State.normal ?  "jiesuo" : "suoding";
   successHandler(cb, {state}, type, tokenInfo, {});
+}
+
+export async function handlerBill(event, context, cb){
+    let userModel = new UserModel();
+    let [userListErr, userList] = await userModel.scan({});
+    if(userListErr) {
+        return console.log(userListErr);
+    }
+    let date = Date.now();
+    //写入账单明细
+    let saveArray = userList.map((user) => {
+        let uuid = Util.billSerial(user.userId);
+        return {
+            userId : user.userId,
+            userName : user.userName,
+            amount : user.balance,
+            balance : user.balance,
+            originalAmount : user.originalAmount,
+            createdAt : Date.now(),
+            action : 1,
+            remark : "系统升级原账结余",
+            sn : uuid,
+            billId : uuid,
+            type : 10
+        }
+    })
+    new UserBillDetailModel().batchWrite(saveArray);
 }
 
 // TOKEN验证

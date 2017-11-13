@@ -5,7 +5,7 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
-
+import _ from 'lodash'
 /**
  * 获取商户列表
  */
@@ -16,7 +16,7 @@ const merchantList = async (e, c, cb) => {
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 列表页搜索和排序查询
-    const [err, ret] = await new MerchantModel().page(token, inparam)
+    let [err, ret] = await new MerchantModel().page(token, inparam)
     if (err) { return ResErr(cb, err) }
     // 查询每个用户余额
     for (let user of ret) {
@@ -24,10 +24,16 @@ const merchantList = async (e, c, cb) => {
       user.balance = lastBill.lastBalance
       user.lastBill = lastBill
     }
+    // 是否需要按照余额排序
+    if (inparam.sortkey && inparam.sortkey == 'balance') {
+      ret = _.sortBy(ret, [inparam.sortkey])
+      if (inparam.sort == "desc") { ret = ret.reverse() }
+    }
     // 结果返回
     if (err) { return ResErr(cb, err) }
     return ResOK(cb, { payload: ret })
   } catch (error) {
+    console.info(error)
     return ResErr(cb, error)
   }
 }

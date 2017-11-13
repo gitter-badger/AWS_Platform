@@ -323,6 +323,37 @@ export class UserModel extends BaseModel {
         return [0, updateRet]
     }
 
+    /**
+     * 查看所有下级用户
+     * @param {*} token 
+     */
+    async listAllChildUsers(token) {
+        let query = {
+            FilterExpression: 'contains(#levelIndex,:levelIndex)',
+            ExpressionAttributeNames: {
+                '#levelIndex': 'levelIndex'
+            },
+            ExpressionAttributeValues: {
+                ':levelIndex': token.userId
+            }
+        }
+        const [queryErr, queryRet] = await this.scan(query)
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        // 去除敏感数据（该方法不需要）
+        // queryRet.Items = _.map(queryRet.Items, (item) => {
+        //     item.passhash = null
+        //     if (!Model.isPlatformAdmin(token)) {
+        //         item.password = '********'
+        //     }
+        //     return item
+        // })
+        // 按照层级排序
+        // const sortResult = _.sortBy(queryRet.Items, ['level'])
+        return [0, queryRet.Items]
+    }
+
     // const params = {
     //     ...this.params,
     //     Key: {

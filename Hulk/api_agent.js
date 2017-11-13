@@ -5,7 +5,7 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { AgentCheck } from './biz/AgentCheck'
-
+import _ from 'lodash'
 /**
  * 代理管理员注册
  */
@@ -118,13 +118,18 @@ const agentList = async (e, c, cb) => {
         inparam.token = token
         const [checkAttError, errorParams] = new AgentCheck().checkQueryList(inparam)
         // 业务操作
-        const [err, ret] = await new AgentModel().page(token, inparam)
+        let [err, ret] = await new AgentModel().page(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of ret) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
+        }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            ret = _.sortBy(ret, [inparam.sortkey])
+            if (inparam.sort == "desc") { ret = ret.reverse() }
         }
         // 结果返回
         return ResOK(cb, { payload: ret })
@@ -152,12 +157,22 @@ const agentUpdate = async (e, c, cb) => {
         Agent.passhash = Model.hashGen(Agent.password)
         // 业务操作
         const [updateErr, updateRet] = await new UserModel().userUpdate(Agent)
+        if (updateErr) { return ResErr(cb, updateErr) }
+
+        // 判断是否变更了游戏或者抽成比
+        let gameListDifference = getGameListDifference(ret, inparam)
+        let isChangeGameList = gameListDifference.length == 0 ? false : true
+        let isChangeRate = ret.rate == inparam.rate ? false : true
+        let isChangeLiveMix = ret.liveMix == inparam.liveMix ? false : true
+        let isChangeVedioMix = ret.vedioMix == inparam.vedioMix ? false : true
+        // 判断是否更新所有子用户的游戏或者抽成比
+        relatedChange(isChangeGameList, isChangeRate, isChangeLiveMix, isChangeVedioMix, gameListDifference, Agent)
+
         // 操作日志记录
         inparam.operateAction = '更新代理信息'
         inparam.operateToken = token
         new LogModel().addOperate(inparam, updateErr, updateRet)
         // 结果返回
-        if (updateErr) { return ResErr(cb, updateErr) }
         return ResOK(cb, { payload: updateRet })
     } catch (error) {
         return ResErr(cb, error)
@@ -195,13 +210,18 @@ const agentAdminList = async (e, c, cb) => {
             return ResErr(cb, BizErr.TokenErr('只有代理管理员有权限'))
         }
         // 业务操作
-        const [err, admins] = await new AgentModel().adminPage(token, inparam)
+        let [err, admins] = await new AgentModel().adminPage(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of admins) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
+        }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            admins = _.sortBy(admins, [inparam.sortkey])
+            if (inparam.sort == "desc") { admins = admins.reverse() }
         }
         // 结果返回
         return ResOK(cb, { payload: admins })
@@ -245,6 +265,69 @@ const updateAgentPassword = async (e, c, cb) => {
 }
 
 // ==================== 以下为内部方法 ====================
+/**
+ * 获取减少的游戏数组
+ * @param {*} userBefore 
+ * @param {*} userAfter 
+ */
+function getGameListDifference(userBefore, userAfter) {
+    let gameListBefore = []
+    let gameListAfter = []
+    for (let i of userBefore.gameList) {
+        gameListBefore.push(i.code)
+    }
+    for (let j of userAfter.gameList) {
+        gameListAfter.push(j.code)
+    }
+    return _.difference(gameListBefore, gameListAfter)
+}
+/**
+ * 变更子用户的游戏和抽成比等
+ * @param {*} isChangeGameList 
+ * @param {*} isChangeRate 
+ * @param {*} isChangeLiveMix 
+ * @param {*} isChangeVedioMix 
+ * @param {*} gameListDifference 
+ * @param {*} user 
+ */
+async function relatedChange(isChangeGameList, isChangeRate, isChangeLiveMix, isChangeVedioMix, gameListDifference, user) {
+    if (isChangeGameList || isChangeRate || isChangeLiveMix || isChangeVedioMix) {
+        const [allChildErr, allChildRet] = await new UserModel().listAllChildUsers(user)
+        for (let child of allChildRet) {
+            let isNeedUpdate = false
+            // 如果变更了抽成比，且小于子用户抽成比，同步子用户抽成比
+            if (isChangeRate && user.rate < child.rate) {
+                child.rate = user.rate
+                isNeedUpdate = true
+            }
+            // 如果变更了真人洗码比，且小于子用户真人洗码比，同步子用户真人洗码比
+            if (isChangeLiveMix && user.liveMix < child.liveMix) {
+                child.liveMix = user.liveMix
+                isNeedUpdate = true
+            }
+            // 如果变更了电子游戏洗码比，且小于子用户电子游戏洗码比，同步子用户电子游戏洗码比
+            if (isChangeVedioMix && user.vedioMix < child.vedioMix) {
+                child.vedioMix = user.vedioMix
+                isNeedUpdate = true
+            }
+            // 如果减少游戏，则同步子用户游戏
+            if (isChangeGameList) {
+                let subGameList = []
+                for (let item of child.gameList) {
+                    if (_.indexOf(gameListDifference, item.code) == -1) {
+                        subGameList.push(item)
+                    }
+                }
+                child.gameList = subGameList
+                isNeedUpdate = true
+            }
+            // 如果需要，则同步更新子用户
+            if (isNeedUpdate) {
+                await new UserModel().userUpdate(child)
+            }
+        }
+    }
+}
 
 export {
     agentLogin,                // 代理登录

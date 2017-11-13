@@ -1,5 +1,6 @@
 let  athena  = require("../lib/athena");
 import {TABLE_NAMES} from "../config";
+import {UserBillDetailModel} from "./UserBillDetailModel"
 import {Util} from "../lib/Util"
 
 
@@ -12,7 +13,7 @@ import {Model} from "../lib/Dynamo"
 export class UserBillModel extends athena.BaseModel {
     constructor({originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
         super(TABLE_NAMES.BILL_USER);
-        this.billId = Util.uuid();
+        this.billId = Util.billSerial(userId);
         this.userId = +userId
         this.action = +action;
         this.userName = userName;
@@ -90,7 +91,34 @@ export class UserBillModel extends athena.BaseModel {
         return [null, sumMount];
     }
     carryPoint(){
-        return this.save();
+        return super.save();
+    }
+    async save(){
+        //写入账单明细
+        let seatInfo = this.seatInfo;
+        let item = {
+            ...this.setProperties(),
+            num : seatInfo.sum,
+            prop : seatInfo.prop,
+            price : seatInfo.price,
+            seatId : seatInfo.seatId,
+            businessKey : this.billId,
+            amount : this.amount,
+            balance : this.originalAmount + this.amount,
+            type : this.type + 10,
+            sn : this.sn || Util.billSerial(this.userId),
+            createdAt : +this.createAt
+        }
+        delete this.seatInfo;
+        let userBillDetailModel = new UserBillDetailModel();
+        Object.assign(userBillDetailModel, item);
+        console.log(userBillDetailModel);
+        let [detailErr] = await userBillDetailModel.save();
+        if(detailErr) {
+            console.log("购买房卡写入明细发生错误");
+            console.log(detailErr);
+        }
+        return super.save();
     }
     async handlerPoint(){
         if(this.action === Action.recharge){ //玩家充值(中心钱包转入平台钱包) 玩家平台钱数对应增加

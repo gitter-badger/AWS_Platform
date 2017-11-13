@@ -1,0 +1,60 @@
+service: PlayerExt
+plugins:
+  - serverless-webpack
+  - serverless-prune-plugin
+custom:
+  webpackIncludeModules: true
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: ap-southeast-1
+  memorySize: 256
+  environment:
+      TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+      Resource:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:dynamodb:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":table/*"  
+functions:
+  tokenVerify:
+    handler: billApi.jwtverify
+    integration: lambda
+  billFlow:  #玩家流水
+    handler: billApi.billFlow
+    events:
+      - http:
+          path: /player/bill/flow
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  billDetail:  #玩家账单详情
+    handler: billApi.billDetail
+    events:
+      - http:
+          path: /player/bill/detail
+          method: post
+          cors: true
+          authorizer: tokenVerify
+  billGameRecord:  #玩家流水战绩
+    handler: billApi.billGameRecord
+    events:
+      - http:
+          path: /player/bill/record
+          method: post
+          cors: true
+          authorizer: tokenVerify

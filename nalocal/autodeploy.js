@@ -22,7 +22,7 @@ function deploy(path, servername) {
         'git pull',
 
         'cd /usr/dev/NA/rotta-admin',
-        'npm run test',
+        'npm run test-admin',
         'cd dist',
         '/usr/local/bin/aws s3 rm s3://rotta-test/*',
         '/usr/local/bin/aws s3 sync . s3://rotta-test --acl public-read --delete',
@@ -33,14 +33,14 @@ function deploy(path, servername) {
         '/usr/local/bin/aws s3 rm s3://rotta-test-agent/*',
         '/usr/local/bin/aws s3 sync . s3://rotta-test-agent --acl public-read --delete',
 
-        'cd /usr/dev/NA/rotta-manager',
-        'npm run test',
+        'cd /usr/dev/NA/rotta-admin',
+        'npm run test-manager',
         'cd dist',
         '/usr/local/bin/aws s3 rm s3://rotta-test-manager/*',
         '/usr/local/bin/aws s3 sync . s3://rotta-test-manager --acl public-read --delete',
 
-        'cd /usr/dev/NA/rotta-merchant',
-        'npm run test',
+        'cd /usr/dev/NA/rotta-admin',
+        'npm run test-merchant',
         'cd dist',
         '/usr/local/bin/aws s3 rm s3://rotta-test-merchant/*',
         '/usr/local/bin/aws s3 sync . s3://rotta-test-merchant --acl public-read --delete',

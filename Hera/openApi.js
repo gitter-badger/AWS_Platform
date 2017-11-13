@@ -369,7 +369,7 @@ async function gamePlayerBalance(event, context, callback) {
 
   if (merError) return callback(null, ReHandler.fail(merError));
   if (!merchantInfo) return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
-  //验证白名单
+  // //验证白名单
   let white = validateIp(event, merchantInfo);
   if(!white) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
@@ -440,6 +440,7 @@ async function gamePlayerBalance(event, context, callback) {
     merchantName: merchantInfo.displayName,
     type: action > 0 ? Type.recharge : Type.withdrawals
   })
+  userBillModel.setBillId(user.userId);
   userBillModel.setAmount(userBillModel.amount);
   let [saveError] = await userBillModel.save();
   if (saveError) {
@@ -684,6 +685,7 @@ async function settlement(event, context, callback) {
   if (playerErr) {
     return callback(null, ReHandler.fail(playerErr));
   }
+  //玩家是否在游戏中
   if(!user.isGames(userModel)) { //如果不在游戏中就无效
     return callback(null, ReHandler.success({
       data: { balance: oriBalance }
@@ -697,7 +699,6 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(parseRecordErr));
   }
   requestParams.records = records = list;
-
   
   //如果记录没有，直接跳过
   if (records.length == 0) { //如果记录为null
@@ -730,7 +731,7 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(err));
   }
   console.log("账单消耗:" + income);
-  let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1 
+  let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
 
   //获取商家
   let merchantId = userModel.buId;
@@ -742,6 +743,9 @@ async function settlement(event, context, callback) {
   if (!merchantModel) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
+  let mix = -1;
+  if(gameType == "30000") mix = merchantModel.vedioMix;
+  if(gameType == "40000") mix = merchantModel.liveMix;
   let billBase = {
     fromRole: RoleCodeEnum.Player,
     toRole: RoleCodeEnum.Merchant,
@@ -756,8 +760,10 @@ async function settlement(event, context, callback) {
     type: Type.gameSettlement,
     typeName: typeName,
     joinTime : userModel.joinTime,
-    list : records,
-    remark: "游戏结算"
+    rate : merchantModel.rate,
+    mix :mix,
+    records : records,
+    remark: `游戏结算[${game.gameName}]`
   }
   //玩家点数发生变化
   let userBillModel = new UserBillModel({
@@ -776,6 +782,7 @@ async function settlement(event, context, callback) {
   }
   //查账
   let [getError, userSumAmount] = await userBillModel.getBalance();
+  console.log("用户余额："+userSumAmount);
   if (getError) {
     return callback(null, ReHandler.fail(getError));
   }
@@ -856,7 +863,7 @@ async function joinGame(event, context, callback) {
   //判断是否正在游戏中
   let game = userModel.isGames(userObj);
   if (game && userObj.gameId!= gameId) {
-    let gameName = GameTypeEnum[userObj.gameId+""].name;
+    let gameName = (GameTypeEnum[userObj.gameId+""] || {}).name || "";
     let gamingError = new CHeraErr(CODES.gameingError);
     gamingError.msg = `您正在${gameName}游戏中,不能进入其他游戏!`
     return callback(null, ReHandler.fail(gamingError));
@@ -864,6 +871,7 @@ async function joinGame(event, context, callback) {
   let joinTime = Date.now();
   let gameState = gameId == "10000" ? GameState.online : GameState.gameing; //如果是棋牌游戏，还是标记为在线
   let sendSid = userObj.gameId == gameId ? userObj.sid : sid;
+  if(gameId =="10000") sendSid = sid;
   let state = userObj.gameState == GameState.gameing ? "0" : "1"; //0 未清账，1，已清账
   //修改游戏状态（不能进行转账操作）
   let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:gameState, gameId:gameId, sid : sendSid, joinTime});
@@ -1023,8 +1031,16 @@ async function playerGameRecord(event, context, callback) {
   if(sign != serverSign  && sign != gameKey) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
   }
-  let buffer = Buffer.from(records, 'base64');
-  let str = zlib.unzipSync(buffer).toString();
+  let str = "";
+  try{
+    let buffer = Buffer.from(records, 'base64');
+    str = zlib.unzipSync(buffer).toString();
+  }catch(err) {
+    let dataErr = new CHeraErr(CODES.DataError);
+    dataErr.msg = "压缩数据错误"
+    return callback(null, ReHandler.fail(dataErr));
+  }
+
   let [parseRecordErr, list] = athena.Util.parseJSON(str);
   if (parseRecordErr) {
     return callback(null, ReHandler.fail(parseRecordErr));
@@ -1097,9 +1113,10 @@ async function getPlayerGameRecord(event, context, callback) {
   }
   let { buId, apiKey, startTime, endTime, userName, lastTime, gameId } = requestParams;
   let pageSize = +requestParams.pageSize || 20;
-  if (endTime < lastTime) { 
+  if(startTime >= endTime || startTime >= lastTime) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.timeError)));
   }
+  
   //检查商户信息是否正确
   const merchant = new MerchantModel();
   const [queryMerchantError, merchantInfo] = await merchant.findById(+buId); 
@@ -1134,7 +1151,6 @@ export {
   gamePlayerA3Login, //A3游戏登陆
   settlement, //账单验证
   getA3GamePlayerBalance, //用户余额（A3）
-  // playerRecordValidate,  //玩家账单验证
   joinGame, //进入游戏
   updatePassword, //修改密码
   updateUserInfo,  //修改用户基本信息

@@ -2,5 +2,5 @@
     "headers":{
         "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BODhBX2RheTAwMiIsInN1ZmZpeCI6Ik5BODhBIiwidXNlcklkIjoxODg0NDQsImlhdCI6MTUwMjg1NjUzM30.xthLmbQx6vX-nj17zfCW4uzEx5iCGnvoPWP3gFt8MSU"
     },
-    "body" : {"gameType":"30000","records":"H4sIAAAAAAAAANVSu07DMBT9F89J5Edsx90KEwIiBN0QQm5zqSKlSZU4RRXiC1jYED/BwIDE0q8pQvwFjh0kWiakDjCec++5vvf4nN8gPYXSpHoGaIDS4WU6NNAYFCA9q9rSoAHBOMI4QGMwB5ntYVJaCic4SQQjEnOJfHFui0TRiIgkwhHxbNrOLE1DJjwe5d1DhGOlYkUFx/3o0XIObrzTVZVpeqWFGSzyCXQdaMACNLW7dq3MaomH/frvj6u3p5f16z3y9EiPiw3+GHfzcgOzQ1jawkmPev3Hw7Ml5rq2jrhlgMpEKarCK0Z5GHOBQ0WpDBWBTHKIFU94p6hhTxe6nICzS1DvWG0NzNwcwVAP/VXOjQaMKeBUG6uiTuCZDYsYI84i053ir6Y98oZYB9oGaveMwlIxjDzz/UtxYsmFLvJsuPWr13l5VDXmiw63+DOjTdvY9ttgB0kR/zgp+z+isl7d7SIt8vdpiSP+x9Ny8QnOka9BWQQAAA==","sign":"bc6bc2b9101f7f555ade4df88392d209198dd64d00167e39a8c489d80c337df0","timestamp":1509949331000}
+    "body" : {"userName":"caowen","gameId":"10000","pageSize":1,"startTime":1,"endTime":2,"lastTime":2,"buId":"754180","apiKey":"3fb35193-abb2-46d5-b43c-1a7a3105aacf"}
 }

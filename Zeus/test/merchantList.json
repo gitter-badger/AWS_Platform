@@ -16,10 +16,8 @@
     },
     "body": {
         "query": {
-            "suffix": "a",
-            "msn": "881"
         },
-        "sortkey": "createdAt",
+        "sortkey": "balance",
         "sort": "desc"
     }
 }
