@@ -7,10 +7,8 @@ const billDetailTrigger = async (e, c, cb) => {
     let lastTime = 0
     let userName = ''
     let balance = 0
-    console.log(e.Records[0])
     for (let item of e.Records) {
         let record = item.dynamodb.NewImage
-        console.info('接收到的数据')
         let type = record.type.N
         let amount = record.amount.N
         let createdAt = record.createdAt.N
