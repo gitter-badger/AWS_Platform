@@ -47,6 +47,7 @@ export class UserRankStatModel extends BaseModel {
             bet: bet,
             win: win
         }).then((res) => {
+            console.log('12334353')
             console.log(res)
         }).catch((err) => {
             console.error(err)
