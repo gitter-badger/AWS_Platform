@@ -24,7 +24,7 @@ const billDetailTrigger = async (e, c, cb) => {
             lastTime = createdAt
             balance = record.balance
         }
-        console.log('玩家id：' + userId + "类型：" + type + "金额：" + amount + "余额：" + balance)
+        console.log('玩家userName：' + userName + "类型：" + type + "金额：" + amount + "余额：" + balance)
     }
     let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId"])
     //更新操作
