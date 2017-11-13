@@ -45,6 +45,9 @@ export class UserRankStatModel extends BaseModel {
             balance: inparam.balance,
             bet: bet,
             win: win
+        }).then((res) => {
+        }).catch((err) => {
+            console.error(err)
         })
 
     }
