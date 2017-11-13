@@ -22,7 +22,7 @@ const billDetailTrigger = async (e, c, cb) => {
         }
         if (lastTime < createdAt) {
             lastTime = createdAt
-            balance = record.balance
+            balance = record.balance.N
         }
         console.log('玩家userName：' + userName + "类型：" + type + "金额：" + amount + "余额：" + balance)
     }
