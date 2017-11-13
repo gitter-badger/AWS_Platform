@@ -1,6 +1,8 @@
 import { Success, Fail, Codes, Tables, JwtVerify, JSONParser, RoleCodeEnum } from './lib/all'
 
 const billDetailTrigger = async (e, c, cb) => {
+    console.log('原始数据')
+    console.log(e.Records)
     let record = e.Records[0].dynamodb.NewImage
     console.info('接收到的数据')
     console.log(record)
