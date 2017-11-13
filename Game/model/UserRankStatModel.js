@@ -19,6 +19,7 @@ export class UserRankStatModel extends BaseModel {
      * 更新数据
      */
     async updateRank(inparam) {
+        console.log(inparam)
         let query = {
             KeyConditionExpression: '#userId = :userId',
             ExpressionAttributeNames: {
@@ -31,6 +32,8 @@ export class UserRankStatModel extends BaseModel {
         const [err, ret] = await this.query(query)
         let bet = inparam.betCount
         let win = inparam.winCount
+        console.log(bet)
+        console.log(win)
         if (ret.Items && ret.Items.length > 0) {
             const record = ret.Items[0]
             bet += record.bet

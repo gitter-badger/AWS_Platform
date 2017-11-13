@@ -6,13 +6,13 @@ const billDetailTrigger = async (e, c, cb) => {
     let winCount = 0
     let lastTime = 0
     let userName = ''
+    let balance = 0
     console.log(e.Records[0])
     for (let item of e.Records) {
         let record = item.dynamodb.NewImage
         console.info('接收到的数据')
         let type = record.type.N
         let amount = record.amount.N
-        let balance = record.balance.N
         let createdAt = record.createdAt.N
         userName = record.userName.S
         if (type == 3) {
@@ -29,7 +29,7 @@ const billDetailTrigger = async (e, c, cb) => {
     let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId"])
     //更新操作
     let inparam = { userId: userInfo.userId, balance: balance, betCount: betCount, winCount: winCount }
-    new UserRankStatModel().updatRank(inparam)
+    new UserRankStatModel().updateRank(inparam)
 }
 
 export {
