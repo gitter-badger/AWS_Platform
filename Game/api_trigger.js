@@ -5,6 +5,7 @@ const billDetailTrigger = async (e, c, cb) => {
     let winCount = 0
     let lastTime = 0
     let userId = 0
+    console.log(e.Records[0])
     for (let item of e.Records) {
         let record = item.dynamodb.NewImage
         console.info('接收到的数据')
