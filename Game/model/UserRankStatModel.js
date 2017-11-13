@@ -39,6 +39,7 @@ export class UserRankStatModel extends BaseModel {
             bet += record.bet
             win += record.win
         }
+        console.log('执行插入')
         this.putItem({
             ...this.item,
             userId: inparam.userId,
@@ -46,9 +47,10 @@ export class UserRankStatModel extends BaseModel {
             bet: bet,
             win: win
         }).then((res) => {
+            console.log(res)
         }).catch((err) => {
             console.error(err)
         })
-
+        console.log('打印结束')
     }
 }
