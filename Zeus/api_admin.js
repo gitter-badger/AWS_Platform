@@ -6,7 +6,7 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
-
+import _ from 'lodash'
 /**
  * 创建管理员帐号
  */
@@ -261,6 +261,11 @@ const adminList = async (e, c, cb) => {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
+        }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            admins = _.sortBy(admins, [inparam.sortkey])
+            if (inparam.sort == "desc") { admins = admins.reverse() }
         }
         // 结果返回
         return ResOK(cb, { payload: admins })

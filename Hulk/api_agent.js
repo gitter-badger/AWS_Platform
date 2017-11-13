@@ -126,6 +126,11 @@ const agentList = async (e, c, cb) => {
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
         }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            ret = _.sortBy(ret, [inparam.sortkey])
+            if (inparam.sort == "desc") { ret = ret.reverse() }
+        }
         // 结果返回
         return ResOK(cb, { payload: ret })
     } catch (error) {
@@ -212,6 +217,11 @@ const agentAdminList = async (e, c, cb) => {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
+        }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            admins = _.sortBy(admins, [inparam.sortkey])
+            if (inparam.sort == "desc") { admins = admins.reverse() }
         }
         // 结果返回
         return ResOK(cb, { payload: admins })
