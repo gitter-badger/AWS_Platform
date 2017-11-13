@@ -169,7 +169,7 @@ const billDetail = async(event, context, cb) => {
       amount : item.amount,   //下注金额
       rate : item.rate || null, //成数
       balance : item.balance,  //结算金额
-      mix : item.mix || null,  //洗马比
+      mix : item.mix > 0? item.mix : null,  //洗马比
       reAmount : item.reAmount || 0,  //返还金额
       deAmount : (item.amount + item.reAmount || 0),  //净利
       balance : item.balance || null,   //返还后余额
