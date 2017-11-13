@@ -254,7 +254,7 @@ const adminList = async (e, c, cb) => {
         // 只有管理员角色可操作
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
         // 业务操作
-        const [err, admins] = await new AdminModel().page(token, inparam)
+        let [err, admins] = await new AdminModel().page(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of admins) {

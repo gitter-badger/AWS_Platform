@@ -118,7 +118,7 @@ const agentList = async (e, c, cb) => {
         inparam.token = token
         const [checkAttError, errorParams] = new AgentCheck().checkQueryList(inparam)
         // 业务操作
-        const [err, ret] = await new AgentModel().page(token, inparam)
+        let [err, ret] = await new AgentModel().page(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of ret) {
@@ -210,7 +210,7 @@ const agentAdminList = async (e, c, cb) => {
             return ResErr(cb, BizErr.TokenErr('只有代理管理员有权限'))
         }
         // 业务操作
-        const [err, admins] = await new AgentModel().adminPage(token, inparam)
+        let [err, admins] = await new AgentModel().adminPage(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of admins) {
