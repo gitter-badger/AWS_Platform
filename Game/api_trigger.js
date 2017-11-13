@@ -26,7 +26,7 @@ const billDetailTrigger = async (e, c, cb) => {
     }
     let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId"])
     //更新操作
-    let inparam = { userId: userInfo.userId, balance: balance, betCount: betCount, winCount: winCount }
+    let inparam = { userId: parseInt(userInfo.userId), balance: parseFloat(balance), betCount: parseFloat(betCount), winCount: parseFloat(winCount) }
     new UserRankStatModel().updateRank(inparam)
 }
 
