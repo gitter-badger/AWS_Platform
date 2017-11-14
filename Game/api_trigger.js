@@ -1,5 +1,6 @@
 import { Success, Fail, Codes, Tables, JwtVerify, JSONParser, RoleCodeEnum } from './lib/all'
 import { UserRankStatModel } from './model/UserRankStatModel'
+import { UserModel } from './model/UserModel'
 const billDetailTrigger = async (e, c, cb) => {
     let betCount = 0
     let winCount = 0
@@ -23,8 +24,10 @@ const billDetailTrigger = async (e, c, cb) => {
         }
         console.log('玩家userName：' + userName + "类型：" + type + "金额：" + amount + "余额：" + balance)
     }
+    // 根据用户名获取UserId
+    let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId"])
     //更新操作
-    let inparam = { userName: userName, balance: balance, betCount: betCount, winCount: winCount }
+    let inparam = { userName: userName, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
     new UserRankStatModel().updateRank(inparam)
 }
 
