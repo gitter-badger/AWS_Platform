@@ -1,5 +1,3 @@
-
-// 错误方案二
 export const Codes = {
   OK: '0',
   Error: '-1',

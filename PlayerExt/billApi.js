@@ -152,7 +152,7 @@ const billDetail = async(event, context, cb) => {
       reSumAmount += item.reAmount || 0;
     }
   }
-  depSumAmount = sumAmount + reSumAmount;
+  depSumAmount = -sumAmount + reSumAmount;
   //根据billId查询账单
   let billModel = new UserBillModel();
   let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt","amount"], "billIdIndex");
@@ -169,7 +169,7 @@ const billDetail = async(event, context, cb) => {
       userName : billInfo.userName,  //用户名
       joinTime : billInfo.joinTime || 0,  //进入时间
       createdAt : billInfo.createAt,   //退出时间（结算时间）
-      avgRTP : +depSumAmount/(sumAmount).toFixed(2),  
+      avgRTP : Math.abs(+reSumAmount/(sumAmount).toFixed(2)),  //净利润/总投注数
       sumAmount : sumAmount , //下注总额
       reSumAmount, //返还金额
       depSumAmount, //利润总额
