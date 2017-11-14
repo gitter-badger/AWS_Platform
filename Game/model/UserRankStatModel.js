@@ -29,7 +29,6 @@ export class UserRankStatModel extends BaseModel {
             }
         }
         const [err, ret] = await this.query(query)
-        console.log(ret)
         let bet = inparam.betCount
         let win = inparam.winCount
         if (ret.Items && ret.Items.length > 0) {

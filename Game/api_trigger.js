@@ -25,7 +25,6 @@ const billDetailTrigger = async (e, c, cb) => {
     }
     // 根据用户名获取UserId
     let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId", "nickname", "headPic"])
-    console.log(userInfo)
     //玩家没有登录不进行用户排行榜操作
     if (userInfo.nickname && userInfo.nickname != "NULL!") {
         let inparam = { userName: userName, nickname: userInfo.nickname, headPic: userInfo.headPic, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
