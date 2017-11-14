@@ -1,5 +1,5 @@
 import { Success, Fail, Codes, Tables, JwtVerify, JSONParser, RoleCodeEnum } from './lib/all'
-// import { UserRankStatModel } from './model/UserRankStatModel'
+import { UserRankStatModel } from './model/UserRankStatModel'
 import { UserModel } from './model/UserModel'
 const billDetailTrigger = async (e, c, cb) => {
     let betCount = 0
@@ -27,10 +27,10 @@ const billDetailTrigger = async (e, c, cb) => {
     // 根据用户名获取UserId
     let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId", "nickname", "headPic"])
     //玩家没有登录不进行用户排行榜操作
-    // if (userInfo.nickname && userInfo.nickname != "NULL!") {
-    //     let inparam = { userName: userName, nickname: userInfo.nickname, headPic: userInfo.headPic, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
-    //     new UserRankStatModel().updateRank(inparam)
-    // }
+    if (userInfo.nickname && userInfo.nickname != "NULL!") {
+        let inparam = { userName: userName, nickname: userInfo.nickname, headPic: userInfo.headPic, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
+        new UserRankStatModel().updateRank(inparam)
+    }
 }
 
 export {
