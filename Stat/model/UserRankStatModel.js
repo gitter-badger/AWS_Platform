@@ -26,6 +26,9 @@ export class UserRankStatModel extends BaseModel {
         }
         const sortResult = _.sortBy(ret.Items, [inparam.sortkey])
         const descResult = sortResult.reverse()
+        for (let i = 1; i < descResult.length; i++) {
+            descResult[i - 1] = { ...descResult[i - 1], index: i }
+        }
         // 用户ID存在时，查询其前后用户
         if (inparam.userName != '0') {
             let targetUserIndex = _.findIndex(descResult, function (i) { return i.userName == inparam.userName })
@@ -42,6 +45,7 @@ export class UserRankStatModel extends BaseModel {
     async putsRank(inparam) {
         this.putItem({
             userName: inparam.userName,
+            userId: inparam.userId,
             balance: inparam.balance,
             bet: 0,
             win: 0
