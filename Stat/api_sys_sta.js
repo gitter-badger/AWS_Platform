@@ -34,9 +34,9 @@ const overview = async function(event, context, callback) {
   //json转换
   let [parserErr, requestParams] = Util.parseJSON(event.body || {});
   if(parserErr) return cb(null, ReHandler.fail(parserErr));
-
   let [tokenErr, tokenInfo] = await validateToken(event);
   if(tokenErr) {
+      console.log("验证token错误");
       return errorHandle(callback, tokenErr);
   }
   //检查参数是否合法
@@ -170,12 +170,21 @@ const overview = async function(event, context, callback) {
 }
 
 async function validateToken(event){
-    const [tokenErr, token] = await Model.currentToken(event);
-    if (tokenErr) {
-        return [tokenErr,null]
+    try{
+        const [tokenErr, token] = await Model.currentToken(event);
+        if (tokenErr) {
+            return [tokenErr,null]
+        }
+        console.log("过期时间正确");
+        console.log(token);
+        // const [e, tokenInfo] = await JwtVerify(token[1])
+        return [null,token];
+    }catch(err) {
+        console.log("错误");
+        console.log(err);
+        return [err];
     }
-    const [e, tokenInfo] = await JwtVerify(token[1])
-    return [e,tokenInfo];
+    
 }
 async function findChildrenMerchant(userId) {
     //找到该线路商下所有商户

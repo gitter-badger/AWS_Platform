@@ -46,13 +46,7 @@ export class BillStatModel extends athena.BaseModel {
                 expressionAttributeValues[`:userId${i}`] = userId[i];
             }
         }
-        console.log({
-                IndexName : "roleTypeIndex",
-                KeyConditionExpression: keyConditionExpression,
-                FilterExpression : filterExpression,
-                ExpressionAttributeNames :expressionAttributeNames,
-                ExpressionAttributeValues: expressionAttributeValues
-            });
+  
         return new Promise((reslove, reject) => {
             this.db$("query", {
                 IndexName : "roleTypeIndex",

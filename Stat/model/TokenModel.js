@@ -3,7 +3,7 @@ let {RoleCodeEnum} = require("../lib/Consts");
 
 import {BaseModel} from "../lib/athena"
 
-import {CODES, CHeraErr} from "../lib/Codes"
+import {CODES, CHeraErr} from "../biz/Codes"
 
 import {
     Tables,
@@ -28,8 +28,6 @@ export class TokenModel extends BaseModel{
             return [new CHeraErr(CODES.TokenError), 0]
         }
         let [err, userToken] = await this.get({userId:inparam.userId});
-        console.log("111111222222222");
-        console.log(userToken);
         if (err) {
             return [err, 0]
         }
