@@ -116,7 +116,9 @@ export async function agentPlayerList(event, context, cb) {
     let role = tokenInfo.role;
     let parent = tokenInfo.parent;
     let sortKey = requestParams.sortKey || "createAt";
-    let sortMode = requestParams.sortKey || "dsc";  //asc 升序  dsc 降序
+    let sortMode = requestParams.sort || "desc";  //asce 升序  desc 降序
+    delete requestParams.sortKey;
+    delete requestParams.sort;
     let displayId = +tokenInfo.displayId;
     let userModel = new UserModel();
     let flag  = false;
@@ -168,7 +170,7 @@ export async function agentPlayerList(event, context, cb) {
         }
     }
     function isSort(a, b){
-        return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+        return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
     }
     userList.forEach(function(element) {
         console.log(element.createAt);

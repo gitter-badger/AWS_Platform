@@ -134,6 +134,7 @@ functions:
           path: /email/list
           method: post
           cors: true
+          authorizer: tokenVerify
   gameToolList :  #道具列表
     handler: emailApi.toolList
     events:

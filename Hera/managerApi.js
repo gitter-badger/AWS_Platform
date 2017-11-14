@@ -128,9 +128,11 @@ export async function gamePlayerList(event, context, cb) {
     let role = tokenInfo.role;
     let displayId = +tokenInfo.displayId;
     let sortKey = requestParams.sortKey || "createAt";
-    let sortMode = requestParams.sortKey || "dsc";  //asc 升序  dsc 降序
+    let sortMode = requestParams.sort || "desc";  //asce 升序  desc 降序
     let userModel = new UserModel();
     let err, userList=[];
+    delete requestParams.sortKey;
+    delete requestParams.sort;
     console.log(requestParams);
     //如果是平台管理员，可以查看所有的玩家信息
     if(role == RoleCodeEnum.SuperAdmin || role == RoleCodeEnum.PlatformAdmin) {
@@ -181,7 +183,7 @@ export async function gamePlayerList(event, context, cb) {
         }
     }
     function isSort(a, b){
-        return sortMode == "asc" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+        return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
     }
     
     ResOK(cb, {list: userList});
@@ -366,7 +368,7 @@ export async function handlerBill(event, context, cb){
             userName : user.userName,
             amount : user.balance,
             balance : user.balance,
-            originalAmount : user.originalAmount,
+            originalAmount : 0,
             createdAt : Date.now(),
             action : 1,
             remark : "系统升级原账结余",
