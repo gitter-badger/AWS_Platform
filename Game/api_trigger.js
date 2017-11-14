@@ -14,7 +14,7 @@ const billDetailTrigger = async (e, c, cb) => {
         let createdAt = parseFloat(record.createdAt.N)
         userName = record.userName.S
         if (type == 3) {
-            betCount += parseFloat(Math.abs(amount))
+            betCount += Math.abs(parseFloat(amount))
         } else if (type == 4) {
             winCount += parseFloat(amount)
         }

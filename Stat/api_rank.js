@@ -59,11 +59,11 @@ const initBetRank = async (e, c, cb) => {
     let groupResult = _.groupBy(billList, 'userName')
     //写入玩家数据
     for (let userName in groupResult) {
-      let bet = 0
-      let win = 0
+      let bet = Number(0)
+      let win = Number(0)
       for (let billItem of groupResult[userName]) {
         if (billItem.type == 3) {
-          bet +=parseFloat(Math.abs(billItem.amount)) 
+          bet += Math.abs(parseFloat(billItem.amount))
         } else if (billItem.type == 4) {
           win += parseFloat(billItem.amount)
         }

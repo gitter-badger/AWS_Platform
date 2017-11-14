@@ -65,8 +65,8 @@ export class UserRankStatModel extends BaseModel {
             Key: { 'userName': inparam.userName },
             UpdateExpression: 'SET bet = :bet , win = :win',
             ExpressionAttributeValues: {
-                ':bet': inparam.bet,
-                ':win': inparam.win
+                ':bet': parseFloat(inparam.bet),
+                ':win': parseFloat(inparam.win)
             }
         }).then((res) => {
         }).catch((err) => {
