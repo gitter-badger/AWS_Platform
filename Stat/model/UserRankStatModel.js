@@ -26,7 +26,7 @@ export class UserRankStatModel extends BaseModel {
         }
         const sortResult = _.sortBy(ret.Items, [inparam.sortkey])
         const descResult = sortResult.reverse()
-        for (let i = 1; i < descResult.length; i++) {
+        for (let i = 1; i <= descResult.length; i++) {
             descResult[i - 1] = { ...descResult[i - 1], index: i }
         }
         // 用户ID存在时，查询其前后用户
