@@ -20,12 +20,12 @@ export class UserRankStatModel extends BaseModel {
      */
     async updateRank(inparam) {
         let query = {
-            KeyConditionExpression: '#userId = :userId',
+            KeyConditionExpression: '#userName = :userName',
             ExpressionAttributeNames: {
-                '#userId': 'userId'
+                '#userName': 'userName'
             },
             ExpressionAttributeValues: {
-                ':userId': inparam.userId
+                ':userName': inparam.userName
             }
         }
         const [err, ret] = await this.query(query)
@@ -38,7 +38,7 @@ export class UserRankStatModel extends BaseModel {
         }
         this.putItem({
             ...this.item,
-            userId: inparam.userId,
+            userName: inparam.userName,
             balance: inparam.balance,
             bet: bet,
             win: win

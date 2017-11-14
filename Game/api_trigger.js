@@ -1,12 +1,11 @@
 import { Success, Fail, Codes, Tables, JwtVerify, JSONParser, RoleCodeEnum } from './lib/all'
 import { UserRankStatModel } from './model/UserRankStatModel'
-import { UserModel } from './model/UserModel'
 const billDetailTrigger = async (e, c, cb) => {
     let betCount = 0
     let winCount = 0
     let lastTime = 0
     let balance = 0
-    let userName = ''
+    let userName = 'NULL!'
     for (let item of e.Records) {
         let record = item.dynamodb.NewImage
         let type = parseInt(record.type.N)
@@ -24,9 +23,8 @@ const billDetailTrigger = async (e, c, cb) => {
         }
         console.log('玩家userName：' + userName + "类型：" + type + "金额：" + amount + "余额：" + balance)
     }
-    let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId"])
     //更新操作
-    let inparam = { userId: userInfo.userId, balance: balance, betCount: betCount, winCount: winCount }
+    let inparam = { userName: userName, balance: balance, betCount: betCount, winCount: winCount }
     new UserRankStatModel().updateRank(inparam)
 }
 
