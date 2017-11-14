@@ -14,9 +14,9 @@ const billDetailTrigger = async (e, c, cb) => {
         let createdAt = parseFloat(record.createdAt.N)
         userName = record.userName.S
         if (type == 3) {
-            betCount += Math.abs(amount)
+            betCount += parseFloat(Math.abs(amount))
         } else if (type == 4) {
-            winCount += amount
+            winCount += parseFloat(amount)
         }
         if (lastTime < createdAt) {
             lastTime = createdAt
@@ -26,8 +26,7 @@ const billDetailTrigger = async (e, c, cb) => {
     }
     // 根据用户名获取UserId
     let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId", "nickname"])
-
-    //更新操作
+    //玩家没有登录不进行用户排行榜操作
     if (userInfo.nickname && userInfo.nickname != "NULL!") {
         let inparam = { userName: userName, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
         new UserRankStatModel().updateRank(inparam)

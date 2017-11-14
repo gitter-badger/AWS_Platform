@@ -33,8 +33,8 @@ export class UserRankStatModel extends BaseModel {
         let win = inparam.winCount
         if (ret.Items && ret.Items.length > 0) {
             const record = ret.Items[0]
-            bet += record.bet
-            win += record.win
+            bet += parseFloat(record.bet) 
+            win += parseFloat(record.win)
         }
         this.putItem({
             ...this.item,

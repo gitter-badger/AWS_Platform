@@ -33,11 +33,13 @@ const initRank = async (e, c, cb) => {
   try {
     //查出所有玩家
     const [userErr, userList] = await new PlayerModel().scan({
-      FilterExpression: 'nickename != NULL!'
     })
     if (userErr) { return ResErr(cb, userErr) }
     //写入玩家数据
     for (let i = 0; i < userList.length; i++) {
+      if (userList[i].nickname == "NULL!") {
+        continue
+      }
       new UserRankStatModel().putsRank(userList[i])
     }
     return ResOK(cb, {})
@@ -61,9 +63,9 @@ const initBetRank = async (e, c, cb) => {
       let win = 0
       for (let billItem of groupResult[userName]) {
         if (billItem.type == 3) {
-          bet += Math.abs(billItem.amount)
+          bet +=parseFloat(Math.abs(billItem.amount)) 
         } else if (billItem.type == 4) {
-          win += billItem.amount
+          win += parseFloat(billItem.amount)
         }
       }
       bet = bet.toFixed(2)
