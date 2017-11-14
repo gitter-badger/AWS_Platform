@@ -48,10 +48,8 @@ export class UserRankStatModel extends BaseModel {
     async putsRank(inparam) {
         this.putItem({
             userName: inparam.userName,
-            nickname: inparam.nickname,
             userId: inparam.userId,
             balance: inparam.balance,
-            headPic: inparam.headPic,
             bet: 0,
             win: 0
         }).then((res) => {

@@ -18,7 +18,7 @@ export class UserRankStatModel extends BaseModel {
     /**
      * 更新数据
      */
-    async putRank(inparam) {
+    async updateRank(inparam) {
         let query = {
             KeyConditionExpression: '#userName = :userName',
             ExpressionAttributeNames: {
@@ -39,8 +39,6 @@ export class UserRankStatModel extends BaseModel {
         this.putItem({
             ...this.item,
             userName: inparam.userName,
-            nickname: inparam.nickname,
-            headPic: inparam.headPic,
             userId: inparam.userId,
             balance: inparam.balance.toFixed(2),
             bet: bet.toFixed(2),

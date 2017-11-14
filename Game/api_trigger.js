@@ -25,11 +25,11 @@ const billDetailTrigger = async (e, c, cb) => {
         console.log('玩家userName：' + userName + "类型：" + type + "金额：" + amount + "余额：" + balance)
     }
     // 根据用户名获取UserId
-    let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId", "nickname", "headPic"])
+    let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId", "nickname"])
     //玩家没有登录不进行用户排行榜操作
     if (userInfo.nickname && userInfo.nickname != "NULL!") {
-        let inparam = { userName: userName, nickname: userInfo.nickname, headPic: userInfo.headPic, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
-        new UserRankStatModel().putRank(inparam)
+        let inparam = { userName: userName, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
+        new UserRankStatModel().updateRank(inparam)
     }
 }
 
