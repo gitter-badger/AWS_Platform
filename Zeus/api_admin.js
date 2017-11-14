@@ -6,7 +6,7 @@ import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
 
 import { UserCheck } from './biz/UserCheck'
-
+import _ from 'lodash'
 /**
  * 创建管理员帐号
  */
@@ -254,13 +254,18 @@ const adminList = async (e, c, cb) => {
         // 只有管理员角色可操作
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
         // 业务操作
-        const [err, admins] = await new AdminModel().page(token, inparam)
+        let [err, admins] = await new AdminModel().page(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of admins) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
+        }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            admins = _.sortBy(admins, [inparam.sortkey])
+            if (inparam.sort == "desc") { admins = admins.reverse() }
         }
         // 结果返回
         return ResOK(cb, { payload: admins })

@@ -20,7 +20,7 @@ const managerList = async (e, c, cb) => {
       return ResErr(cb, BizErr.TokenErr('只有管理员/线路商有权限'))
     }
     // 列表页搜索和排序查询
-    const [err, ret] = await new ManagerModel().page(token, inparam)
+    let [err, ret] = await new ManagerModel().page(token, inparam)
     // 结果返回
     if (err) { return ResErr(cb, err) }
     // 查询每个用户余额 
@@ -36,8 +36,14 @@ const managerList = async (e, c, cb) => {
         user.merchantUsedCount = 0
       }
     }
+    // 是否需要按照余额排序
+    if (inparam.sortkey && inparam.sortkey == 'balance') {
+      ret = _.sortBy(ret, [inparam.sortkey])
+      if (inparam.sort == "desc") { ret = ret.reverse() }
+    }
     return ResOK(cb, { payload: ret })
   } catch (error) {
+    console.info(error)
     return ResErr(cb, error)
   }
 }
@@ -110,10 +116,9 @@ const managerUpdate = async (e, c, cb) => {
     // 判断是否变更了游戏或者抽成比
     let gameListDifference = getGameListDifference(manager, managerInfo)
     let isChangeGameList = gameListDifference.length == 0 ? false : true
-    let isChangeRate = manager.rate == managerInfo.rate ? false : true
     // 判断是否更新所有子用户的游戏或者抽成比
-    relatedChange(isChangeGameList, isChangeRate, gameListDifference, Manager)
-    
+    relatedChange(isChangeGameList, gameListDifference, Manager)
+
     // 操作日志记录
     params.operateAction = '更新线路商信息'
     params.operateToken = token
@@ -164,22 +169,16 @@ function getGameListDifference(userBefore, userAfter) {
   return _.difference(gameListBefore, gameListAfter)
 }
 /**
- * 变更子用户的游戏和抽成比等
+ * 变更子用户的游戏等
  * @param {*} isChangeGameList 
- * @param {*} isChangeRate 
  * @param {*} gameListDifference 
  * @param {*} user 
  */
-async function relatedChange(isChangeGameList, isChangeRate, gameListDifference, user) {
-  if (isChangeGameList || isChangeRate) {
+async function relatedChange(isChangeGameList, gameListDifference, user) {
+  if (isChangeGameList) {
     const [allChildErr, allChildRet] = await new UserModel().listAllChildUsers(user)
     for (let child of allChildRet) {
       let isNeedUpdate = false
-      // 如果变更了抽成比，且小于子用户抽成比，同步子用户抽成比
-      if (isChangeRate && user.rate < child.rate) {
-        child.rate = user.rate
-        isNeedUpdate = true
-      }
       // 如果减少游戏，则同步子用户游戏
       if (isChangeGameList) {
         let subGameList = []

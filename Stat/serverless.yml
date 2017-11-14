@@ -59,4 +59,29 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  
+  userRank: #用户排行榜
+    handler: api_rank.userRank
+    events:
+      -
+        http:
+          path: /statistics/userRank
+          method: post
+          cors: true
+          # authorizer: tokenAuth
+  initRank: #初始用户排行榜
+    handler: api_rank.initRank
+    events:
+      -
+        http:
+          path: /statistics/initRank
+          method: post
+          cors: true
+          # authorizer: tokenAuth
+  initBetRank: #初始用户流水排行榜
+    handler: api_rank.initBetRank
+    events:
+      -
+        http:
+          path: /statistics/initBetRank
+          method: post
+          cors: true

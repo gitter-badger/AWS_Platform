@@ -118,13 +118,18 @@ const agentList = async (e, c, cb) => {
         inparam.token = token
         const [checkAttError, errorParams] = new AgentCheck().checkQueryList(inparam)
         // 业务操作
-        const [err, ret] = await new AgentModel().page(token, inparam)
+        let [err, ret] = await new AgentModel().page(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of ret) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
+        }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            ret = _.sortBy(ret, [inparam.sortkey])
+            if (inparam.sort == "desc") { ret = ret.reverse() }
         }
         // 结果返回
         return ResOK(cb, { payload: ret })
@@ -205,13 +210,18 @@ const agentAdminList = async (e, c, cb) => {
             return ResErr(cb, BizErr.TokenErr('只有代理管理员有权限'))
         }
         // 业务操作
-        const [err, admins] = await new AgentModel().adminPage(token, inparam)
+        let [err, admins] = await new AgentModel().adminPage(token, inparam)
         if (err) { return ResErr(cb, err) }
         // 查询每个用户余额
         for (let user of admins) {
             const [balanceErr, lastBill] = await new BillModel().checkUserLastBill(user)
             user.balance = lastBill.lastBalance
             user.lastBill = lastBill
+        }
+        // 是否需要按照余额排序
+        if (inparam.sortkey && inparam.sortkey == 'balance') {
+            admins = _.sortBy(admins, [inparam.sortkey])
+            if (inparam.sort == "desc") { admins = admins.reverse() }
         }
         // 结果返回
         return ResOK(cb, { payload: admins })

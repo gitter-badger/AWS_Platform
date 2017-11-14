@@ -1,4 +1,5 @@
-// Biz Codes defines
+
+// 错误方案二
 export const Codes = {
   OK: '0',
   Error: '-1',
@@ -52,7 +53,6 @@ export const Codes = {
 
   TokenExpire: '90001',
 }
-
 export const BizErr = {
   JSONParseErr: (errMsg = 'JSON转换错误，请检查入参JSON格式') => {
     return { code: Codes.JSONParseError, msg: errMsg }
@@ -138,10 +138,10 @@ export const BizErr = {
   HttpsErr: (errMsg = '请求游戏服务器后台失败') => {
     return { code: Codes.HttpsError, msg: errMsg }
   },
-  CompanyNotExistError: (errMsg = "company not exist") => {
+  CompanyNotExistError: (errMsg = "游戏厂商不存在") => {
     return { code: Codes.CompanyNotExistError, msg: errMsg }
   },
-  PushMerchantError: (errMsg = "company not exist") => {
+  PushMerchantError: (errMsg = "推送商户错误") => {
     return { code: Codes.PushMerchantError, msg: errMsg }
   },
   TokenExpire: (errMsg = 'TOKEN已过期') => {
