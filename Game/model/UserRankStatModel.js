@@ -39,9 +39,9 @@ export class UserRankStatModel extends BaseModel {
         this.putItem({
             ...this.item,
             userName: inparam.userName,
-            balance: inparam.balance,
-            bet: bet,
-            win: win
+            balance: inparam.balance.toFixed(2),
+            bet: bet.toFixed(2),
+            win: win.toFixed(2)
         }).then((res) => {
             console.log(res)
         }).catch((err) => {
