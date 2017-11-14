@@ -2,8 +2,6 @@ import { Success, Fail, Codes, Tables, JwtVerify, JSONParser, RoleCodeEnum } fro
 import { UserRankStatModel } from './model/UserRankStatModel'
 import { UserModel } from './model/UserModel'
 const billDetailTrigger = async (e, c, cb) => {
-    console.info(e)
-    console.info('结束111111111111111111111')
     let betCount = 0
     let winCount = 0
     let lastTime = 0
