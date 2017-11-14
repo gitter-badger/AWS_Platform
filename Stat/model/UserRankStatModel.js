@@ -32,6 +32,9 @@ export class UserRankStatModel extends BaseModel {
         // 用户ID存在时，查询其前后用户
         if (inparam.userName != '0') {
             let targetUserIndex = _.findIndex(descResult, function (i) { return i.userName == inparam.userName })
+            if(targetUserIndex == -1){
+                return [0, []]
+            }
             let start = targetUserIndex < 2 ? 0 : targetUserIndex - 2
             let end = start + 5 > descResult.length - 1 ? descResult.length : targetUserIndex + 3
             let data = _.slice(descResult, start, end)
