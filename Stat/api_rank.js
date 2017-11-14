@@ -36,6 +36,9 @@ const initRank = async (e, c, cb) => {
     if (userErr) { return ResErr(cb, userErr) }
     //写入玩家数据
     for (let i = 0; i < userList.length; i++) {
+      if(userList[i].nickname=='NULL!'){
+        continue
+      }
       new UserRankStatModel().putsRank(userList[i])
     }
     return ResOK(cb, {})
