@@ -38,11 +38,11 @@ custom:
         - parentIdIndex
         - CreatedDateIndex
       read:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: ${ssm:BIG_STORE_UNIT}
         maximum: 10000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: ${ssm:BIG_STORE_UNIT}
         maximum: 10000
         usage: 0.75
     - table: HeraGamePlayer
@@ -82,6 +82,18 @@ custom:
     - table: HawkeyePlayerEmailRecord
       index:
         - CreatedDateIndex
+      read:
+        minimum: ${ssm:SMALL_STORE_UNIT}
+        maximum: 10000
+        usage: 0.75
+      write:
+        minimum: ${ssm:SMALL_STORE_UNIT}
+        maximum: 10000
+        usage: 0.75
+    - table: PlayerBillDetail
+      index:
+        - UserNameIndex
+        - BillIdIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
@@ -128,8 +140,8 @@ resources:
             AttributeName: emid
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: CreatedDateIndex
@@ -140,8 +152,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
 
     HeraGamePlayer: #玩家表
       Type: AWS::DynamoDB::Table
@@ -159,7 +171,7 @@ resources:
             AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
           WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
@@ -171,7 +183,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+              ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
 
     HeraGameRecord: #游戏战绩表
@@ -202,7 +214,7 @@ resources:
             AttributeName: betId
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
           WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
@@ -218,7 +230,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: CreatedDateIndex
             KeySchema:
@@ -390,7 +402,7 @@ resources:
             AttributeName: sn
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
@@ -408,7 +420,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
           -
             IndexName: BillIdIndex
             KeySchema:
@@ -422,7 +434,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
     UserRankStat: #用户排行榜
       Type: AWS::DynamoDB::Table
       Properties:

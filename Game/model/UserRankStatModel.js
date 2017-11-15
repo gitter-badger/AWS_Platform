@@ -29,8 +29,8 @@ export class UserRankStatModel extends BaseModel {
             }
         }
         const [err, ret] = await this.query(query)
-        let bet = inparam.betCount
-        let win = inparam.winCount
+        let bet = parseFloat(inparam.betCount)
+        let win = parseFloat(inparam.winCount)
         if (ret.Items && ret.Items.length > 0) {
             const record = ret.Items[0]
             bet += parseFloat(record.bet)
@@ -42,9 +42,9 @@ export class UserRankStatModel extends BaseModel {
             nickname: inparam.nickname,
             headPic: inparam.headPic,
             userId: inparam.userId,
-            balance: inparam.balance.toFixed(2),
-            bet: bet.toFixed(2),
-            win: win.toFixed(2)
+            balance: +inparam.balance.toFixed(2),
+            bet: +bet.toFixed(2),
+            win: +win.toFixed(2)
         }).then((res) => {
             console.log(res)
         }).catch((err) => {

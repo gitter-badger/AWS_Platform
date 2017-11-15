@@ -32,7 +32,7 @@ export class UserRankStatModel extends BaseModel {
         // 用户ID存在时，查询其前后用户
         if (inparam.userName != '0') {
             let targetUserIndex = _.findIndex(descResult, function (i) { return i.userName == inparam.userName })
-            if(targetUserIndex == -1){
+            if (targetUserIndex == -1) {
                 return [0, []]
             }
             let start = targetUserIndex < 2 ? 0 : targetUserIndex - 2
@@ -49,9 +49,9 @@ export class UserRankStatModel extends BaseModel {
         this.putItem({
             userName: inparam.userName,
             nickname: inparam.nickname,
-            headPic:inparam.headPic,
+            headPic: inparam.headPic,
             userId: inparam.userId,
-            balance: inparam.balance,
+            balance: parseFloat(inparam.balance),
             bet: 0,
             win: 0
         }).then((res) => {

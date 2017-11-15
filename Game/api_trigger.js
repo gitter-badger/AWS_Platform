@@ -22,13 +22,13 @@ const billDetailTrigger = async (e, c, cb) => {
             lastTime = createdAt
             balance = parseFloat(record.balance.N)
         }
-        console.log('玩家userName：' + userName + "类型：" + type + "金额：" + amount + "余额：" + balance)
     }
     // 根据用户名获取UserId
     let [uerErr, userInfo] = await new UserModel().get({ userName }, ["userId", "nickname", "headPic"])
     //玩家没有登录不进行用户排行榜操作
     if (userInfo.nickname && userInfo.nickname != "NULL!") {
         let inparam = { userName: userName, nickname: userInfo.nickname, headPic: userInfo.headPic, userId: parseInt(userInfo.userId), balance: balance, betCount: betCount, winCount: winCount }
+        console.log(inparam)
         new UserRankStatModel().updateRank(inparam)
     }
 }

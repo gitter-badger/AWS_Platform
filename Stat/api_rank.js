@@ -68,8 +68,8 @@ const initBetRank = async (e, c, cb) => {
           win += parseFloat(billItem.amount)
         }
       }
-      bet = bet.toFixed(2)
-      win = win.toFixed(2)
+      bet = +bet.toFixed(2)
+      win = +win.toFixed(2)
       new UserRankStatModel().updateBetRank({ userName: userName, bet: bet, win: win })
     }
     return ResOK(cb, {})
