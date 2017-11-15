@@ -55,11 +55,6 @@ export class UserRecordModel extends athena.BaseModel {
      */
     validateRecords(){
         let playerRecordError = CODES.playerRecordError;
-        // let singlieUser = this.isSingleUser();
-        // if(!singlieUser) {
-        //     this.remark = "数据非同一用户"
-        //     return [new CHeraErr(playerRecordError.takeErr), 0]
-        // }
 
         //获取玩家游戏累计收益（除去转入转出）
         let income = +(this.settlementIncome(this.records)).toFixed(2);
