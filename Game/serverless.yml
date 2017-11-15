@@ -435,30 +435,30 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
-    # UserRankStat: #用户排行榜
-    #   Type: AWS::DynamoDB::Table
-    #   Properties:
-    #     TableName: UserRankStat
-    #     AttributeDefinitions:
-    #       -
-    #         AttributeName: userName
-    #         AttributeType: S
-    #       # -
-    #       #   AttributeName: balance
-    #       #   AttributeType: N
-    #       # -
-    #       #   AttributeName: bet
-    #       #   AttributeType: N
-    #       # -
-    #       #   AttributeName: win
-    #       #   AttributeType: N
-    #     KeySchema:
-    #       -
-    #         AttributeName: userName
-    #         KeyType: HASH
-    #       # -
-    #       #   AttributeName: balance
-    #       #   KeyType: RANGE
-    #     ProvisionedThroughput:
-    #       ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-    #       WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}          
+    UserRankStat: #用户排行榜
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UserRankStat
+        AttributeDefinitions:
+          -
+            AttributeName: userName
+            AttributeType: S
+          # -
+          #   AttributeName: balance
+          #   AttributeType: N
+          # -
+          #   AttributeName: bet
+          #   AttributeType: N
+          # -
+          #   AttributeName: win
+          #   AttributeType: N
+        KeySchema:
+          -
+            AttributeName: userName
+            KeyType: HASH
+          # -
+          #   AttributeName: balance
+          #   KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}          
