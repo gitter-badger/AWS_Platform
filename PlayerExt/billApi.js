@@ -32,14 +32,14 @@ const ResFail = (callback, res) => {
  * @param {*} cb 
  */
 const billFlow = async(event, context, cb) => {
-  // const [tokenErr, token] = await Model.currentToken(event);
-  // if (tokenErr) {
-  //   return ResFail(cb, tokenErr)
-  // }
-  // const [e, tokenInfo] = await JwtVerify(token[1])
-  // if(e) {
-  //   return ResFail(cb, e)
-  // }
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
    //检查参数是否合法
   console.log(event.body);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
@@ -53,7 +53,8 @@ const billFlow = async(event, context, cb) => {
       Object.assign(checkAttError, {params: errorParams});
       return cb(null, ReHandler.fail(checkAttError));
   }
-
+  let sortKey = requestParams.sortKey || "createdAt";
+  let sortMode = requestParams.sort || "desc";  //asce 升序  desc 降序
   let {userName,startTime, endTime, type, action} = requestParams;
   if(!startTime) {
     startTime = 0;
@@ -77,13 +78,25 @@ const billFlow = async(event, context, cb) => {
       i --;
     }
   }
+  for(let i = 0; i < list.length; i++) {
+      for(let j = i+1; j < list.length;j++) {
+          if(isSort(list[i], list[j])){
+              let item = list[i];
+              list[i] = list[j];
+              list[j] = item;
+          }
+      }
+  }
+  function isSort(a, b){
+      return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+  }
   function buildObj(item) {
     return {
       sn : item.sn,
       createdAt : item.createdAt,
       type : item.type,
       businessKey : item.businessKey || "",
-      originalAmount : item.originalAmount || "",
+      originalAmount : item.originalAmount || 0,
       balance : item.balance || "",
       amount : item.amount
     }
@@ -97,14 +110,14 @@ const billFlow = async(event, context, cb) => {
  * @param {*} cb 
  */
 const billDetail = async(event, context, cb) => {
-  // const [tokenErr, token] = await Model.currentToken(event);
-  // if (tokenErr) {
-  //   return ResFail(cb, tokenErr)
-  // }
-  // const [e, tokenInfo] = await JwtVerify(token[1])
-  // if(e) {
-  //   return ResFail(cb, e)
-  // }
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
   if(parserErr) {
       return ResFail(cb, parserErr);
@@ -116,6 +129,8 @@ const billDetail = async(event, context, cb) => {
       Object.assign(checkAttError, {params: errorParams});
       return cb(null, ReHandler.fail(checkAttError));
   }
+  let sortKey = requestParams.sortKey || "createdAt";
+  let sortMode = requestParams.sort || "desc";  //asce 升序  desc 降序
   let {billId} = requestParams;
   let billDetail = new UserBillDetailModel();
   let [detailErr, list] = await billDetail.billDetail(billId);
@@ -133,11 +148,11 @@ const billDetail = async(event, context, cb) => {
       list.splice(i, 1);
       i --;
     }else {
-      sumAmount += item.amount;
+      sumAmount += Math.abs(item.amount);
       reSumAmount += item.reAmount || 0;
     }
   }
-  depSumAmount = sumAmount + reSumAmount;
+  depSumAmount = -sumAmount + reSumAmount;
   //根据billId查询账单
   let billModel = new UserBillModel();
   let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt","amount"], "billIdIndex");
@@ -154,12 +169,24 @@ const billDetail = async(event, context, cb) => {
       userName : billInfo.userName,  //用户名
       joinTime : billInfo.joinTime || 0,  //进入时间
       createdAt : billInfo.createAt,   //退出时间（结算时间）
-      avgRTP : +depSumAmount/(-sumAmount).toFixed(2),  
+      avgRTP : Math.abs(+reSumAmount/(sumAmount).toFixed(2)),  //净利润/总投注数
       sumAmount : sumAmount , //下注总额
       reSumAmount, //返还金额
       depSumAmount, //利润总额
-      mixNum :reSumAmount  //洗马量
+      mixNum :sumAmount  //洗马量
     }
+  }
+  for(let i = 0; i < list.length; i++) {
+      for(let j = i+1; j < list.length;j++) {
+          if(isSort(list[i], list[j])){
+              let item = list[i];
+              list[i] = list[j];
+              list[j] = item;
+          }
+      }
+  }
+  function isSort(a, b){
+      return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
   }
   let returnArr = list.map((item) => {
     return {
@@ -190,15 +217,14 @@ const billDetail = async(event, context, cb) => {
  * @param {*} cb 
  */
 const billGameRecord = async(event, context, cb) => {
-  // const [tokenErr, token] = await Model.currentToken(event);
-  // if (tokenErr) {
-  //   return ResFail(cb, tokenErr)
-  // }
-  // const [e, tokenInfo] = await JwtVerify(token[1])
-  // if(e) {
-  //   return ResFail(cb, e)
-  // }
-
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
   if(parserErr) {
       return ResFail(cb, parserErr);

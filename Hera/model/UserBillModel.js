@@ -141,7 +141,6 @@ export class UserBillModel extends athena.BaseModel {
         if(serial) {
             list.forEach((item, index) => {
                 if(item.type == 3) {
-                    console.log(betArray);
                     // let p = findBet(betArray, item);
                     let p = betArray.find((b) => b.businessKey == item.businessKey)
                     if(!p) {

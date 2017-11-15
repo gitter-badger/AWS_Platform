@@ -1,0 +1,38 @@
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
+import { BaseModel } from './BaseModel'
+import _ from 'lodash'
+
+export class PlayerBillDetailModel extends BaseModel {
+    constructor() {
+        super()
+        // 设置表名
+        this.params = {
+            TableName: Tables.PlayerBillDetail,
+        }
+        // 设置对象属性
+        this.item = {
+            ...this.baseitem
+        }
+    }
+    /**
+     * 查询用户排行
+     */
+    async scanBillDetail() {
+        const [err, ret] = await this.scan({
+            FilterExpression: '#type = :type1 OR #type = :type2',
+            ExpressionAttributeNames: {
+                '#type': 'type',
+            },
+            ExpressionAttributeValues: {
+                ':type1': 3,
+                ':type2': 4
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+       
+        return [0,ret.Items]
+    }
+  
+}
