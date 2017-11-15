@@ -637,6 +637,7 @@ function getSign(secret, args, msg) {
 async function settlement(event, context, callback) {
    //json转换
   console.log(event);
+  console.log("开始处理："+Date.now());
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if (parserErr) return callback(null, ReHandler.fail(parserErr));
   //检查参数是否合法
@@ -665,7 +666,6 @@ async function settlement(event, context, callback) {
   }
   let company = game.company || {};
   let gameKey = company.companyKey;
-  console.log("gameKey:"+gameKey);
   let serverSign = getSign(gameKey, ["userId", "timestamp", "records", "gameId"], requestParams);
   if(sign != serverSign) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
@@ -692,9 +692,12 @@ async function settlement(event, context, callback) {
     }));
   }
   //解压账单数据
+  console.log("解压前："+Date.now());
   let buffer = Buffer.from(records, 'base64');
   let str = zlib.unzipSync(buffer).toString();
+  console.log("解压后："+Date.now());
   let [parseRecordErr, list] = athena.Util.parseJSON(str);
+  console.log("数据条数");
   if (parseRecordErr) {
     return callback(null, ReHandler.fail(parseRecordErr));
   }
@@ -781,11 +784,12 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(uSaveErr));
   }
   //查账
-  let [getError, userSumAmount] = await userBillModel.getBalance();
+  let userSumAmount = +((oriBalance + userBillModel.amount).toFixed(2));
+  // let [getError, userSumAmount] = await userBillModel.getBalance();
   console.log("用户余额："+userSumAmount);
-  if (getError) {
-    return callback(null, ReHandler.fail(getError));
-  }
+  // if (getError) {
+  //   return callback(null, ReHandler.fail(getError));
+  // }
   //更新余额
   let u = new UserModel();
   let [updatebError] = await u.update({ userName: userModel.userName }, { balance: userSumAmount });
@@ -797,6 +801,7 @@ async function settlement(event, context, callback) {
       return callback(null, ReHandler.fail(gameError));
     }
   }
+  console.log("处理完毕时间:"+Date.now());
   callback(null, ReHandler.success({
     data: { balance: userSumAmount }
   }));

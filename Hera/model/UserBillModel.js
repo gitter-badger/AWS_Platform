@@ -114,6 +114,7 @@ export class UserBillModel extends athena.BaseModel {
                 delete item.preBalance
             })
         }
+        console.log("汇总前:"+Date.now());
         list.map((item) => {
             item.billId = this.billId;
             item.createdAt = +item.createdAt || 0;
@@ -127,6 +128,7 @@ export class UserBillModel extends athena.BaseModel {
         list.sort((a, b) => {
             return a.createdAt - b.createdAt;
         })
+        
         //小汇总
         let  betArray = [], reArray= [], notDep = true;
         function findBet(array, b) {
@@ -172,6 +174,7 @@ export class UserBillModel extends athena.BaseModel {
             })
         }
         list = list.concat(betArray);
+        console.log("汇总后:"+Date.now());
         new UserBillDetailModel().batchWrite(list);
         delete this.records;
         return super.save();
