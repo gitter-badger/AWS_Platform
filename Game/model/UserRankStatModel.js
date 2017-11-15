@@ -42,9 +42,9 @@ export class UserRankStatModel extends BaseModel {
             nickname: inparam.nickname,
             headPic: inparam.headPic,
             userId: inparam.userId,
-            balance: inparam.balance.toFixed(2),
-            bet: bet.toFixed(2),
-            win: win.toFixed(2)
+            balance: +inparam.balance.toFixed(2),
+            bet: +bet.toFixed(2),
+            win: +win.toFixed(2)
         }).then((res) => {
             console.log(res)
         }).catch((err) => {
