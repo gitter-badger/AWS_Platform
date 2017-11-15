@@ -120,6 +120,7 @@ functions:
           cors: true
   settlement:  #玩家游戏结算
     handler: openApi.settlement
+    memorySize: 512
     events:
       - http:
           path: /game/settlement

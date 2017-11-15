@@ -26,6 +26,7 @@ export class UserBillDetailModel extends athena.BaseModel {
      * @param {*} records 
      */
     batchWrite(records) {
+        console.log("批量写入前："+Date.now());
         let sumBatch= [];
         for(let i =0; i < records.length; i += 25) {
             let batch = {
@@ -53,8 +54,10 @@ export class UserBillDetailModel extends athena.BaseModel {
         
         Promise.all(promises).then((result) => {
             console.log("插入账单明细成功");
+            console.log("批量写入后："+Date.now());
         }).catch((err) => {
             console.log("插入账单明细失败");
+            console.log(records);
             console.log(err);
         });
         
