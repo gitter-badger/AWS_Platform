@@ -43,9 +43,11 @@ export class BaseModel{
         return item;
     }
     save(){
+        console.log("保存前："+Date.now());
         let item = this.setProperties();
         return new Promise((reslove, reject) => {
             this.db$("put", {Item:item}).then((result) => {
+                console.log("保存后："+Date.now());
                 return reslove([null, result]);
             }).catch((err) => {
                 console.log(err);
@@ -310,7 +312,8 @@ export class BaseModel{
         })
     }
     db$(action, params){
-        Object.assign(params, {TableName : this.tableName});
+        params.TableName = this.tableName;
+        // Object.assign(params, {TableName : this.tableName});
         return this.dbClient[action](params).promise();
     }
 }

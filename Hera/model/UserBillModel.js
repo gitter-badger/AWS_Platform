@@ -175,9 +175,12 @@ export class UserBillModel extends athena.BaseModel {
         }
         list = list.concat(betArray);
         console.log("汇总后:"+Date.now());
-        new UserBillDetailModel().batchWrite(list);
+        // new UserBillDetailModel().batchWrite(list);
         delete this.records;
-        return super.save();
+        let promise =  super.save();
+        this.records = list;
+        return promise;
+        
     }
     async handlerPoint(){
         if(this.action === Action.recharge){ //玩家充值(中心钱包转入平台钱包) 玩家平台钱数对应增加

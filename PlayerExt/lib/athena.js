@@ -17,6 +17,7 @@ export class BaseModel{
         return this.db$(action, params).then((result)=>{
             array = array.concat(result.Items);
             if(result.LastEvaluatedKey) {
+                console.log("11111111111111111");
                 params.ExclusiveStartKey = result.LastEvaluatedKey;
                 return this.promise(action, params, array);
             }else {
@@ -121,12 +122,13 @@ export class BaseModel{
         return [null, array[0]];
     }
  
-    count(filterExpression, expressionAttributeValues){
+    count(filterExpression, expressionAttributeValues, indexName){
         return new Promise((reslove, reject) => {
             this.db$("query", {
                 KeyConditionExpression : filterExpression,
                 ExpressionAttributeValues : expressionAttributeValues,
                 Select : "COUNT",
+                IndexName : indexName
             }).then((result) => {
                 reslove([null, result.Count])
             }).catch((err) => {

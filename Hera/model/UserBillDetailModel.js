@@ -27,7 +27,7 @@ export class UserBillDetailModel extends athena.BaseModel {
      */
     batchWrite(records) {
         console.log("批量写入前："+Date.now());
-        let sumBatch= [];
+        let  createdDate = this.parseDay(new Date()),promises = [];
         for(let i =0; i < records.length; i += 25) {
             let batch = {
                 "RequestItems":{
@@ -38,7 +38,7 @@ export class UserBillDetailModel extends athena.BaseModel {
             for(let j = i; j< i+25;j ++){
                 let item = records[j];
                 if(item) {
-                    item.createdDate = this.parseDay(new Date(item.createdAt));
+                    item.createdDate = createdDate;
                     saveArray.push({
                         PutRequest : {
                             Item : item
@@ -47,19 +47,22 @@ export class UserBillDetailModel extends athena.BaseModel {
                 }
             }
             batch.RequestItems.PlayerBillDetail = saveArray;
-            sumBatch.push(batch);
+            promises.push(this.db$("batchWrite", batch));
         }
-
-        let promises = sumBatch.map((b)  => this.db$("batchWrite", b));
-        
+        console.log("-----------------");
+        console.log(records.length);
+        console.log(promises.length);
+        // let promises = sumBatch.map((b)  => this.db$("batchWrite", b));
+        console.log("promise开始："+Date.now());
         Promise.all(promises).then((result) => {
             console.log("插入账单明细成功");
             console.log("批量写入后："+Date.now());
         }).catch((err) => {
             console.log("插入账单明细失败");
+            console.log("批量写入后："+Date.now());
             console.log(records);
             console.log(err);
         });
-        
+        console.log("promise结束："+Date.now());
     }
 }

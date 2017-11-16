@@ -134,9 +134,7 @@ const billDetail = async(event, context, cb) => {
   let {billId} = requestParams;
   let billDetail = new UserBillDetailModel();
   let [detailErr, list] = await billDetail.billDetail(billId);
-  console.log(list);
   if(detailErr) {
-    console.log("11111111111111");
     return cb(null, ReHandler.fail(detailErr));
   }
   //洗马量和argPTR没有写

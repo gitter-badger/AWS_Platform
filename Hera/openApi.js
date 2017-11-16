@@ -15,6 +15,8 @@ import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
 
 import { MerchantModel } from "./model/MerchantModel";
 
+import { UserBillDetailModel } from "./model/UserBillDetailModel";
+
 
 import { UserModel, GameState, State } from "./model/UserModel";
 
@@ -620,7 +622,6 @@ function getSign(secret, args, msg) {
     for (var i = 0, l = paramNameAndValueArray.length; i < l; i++) {
         signValue += paramNameAndValueArray[i];
     }
-    console.log(signValue);
     //首尾加上秘钥
     signValue = encodeURIComponent(signValue);
     signValue = secret + signValue + secret;
@@ -636,7 +637,7 @@ function getSign(secret, args, msg) {
  */
 async function settlement(event, context, callback) {
    //json转换
-  console.log(event);
+  // console.log(event);
   console.log("开始处理："+Date.now());
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if (parserErr) return callback(null, ReHandler.fail(parserErr));
@@ -697,7 +698,7 @@ async function settlement(event, context, callback) {
   let str = zlib.unzipSync(buffer).toString();
   console.log("解压后："+Date.now());
   let [parseRecordErr, list] = athena.Util.parseJSON(str);
-  console.log("数据条数");
+  console.log("数据条数:"+list.length);
   if (parseRecordErr) {
     return callback(null, ReHandler.fail(parseRecordErr));
   }
@@ -785,15 +786,12 @@ async function settlement(event, context, callback) {
   }
   //查账
   let userSumAmount = +((oriBalance + userBillModel.amount).toFixed(2));
-  // let [getError, userSumAmount] = await userBillModel.getBalance();
   console.log("用户余额："+userSumAmount);
-  // if (getError) {
-  //   return callback(null, ReHandler.fail(getError));
-  // }
   //更新余额
   let u = new UserModel();
   let [updatebError] = await u.update({ userName: userModel.userName }, { balance: userSumAmount });
   if (updatebError) return callback(null, ReHandler.fail(updatebError));
+  console.log("玩家状态开始："+Date.now());
   //解除玩家状态
   if (userModel.gameState != GameState.offline) {
     let [gameError] = await new UserModel().update({userName:userModel.userName}, {gameState:GameState.online, gameId:"0",sid:"0"});
@@ -801,10 +799,13 @@ async function settlement(event, context, callback) {
       return callback(null, ReHandler.fail(gameError));
     }
   }
+  console.log("玩家状态结束："+Date.now());
   console.log("处理完毕时间:"+Date.now());
+  console.log("批量写入数量:"+ userBillModel.records.length);
   callback(null, ReHandler.success({
     data: { balance: userSumAmount }
   }));
+  new UserBillDetailModel().batchWrite(userBillModel.records);
 }
 
 /**

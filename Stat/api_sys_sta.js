@@ -9,8 +9,12 @@ import athena from "./lib/athena"
 import {PlatformUserModel} from "./model/PlatformUserModel"
 
 import {PlatformBillModel} from "./model/PlatformBillModel"
+const uid = require('uuid/v4');
 
 import {BillStatModel} from "./model/BillStatModel"
+
+import {UserBillModel} from "./model/UserBillModel"
+
 
 import {PlayerModel} from "./model/PlayerModel"
 
@@ -22,6 +26,144 @@ import {onlineUser}  from "./lib/TcpUtil"
 
 
 import {Model} from "./lib/Dynamo"
+
+/**
+ * 初始看板
+ * 1,找到所有用户账单
+ * 2,找到所有管理员账单
+ * @param {*} event 
+ * @param {*} context 
+ * @param {*} callback 
+ */
+const init = async function(event, context, callback) {
+    let  allStatArr = [],userInfoObj = {},platUserObj= {},platUserRoleObj = {};
+    let [playerBillListErr, playerBillList] = await new UserBillModel().scan({});
+    console.log(playerBillList.length);
+    if(playerBillListErr) {
+        console.log("玩家账单列表失败:");
+        console.log(playerBillListErr);
+    }
+    
+    for(let i = 0; i < playerBillList.length; i++) {
+        let playerBillItem = playerBillList[i];
+        if(playerBillItem.type== 3 || playerBillItem.type ==4) {
+            let parentId = userInfoObj[playerBillItem.userName];
+            if(!parentId) {
+                let [userErr, userInfo] = await new PlayerModel().get({userName:playerBillItem.userName});
+                if(userErr || !userInfo) {
+                    console.log("没有找到用户上级:"+playerBillItem.userName);
+                    continue;
+                }
+                parentId = userInfo.parent;
+                userInfoObj[playerBillItem.userName] = parentId;
+            }
+            pushStat(allStatArr, playerBillItem, parentId, "10000",false, 1);
+            let allUserId = playerBillItem.msn == "000" ? "ALL_AGENT_PLAYER" : "ALL_PLAYER";
+            pushStat(allStatArr, playerBillItem, allUserId, "10000", false, 3);
+        }
+    }
+
+    // 用户账单表
+    let [userBillListErr, userBillList] = await new PlatformBillModel().scan({});
+    if(userBillListErr) {
+        console.log("平台用户账单列表失败:");
+        console.log(userBillListErr);
+    }
+    console.log(userBillList.length);
+    for(let i = 0; i < userBillList.length; i++) {
+        console.log(i);
+        let billInfo = userBillList[i];
+        let {amount, fromUser, toUser,fromRole, toRole, userId} = billInfo;
+        let platUserInfo = platUserObj[userId];
+        if(!platUserInfo) {
+            let [userErr, p] = await new PlatformUserModel().findByUserId(userId);
+            if(userErr || !p) {
+                console.log("查找用户信息失败:"+userErr);
+                continue;
+            }
+            platUserInfo = p;
+            platUserObj[userId] = platUserInfo;
+        }
+        
+        //找到上下级关系，只有上次给下级存钱才保存
+        let toUserInfo = platUserRoleObj[toUser+"-"+toRole];
+        if(!toUserInfo) {
+            console.log("没有："+toUser);
+            let [toUserErr, t] = await new PlatformUserModel().get({username:toUser,role:toRole},[], "RoleUsernameIndex");
+            if(toUserErr || !t) {
+                console.log("找目标用户错误:"+toUserErr);
+                continue;
+            }
+            platUserRoleObj[toUser+"-"+toRole] = toUserInfo = t;
+        }
+        
+        if(toUserInfo) {
+            let levelArr = toUserInfo.levelIndex.split(",");
+            let isAdmin = fromRole == RoleCodeEnum.SuperAdmin || fromRole == RoleCodeEnum.PlatformAdmin;
+            let isAgentAdmin = fromRole == RoleCodeEnum.Agent;
+            let parentUid = levelArr.pop();
+            if((parentUid == userId || (isAdmin && parentUid == "01") || (isAgentAdmin && parentUid == "01") ) && amount < 0) { //只管直属上级对下级存钱
+                console.log("是直属");
+                let allUserId = null;
+                if(isAdmin) {
+                    allUserId = "ALL_ADMIN"
+                }
+                if(isAgentAdmin) {
+                    allUserId = "ALL_AGENT_ADMIN"
+                }
+                pushStat(allStatArr, billInfo, userId, platUserInfo.role, false, 1);
+                pushStat(allStatArr, billInfo, userId, platUserInfo.role,true, 2);
+                if(allUserId) {
+                    pushStat(allStatArr, billInfo, allUserId, platUserInfo.role, false, 3);
+                }
+            }
+        }
+    }
+    //批量写入
+    console.log("?????????????????");
+    console.log(allStatArr.length);
+    // console.log(allStatArr);
+    new BillStatModel().batchWrite(allStatArr);
+    /**
+     * 
+     * @param {*} array  所有账单拼接
+     * @param {*} userId 
+     * @param {*} billItem 比较账单
+     */
+    function findStat(array, userId, billItem, month) {
+        for(let i = 0; i < array.length; i ++) {
+            let item = array[i];
+            if(item.userId == userId 
+                && item.dateStr == (month ? TimeUtil.formatMonth(billItem.createAt || billItem.createdAt) :TimeUtil.formatDay(billItem.createAt || billItem.createdAt))
+                && item.gameType == billItem.gameType) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    function pushStat(array, billItem,userId, role,month, type) {
+        let oriItem = findStat(array, userId, billItem,month);
+        if(!oriItem) {
+            array.push({
+                sn : uid(),
+                createdAt : Date.now(),
+                createdDate : TimeUtil.formatFillDay(Date.now()),
+                dateStr : month ? TimeUtil.formatMonth(billItem.createAt || billItem.createdAt) :TimeUtil.formatDay(billItem.createAt || billItem.createdAt),
+                amount : billItem.amount,
+                role : role,
+                type : type,
+                gameType : billItem.gameType || -1,
+                userId : userId,
+            })
+        }else {
+            oriItem.amount += +(billItem.amount.toFixed(2));
+            oriItem.amount = +(oriItem.amount).toFixed(2);
+        }
+    }
+    // console.log(allStatArr);
+    console.log(allStatArr.length);
+}
 
 /**
  * 系统总看板
@@ -452,11 +594,11 @@ async function consumeSumPoints(role, userId){
     array.forEach(function(element) {
         if(typeof userId == "string") {
             if(userId  && element.userId == userId) {
-                sum += element.amount;
+                sum += +(element.amount.toFixed(2));
             }
         }else {
             if(userId.indexOf(element.userId)!=-1) {
-                sum += element.amount;
+                sum += +(element.amount.toFixed(2));
             }
         }
         
@@ -511,4 +653,5 @@ export{
     overview, //总看板
     gameConsumeStat, //游戏消耗详情
     consumeAndIncome, //售出/收益
+    init
 }
