@@ -799,7 +799,6 @@ async function settlement(event, context, callback) {
       return callback(null, ReHandler.fail(gameError));
     }
   }
-  console.log("玩家状态结束："+Date.now());
   console.log("处理完毕时间:"+Date.now());
   console.log("批量写入数量:"+ userBillModel.records.length);
   callback(null, ReHandler.success({
@@ -1067,7 +1066,6 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
-  console.log(batchSaveArr);
   let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
   if (batchSaveErr) {
     return callback(null, ReHandler.fail(batchSaveErr));

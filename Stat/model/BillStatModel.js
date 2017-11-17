@@ -96,7 +96,22 @@ export class BillStatModel extends athena.BaseModel {
         console.log(promises.length);
         console.log("promise开始："+Date.now());
         Promise.all(promises).then((result) => {
-            console.log("批量写入后："+Date.now());
+            // console.log(result);
+            let unArray = [];
+            for(let i =0; i < result.length; i++) {
+                let r = result[i];
+                if(r.UnprocessedItems.BillStat) {
+                    unArray = unArray.concat(r.UnprocessedItems.BillStat);
+                }
+            }
+            for(let i = 0; i < unArray.length; i++) {
+                unArray[i] = unArray[i].PutRequest.Item;
+            }
+            console.log("重新处理");
+            console.log("发生错误的总条目数:"+unArray.length);
+            if(unArray.length > 0) {
+                this.batchWrite(unArray);
+            }
         }).catch((err) => {
             console.log("插入失败");
             console.log("批量写入后："+Date.now());

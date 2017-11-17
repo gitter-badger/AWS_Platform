@@ -49,20 +49,31 @@ export class UserBillDetailModel extends athena.BaseModel {
             batch.RequestItems.PlayerBillDetail = saveArray;
             promises.push(this.db$("batchWrite", batch));
         }
-        console.log("-----------------");
-        console.log(records.length);
-        console.log(promises.length);
-        // let promises = sumBatch.map((b)  => this.db$("batchWrite", b));
-        console.log("promise开始："+Date.now());
         Promise.all(promises).then((result) => {
             console.log("插入账单明细成功");
+            // console.log(result);
+            console.log(result.length);
             console.log("批量写入后："+Date.now());
+            let unArray = [],errPromiseNum = 0;
+            for(let i =0; i < result.length; i++) {
+                let r = result[i];
+                if(r.UnprocessedItems.PlayerBillDetail) {
+                    errPromiseNum ++;
+                    unArray = unArray.concat(r.UnprocessedItems.PlayerBillDetail);
+                }
+            }
+            for(let i = 0; i < unArray.length; i++) {
+                unArray[i] = unArray[i].PutRequest.Item;
+            }
+            console.log("重新处理");
+            console.log("发生错误的总条目数:"+unArray.length);
+            if(unArray.length > 0) {
+                this.batchWrite(unArray);
+            }
         }).catch((err) => {
             console.log("插入账单明细失败");
-            console.log("批量写入后："+Date.now());
             console.log(records);
             console.log(err);
         });
-        console.log("promise结束："+Date.now());
     }
 }

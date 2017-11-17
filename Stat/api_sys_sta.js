@@ -62,7 +62,7 @@ const init = async function(event, context, callback) {
             pushStat(allStatArr, playerBillItem, allUserId, "10000", false, 3);
         }
     }
-
+    console.log("玩家报表处理成功，准备处理平台用户报表");
     // 用户账单表
     let [userBillListErr, userBillList] = await new PlatformBillModel().scan({});
     if(userBillListErr) {
@@ -88,7 +88,6 @@ const init = async function(event, context, callback) {
         //找到上下级关系，只有上次给下级存钱才保存
         let toUserInfo = platUserRoleObj[toUser+"-"+toRole];
         if(!toUserInfo) {
-            console.log("没有："+toUser);
             let [toUserErr, t] = await new PlatformUserModel().get({username:toUser,role:toRole},[], "RoleUsernameIndex");
             if(toUserErr || !t) {
                 console.log("找目标用户错误:"+toUserErr);
@@ -103,7 +102,6 @@ const init = async function(event, context, callback) {
             let isAgentAdmin = fromRole == RoleCodeEnum.Agent;
             let parentUid = levelArr.pop();
             if((parentUid == userId || (isAdmin && parentUid == "01") || (isAgentAdmin && parentUid == "01") ) && amount < 0) { //只管直属上级对下级存钱
-                console.log("是直属");
                 let allUserId = null;
                 if(isAdmin) {
                     allUserId = "ALL_ADMIN"
@@ -120,7 +118,6 @@ const init = async function(event, context, callback) {
         }
     }
     //批量写入
-    console.log("?????????????????");
     console.log(allStatArr.length);
     // console.log(allStatArr);
     new BillStatModel().batchWrite(allStatArr);
@@ -268,23 +265,6 @@ const overview = async function(event, context, callback) {
             }
         }
         return callback(null, ReHandler.success({oneNum : online, twoNum:sum}));
-        // if(isAdmin) {
-        //     [err, obj] = await new PlayerModel().statCount();
-        // }else {
-        //     let buIds = [];
-        //     if(role == RoleCodeEnum.Merchant) {
-        //         buIds = [userId];
-        //     }
-        //     if(role == RoleCodeEnum.Manager) {
-        //         buIds = await findChildrenMerchant(userId);
-        //     }
-        //     [err, obj] = await new PlayerModel().statCount(buIds);
-        // }
-        // if(err) {
-        //     return errorHandle(callback, ReHandler.fail(err));
-        // }
-        // obj.type = type;
-        // return callback(null, ReHandler.success(obj));
       }
       case 4 : { //签约情况
         let buIds;
