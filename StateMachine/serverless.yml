@@ -56,6 +56,13 @@ functions:
             path: ipquery
             method: get
             cors: true
+  fetchuser: #获取用户信息
+    handler: api_fetch.fetchuser
+    events:
+        - http:
+            path: fetchuser
+            method: post
+            cors: true
 # stepFunctions:
 #   stateMachines:
 #     backup:

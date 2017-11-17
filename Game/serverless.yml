@@ -38,11 +38,11 @@ custom:
         - parentIdIndex
         - CreatedDateIndex
       read:
-        minimum: ${ssm:BIG_STORE_UNIT}
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
       write:
-        minimum: ${ssm:BIG_STORE_UNIT}
+        minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
         usage: 0.75
     - table: HeraGamePlayer
@@ -99,7 +99,7 @@ custom:
         maximum: 10000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: ${ssm:BIG_STORE_UNIT}
         maximum: 10000
         usage: 0.75
 functions:
