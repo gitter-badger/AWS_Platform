@@ -11,7 +11,7 @@ const fetchuser = async (e, c, cb) => {
         // 入参转换
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
-        // const [checkAttError, errorParams] = new FetchCheck().check(inparam)
+        // const [checkAttError, errorParams] = new FetchCheck().checkFetchUser(inparam)
         // 获取令牌，只有管理员有权限
         // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
 
