@@ -22,7 +22,7 @@ export class UserModel extends BaseModel {
      */
     async fetch(inparam) {
         let query = {
-            ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt',
+            ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt',
             ExpressionAttributeNames: {
                 '#role': 'role',
                 '#level': 'level',
