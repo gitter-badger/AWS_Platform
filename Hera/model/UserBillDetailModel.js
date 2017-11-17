@@ -27,7 +27,7 @@ export class UserBillDetailModel extends athena.BaseModel {
      */
     batchWrite(records) {
         console.log("批量写入前："+Date.now());
-        let sumBatch= [];
+        let  createdDate = this.parseDay(new Date()),promises = [];
         for(let i =0; i < records.length; i += 25) {
             let batch = {
                 "RequestItems":{
@@ -38,7 +38,7 @@ export class UserBillDetailModel extends athena.BaseModel {
             for(let j = i; j< i+25;j ++){
                 let item = records[j];
                 if(item) {
-                    item.createdDate = this.parseDay(new Date(item.createdAt));
+                    item.createdDate = createdDate;
                     saveArray.push({
                         PutRequest : {
                             Item : item
@@ -47,19 +47,33 @@ export class UserBillDetailModel extends athena.BaseModel {
                 }
             }
             batch.RequestItems.PlayerBillDetail = saveArray;
-            sumBatch.push(batch);
+            promises.push(this.db$("batchWrite", batch));
         }
-
-        let promises = sumBatch.map((b)  => this.db$("batchWrite", b));
-        
         Promise.all(promises).then((result) => {
             console.log("插入账单明细成功");
+            // console.log(result);
+            console.log(result.length);
             console.log("批量写入后："+Date.now());
+            let unArray = [],errPromiseNum = 0;
+            for(let i =0; i < result.length; i++) {
+                let r = result[i];
+                if(r.UnprocessedItems.PlayerBillDetail) {
+                    errPromiseNum ++;
+                    unArray = unArray.concat(r.UnprocessedItems.PlayerBillDetail);
+                }
+            }
+            for(let i = 0; i < unArray.length; i++) {
+                unArray[i] = unArray[i].PutRequest.Item;
+            }
+            console.log("重新处理");
+            console.log("发生错误的总条目数:"+unArray.length);
+            if(unArray.length > 0) {
+                this.batchWrite(unArray);
+            }
         }).catch((err) => {
             console.log("插入账单明细失败");
             console.log(records);
             console.log(err);
         });
-        
     }
 }

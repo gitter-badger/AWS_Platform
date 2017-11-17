@@ -64,5 +64,61 @@ export class BillStatModel extends athena.BaseModel {
             });
         })
     }
+    /**
+     * 批量保存
+     * @param {*} records 
+     */
+    batchWrite(records) {
+        let  createdDate = this.parseDay(new Date()),promises = [];
+        for(let i =0; i < records.length; i += 25) {
+            let batch = {
+                "RequestItems":{
+                    "BillStat" : []
+                } 
+            }
+            let saveArray = [];
+            for(let j = i; j< i+25;j ++){
+                let item = records[j];
+                if(item) {
+                    item.createdDate = createdDate;
+                    saveArray.push({
+                        PutRequest : {
+                            Item : item
+                        }
+                    })
+                }
+            }
+            batch.RequestItems.BillStat = saveArray;
+            promises.push(this.db$("batchWrite", batch));
+        }
+        console.log("-----------------");
+        console.log(records.length);
+        console.log(promises.length);
+        console.log("promise开始："+Date.now());
+        Promise.all(promises).then((result) => {
+            // console.log(result);
+            let unArray = [];
+            for(let i =0; i < result.length; i++) {
+                let r = result[i];
+                if(r.UnprocessedItems.BillStat) {
+                    unArray = unArray.concat(r.UnprocessedItems.BillStat);
+                }
+            }
+            for(let i = 0; i < unArray.length; i++) {
+                unArray[i] = unArray[i].PutRequest.Item;
+            }
+            console.log("重新处理");
+            console.log("发生错误的总条目数:"+unArray.length);
+            if(unArray.length > 0) {
+                this.batchWrite(unArray);
+            }
+        }).catch((err) => {
+            console.log("插入失败");
+            console.log("批量写入后："+Date.now());
+            console.log(records);
+            console.log(err);
+        });
+        console.log("promise结束："+Date.now());
+    }
 }
 

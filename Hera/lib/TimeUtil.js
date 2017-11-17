@@ -58,19 +58,10 @@ const TimeUtil = {
     },
     formatDay(date){
         date = new Date(date);
-        // date.setHours(date.getHours()+8)
+        date.setHours(date.getHours()+8)
         return date.getFullYear()+"-"+(date.getMonth()+1+"") + "-"+ date.getDate();
     },
-    formatMonth(date){
-        date = new Date(date);
-        // date.setHours(date.getHours()+8)
-        return date.getFullYear()+"-"+this.toNumberTwo(date.getMonth()+1);
-    },
-    formatFillDay(date){
-        date = new Date(date);
-        // date.setHours(date.getHours()+8)
-        return date.getFullYear()+"-"+this.toNumberTwo((date.getMonth()+1)) + "-"+ this.toNumberTwo(date.getDate());
-    },
+ 
     toNumberTwo(number){
         return number > 9 ? number+"" : "0"+number
     }
