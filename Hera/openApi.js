@@ -637,7 +637,7 @@ function getSign(secret, args, msg) {
  */
 async function settlement(event, context, callback) {
    //json转换
-  // console.log(event);
+  console.log(event);
   console.log("开始处理："+Date.now());
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if (parserErr) return callback(null, ReHandler.fail(parserErr));
@@ -1066,11 +1066,14 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
-  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
-  if (batchSaveErr) {
-    return callback(null, ReHandler.fail(batchSaveErr));
-  }
+  // let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
+  // if (batchSaveErr) {
+  //   return callback(null, ReHandler.fail(batchSaveErr));
+  // }
   callback(null, ReHandler.success({}));
+
+  new GameRecordModel().batchWrite(batchSaveArr);
+  
 }
 
 async function validateGame(event, params = []) {
