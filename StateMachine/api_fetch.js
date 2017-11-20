@@ -50,7 +50,6 @@ const testmysql = async (e, c, cb) => {
         // })
         let end = new Date().getTime()
         console.info('用时' + (end - start) + '毫秒')
-        console.info(ret)
         return ResOK(cb, { payload: 'OK' })
     } catch (error) {
         console.error(error)
