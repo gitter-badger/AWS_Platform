@@ -2,7 +2,7 @@ import { ResOK, ResErr, Codes, JSONParser, Model, SeatTypeEnum, RoleCodeEnum, Tr
 
 // import { FetchCheck } from './model/FetchCheck'
 import { UserModel } from './model/UserModel'
-
+import NodeBatis from 'nodebatis'
 /**
  * 获取用户
  */
@@ -30,8 +30,36 @@ const fetchuser = async (e, c, cb) => {
     }
 }
 
+/**
+ * 测试mysql数据库连接
+ */
+const testmysql = async (e, c, cb) => {
+    try {
+        let start = new Date().getTime()
+        const nodebatis = new NodeBatis('./batis', {
+            debug: true,
+            dialect: 'mysql',
+            port: 3306,
+            database: 'na_gameplaza',
+            host: process.env.RDS_HOST,
+            user: process.env.RDS_USERNAME,
+            password: process.env.RDS_PASSWORD
+        })
+
+        let ret = await nodebatis.query('test.findTest', {
+        })
+        let end = new Date().getTime()
+        console.info('用时' + (end - start) + '毫秒，查询mysql结果：' + ret)
+        return ResOK(cb, { payload: ret })
+    } catch (error) {
+        console.error(error)
+        return ResErr(cb, error)
+    }
+}
+
 // ==================== 以下为内部方法 ====================
 
 export {
+    testmysql,
     fetchuser   // 获取平台用户
 }
