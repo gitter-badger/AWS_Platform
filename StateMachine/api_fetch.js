@@ -36,18 +36,18 @@ const fetchuser = async (e, c, cb) => {
 const testmysql = async (e, c, cb) => {
     try {
         let start = new Date().getTime()
-        const nodebatis = new NodeBatis('./batis', {
-            debug: true,
-            dialect: 'mysql',
-            port: 3306,
-            database: 'na_gameplaza',
-            host: process.env.RDS_HOST,
-            user: process.env.RDS_USERNAME,
-            password: process.env.RDS_PASSWORD
-        })
+        // const nodebatis = new NodeBatis('./batis', {
+        //     debug: true,
+        //     dialect: 'mysql',
+        //     port: 3306,
+        //     database: 'na_gameplaza',
+        //     host: process.env.RDS_HOST,
+        //     user: process.env.RDS_USERNAME,
+        //     password: process.env.RDS_PASSWORD
+        // })
 
-        let ret = await nodebatis.query('test.findTest', {
-        })
+        // let ret = await nodebatis.query('test.findTest', {
+        // })
         let end = new Date().getTime()
         console.info('用时' + (end - start) + '毫秒')
         console.info(ret)
