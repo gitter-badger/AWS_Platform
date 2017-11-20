@@ -2,6 +2,7 @@ var yaml = require('js-yaml');
 var fs = require('fs');
 var path = require('path');
 var nodeExternals = require('webpack-node-externals');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 var handlerRegex = /\.[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*$/;
 var include = './_webpack/include.js';
@@ -28,6 +29,14 @@ module.exports = {
   // we exclude all node dependencies
   externals: [nodeExternals()],
   // Run babel on all .js files and skip those in node_modules
+  plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: './batis',
+        to: './batis'
+      }
+    ])
+  ],
   module: {
     loaders: [{
       test: /\.js$/,
@@ -39,7 +48,6 @@ module.exports = {
   output: {
     libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),
-    filename: '[name].js',
-    publicPath: '/batis/'    
+    filename: '[name].js'
   }
 };
