@@ -409,9 +409,9 @@ const gameConsumeStat = async function(event, context, callback) {
   callback(null, ReHandler.success({data:returnObj}));
 }
 function filterNumber(array = []){
-    array.forEach((item) => {
-        item = +(item).toFixed(2);
-    })
+    for(var i = 0;i < array.length; i ++) {
+        array[i] = +(array[i]).toFixed(2);
+    }
 }
 /**总收益与总消耗
  * @param {*} event 
@@ -494,12 +494,12 @@ const consumeAndIncome = async function(event, context, callback) {
   consumeList.forEach((item) => {
       let {dateStr,amount} = item;
       let index = returnObj.keys.indexOf(dateStr);
-      returnObj.consume[index] -= amount;
+      returnObj.consume[index] -= +(amount.toFixed(2));
   })
   saleList.forEach((item) => {
       let {dateStr,amount} = item;
       let index = returnObj.keys.indexOf(dateStr);
-      returnObj.sale[index] -= amount;
+      returnObj.sale[index] -= +(amount.toFixed(2));
   })
     filterNumber(returnObj.sale);
   filterNumber(returnObj.consume);
