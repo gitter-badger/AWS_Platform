@@ -879,7 +879,11 @@ async function joinGame(event, context, callback) {
   if(gameId =="10000") sendSid = sid;
   let state = userObj.gameState == GameState.gameing ? "0" : "1"; //0 未清账，1，已清账
   //修改游戏状态（不能进行转账操作）
-  let [updateError] = await userModel.update({userName:userObj.userName}, {gameState:gameState, gameId:gameId, sid : sendSid, joinTime});
+  let updates = {gameState:gameState, gameId:gameId, sid : sendSid};
+  if(!game) { //如果之前不在游戏中，设置joinTime
+    updates.joinTime = joinTime;
+  }
+  let [updateError] = await userModel.update({userName:userObj.userName}, updates);
   if (updateError) {
     return callback(null, ReHandler.fail(updateError));
   }
