@@ -46,11 +46,12 @@ const testmysql = async (e, c, cb) => {
             password: process.env.RDS_PASSWORD
         })
 
-            let ret = await nodebatis.query('test.findTest', {
-            })
+        let ret = await nodebatis.query('test.findTest', {
+        })
         let end = new Date().getTime()
-        console.info('用时' + (end - start) + '毫秒，查询mysql结果：' + ret)
-        return ResOK(cb, { payload: ret })
+        console.info('用时' + (end - start) + '毫秒')
+        console.info(ret)
+        return ResOK(cb, { payload: 'OK' })
     } catch (error) {
         console.error(error)
         return ResErr(cb, error)
