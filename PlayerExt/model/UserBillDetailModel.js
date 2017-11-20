@@ -95,15 +95,15 @@ export class UserBillDetailModel extends athena.BaseModel {
                 opts.FilterExpression = opts.FilterExpression.substring(0, opts.FilterExpression.length-4);
             }
         }
-        console.log(opts);
-        return new Promise((reslove, reject) => {
-            this.db$("query", opts).then((result) => {
-                reslove([null, result.Items]);
-            }).catch((err) => {
-                console.log(err);
-                reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
-            });
-        })
+        return this.promise("query",opts);
+        // return new Promise((reslove, reject) => {
+        //     this.db$("query", opts).then((result) => {
+        //         reslove([null, result.Items]);
+        //     }).catch((err) => {
+        //         console.log(err);
+        //         reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
+        //     });
+        // })
     }
     /**
      * 账单流水详情
@@ -114,7 +114,7 @@ export class UserBillDetailModel extends athena.BaseModel {
             IndexName : "BillIdIndex",
             ScanIndexForward :false,
             KeyConditionExpression : "billId=:billId",
-            ProjectionExpression : ["sn", "createdAt","originalAmount","amount","reAmount","reTime","rat","mix","balance","#type","businessKey"].join(","),
+            ProjectionExpression : ["sn", "createdAt","originalAmount","amount","reAmount","reTime","rate","mix","balance","#type","businessKey"].join(","),
             ExpressionAttributeValues : {
                 ":billId":billId
             },

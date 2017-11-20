@@ -215,7 +215,7 @@ resources:
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:BIG_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: parentIdIndex
@@ -229,7 +229,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:BIG_STORE_UNIT}
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: CreatedDateIndex

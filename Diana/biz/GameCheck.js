@@ -38,6 +38,9 @@ export class GameCheck {
         if (!GameTypeEnum[inparam.gameType]) {
             throw { "code": -1, "msg": "游戏类型不合法", "params": ["gameType"] }
         }
+        if (inparam.gameType.charAt(0) != inparam.kindId.charAt(0)) {
+            throw { "code": -1, "msg": "kindId必须与游戏类型一致", "params": ["kindId"] }
+        }
 
         return [checkAttError, errorParams]
     }
@@ -95,7 +98,7 @@ export class GameCheck {
         // 数据类型处理
         inparam.gameType = inparam.gameType.toString()
         inparam.keyword = inparam.keyword || null
-        
+
         return [checkAttError, errorParams]
     }
 }
