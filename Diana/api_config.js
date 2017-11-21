@@ -15,6 +15,8 @@ const configNew = async (e, c, cb) => {
       const [checkAttError, errorParams] = new ConfigCheck().checkQueue(inparam)
     } else if (inparam.code == 'bfagent') {
       const [checkAttError, errorParams] = new ConfigCheck().checkBFagent(inparam)
+    } else if (inparam.code == 'videoconfig') {
+      const [checkAttError, errorParams] = new ConfigCheck().checkVideoConfig(inparam)
     } else {
       throw { 'code': -1, 'msg': '配置编码错误', 'params': ['code'] }
     }

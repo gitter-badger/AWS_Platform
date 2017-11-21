@@ -46,4 +46,25 @@ export class ConfigCheck {
 
         return [checkAttError, errorParams]
     }
+
+    /**
+     * 电子游戏配置
+     */
+    checkVideoConfig(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "linebet", type: "N", min: 0, max: 200 },
+            { name: "linecount", type: "N", min: 0, max: 50 }
+        ], inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
+        // 数据类型处理
+        inparam.linebet = parseInt(inparam.linebet)
+        inparam.linecount = parseInt(inparam.linecount)
+
+        return [checkAttError, errorParams]
+    }
 }
