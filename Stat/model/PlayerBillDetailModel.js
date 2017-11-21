@@ -19,9 +19,11 @@ export class PlayerBillDetailModel extends BaseModel {
      */
     async scanBillDetail() {
         const [err, ret] = await this.scan({
+            ProjectionExpression: 'userName,#type,#amount',
             FilterExpression: '#type = :type1 OR #type = :type2',
             ExpressionAttributeNames: {
                 '#type': 'type',
+                '#amount': 'amount'
             },
             ExpressionAttributeValues: {
                 ':type1': 3,
@@ -31,8 +33,8 @@ export class PlayerBillDetailModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
-       
-        return [0,ret.Items]
+
+        return [0, ret.Items]
     }
-  
+
 }
