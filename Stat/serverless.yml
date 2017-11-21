@@ -82,6 +82,7 @@ functions:
           # authorizer: tokenAuth
   initBetRank: #初始用户流水排行榜
     handler: api_rank.initBetRank
+    memorySize: 512
     events:
       -
         http:
