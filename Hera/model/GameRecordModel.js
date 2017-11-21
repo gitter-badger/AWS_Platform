@@ -66,14 +66,6 @@ export class GameRecordModel extends BaseModel{
         }).catch((err) => {
             console.log(err);
         });
-        // return new Promise((resolve, reject) => {
-        //     Promise.all(promises).then((result) => {
-        //         resolve([null, result])
-        //     }).catch((err) => {
-        //         console.log(err);
-        //         resolve([new CHeraErr(CODES.SystemError), null])
-        //     });
-        // })
     }
     async page(pageSize, parentId, userName, gameId, startTime, endTime, lastTime) {
         //找到总数
