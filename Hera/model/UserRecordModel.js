@@ -7,7 +7,9 @@ import {Util} from "../lib/Util"
 
 const TypeEnum = {
     deposit : 1,   //转入
-    take : 2   //转出
+    take : 2,  //转出
+    bet : 3,   //下注
+    reward : 4  //返奖
 }
 
 export const SettlementState = {  //结算状态
@@ -105,7 +107,7 @@ export class UserRecordModel extends athena.BaseModel {
         for(let i = 0; i < this.records.length; i++) {
             let record = this.records[i];
             let amount = record.amount;
-            if(record.type != TypeEnum.deposit && record.type != TypeEnum.take){
+            if(record.type == TypeEnum.bet || record.type == TypeEnum.reward){
                 income += +amount
             }
         }

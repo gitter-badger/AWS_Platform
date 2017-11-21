@@ -18,6 +18,7 @@ export class UserBillDetailModel extends athena.BaseModel {
         this.userName = userName;
         this.amount = amount;
         this.rate = rate;
+        this.userId = userId;
         this.createdAt = createdAt;
         this.businessKey = businessKey;
         this.preBalance = preBalance;
@@ -100,7 +101,6 @@ export class UserBillDetailModel extends athena.BaseModel {
         list.sort((a, b) => {
             return a.createdAt - b.createdAt;
         })
-        
         //小汇总
         let  betArray = [], reArray= [], notDep = true;
         function findBet(array, b) {
@@ -113,8 +113,7 @@ export class UserBillDetailModel extends athena.BaseModel {
         }
         list.forEach((item, index) => {
             if(item.type == 3) {
-                // let p = findBet(betArray, item);
-                let p = betArray.find((b) => b.businessKey == item.businessKey)
+                let p = betArray.find((b) => b.businessKey == item.businessKey && item.businessKey)
                 if(!p) {
                     p = {
                         ...item,
@@ -145,6 +144,7 @@ export class UserBillDetailModel extends athena.BaseModel {
         return list;
     }
     async findPlayerDetail(userName, createdAt) {
+        createdAt = createdAt || Date.now();
         let opts = {
             KeyConditionExpression : "userName=:userName and createdAt>:createdAt",
             IndexName : "UserNameIndex",
@@ -156,26 +156,26 @@ export class UserBillDetailModel extends athena.BaseModel {
         return this.promise("query",opts);
     }
     async getBillId(userName, createdAt) {
+        createdAt = createdAt || Date.now();
         let opts = {
             KeyConditionExpression : "userName=:userName and createdAt>:createdAt",
-            Limit : 1,
             IndexName : "UserNameIndex",
+            Limit :1,
             ExpressionAttributeValues : {
                 ":userName" : userName,
                 ":createdAt" : createdAt
             }
         }
         return new Promise((reslove, reject) => {
-            this.promise("query",opts).then((result) => {
-                if(result.Items.length == 0) {
-                    return reslove([null, 0])
+            this.db$("query",opts).then((result) => {
+                if(result.Items.length>0) {
+                    return reslove([0, result.Items[0].billId]);
                 }
-                return reslove([null, result.Items[0].billId]);
+                return reslove([0, null]);
             }).catch((err) => {
                 console.log(err);
-                return reslove([new CHeraErr(CODES.SystemError)]);
+                reslove([err, 0])
             });
         })
-        
     }
 }

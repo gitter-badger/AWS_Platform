@@ -675,9 +675,9 @@ async function settlement(event, context, callback) {
   let company = game.company || {};
   let gameKey = company.companyKey;
   let serverSign = getSign(gameKey, ["userId", "timestamp", "records", "gameId"], requestParams);
-  // if(sign != serverSign) {
-  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
-  // }
+  if(sign != serverSign) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  }
 
   //获取用户数据
   let user = new UserModel();
@@ -689,29 +689,41 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
   }
   let joinTime = userModel.joinTime;  //进入游戏时间
+
+  //获取商家
+  let merchantId = userModel.buId;
+  let parentId = userModel.parent;
+  let [meError, merchantModel] = await new MerchantModel().findByUserId(parentId);
+  if (meError) {
+    return callback(null, ReHandler.fail(meError));
+  }
+  if (!merchantModel) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
+  }
+  let mix = -1;
+  if(gameType == "30000") mix = merchantModel.vedioMix;
+  if(gameType == "40000") mix = merchantModel.liveMix;
+
   //获取玩家余额
   let [playerErr, oriBalance] = await new UserBillModel().getBalanceByUid(userId);
   if (playerErr) {
     return callback(null, ReHandler.fail(playerErr));
   }
   //玩家是否在游戏中
-  // if(!user.isGames(userModel)) { //如果不在游戏中就无效
-  //   return callback(null, ReHandler.success({
-  //     data: { balance: oriBalance }
-  //   }));
-  // }
+  if(!user.isGames(userModel)) { //如果不在游戏中就无效
+    return callback(null, ReHandler.success({
+      data: { balance: oriBalance }
+    }));
+  }
   //解压账单数据
-  console.log("解压前："+Date.now());
   let buffer = Buffer.from(records, 'base64');
   let str = zlib.unzipSync(buffer).toString();
-  console.log("解压后："+Date.now());
   let [parseRecordErr, list] = athena.Util.parseJSON(str);
   console.log("数据条数:"+list.length);
   if (parseRecordErr) {
     return callback(null, ReHandler.fail(parseRecordErr));
   }
   requestParams.records = records = list;
-
   //获取游戏
   let gameType = gameId - gameId%10000;
   let gameInfo = GameTypeEnum[gameType + ""];
@@ -720,9 +732,13 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.gameNotExist)));
   }
   let typeName = gameInfo.name;
-  let detailBill = new UserBillDetailModel();
+  let detailBill = new UserBillDetailModel({
+    userName : userModel.userName,
+    rate : merchantModel.rate,
+    userId : userModel.userId,
+    mix : mix,
+  });
   let billId = Util.billSerial(userModel.userId);
-
   //billId获取，如果是电子游戏的则先在数据库中找
   if(gameType == "40000") {
     let [billIdErr, dbBillId] = await detailBill.getBillId(userModel.userName, joinTime);
@@ -746,7 +762,7 @@ async function settlement(event, context, callback) {
         }));
       }else {
         //查询用户本次登录的账单
-        let [playerDetailErr, playerDetailList] = await detailBill.findPlayerDetail(userModel.userName, joinTime);
+        let [playerDetailErr, playerDetailList] = await detailBill.get({billId},["amount", "type"],"BillIdIndex",true);
         if(playerDetailErr) {
           return callback(null, ReHandler.fail(playerDetailErr));
         }
@@ -754,8 +770,7 @@ async function settlement(event, context, callback) {
       }
   }
   
-  let userRecordModel = new UserRecordModel(requestParams);
-  
+  let userRecordModel = new UserRecordModel({records :list});
   let [validErr, income] = userRecordModel.validateRecords(list);
   if (validErr) {
     return callback(null, ReHandler.fail(err));
@@ -763,19 +778,7 @@ async function settlement(event, context, callback) {
   console.log("账单消耗:" + income);
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
 
-  //获取商家
-  let merchantId = userModel.buId;
-  let parentId = userModel.parent;
-  let [meError, merchantModel] = await new MerchantModel().findByUserId(parentId);
-  if (meError) {
-    return callback(null, ReHandler.fail(meError));
-  }
-  if (!merchantModel) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
-  }
-  let mix = -1;
-  if(gameType == "30000") mix = merchantModel.vedioMix;
-  if(gameType == "40000") mix = merchantModel.liveMix;
+  
   let billBase = {
     fromRole: RoleCodeEnum.Player,
     toRole: RoleCodeEnum.Merchant,
