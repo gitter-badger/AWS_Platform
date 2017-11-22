@@ -6,13 +6,14 @@ const billDetailTrigger = async (e, c, cb) => {
     let winCount = 0
     let lastTime = 0
     let userName = 'NULL!'
+    console.log('打印json对象')
     console.log(JSON.stringify(e.Records))
     for (let item of e.Records) {
 
         let record = item.dynamodb.NewImage
         let type = parseInt(record.type.N)
         let amount = parseFloat(record.amount.N)
-        console.log(record)
+        console.log('record:的内容有'+record)
         if (type == 3) {
             userName = record.userName.S
             betCount += Math.abs(parseFloat(amount))
@@ -26,6 +27,7 @@ const billDetailTrigger = async (e, c, cb) => {
     //玩家没有登录不进行用户排行榜操作
     if (userInfo.nickname && userInfo.nickname != "NULL!") {
         let inparam = { userName: userName, nickname: userInfo.nickname, headPic: userInfo.headPic, userId: parseInt(userInfo.userId), betCount: betCount, winCount: winCount }
+       console.log(inparam)
         new UserRankStatModel().insertRank(inparam)
     }
 }
