@@ -57,12 +57,11 @@ export class UserRecordModel extends athena.BaseModel {
      */
     validateRecords(){
         let playerRecordError = CODES.playerRecordError;
-
         //获取玩家游戏累计收益（除去转入转出）
-        let income = +(this.settlementIncome(this.records)).toFixed(2);
-        this.income = income;
+        let incomeObj = this.settlementIncome(this.records);
+        this.income = +(incomeObj.income.toFixed(2));
         this.state = SettlementState.success;
-        return [0, income]
+        return [0, incomeObj]
     } 
     isSingleUser(){
         if(this.records.length == 0) return false;
@@ -103,14 +102,20 @@ export class UserRecordModel extends athena.BaseModel {
         //     income += (+amount + (+betAmount));
         // }
         // return income;
-        let income = 0;
+        let income = 0, betAmount = 0,reAmount =0;
         for(let i = 0; i < this.records.length; i++) {
             let record = this.records[i];
             let amount = record.amount;
             if(record.type == TypeEnum.bet || record.type == TypeEnum.reward){
                 income += +amount
+                if(record.type == TypeEnum.bet) {
+                    betAmount += +amount;
+                }
+                if(record.type == TypeEnum.reward) {
+                    reAmount += +amount
+                }
             }
         }
-        return income;
+        return {income,betAmount, reAmount};
     }
 }

@@ -659,9 +659,9 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(checkAttError));
   }
   let {gameId, userId, sign, records, timestamp, exit} = requestParams;
-  if(exit ==1) { //是否为退出
+  // if(exit ==1) { //是否为退出
     exit = true;
-  }
+  // }
 
   //找到游戏厂商的gameKey
   let gameModel = new GameModel();
@@ -675,9 +675,9 @@ async function settlement(event, context, callback) {
   let company = game.company || {};
   let gameKey = company.companyKey;
   let serverSign = getSign(gameKey, ["userId", "timestamp", "records", "gameId"], requestParams);
-  if(sign != serverSign) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
-  }
+  // if(sign != serverSign) {
+  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  // }
 
   //获取用户数据
   let user = new UserModel();
@@ -710,11 +710,11 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(playerErr));
   }
   //玩家是否在游戏中
-  if(!user.isGames(userModel)) { //如果不在游戏中就无效
-    return callback(null, ReHandler.success({
-      data: { balance: oriBalance }
-    }));
-  }
+  // if(!user.isGames(userModel)) { //如果不在游戏中就无效
+  //   return callback(null, ReHandler.success({
+  //     data: { balance: oriBalance }
+  //   }));
+  // }
   //解压账单数据
   let buffer = Buffer.from(records, 'base64');
   let str = zlib.unzipSync(buffer).toString();
@@ -771,10 +771,11 @@ async function settlement(event, context, callback) {
   }
   
   let userRecordModel = new UserRecordModel({records :list});
-  let [validErr, income] = userRecordModel.validateRecords(list);
+  let [validErr, incomeObj] = userRecordModel.validateRecords(list);
   if (validErr) {
     return callback(null, ReHandler.fail(err));
   }
+  let {betAmount, reAmount, income} = incomeObj;
   console.log("账单消耗:" + income);
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
 
@@ -786,6 +787,8 @@ async function settlement(event, context, callback) {
     toUser: merchantModel.username,
     operator: userModel.userName,
     merchantName: merchantModel.displayName,
+    reAmount : +(reAmount.toFixed(2)),
+    betAmount:+(betAmount.toFixed(2)),
     kindId: gameType,
     gameId: gameId,
     gameType: gameType,

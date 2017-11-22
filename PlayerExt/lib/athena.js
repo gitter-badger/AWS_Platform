@@ -17,7 +17,6 @@ export class BaseModel{
         return this.db$(action, params).then((result)=>{
             array = array.concat(result.Items);
             if(result.LastEvaluatedKey) {
-                console.log("11111111111111111");
                 params.ExclusiveStartKey = result.LastEvaluatedKey;
                 return this.promise(action, params, array);
             }else {
