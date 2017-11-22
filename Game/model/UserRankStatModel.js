@@ -16,9 +16,9 @@ export class UserRankStatModel extends BaseModel {
     }
 
     /**
-     * 更新数据
+     * 插入数据
      */
-    async updateRank(inparam) {
+    async insertRank(inparam) {
         let query = {
             KeyConditionExpression: '#userName = :userName',
             ExpressionAttributeNames: {
@@ -29,24 +29,48 @@ export class UserRankStatModel extends BaseModel {
             }
         }
         const [err, ret] = await this.query(query)
+        if (ret.Items.length == 0) {
+            let bet = parseFloat(inparam.betCount)
+            let win = parseFloat(inparam.winCount)
+            this.putItem({
+                ...this.item,
+                userName: inparam.userName,
+                nickname: inparam.nickname,
+                headPic: inparam.headPic,
+                userId: inparam.userId,
+                bet: +bet.toFixed(2),
+                win: +win.toFixed(2)
+            }).then((res) => {
+                console.log(res)
+                console.log('新用户下注和返奖统计插入完成')
+            }).catch((err) => {
+                console.error(err)
+            })
+        } else {
+            this.updateRank(inparam)
+        }
+    }
+
+    /**
+     * 更新数据
+     */
+    async updateRank(inparam) {
         let bet = parseFloat(inparam.betCount)
         let win = parseFloat(inparam.winCount)
-        if (ret.Items && ret.Items.length > 0) {
-            const record = ret.Items[0]
-            bet += parseFloat(record.bet)
-            win += parseFloat(record.win)
+        let updateObj = {
+            Key: { userName: inparam.userName },
+            UpdateExpression: 'SET bet=bet + :bet,win=win + :win,nickname=:nickname,headPic=:headPic',
+            ExpressionAttributeValues: {
+                ':bet': inparam.bet,
+                ':win': inparam.win,
+                ':nickname': inparam.nickname,
+                ':headPic': inparam.headPic
+            }
         }
-        this.putItem({
-            ...this.item,
-            userName: inparam.userName,
-            nickname: inparam.nickname,
-            headPic: inparam.headPic,
-            userId: inparam.userId,
-            balance: +inparam.balance.toFixed(2),
-            bet: +bet.toFixed(2),
-            win: +win.toFixed(2)
-        }).then((res) => {
+
+        this.updateItem(updateObj).then((res) => {
             console.log(res)
+            console.log('用户下注和返奖统计更新完成')
         }).catch((err) => {
             console.error(err)
         })

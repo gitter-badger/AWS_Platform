@@ -126,12 +126,12 @@ functions:
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是系统配置接口服务 ====================
-  queueNew: #创建排队配置
-    handler: api_config.queueNew
+  configNew: #创建配置
+    handler: api_config.configNew
     events:
       -
         http:
-          path: queueNew
+          path: configNew
           method: post
           cors: true
           authorizer: tokenAuth

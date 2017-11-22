@@ -54,9 +54,16 @@ const initRank = async (e, c, cb) => {
 const initBetRank = async (e, c, cb) => {
   try {
     //查出所有玩家流水
+    let start = new Date().getTime()
     const [billErr, billList] = await new PlayerBillDetailModel().scanBillDetail()
+    let start2 = new Date().getTime()
+    console.log('查询所有玩家流水耗时：' + (start2 - start) + '毫秒')
+
     if (billErr) { return ResErr(cb, billErr) }
     let groupResult = _.groupBy(billList, 'userName')
+    let start3 = new Date().getTime()
+    console.log('分组所有玩家流水耗时：' + (start3 - start2) + '毫秒')
+
     //写入玩家数据
     for (let userName in groupResult) {
       let bet = Number(0)
@@ -72,7 +79,9 @@ const initBetRank = async (e, c, cb) => {
       win = +win.toFixed(2)
       new UserRankStatModel().updateBetRank({ userName: userName, bet: bet, win: win })
     }
-    return ResOK(cb, {})
+    let start4 = new Date().getTime()
+    console.log('更新任务分发结束耗时：' + (start4 - start3) + '毫秒')
+    return ResOK(cb, 'OK')
   } catch (error) {
     console.error(error)
     return ResErr(cb, error)

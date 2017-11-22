@@ -2,7 +2,7 @@ import { Codes, Model, RoleCodeEnum, ConfigStatusEnum } from '../lib/all'
 const athena = require("../lib/athena")
 export class ConfigCheck {
     /**
-     * 检查数据
+     * 检查排队设置
      */
     checkQueue(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
@@ -20,7 +20,50 @@ export class ConfigCheck {
         inparam.status = parseInt(inparam.status)
         inparam.countPeople = parseInt(inparam.countPeople)
         inparam.countTime = parseInt(inparam.countTime)
-        inparam.code = 'queue'
+
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 检查包房配置
+     */
+    checkBFagent(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "banker", type: "N", min: 0, max: 50 },
+            { name: "hedging", type: "N", min: 0, max: 50 },
+            { name: "remain", type: "N", min: 0, max: 50 }
+        ], inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
+        // 数据类型处理
+        inparam.banker = parseInt(inparam.banker)
+        inparam.hedging = parseInt(inparam.hedging)
+        inparam.remain = parseInt(inparam.remain)
+
+        return [checkAttError, errorParams]
+    }
+
+    /**
+     * 电子游戏配置
+     */
+    checkVideoConfig(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "linebet", type: "N", min: 0, max: 200 },
+            { name: "linecount", type: "N", min: 0, max: 50 }
+        ], inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
+        // 数据类型处理
+        inparam.linebet = parseInt(inparam.linebet)
+        inparam.linecount = parseInt(inparam.linecount)
 
         return [checkAttError, errorParams]
     }
