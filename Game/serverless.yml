@@ -108,15 +108,15 @@ functions:
     handler: api.jwtverify
     integration: lambda
   # 触发器开始
-  billDetailTrigger: #玩家流水触发器
-    handler: api_trigger.billDetailTrigger
-    events:
-      - stream:
-          type: dynamodb
-          arn:
-            Fn::GetAtt:
-              - PlayerBillDetail
-              - StreamArn
+  # billDetailTrigger: #玩家流水触发器
+  #   handler: api_trigger.billDetailTrigger
+  #   events:
+  #     - stream:
+  #         type: dynamodb
+  #         arn:
+  #           Fn::GetAtt:
+  #             - PlayerBillDetail
+  #             - StreamArn
 resources:
   Resources:
     HawkeyePlayerEmailRecord: #玩家接收邮件记录表
