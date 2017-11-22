@@ -61,13 +61,12 @@ export class UserRankStatModel extends BaseModel {
             Key: { userName: inparam.userName },
             UpdateExpression: 'SET bet=bet + :bet,win=win + :win,nickname=:nickname,headPic=:headPic',
             ExpressionAttributeValues: {
-                ':bet': inparam.bet,
-                ':win': inparam.win,
+                ':bet': bet,
+                ':win': win,
                 ':nickname': inparam.nickname,
                 ':headPic': inparam.headPic
             }
         }
-
         this.updateItem(updateObj).then((res) => {
             console.log(res)
             console.log('用户下注和返奖统计更新完成')

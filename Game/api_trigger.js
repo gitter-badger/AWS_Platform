@@ -6,10 +6,7 @@ const billDetailTrigger = async (e, c, cb) => {
     let winCount = 0
     let lastTime = 0
     let userName = 'NULL!'
-    console.log('本次触发开始')
-    console.log(JSON.stringify(e.Records))
     console.log('数组长度' + e.Records.length)
-    console.log('本次触发结束')
     for (let item of e.Records) {
         let record = item.dynamodb.NewImage
         if (record) {
@@ -32,7 +29,6 @@ const billDetailTrigger = async (e, c, cb) => {
     //玩家没有登录不进行用户排行榜操作
     if (userInfo && userInfo.nickname && userInfo.nickname != "NULL!") {
         let inparam = { userName: userName, nickname: userInfo.nickname, headPic: userInfo.headPic, userId: parseInt(userInfo.userId), betCount: betCount, winCount: winCount }
-        console.log(inparam)
         new UserRankStatModel().insertRank(inparam)
     }
 }
