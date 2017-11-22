@@ -29,7 +29,7 @@ export class UserRankStatModel extends BaseModel {
             }
         }
         const [err, ret] = await this.query(query)
-        if (ret.Items.length == 0) {
+        if (ret.Items.length == 0 || !ret.Items[0].bet) {
             let bet = parseFloat(inparam.betCount)
             let win = parseFloat(inparam.winCount)
             let updateObj = {
