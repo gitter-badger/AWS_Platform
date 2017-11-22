@@ -1,5 +1,5 @@
 {
-  "name": "Hera",
+  "name": "Game",
   "version": "1.0.0",
   "description": "A starter project for the Serverless Framework with ES7 support",
   "main": "api.js",

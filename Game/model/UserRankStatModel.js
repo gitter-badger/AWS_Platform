@@ -32,17 +32,21 @@ export class UserRankStatModel extends BaseModel {
         if (ret.Items.length == 0) {
             let bet = parseFloat(inparam.betCount)
             let win = parseFloat(inparam.winCount)
-            this.putItem({
-                ...this.item,
-                userName: inparam.userName,
-                nickname: inparam.nickname,
-                headPic: inparam.headPic,
-                userId: inparam.userId,
-                bet: +bet.toFixed(2),
-                win: +win.toFixed(2)
-            }).then((res) => {
+            let updateObj = {
+                Key: { userName: inparam.userName },
+                UpdateExpression: 'SET bet=:bet,win=:win,nickname=:nickname,headPic=:headPic,userName=:userName,userId=:userId',
+                ExpressionAttributeValues: {
+                    ':bet': +bet.toFixed(2),
+                    ':win': +win.toFixed(2),
+                    'userName': inparam.userName,
+                    'nickname': inparam.nickname,
+                    'headPic': inparam.headPic,
+                    'userId': inparam.userId,
+                }
+            }
+            this.updateItem(updateObj).then((res) => {
                 console.log(res)
-                console.log('新用户下注和返奖统计插入完成')
+                console.log('用户下注和返奖统计新增更新完成')
             }).catch((err) => {
                 console.error(err)
             })
@@ -61,13 +65,12 @@ export class UserRankStatModel extends BaseModel {
             Key: { userName: inparam.userName },
             UpdateExpression: 'SET bet=bet + :bet,win=win + :win,nickname=:nickname,headPic=:headPic',
             ExpressionAttributeValues: {
-                ':bet': inparam.bet,
-                ':win': inparam.win,
+                ':bet': bet,
+                ':win': win,
                 ':nickname': inparam.nickname,
                 ':headPic': inparam.headPic
             }
         }
-
         this.updateItem(updateObj).then((res) => {
             console.log(res)
             console.log('用户下注和返奖统计更新完成')
