@@ -63,13 +63,6 @@ const playerBalanceTrigger = async (e, c, cb) => {
         console.log(bError);
         return;
     }
-    let [er] = await new PushModel().pushUserBalance(userId, balance);
-    if (er) {
-        console.info("玩家余额变更推送失败");
-        console.info(er);
-    } else {
-        console.info("玩家余额变更推送成功");
-    }
     // 更新用户排行榜余额
     new UserModel().updateItem({
         TableName: Tables.UserRankStat,
@@ -80,10 +73,18 @@ const playerBalanceTrigger = async (e, c, cb) => {
         }
     }).then((res) => {
         console.log(res)
-        console.log('用户下注和返奖统计更新完成')
+        console.log(userName + '下注和返奖统计更新完成：' + balance)
     }).catch((err) => {
         console.error(err)
     })
+    // 推送余额给大厅
+    let [er] = await new PushModel().pushUserBalance(userId, balance);
+    if (er) {
+        console.info("玩家余额变更推送失败");
+        console.info(er);
+    } else {
+        console.info("玩家余额变更推送成功");
+    }
 }
 async function updateAmount(userId, dateStr, amount, gameType, obj) {
     obj.gameType = gameType;
