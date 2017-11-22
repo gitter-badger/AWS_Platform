@@ -38,10 +38,10 @@ export class UserRankStatModel extends BaseModel {
                 ExpressionAttributeValues: {
                     ':bet': +bet.toFixed(2),
                     ':win': +win.toFixed(2),
-                    'userName': inparam.userName,
-                    'nickname': inparam.nickname,
-                    'headPic': inparam.headPic,
-                    'userId': inparam.userId,
+                    ':userName': inparam.userName,
+                    ':nickname': inparam.nickname,
+                    ':headPic': inparam.headPic,
+                    ':userId': inparam.userId,
                 }
             }
             this.updateItem(updateObj).then((res) => {
