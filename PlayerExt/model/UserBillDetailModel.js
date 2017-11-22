@@ -96,14 +96,6 @@ export class UserBillDetailModel extends athena.BaseModel {
             }
         }
         return this.promise("query",opts);
-        // return new Promise((reslove, reject) => {
-        //     this.db$("query", opts).then((result) => {
-        //         reslove([null, result.Items]);
-        //     }).catch((err) => {
-        //         console.log(err);
-        //         reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
-        //     });
-        // })
     }
     /**
      * 账单流水详情

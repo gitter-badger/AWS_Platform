@@ -801,6 +801,7 @@ async function settlement(event, context, callback) {
   let userBillModel = new UserBillModel({
     userId: +userModel.userId,
     action: userAction,
+    billId : billId,
     userName: userModel.userName,
     amount: +(income.toFixed(2))
   })

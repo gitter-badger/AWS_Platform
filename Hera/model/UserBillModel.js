@@ -12,9 +12,9 @@ import {Model} from "../lib/Dynamo"
 
 export class UserBillModel extends athena.BaseModel {
     constructor({gameId,originalAmount, userName, action, amount, userId, msn, merchantName, operator, type, 
-        fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo} = {}) {
+        fromRole, toRole, fromUser, toUser, kindId, toolId, toolName, remark, typeName, gameType, seatInfo, billId} = {}) {
         super(TABLE_NAMES.BILL_USER);
-        this.billId = Util.billSerial(userId);
+        this.billId = billId || Util.billSerial(userId);
         this.userId = +userId
         this.action = +action;
         this.userName = userName;

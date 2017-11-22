@@ -264,7 +264,7 @@ const overview = async function(event, context, callback) {
                 return errorHandle(callback, err);
             }
         }
-        return callback(null, ReHandler.success({oneNum : online, twoNum:sum}));
+        return callback(null, ReHandler.success({oneNum : online, twoNum:sum,type :type}));
       }
       case 4 : { //签约情况
         let buIds;
