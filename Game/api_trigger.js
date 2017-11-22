@@ -6,7 +6,9 @@ const billDetailTrigger = async (e, c, cb) => {
     let winCount = 0
     let lastTime = 0
     let userName = 'NULL!'
+    console.log(JSON.stringify(e.Records))
     for (let item of e.Records) {
+
         let record = item.dynamodb.NewImage
         let type = parseInt(record.type.N)
         let amount = parseFloat(record.amount.N)
