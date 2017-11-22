@@ -42,7 +42,7 @@ const initRank = async (e, c, cb) => {
       }
       new UserRankStatModel().putsRank(userList[i])
     }
-    return ResOK(cb, {})
+    return ResOK(cb, 'OK')
   } catch (error) {
     console.error(error)
     return ResErr(cb, error)
