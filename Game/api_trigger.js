@@ -8,20 +8,22 @@ const billDetailTrigger = async (e, c, cb) => {
     let userName = 'NULL!'
     console.log('本次触发开始')
     console.log(JSON.stringify(e.Records))
-    console.log('数组长度'+e.Records.length)
+    console.log('数组长度' + e.Records.length)
     console.log('本次触发结束')
     for (let item of e.Records) {
         let record = item.dynamodb.NewImage
-        let type = parseInt(record.type.N)
-        let amount = parseFloat(record.amount.N)
-        console.log('record:的内容有' + JSON.stringify(record))
-        console.log('所有的用户名：' + JSON.stringify(record.userName))
-        if (type == 3) {
-            userName = record.userName.S
-            betCount += Math.abs(parseFloat(amount))
-        } else if (type == 4) {
-            userName = record.userName.S
-            winCount += parseFloat(amount)
+        if (record) {
+            let type = parseInt(record.type.N)
+            let amount = parseFloat(record.amount.N)
+            console.log('record:的内容有' + JSON.stringify(record))
+            console.log('所有的用户名：' + JSON.stringify(record.userName))
+            if (type == 3) {
+                userName = record.userName.S
+                betCount += Math.abs(parseFloat(amount))
+            } else if (type == 4) {
+                userName = record.userName.S
+                winCount += parseFloat(amount)
+            }
         }
     }
     // 根据用户名获取UserId
