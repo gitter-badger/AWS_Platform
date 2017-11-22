@@ -63,6 +63,7 @@ const playerBalanceTrigger = async (e, c, cb) => {
         console.log(bError);
         return;
     }
+    console.log('开始更新排行榜')
     // 更新用户排行榜余额
     new UserModel().updateItem({
         TableName: Tables.UserRankStat,
