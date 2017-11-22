@@ -34,11 +34,10 @@ export class UserRankStatModel extends BaseModel {
             let win = parseFloat(inparam.winCount)
             let updateObj = {
                 Key: { userName: inparam.userName },
-                UpdateExpression: 'SET bet=:bet,win=:win,nickname=:nickname,headPic=:headPic,userName=:userName,userId=:userId',
+                UpdateExpression: 'SET bet=:bet,win=:win,nickname=:nickname,headPic=:headPic,userId=:userId',
                 ExpressionAttributeValues: {
                     ':bet': +bet.toFixed(2),
                     ':win': +win.toFixed(2),
-                    ':userName': inparam.userName,
                     ':nickname': inparam.nickname,
                     ':headPic': inparam.headPic,
                     ':userId': inparam.userId,
