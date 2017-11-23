@@ -659,9 +659,9 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(checkAttError));
   }
   let {gameId, userId, sign, records, timestamp, exit} = requestParams;
-  // if(exit ==1) { //是否为退出
+  if(exit ==1) { //是否为退出
     exit = true;
-  // }
+  }
 
   //找到游戏厂商的gameKey
   let gameModel = new GameModel();
@@ -675,9 +675,9 @@ async function settlement(event, context, callback) {
   let company = game.company || {};
   let gameKey = company.companyKey;
   let serverSign = getSign(gameKey, ["userId", "timestamp", "records", "gameId"], requestParams);
-  // if(sign != serverSign) {
-  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
-  // }
+  if(sign != serverSign) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  }
 
   //获取用户数据
   let user = new UserModel();
@@ -703,18 +703,18 @@ async function settlement(event, context, callback) {
   let mix = -1;
   if(gameType == "30000") mix = merchantModel.vedioMix;
   if(gameType == "40000") mix = merchantModel.liveMix;
-
   //获取玩家余额
   let [playerErr, oriBalance] = await new UserBillModel().getBalanceByUid(userId);
   if (playerErr) {
     return callback(null, ReHandler.fail(playerErr));
   }
   //玩家是否在游戏中
-  // if(!user.isGames(userModel)) { //如果不在游戏中就无效
-  //   return callback(null, ReHandler.success({
-  //     data: { balance: oriBalance }
-  //   }));
-  // }
+  if(!user.isGames(userModel)) { //如果不在游戏中就无效
+    console.log("玩家不在游戏中");
+    return callback(null, ReHandler.success({
+      data: { balance: oriBalance }
+    }));
+  }
   //解压账单数据
   let buffer = Buffer.from(records, 'base64');
   let str = zlib.unzipSync(buffer).toString();
@@ -1100,13 +1100,11 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
-  // let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
-  // if (batchSaveErr) {
-  //   return callback(null, ReHandler.fail(batchSaveErr));
-  // }
+  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
+  if (batchSaveErr) {
+    return callback(null, ReHandler.fail(batchSaveErr));
+  }
   callback(null, ReHandler.success({}));
-
-  new GameRecordModel().batchWrite(batchSaveArr);
   
 }
 

@@ -68,7 +68,6 @@ const billFlow = async(event, context, cb) => {
   let billDetail = new UserBillDetailModel();
   let [detailErr, list] = await billDetail.billFlow(userName, startTime, endTime, type, action);
   console.log("数据总长度:"+list.length);
-  return;
   if(detailErr) {
     return cb(null, ReHandler.fail(detailErr));
   }
@@ -80,6 +79,7 @@ const billFlow = async(event, context, cb) => {
       i --;
     }
   }
+  console.log("11111111111111");
   for(let i = 0; i < list.length; i++) {
       for(let j = i+1; j < list.length;j++) {
           if(isSort(list[i], list[j])){

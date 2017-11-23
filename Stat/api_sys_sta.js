@@ -36,6 +36,7 @@ import {Model} from "./lib/Dynamo"
  * @param {*} callback 
  */
 const init = async function(event, context, callback) {
+    console.log("开始");
     let  allStatArr = [],userInfoObj = {},platUserObj= {},platUserRoleObj = {};
     let [playerBillListErr, playerBillList] = await new UserBillModel().scan({});
     console.log(playerBillList.length);
