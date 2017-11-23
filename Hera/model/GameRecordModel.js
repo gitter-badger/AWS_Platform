@@ -47,7 +47,7 @@ export class GameRecordModel extends BaseModel{
         }
 
         let promises = sumBatch.map((b)  => this.db$("batchWrite", b));
-        Promise.all(promises).then((result) => {
+        return Promise.all(promises).then((result) => {
             let unArray = [];
             for(let i =0; i < result.length; i++) {
                 let r = result[i];
@@ -62,10 +62,14 @@ export class GameRecordModel extends BaseModel{
             if(unArray.length > 0) {
                 console.log("重新处理");
                 this.batchWrite(unArray);
+            }else {
+                return [0]
             }
         }).catch((err) => {
             console.log(err);
+            return [err]
         });
+        
     }
     async page(pageSize, parentId, userName, gameId, startTime, endTime, lastTime) {
         //找到总数

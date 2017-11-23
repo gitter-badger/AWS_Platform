@@ -703,7 +703,6 @@ async function settlement(event, context, callback) {
   let mix = -1;
   if(gameType == "30000") mix = merchantModel.vedioMix;
   if(gameType == "40000") mix = merchantModel.liveMix;
-
   //获取玩家余额
   let [playerErr, oriBalance] = await new UserBillModel().getBalanceByUid(userId);
   if (playerErr) {
@@ -711,6 +710,7 @@ async function settlement(event, context, callback) {
   }
   //玩家是否在游戏中
   if(!user.isGames(userModel)) { //如果不在游戏中就无效
+    console.log("玩家不在游戏中");
     return callback(null, ReHandler.success({
       data: { balance: oriBalance }
     }));
@@ -771,10 +771,11 @@ async function settlement(event, context, callback) {
   }
   
   let userRecordModel = new UserRecordModel({records :list});
-  let [validErr, income] = userRecordModel.validateRecords(list);
+  let [validErr, incomeObj] = userRecordModel.validateRecords(list);
   if (validErr) {
     return callback(null, ReHandler.fail(err));
   }
+  let {betAmount, reAmount, income} = incomeObj;
   console.log("账单消耗:" + income);
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
 
@@ -786,6 +787,8 @@ async function settlement(event, context, callback) {
     toUser: merchantModel.username,
     operator: userModel.userName,
     merchantName: merchantModel.displayName,
+    reAmount : +(reAmount.toFixed(2)),
+    betAmount:+(betAmount.toFixed(2)),
     kindId: gameType,
     gameId: gameId,
     gameType: gameType,
@@ -801,6 +804,7 @@ async function settlement(event, context, callback) {
   let userBillModel = new UserBillModel({
     userId: +userModel.userId,
     action: userAction,
+    billId : billId,
     userName: userModel.userName,
     amount: +(income.toFixed(2))
   })
@@ -1096,13 +1100,11 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
-  // let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
-  // if (batchSaveErr) {
-  //   return callback(null, ReHandler.fail(batchSaveErr));
-  // }
+  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
+  if (batchSaveErr) {
+    return callback(null, ReHandler.fail(batchSaveErr));
+  }
   callback(null, ReHandler.success({}));
-
-  new GameRecordModel().batchWrite(batchSaveArr);
   
 }
 
