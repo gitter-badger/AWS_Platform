@@ -68,7 +68,7 @@ export class MysteryModel extends BaseModel {
             let receiveAt = new Date().getTime()
         }
         let updateObj = {
-            Key: { 'sn': inparam.sn },
+            Key: { 'sn': inparam.sn, 'winAt': parseInt(inparam.winAt) },
             UpdateExpression: 'SET #status = :status,receiveAt = :receiveAt',
             ExpressionAttributeNames: {
                 '#status': 'status'
