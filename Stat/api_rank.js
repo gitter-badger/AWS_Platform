@@ -69,9 +69,13 @@ const playerBetRank = async (e, c, cb) => {
     }
     let start3 = new Date().getTime()
     console.log('for循序分发promise耗时：' + (start3 - start2) + '毫秒')
-    Promise.all(promiseArr)
-    let start4 = new Date().getTime()
-    console.log('执行promise用时：' + (start4 - start3) + '毫秒')
+    Promise.all(promiseArr).then((res)=>{
+      let start4 = new Date().getTime()
+      console.log('总共耗时：' + (start4 - start) + '毫秒')
+    }).catch((err)=>{
+      console.error(err)
+    })
+    
     return ResOK(cb, 'OK')
   } catch (error) {
     console.log(error)
