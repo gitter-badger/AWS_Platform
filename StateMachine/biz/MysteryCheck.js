@@ -6,8 +6,8 @@ export class MysteryCheck {
      */
     check(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "role", type: "NN", min: 1, max: 10000 }]
-            , inparam)
+            { name: "role", type: "NN", min: 1, max: 10000 }
+        ], inparam)
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })

@@ -77,7 +77,7 @@ functions:
     handler: api_mystery.mysteryList
     events:
         - http:
-            path: pushMystery
+            path: mysteryList
             method: post
             cors: true
             authorizer: tokenAuth

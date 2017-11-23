@@ -50,4 +50,23 @@ export class MysteryModel extends BaseModel {
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
         return [0, sortResult]
     }
+    /**
+     * 更新神秘大奖状态
+     * @param {*} inparam 
+     */
+    async updateOperate(inparam) {
+        let updateObj={
+            Key: { 'sn': inparam.sn },
+            UpdateExpression: 'SET status = :status',
+            ExpressionAttributeValues: {
+                ':status': inparam.status
+            }
+        }
+        const [err, ret] = await this.updateItem(updateObj)
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
+    }
+
 }
