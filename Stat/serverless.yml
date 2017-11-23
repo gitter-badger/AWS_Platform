@@ -73,14 +73,14 @@ functions:
           # authorizer: tokenAuth
   initRank: #初始用户排行榜
     handler: api_rank.initRank
-    events:
-      - schedule: cron(0 0 * * 1 *)
-      # -
-      #   http:
-      #     path: /statistics/initRank
-      #     method: post
-      #     cors: true
-          # authorizer: tokenAuth
+    # events:
+    #   - schedule: cron(0 0 * * 1 *)
+      -
+        http:
+          path: /statistics/initRank
+          method: post
+          cors: true
+          authorizer: tokenAuth
   initBetRank: #初始用户流水排行榜
     handler: api_rank.initBetRank
     memorySize: 512
