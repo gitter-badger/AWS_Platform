@@ -36,11 +36,19 @@ export class MysteryModel extends BaseModel {
         let query = {}
         // 条件搜索
         if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.buildQueryParams(inparam.query, true)
+            if (inparam.query.winAt) {
+                inparam.query.winAt = { $range: inparam.query.winAt }
+            }
+            if (inparam.query.userName) { inparam.query.userName = { $like: inparam.query.userName } }
+            if (inparam.query.merchantName) { inparam.query.merchantName = { $like: inparam.query.merchantName } }
+            if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
+            if (inparam.query.nickname) { inparam.query.nickname = { $like: inparam.query.nickname } }
+            const queryParams = this.buildQueryParams(inparam.query, false)
             query.FilterExpression = queryParams.FilterExpression
             query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
             query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
+        console.info(query)
         const [queryErr, adminRet] = await this.scan(query)
         if (queryErr) {
             return [queryErr, 0]
@@ -55,7 +63,7 @@ export class MysteryModel extends BaseModel {
      * @param {*} inparam 
      */
     async updateOperate(inparam) {
-        let updateObj={
+        let updateObj = {
             Key: { 'sn': inparam.sn },
             UpdateExpression: 'SET status = :status',
             ExpressionAttributeValues: {

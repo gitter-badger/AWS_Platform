@@ -6,13 +6,17 @@ export class MysteryCheck {
      */
     check(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "role", type: "NN", min: 1, max: 10000 }
         ], inparam)
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
             throw checkAttError
         }
+
+        // 数据类型转换
+        inparam.status = 0
+        inparam.receiveAt = 0
+        inparam.winAt = parseInt(inparam.winAt)
 
         return [checkAttError, errorParams]
     }

@@ -1,5 +1,5 @@
 import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit } from '../lib/all'
-
+import _ from 'lodash'
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
 // AWS.config.setPromisesDependency(require('bluebird'))
@@ -265,6 +265,13 @@ export class BaseModel {
                                 opts.ExpressionAttributeValues[`:${k}${i}`] = value[i]
                             }
                             break
+                        }
+                        case "$range": {
+                            array = true
+                            opts.ExpressionAttributeNames[`#${k}`] = k
+                            opts.FilterExpression += `#${k} between :${k}0 and :${k}1`
+                            opts.ExpressionAttributeValues[`:${k}0`] = value[0]
+                            opts.ExpressionAttributeValues[`:${k}1`] = value[1]
                         }
                     }
                     break

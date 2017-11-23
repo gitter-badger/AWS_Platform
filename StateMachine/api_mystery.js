@@ -1,6 +1,6 @@
 import { ResOK, ResErr, Codes, JSONParser, Model, SeatTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 
-//import { MysteryCheck } from './biz/MysteryCheck'
+import { MysteryCheck } from './biz/MysteryCheck'
 import { MysteryModel } from './model/MysteryModel'
 
 /**
@@ -11,11 +11,9 @@ const pushMystery = async (e, c, cb) => {
         // 入参转换
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
         // 检查参数是否合法
-        //const [checkAttError, errorParams] = new MysteryCheck().check(inparam)
+        const [checkAttError, errorParams] = new MysteryCheck().check(inparam)
         // 获取令牌，只有管理员有权限
         // const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-        inparam.status=0
-        inparam.receiveAt=0
         // 业务操作
         const [err, ret] = await new MysteryModel().add(inparam)
         // 操作日志记录
