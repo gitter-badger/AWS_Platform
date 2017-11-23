@@ -1,4 +1,4 @@
-import {Tables,Store$,Codes,BizErr,Trim,Empty,Model,Keys,Pick,Omit} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit } from '../lib/all'
 
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
@@ -125,20 +125,32 @@ export class BaseModel {
         // return [queryErr, queryRet]
     }
     /**
-     * 查询数据
+     * 递归查询所有数据
      */
     query(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.queryInc(params, null)
+    }
+
+    // 内部增量查询，用于结果集超过1M的情况
+    queryInc(params, result) {
+        return this.db$('query', params).then((res) => {
+            if (!result) {
+                result = res
+            } else {
+                result.Items.push(...res.Items)
             }
-            this.db$('query', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
+            if (res.LastEvaluatedKey) {
+                params.ExclusiveStartKey = res.LastEvaluatedKey
+                return this.queryInc(params, result)
+            } else {
+                return [false, result]
+            }
+        }).catch((err) => {
+            return [BizErr.DBErr(err.toString()), false]
         })
     }
 
@@ -174,17 +186,30 @@ export class BaseModel {
      * 全表查询数据
      */
     scan(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.scanInc(params, null)
+    }
+
+    // 内部增量查询，用于结果集超过1M的情况
+    scanInc(params, result) {
+        return this.db$('scan', params).then((res) => {
+            if (!result) {
+                result = res
+            } else {
+                result.Items.push(...res.Items)
             }
-            this.db$('scan', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
+            if (res.LastEvaluatedKey) {
+                params.ExclusiveStartKey = res.LastEvaluatedKey
+                return this.scanInc(params, result)
+            } else {
+                return [false, result]
+            }
+        }).catch((err) => {
+            console.error(err)
+            return [BizErr.DBErr(err.toString()), false]
         })
     }
 
