@@ -60,7 +60,7 @@ const playerBetRank = async (e, c, cb) => {
       ProjectionExpression: "userName"
     })
     let start2 = new Date().getTime()
-    console.log('查出所有玩家耗时：' + (start2 - start) +'毫秒')
+    console.log('查出所有玩家耗时：' + (start2 - start) + '毫秒')
     if (playerErr) return ResErr(cb, playerErr)
     let promiseArr = []
     for (let item of playerRet.Items) {
@@ -68,10 +68,10 @@ const playerBetRank = async (e, c, cb) => {
       promiseArr.push(p)
     }
     let start3 = new Date().getTime()
-    console.log('for循序分发promise耗时：' + (start3 - start2)+'毫秒')
+    console.log('for循序分发promise耗时：' + (start3 - start2) + '毫秒')
     Promise.all(promiseArr)
     let start4 = new Date().getTime()
-    console.log('执行promise用时：' + (start4 - start3)+'毫秒')
+    console.log('执行promise用时：' + (start4 - start3) + '毫秒')
     return ResOK(cb, 'OK')
   } catch (error) {
     console.log(error)
