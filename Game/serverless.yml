@@ -484,24 +484,24 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    SYSConfigMult: #系统多级配置
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: SYSConfigMult
-        AttributeDefinitions:
-          -
-            AttributeName: code
-            AttributeType: S
-          -
-            AttributeName: businessKey
-            AttributeType: N
-        KeySchema:
-          -
-            AttributeName: code
-            KeyType: HASH
-          -
-            AttributeName: businessKey
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+    # SYSConfigMult: #系统多级配置
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: SYSConfigMult
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: code
+    #         AttributeType: S
+    #       -
+    #         AttributeName: businessKey
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: code
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: businessKey
+    #         KeyType: RANGE
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
