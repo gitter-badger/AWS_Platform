@@ -20,28 +20,17 @@ export class GamePlayerBillModel extends BaseModel {
 
     async scanPlayerBill(inparam) {
         let self = this
-        //获取周一零点零时的时间
-        let oneDayTime = 24 * 60 * 60 * 1000
-        let day = new Date().getDay() || 7
-        let date = new Date()
-        date.setHours(0)
-        date.setMinutes(0)
-        date.setSeconds(0)
-        date.setMilliseconds(0)
-        let time = date.getTime()
-        let nowTime = new Date().getTime()
-        let mondayTime = time - (day - 1) * oneDayTime
-        return new Promise(function (resolve, reject) {
-            //查询一周内的玩家流水
-            let query = {
-                KeyConditionExpression: "userName=:userName and createAt between :start and :end",
-                ProjectionExpression: "betAmount,reAmount",
-                ExpressionAttributeValues: {
-                    ":userName": inparam.userName,
-                    ":start": mondayTime,
-                    ":end": nowTime
-                }
+        //查询一周内的玩家流水
+        let query = {
+            KeyConditionExpression: "userName=:userName and createAt between :start and :end",
+            ProjectionExpression: "betAmount,reAmount",
+            ExpressionAttributeValues: {
+                ":userName": inparam.userName,
+                ":start": inparam.mondayTime,
+                ":end": inparam.nowTime
             }
+        }
+        return new Promise(function (resolve, reject) {
             self.query(query).then((res) => {
                 let resArr = res[1]
                 console.log('用户名：' + inparam.userName + '一共有：' + resArr.Items.length + '条记录')
