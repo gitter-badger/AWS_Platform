@@ -42,6 +42,7 @@ const HeraGamePlayer = 'HeraGamePlayer'
 const PushErrorModel = 'PushErrorModel'
 
 const SYSConfig = 'SYSConfig'
+const SYSConfigMult = 'SYSConfigMult'
 const SYSToken = 'SYSToken'
 const SYSRolePermission = 'SYSRolePermission'
 
@@ -64,6 +65,7 @@ export const Tables = {
   PushErrorModel,
 
   SYSConfig,
+  SYSConfigMult,
   SYSToken,
   SYSRolePermission
 }
