@@ -1,9 +1,11 @@
 import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
 import { LogModel } from './model/LogModel'
+import { UserModel } from './model/UserModel'
 import { ConfigModel } from './model/ConfigModel'
 import { ConfigMultModel } from './model/ConfigMultModel'
 
 import { ConfigCheck } from './biz/ConfigCheck'
+import _ from 'lodash'
 
 /**
  * 创建配置
@@ -114,11 +116,25 @@ const configMultList = async (e, c, cb) => {
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     // 业务操作
-    const [err, ret] = await new ConfigMultModel().page(inparam)
+    let [err, ret] = await new ConfigMultModel().page(inparam)
+    // 如果是电子游戏配置，需要所有商户
+    if (inparam.code == 'videoconfig') {
+      inparam.role = RoleCodeEnum.Merchant
+      const [usersErr, usersRet] = await new UserModel().queryByRole(inparam)
+      if (usersErr) { return ResErr(cb, usersErr) }
+      for (let user of usersRet) {
+        const itemIndex = _.findIndex(ret, ['businessKey', user.displayId])
+        if (itemIndex >= 0) {
+          user.content = ret[itemIndex]
+        }
+      }
+      ret = usersRet
+    }
     // 结果返回
     if (err) { return ResErr(cb, err) }
     return ResOK(cb, { payload: ret })
   } catch (error) {
+    console.error(error)
     return ResErr(cb, error)
   }
 }

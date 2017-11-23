@@ -74,21 +74,11 @@ export class ConfigMultModel extends BaseModel {
                 ':code': inparam.code,
             }
         }
-        // 条件搜索
-        if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.buildQueryParams(inparam.query, true)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
-        }
-        const [queryErr, adminRet] = await this.query(query)
+        const [queryErr, queryRet] = await this.query(query)
         if (queryErr) {
             return [queryErr, 0]
         }
-        // 排序输出
-        let sortResult = _.sortBy(adminRet.Items, [inparam.sortkey || 'createdAt'])
-        if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
-        return [0, sortResult]
+        return [0, queryRet.Items]
     }
 }
 
