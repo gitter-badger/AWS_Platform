@@ -123,7 +123,7 @@ const configMultList = async (e, c, cb) => {
       const [usersErr, usersRet] = await new UserModel().queryByRole(inparam)
       if (usersErr) { return ResErr(cb, usersErr) }
       for (let user of usersRet) {
-        const itemIndex = _.findIndex(ret, ['businessKey', user.displayId])
+        const itemIndex = _.findIndex(ret, ['businessKey', user.displayId.toString()])
         if (itemIndex >= 0) {
           user.content = ret[itemIndex]
         }
