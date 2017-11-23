@@ -46,7 +46,7 @@ const SYSToken = 'SYSToken'
 const SYSRolePermission = 'SYSRolePermission'
 const UserRankStat = 'UserRankStat'
 const PlayerBillDetail = 'PlayerBillDetail'
-
+const HeraGamePlayerBill='HeraGamePlayerBill'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -70,7 +70,8 @@ export const Tables = {
   SYSToken,
   SYSRolePermission,
   UserRankStat,
-  PlayerBillDetail
+  PlayerBillDetail,
+  HeraGamePlayerBill
 }
 
 export const Model = {

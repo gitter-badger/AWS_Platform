@@ -74,11 +74,12 @@ functions:
   initRank: #初始用户排行榜
     handler: api_rank.initRank
     events:
-      -
-        http:
-          path: /statistics/initRank
-          method: post
-          cors: true
+      - schedule: cron(0 0 * * 1 *)
+      # -
+      #   http:
+      #     path: /statistics/initRank
+      #     method: post
+      #     cors: true
           # authorizer: tokenAuth
   initBetRank: #初始用户流水排行榜
     handler: api_rank.initBetRank
@@ -87,5 +88,13 @@ functions:
       -
         http:
           path: /statistics/initBetRank
+          method: post
+          cors: true
+  playerBetRank: #统计排行榜流水
+    handler: api_rank.playerBetRank
+    events:
+      -
+        http:
+          path: /statistics/playerBetRank
           method: post
           cors: true
