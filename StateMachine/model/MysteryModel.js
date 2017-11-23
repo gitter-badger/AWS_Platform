@@ -63,11 +63,16 @@ export class MysteryModel extends BaseModel {
      * @param {*} inparam 
      */
     async updateOperate(inparam) {
+        let receiveAt = 0
+        if (inparam.status == 1) {
+            let receiveAt = new Date().getTime()
+        }
         let updateObj = {
             Key: { 'sn': inparam.sn },
-            UpdateExpression: 'SET status = :status',
+            UpdateExpression: 'SET status = :status and receiveAt=:receiveAt',
             ExpressionAttributeValues: {
-                ':status': inparam.status
+                ':status': inparam.status,
+                ':receiveAt': receiveAt
             }
         }
         const [err, ret] = await this.updateItem(updateObj)

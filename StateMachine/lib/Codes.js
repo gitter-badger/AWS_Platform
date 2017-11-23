@@ -1,3 +1,9 @@
+export const CodeStatus={
+  Receive:'0',
+  Unreceive:'1'
+}
+
+
 // Biz Codes defines
 export const Codes = {
   OK: '0',
