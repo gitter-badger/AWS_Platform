@@ -69,7 +69,10 @@ export class MysteryModel extends BaseModel {
         }
         let updateObj = {
             Key: { 'sn': inparam.sn },
-            UpdateExpression: 'SET status = :status and receiveAt=:receiveAt',
+            UpdateExpression: 'SET #status = :status,receiveAt = :receiveAt',
+            ExpressionAttributeNames: {
+                '#status': 'status'
+            },
             ExpressionAttributeValues: {
                 ':status': inparam.status,
                 ':receiveAt': receiveAt
