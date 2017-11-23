@@ -44,7 +44,7 @@ export class UserModel extends BaseModel {
      */
     async queryByRole(inparam) {
         let query = {
-            ProjectionExpression: 'userId,displayId,username,suffix,uanme,displayName,createdAt,updatedAt',         
+            ProjectionExpression: 'userId,displayId,username,suffix,uanme,displayName,createdAt,updatedAt',
             KeyConditionExpression: '#role = :role',
             ExpressionAttributeNames: {
                 '#role': 'role'
