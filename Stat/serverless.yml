@@ -74,7 +74,9 @@ functions:
   initRank: #初始用户排行榜
     handler: api_rank.initRank
     events:
-      - schedule: cron(0 0 * * 1 *)
+      - schedule:
+          rate: cron(0 0 * * 1 *)
+      # - schedule: cron(0 0 * * 1 *)
       # -
       #   http:
       #     path: /statistics/initRank
