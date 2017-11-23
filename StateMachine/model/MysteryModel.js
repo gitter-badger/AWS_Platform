@@ -1,4 +1,4 @@
-import { Tables, Store$, Codes, BizErr, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels } from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Empty, Model, Keys, Pick, Omit, StatusEnum, RoleCodeEnum, RoleModels, MysteryStatusEnum } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 export class MysteryModel extends BaseModel {
@@ -64,7 +64,7 @@ export class MysteryModel extends BaseModel {
      */
     async updateOperate(inparam) {
         let receiveAt = 0
-        if (inparam.status == 1) {
+        if (inparam.status == MysteryStatusEnum.Received) {
             let receiveAt = new Date().getTime()
         }
         let updateObj = {

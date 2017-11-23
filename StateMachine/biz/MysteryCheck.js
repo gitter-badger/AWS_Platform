@@ -1,4 +1,4 @@
-import { Codes,CodeStatus, Model, RoleCodeEnum } from '../lib/all'
+import { Codes, MysteryStatusEnum, Model, RoleCodeEnum } from '../lib/all'
 const athena = require("../lib/athena")
 export class MysteryCheck {
     /**
@@ -15,8 +15,8 @@ export class MysteryCheck {
         }
 
         // 数据类型转换
-        inparam.status = CodeStatus.Receive
-        inparam.receiveAt = 0
+        inparam.status = MysteryStatusEnum.Unreceived
+        inparam.receiveAt = Model.NumberValue
         inparam.winAt = parseInt(inparam.winAt)
 
         return [checkAttError, errorParams]

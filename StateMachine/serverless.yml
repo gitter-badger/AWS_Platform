@@ -81,6 +81,14 @@ functions:
             method: post
             cors: true
             authorizer: tokenAuth
+  mysteryOperate: #神秘大奖操作
+    handler: api_mystery.mysteryOperate
+    events:
+        - http:
+            path: mysteryOperate
+            method: post
+            cors: true
+            authorizer: tokenAuth
   # testmysql: #测试mysql
   #   handler: api_fetch.testmysql
   #   events:
