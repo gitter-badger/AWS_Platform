@@ -17,7 +17,9 @@
         "HulkPlatformAd",
         "HeraGamePlayer",
         "SYSConfig",
+        "SYSConfigMult",
         "SYSRolePermission",
+        "SYSMystery",
         "HawkeyeGameNotice"
     ],
     "incBackupTables": [
