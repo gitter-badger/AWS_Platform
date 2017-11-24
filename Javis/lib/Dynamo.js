@@ -44,6 +44,7 @@ const PushErrorModel = 'PushErrorModel'
 const SYSConfig = 'SYSConfig'
 const SYSToken = 'SYSToken'
 const SYSRolePermission = 'SYSRolePermission'
+const UserRankStat = 'UserRankStat'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -65,7 +66,8 @@ export const Tables = {
 
   SYSConfig,
   SYSToken,
-  SYSRolePermission
+  SYSRolePermission,
+  UserRankStat
 }
 
 export const Model = {

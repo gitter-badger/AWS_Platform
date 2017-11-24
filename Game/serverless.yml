@@ -8,6 +8,7 @@ provider:
   runtime: nodejs6.10
   region: ap-southeast-1
   memorySize: 256
+  timeout: 300
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
   iamRoleStatements:
@@ -72,11 +73,11 @@ custom:
         - roleTypeIndex
         - userIdAndDate
       read:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 10
         maximum: 10000
         usage: 0.75
     - table: HawkeyePlayerEmailRecord
@@ -271,8 +272,8 @@ resources:
             AttributeName: sn
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 10
         GlobalSecondaryIndexes:
           -
             IndexName: CreatedDateIndex
@@ -283,8 +284,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 10
           -
             IndexName: roleDateIndex
             KeySchema:
@@ -297,8 +298,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 10
           -
             IndexName: roleTypeIndex
             KeySchema:
@@ -311,8 +312,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 10
           -
             IndexName: userIdAndDate
             KeySchema:
@@ -325,8 +326,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 10
 
     SYSToken: #用户登录令牌表
       Type: AWS::DynamoDB::Table
@@ -460,5 +461,47 @@ resources:
           #   AttributeName: balance
           #   KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}          
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
+    SYSMystery: #神秘大奖
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSMystery
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: winAt
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+          -
+            AttributeName: winAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    SYSConfigMult: #系统多级配置
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSConfigMult
+        AttributeDefinitions:
+          -
+            AttributeName: code
+            AttributeType: S
+          -
+            AttributeName: businessKey
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: code
+            KeyType: HASH
+          -
+            AttributeName: businessKey
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

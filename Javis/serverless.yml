@@ -8,6 +8,7 @@ provider:
   runtime: nodejs6.10
   region: ap-southeast-1
   memorySize: 256
+  timeout: 300
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
       NA_CENTER: ${ssm:NA_CENTER~true}
@@ -46,11 +47,11 @@ custom:
         - UserIdIndex
         - merchantIdIndex
       read:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 5
         maximum: 10000
         usage: 0.75
     - table: ZeusPlatformBill
@@ -70,11 +71,11 @@ custom:
         usage: 0.75
     - table: ZeusPlatformCode
       read:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 5
         maximum: 10000
         usage: 0.75
     - table: ZeusPlatformCaptcha
@@ -91,11 +92,11 @@ custom:
         - LogRoleIndex
         - CreatedDateIndex
       read:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 5
         maximum: 10000
         usage: 0.75
     - table: HeraGamePlayerBill
@@ -338,8 +339,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: RoleUsernameIndex
             KeySchema:
@@ -353,8 +354,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: RoleParentIndex
             KeySchema:
@@ -368,8 +369,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: UserIdIndex
             KeySchema:
@@ -380,8 +381,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: merchantIdIndex
             KeySchema:
@@ -391,11 +392,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
 
@@ -536,8 +537,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: CreatedDateIndex
             KeySchema:
@@ -547,11 +548,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 
     HawkeyeGameNotice:  #游戏通知表
       Type: AWS::DynamoDB::Table
@@ -773,8 +774,8 @@ resources:
             AttributeName: code
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 
     ZeusPlatformCaptcha: #验证码表
       Type: AWS::DynamoDB::Table

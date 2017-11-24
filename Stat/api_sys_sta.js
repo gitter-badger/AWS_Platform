@@ -36,6 +36,7 @@ import {Model} from "./lib/Dynamo"
  * @param {*} callback 
  */
 const init = async function(event, context, callback) {
+    console.log("开始");
     let  allStatArr = [],userInfoObj = {},platUserObj= {},platUserRoleObj = {};
     let [playerBillListErr, playerBillList] = await new UserBillModel().scan({});
     console.log(playerBillList.length);
@@ -264,7 +265,7 @@ const overview = async function(event, context, callback) {
                 return errorHandle(callback, err);
             }
         }
-        return callback(null, ReHandler.success({oneNum : online, twoNum:sum}));
+        return callback(null, ReHandler.success({oneNum : online, twoNum:sum,type :type}));
       }
       case 4 : { //签约情况
         let buIds;

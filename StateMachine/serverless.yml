@@ -13,6 +13,9 @@ provider:
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
       IMG_BUCKET: ${ssm:IMG_BUCKET}
+      RDS_HOST: ${ssm:RDS_HOST~true}
+      RDS_USERNAME: ${ssm:RDS_USERNAME~true}
+      RDS_PASSWORD: ${ssm:RDS_PASSWORD~true}
   timeout: 300
   iamRoleStatements:
     - Effect: Allow
@@ -63,6 +66,36 @@ functions:
             path: fetchuser
             method: post
             cors: true
+  pushMystery: #大厅推送神秘大奖给平台
+    handler: api_mystery.pushMystery
+    events:
+        - http:
+            path: pushMystery
+            method: post
+            cors: true
+  mysteryList: #神秘大奖列表
+    handler: api_mystery.mysteryList
+    events:
+        - http:
+            path: mysteryList
+            method: post
+            cors: true
+            authorizer: tokenAuth
+  mysteryOperate: #神秘大奖操作
+    handler: api_mystery.mysteryOperate
+    events:
+        - http:
+            path: mysteryOperate
+            method: post
+            cors: true
+            authorizer: tokenAuth
+  # testmysql: #测试mysql
+  #   handler: api_fetch.testmysql
+  #   events:
+  #       - http:
+  #           path: testmysql
+  #           method: get
+  #           cors: true
 # stepFunctions:
 #   stateMachines:
 #     backup:
