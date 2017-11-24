@@ -58,6 +58,8 @@ const mysteryOperate = async (e, c, cb) => {
         // 获取令牌，只有管理员有权限
         const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
         // 更新状态
+        inparam.username=token.username
+        inparam.displayName=token.displayName
         let [err, ret] = await new MysteryModel().updateOperate(inparam)
         // 结果返回
         if (err) { return ResErr(cb, err) }
