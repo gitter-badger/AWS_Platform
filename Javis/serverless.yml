@@ -47,11 +47,11 @@ custom:
         - UserIdIndex
         - merchantIdIndex
       read:
-        minimum: 10
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 10
+        minimum: 5
         maximum: 10000
         usage: 0.75
     - table: ZeusPlatformBill
@@ -71,11 +71,11 @@ custom:
         usage: 0.75
     - table: ZeusPlatformCode
       read:
-        minimum: 10
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 10
+        minimum: 5
         maximum: 10000
         usage: 0.75
     - table: ZeusPlatformCaptcha
@@ -92,11 +92,11 @@ custom:
         - LogRoleIndex
         - CreatedDateIndex
       read:
-        minimum: 10
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
-        minimum: 10
+        minimum: 5
         maximum: 10000
         usage: 0.75
     - table: HeraGamePlayerBill
@@ -339,8 +339,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: RoleUsernameIndex
             KeySchema:
@@ -354,8 +354,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: RoleParentIndex
             KeySchema:
@@ -369,8 +369,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: UserIdIndex
             KeySchema:
@@ -381,8 +381,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: merchantIdIndex
             KeySchema:
@@ -392,11 +392,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
 
@@ -537,8 +537,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           -
             IndexName: CreatedDateIndex
             KeySchema:
@@ -548,11 +548,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 
     HawkeyeGameNotice:  #游戏通知表
       Type: AWS::DynamoDB::Table
@@ -774,8 +774,8 @@ resources:
             AttributeName: code
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 
     ZeusPlatformCaptcha: #验证码表
       Type: AWS::DynamoDB::Table

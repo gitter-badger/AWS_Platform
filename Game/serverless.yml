@@ -73,7 +73,7 @@ custom:
         - roleTypeIndex
         - userIdAndDate
       read:
-        minimum: 10
+        minimum: 5
         maximum: 10000
         usage: 0.75
       write:
@@ -272,7 +272,7 @@ resources:
             AttributeName: sn
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
+          ReadCapacityUnits: 5
           WriteCapacityUnits: 10
         GlobalSecondaryIndexes:
           -
@@ -284,7 +284,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
+              ReadCapacityUnits: 5
               WriteCapacityUnits: 10
           -
             IndexName: roleDateIndex
@@ -298,7 +298,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
+              ReadCapacityUnits: 5
               WriteCapacityUnits: 10
           -
             IndexName: roleTypeIndex
@@ -312,7 +312,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
+              ReadCapacityUnits: 5
               WriteCapacityUnits: 10
           -
             IndexName: userIdAndDate
@@ -326,7 +326,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 10
+              ReadCapacityUnits: 5
               WriteCapacityUnits: 10
 
     SYSToken: #用户登录令牌表
