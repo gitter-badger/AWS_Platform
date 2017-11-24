@@ -272,6 +272,7 @@ export class BaseModel {
                             opts.FilterExpression += `#${k} between :${k}0 and :${k}1`
                             opts.ExpressionAttributeValues[`:${k}0`] = value[0]
                             opts.ExpressionAttributeValues[`:${k}1`] = value[1]
+                            break
                         }
                     }
                     break
