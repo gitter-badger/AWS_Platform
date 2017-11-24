@@ -29,19 +29,18 @@ export class UserRankStatModel extends BaseModel {
             }
         }
         const [err, ret] = await this.query(query)
-        if (ret.Items.length == 0) {
+        if (ret.Items.length == 0 || !ret.Items[0].bet) {
             let bet = parseFloat(inparam.betCount)
             let win = parseFloat(inparam.winCount)
             let updateObj = {
                 Key: { userName: inparam.userName },
-                UpdateExpression: 'SET bet=:bet,win=:win,nickname=:nickname,headPic=:headPic,userName=:userName,userId=:userId',
+                UpdateExpression: 'SET bet=:bet,win=:win,nickname=:nickname,headPic=:headPic,userId=:userId',
                 ExpressionAttributeValues: {
                     ':bet': +bet.toFixed(2),
                     ':win': +win.toFixed(2),
-                    'userName': inparam.userName,
-                    'nickname': inparam.nickname,
-                    'headPic': inparam.headPic,
-                    'userId': inparam.userId,
+                    ':nickname': inparam.nickname,
+                    ':headPic': inparam.headPic,
+                    ':userId': inparam.userId,
                 }
             }
             this.updateItem(updateObj).then((res) => {
@@ -65,8 +64,8 @@ export class UserRankStatModel extends BaseModel {
             Key: { userName: inparam.userName },
             UpdateExpression: 'SET bet=bet + :bet,win=win + :win,nickname=:nickname,headPic=:headPic',
             ExpressionAttributeValues: {
-                ':bet': bet,
-                ':win': win,
+                ':bet': +bet.toFixed(2),
+                ':win': +win.toFixed(2),
                 ':nickname': inparam.nickname,
                 ':headPic': inparam.headPic
             }

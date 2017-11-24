@@ -63,17 +63,8 @@ const playerBalanceTrigger = async (e, c, cb) => {
         console.log(bError);
         return;
     }
-    // 推送余额给大厅
-    console.log('1、开始推送余额给大厅')
-    new PushModel().pushUserBalance(userId, balance).then((res)=>{
-        console.info("玩家余额变更推送成功");
-    }).catch((err)=>{
-        console.info("玩家余额变更推送失败");
-        console.info(err);
-    });
-    
     // 更新用户排行榜余额
-    console.log('2、开始更新排行榜')
+    console.log('开始更新排行榜')
     new UserModel().updateItem({
         TableName: Tables.UserRankStat,
         Key: { userName: userName },
@@ -87,8 +78,18 @@ const playerBalanceTrigger = async (e, c, cb) => {
     }).catch((err) => {
         console.error(err)
     })
+
+    // 推送余额给大厅
+    console.log('开始推送余额给大厅')
+    new PushModel().pushUserBalance(userId, balance).then((res)=>{
+        console.info("玩家余额变更推送成功");
+    }).catch((err)=>{
+        console.info("玩家余额变更推送失败");
+        console.info(err);
+    });
+    
     // 统计看板数据
-    console.log('3、开始统计看板数据')
+    console.log('开始统计看板数据')
     playerBillStat(userName, createAt);
 }
 async function updateAmount(userId, dateStr, amount, gameType, obj) {

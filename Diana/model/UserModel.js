@@ -1,6 +1,7 @@
 import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
 
 import { BaseModel } from './BaseModel'
+import _ from 'lodash'
 
 export class UserModel extends BaseModel {
     constructor() {
@@ -38,31 +39,35 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 根据角色和带前缀的用户名查询唯一用户
-     * @param {*} role 
-     * @param {*} username 
+     * 根据角色查询
+     * @param {*} inparam 
      */
-    async getUserByName(role, username) {
-        const [queryErr, queryRet] = await this.query({
-            IndexName: 'RoleUsernameIndex',
-            KeyConditionExpression: '#role = :role and #username = :username',
+    async queryByRole(inparam) {
+        let query = {
+            ProjectionExpression: 'userId,displayId,username,suffix,uanme,displayName,createdAt,updatedAt',
+            KeyConditionExpression: '#role = :role',
             ExpressionAttributeNames: {
-                '#username': 'username',
                 '#role': 'role'
             },
             ExpressionAttributeValues: {
-                ':username': username,
-                ':role': role
+                ':role': inparam.role
             }
-        })
+        }
+        // 条件搜索
+        if (!_.isEmpty(inparam.query)) {
+            const queryParams = this.buildQueryParams(inparam.query, true)
+            query.FilterExpression = queryParams.FilterExpression
+            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+        }
+        const [queryErr, queryRet] = await this.query(query)
         if (queryErr) {
             return [queryErr, 0]
         }
-        const User = queryRet.Items[0]
-        if (!User) {
-            return [BizErr.UserNotFoundErr(), 0]
-        }
-        return [0, User]
+        // 排序输出
+        let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
+        if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
+        return [0, sortResult]
     }
 
     // const params = {

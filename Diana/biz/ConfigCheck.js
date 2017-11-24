@@ -52,8 +52,8 @@ export class ConfigCheck {
      */
     checkVideoConfig(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "linebet", type: "N", min: 0, max: 200 },
-            { name: "linecount", type: "N", min: 0, max: 50 }
+            { name: "code", type: "S", min: 1, max: 200 },
+            { name: "businessKey", type: "S", min: 1, max: 200 }
         ], inparam)
 
         if (checkAttError) {
@@ -62,8 +62,8 @@ export class ConfigCheck {
         }
 
         // 数据类型处理
-        inparam.linebet = parseInt(inparam.linebet)
-        inparam.linecount = parseInt(inparam.linecount)
+        inparam.code = inparam.code.toString()
+        inparam.businessKey = inparam.businessKey.toString()
 
         return [checkAttError, errorParams]
     }

@@ -463,3 +463,45 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 10
           WriteCapacityUnits: 10
+    SYSMystery: #神秘大奖
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSMystery
+        AttributeDefinitions:
+          -
+            AttributeName: sn
+            AttributeType: S
+          -
+            AttributeName: winAt
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: sn
+            KeyType: HASH
+          -
+            AttributeName: winAt
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    SYSConfigMult: #系统多级配置
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SYSConfigMult
+        AttributeDefinitions:
+          -
+            AttributeName: code
+            AttributeType: S
+          -
+            AttributeName: businessKey
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: code
+            KeyType: HASH
+          -
+            AttributeName: businessKey
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

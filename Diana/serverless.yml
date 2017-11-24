@@ -144,6 +144,33 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  configMultNew: #创建多级配置
+    handler: api_config.configMultNew
+    events:
+      -
+        http:
+          path: configMultNew
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  configMultOne: #单个配置
+    handler: api_config.configMultOne
+    events:
+      -
+        http:
+          path: configMultOne
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  configMultList: #多级配置列表
+    handler: api_config.configMultList
+    events:
+      -
+        http:
+          path: configMultList
+          method: post
+          cors: true
+          authorizer: tokenAuth
   # ==================== 以下是系统子角色配置接口服务 ====================
   subRoleNew: #创建子角色
     handler: api_subrole.subRoleNew

@@ -37,30 +37,17 @@ const gameNew = async (e, c, cb) => {
  */
 const gameList = async (e, c, cb) => {
   try {
-    // const [paramsErr, gameParams] = Model.pathParams(e)
-    // if (paramsErr) {
-    //   return ResErr(cb, jsonParseErr)
-    // }
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
     const [jsonParseErr, gameParams] = JSONParser(e && e.body)
     //检查参数是否合法
     const [checkAttError, errorParams] = new GameCheck().checkQuery(gameParams)
-    let [err, ret] = [1, 1]
     // 普通游戏列表
-    // if (!gameParams.parent || gameParams.parent == RoleCodeEnum['PlatformAdmin'] || gameParams.parent == '01') {
-    [err, ret] = await new GameModel().listGames(gameParams)
-    // }
-    // 上级用户拥有的游戏列表
-    // else {
-    // [err, ret] = await new UserModel().queryUserById(gameParams.parent)
-    // }
+    let [err, ret] = await new GameModel().listGames(gameParams)
     if (err) { return ResErr(cb, err) }
-    // if (gameParams.parent) {
-    //   ret = ret.gameList
-    // }
     return ResOK(cb, { payload: ret })
   } catch (error) {
+    console.info(error)
     return ResErr(cb, error)
   }
 }

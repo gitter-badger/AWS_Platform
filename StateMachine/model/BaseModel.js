@@ -1,5 +1,5 @@
-import {Tables,Store$,Codes,BizErr,Trim,Empty,Model,Keys,Pick,Omit} from '../lib/all'
-
+import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit } from '../lib/all'
+import _ from 'lodash'
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
 // AWS.config.setPromisesDependency(require('bluebird'))
@@ -125,20 +125,32 @@ export class BaseModel {
         // return [queryErr, queryRet]
     }
     /**
-     * 查询数据
+     * 递归查询所有数据
      */
     query(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.queryInc(params, null)
+    }
+
+    // 内部增量查询，用于结果集超过1M的情况
+    queryInc(params, result) {
+        return this.db$('query', params).then((res) => {
+            if (!result) {
+                result = res
+            } else {
+                result.Items.push(...res.Items)
             }
-            this.db$('query', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
+            if (res.LastEvaluatedKey) {
+                params.ExclusiveStartKey = res.LastEvaluatedKey
+                return this.queryInc(params, result)
+            } else {
+                return [false, result]
+            }
+        }).catch((err) => {
+            return [BizErr.DBErr(err.toString()), false]
         })
     }
 
@@ -174,18 +186,105 @@ export class BaseModel {
      * 全表查询数据
      */
     scan(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.scanInc(params, null)
+    }
+
+    // 内部增量查询，用于结果集超过1M的情况
+    scanInc(params, result) {
+        return this.db$('scan', params).then((res) => {
+            if (!result) {
+                result = res
+            } else {
+                result.Items.push(...res.Items)
             }
-            this.db$('scan', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
+            if (res.LastEvaluatedKey) {
+                params.ExclusiveStartKey = res.LastEvaluatedKey
+                return this.scanInc(params, result)
+            } else {
+                return [false, result]
+            }
+        }).catch((err) => {
+            console.error(err)
+            return [BizErr.DBErr(err.toString()), false]
         })
     }
 
+    /**
+     * 构建搜索条件
+     * @param {*} conditions 查询条件对象
+     * @param {*} isDefault 是否默认全模糊搜索
+     */
+    buildQueryParams(conditions = {}, isDefault) {
+        // 默认设置搜索条件，所有查询模糊匹配
+        if (isDefault) {
+            for (let key in conditions) {
+                if (!_.isArray(conditions[key])) {
+                    conditions[key] = { '$like': conditions[key] }
+                }
+            }
+        }
+        let keys = Object.keys(conditions), opts = {}
+        if (keys.length > 0) {
+            opts.FilterExpression = ''
+            opts.ExpressionAttributeValues = {}
+            opts.ExpressionAttributeNames = {}
+        }
+        keys.forEach((k, index) => {
+            let item = conditions[k]
+            let value = item, array = false
+            if (_.isArray(item)) {
+                opts.FilterExpression += `${k} between :${k}0 and :${k}1`
+                // opts.FilterExpression += `${k} > :${k}0 and ${k} < :${k}1`
+                opts.ExpressionAttributeValues[`:${k}0`] = item[0]
+                opts.ExpressionAttributeValues[`:${k}1`] = item[1] + 86399999
+            }
+            else if (Object.is(typeof item, "object")) {
+                for (let key in item) {
+                    value = item[key]
+                    switch (key) {
+                        case "$like": {
+                            opts.FilterExpression += `contains(#${k}, :${k})`
+                            break
+                        }
+                        case "$in": {
+                            array = true
+                            opts.ExpressionAttributeNames[`#${k}`] = k
+                            for (let i = 0; i < value.length; i++) {
+                                if (i == 0) opts.FilterExpression += "("
+                                opts.FilterExpression += `#${k} = :${k}${i}`
+                                if (i != value.length - 1) {
+                                    opts.FilterExpression += " or "
+                                }
+                                if (i == value.length - 1) {
+                                    opts.FilterExpression += ")"
+                                }
+                                opts.ExpressionAttributeValues[`:${k}${i}`] = value[i]
+                            }
+                            break
+                        }
+                        case "$range": {
+                            array = true
+                            opts.ExpressionAttributeNames[`#${k}`] = k
+                            opts.FilterExpression += `#${k} between :${k}0 and :${k}1`
+                            opts.ExpressionAttributeValues[`:${k}0`] = value[0]
+                            opts.ExpressionAttributeValues[`:${k}1`] = value[1]
+                        }
+                    }
+                    break
+                }
+            } else {
+                opts.FilterExpression += `#${k} = :${k}`
+            }
+            if (!array && !_.isArray(value)) {
+                opts.ExpressionAttributeValues[`:${k}`] = value
+                opts.ExpressionAttributeNames[`#${k}`] = k
+            }
+            if (index != keys.length - 1) opts.FilterExpression += " and "
+        })
+        return opts
+    }
 }

@@ -3,6 +3,7 @@ import { UserRankCheck } from './biz/UserRankCheck'
 import { UserRankStatModel } from './model/UserRankStatModel'
 import { PlayerModel } from './model/PlayerModel'
 import { PlayerBillDetailModel } from './model/PlayerBillDetailModel'
+import { GamePlayerBillModel } from './model/GamePlayerBillModel'
 import _ from 'lodash'
 /**
  * 用户排行榜
@@ -49,7 +50,55 @@ const initRank = async (e, c, cb) => {
   }
 }
 /**
- * 获取老玩家的下注和返奖金额
+ * 以时间为维度获取玩家的下注和返奖金额
+ */
+const playerBetRank = async (e, c, cb) => {
+  try {
+    //查出所有玩家
+    let start = new Date().getTime()
+    const [playerErr, playerRet] = await new UserRankStatModel().scan({
+      ProjectionExpression: "userName"
+    })
+    let start2 = new Date().getTime()
+    console.log('查出所有玩家耗时：' + (start2 - start) + '毫秒')
+    if (playerErr) return ResErr(cb, playerErr)
+    let promiseArr = []
+
+    //获取周一零点零时的时间
+    let oneDayTime = 24 * 60 * 60 * 1000
+    let day = new Date().getDay() || 7
+    let date = new Date()
+    date.setHours(0)
+    date.setMinutes(0)
+    date.setSeconds(0)
+    date.setMilliseconds(0)
+    let time = date.getTime()
+    let nowTime = new Date().getTime()
+    let mondayTime = time - (day - 1) * oneDayTime
+
+    for (let item of playerRet.Items) {
+      let p = new GamePlayerBillModel().scanPlayerBill({ userName: item.userName, nowTime: nowTime, mondayTime: mondayTime })
+      promiseArr.push(p)
+    }
+    let start3 = new Date().getTime()
+    console.log('for循序分发promise耗时：' + (start3 - start2) + '毫秒')
+    Promise.all(promiseArr).then((res) => {
+      let start4 = new Date().getTime()
+      console.log('总共耗时：' + (start4 - start) + '毫秒')
+    }).catch((err) => {
+      console.error(err)
+    })
+
+    return ResOK(cb, 'OK')
+  } catch (error) {
+    console.log(error)
+    return ResErr(cb, error)
+  }
+}
+
+
+/**
+ * 获取老玩家的所有下注和返奖金额
  */
 const initBetRank = async (e, c, cb) => {
   try {
@@ -95,5 +144,6 @@ const initBetRank = async (e, c, cb) => {
 export {
   userRank,                      //用户排行榜 
   initRank,                      //初始玩家用户名和余额
-  initBetRank
+  initBetRank,
+  playerBetRank
 }

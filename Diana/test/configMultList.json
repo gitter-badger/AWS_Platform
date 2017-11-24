@@ -15,6 +15,11 @@
     }
   },
   "body": {
-    "gameType": "10000,30000,40000"
+    "code": "videoconfig",
+    "query": {
+      "displayName": "幸运城"
+    },
+    "sortkey": "createdAt",
+    "sort": "desc"
   }
 }
