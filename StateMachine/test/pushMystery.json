@@ -32,14 +32,14 @@
         }
     },
     "body": {
-        "sn": "流水号",
-        "userName": "用户名",
+        "sn": "流水号2",
+        "userName": "用户名2",
         "msn": "100",
         "merchantId": "999999",
         "merchantName": "商户名称",
         "gameType": "所属游戏类型",
-        "nickname": "玩家昵称",
-        "amount": "10000",
-        "winAt": 1511425638512
+        "nickname": "玩家昵称2",
+        "amount": "80000",
+        "winAt": 1511425738512
     }
 }
