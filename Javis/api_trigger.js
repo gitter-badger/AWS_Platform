@@ -79,6 +79,7 @@ const playerBalanceTrigger = async (e, c, cb) => {
     let bet = +(recordRnak.NewImage.betAmount || {}).N || 0
     let win = +(recordRnak.NewImage.reAmount || {}).N || 0
     let query = {
+        TableName: Tables.UserRankStat,
         KeyConditionExpression: '#userName = :userName',
         ExpressionAttributeNames: {
             '#userName': 'userName'
@@ -87,8 +88,8 @@ const playerBalanceTrigger = async (e, c, cb) => {
             ':userName': userName
         }
     }
-    this.query(query).then((res) => {
-        let ret = res[0]
+    new UserModel().query(query).then((res) => {
+        let ret = res[1]
         if (ret.Items.length == 0 || !ret.Items[0].bet) {
             let updateObj = {
                 TableName: Tables.UserRankStat,
