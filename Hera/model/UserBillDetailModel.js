@@ -84,7 +84,7 @@ export class UserBillDetailModel extends athena.BaseModel {
             });
         })
     }
-    summary(list){
+    summary(list, lastCreatedAt){
         //写入账单明细
         list.map((item) => {
             item.billId = this.billId;
@@ -112,7 +112,8 @@ export class UserBillDetailModel extends athena.BaseModel {
             }
         }
         list.forEach((item, index) => {
-            if(item.type == 3) {
+            let alreadySave = lastCreatedAt ? item.createdAt > lastCreatedAt : true;
+            if(item.type == 3 && alreadySave) {
                 let p = betArray.find((b) => b.businessKey == item.businessKey && item.businessKey)
                 if(!p) {
                     p = {
@@ -155,11 +156,12 @@ export class UserBillDetailModel extends athena.BaseModel {
         }
         return this.promise("query",opts);
     }
-    async getBillId(userName, createdAt) {
+    async getLastDetail(userName, createdAt) {
         createdAt = createdAt || Date.now();
         let opts = {
             KeyConditionExpression : "userName=:userName and createdAt>:createdAt",
             IndexName : "UserNameIndex",
+            ScanIndexForward : false,
             Limit :1,
             ExpressionAttributeValues : {
                 ":userName" : userName,
@@ -169,7 +171,7 @@ export class UserBillDetailModel extends athena.BaseModel {
         return new Promise((reslove, reject) => {
             this.db$("query",opts).then((result) => {
                 if(result.Items.length>0) {
-                    return reslove([0, result.Items[0].billId]);
+                    return reslove([0, result.Items[0]]);
                 }
                 return reslove([0, null]);
             }).catch((err) => {

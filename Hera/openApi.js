@@ -738,24 +738,25 @@ async function settlement(event, context, callback) {
     userId : userModel.userId,
     mix : mix,
   });
-  let billId = Util.billSerial(userModel.userId);
+  let billId = Util.billSerial(userModel.userId), lastCreatedAt;
   //billId获取，如果是电子游戏的则先在数据库中找
   if(gameType == "40000") {
-    let [billIdErr, dbBillId] = await detailBill.getBillId(userModel.userName, joinTime);
+    let [billIdErr, lastBillDetail] = await detailBill.getLastDetail(userModel.userName, joinTime);
     if(billIdErr) {
       return callback(null, ReHandler.fail(billIdErr));
     }
-    if(dbBillId) {
-      billId = dbBillId;
+    if(lastBillDetail) {
+      billId = lastBillDetail.billId;
+      lastCreatedAt = lastBillDetail.createdAt;
     }
   }
   detailBill.billId = billId;
-  list = detailBill.summary(list);
+  list = detailBill.summary(list, lastCreatedAt);
   let [sumErr] = await detailBill.batchWrite(list);
   if(sumErr) {
     return callback(null, ReHandler.fail(sumErr));
   }
-  if(gameType == "40000") { //如果是棋牌游戏
+  if(gameType == "40000") { //如果是电子游戏
       if(!exit) {
         return callback(null, ReHandler.success({
           data: { balance: 0 }
@@ -1155,7 +1156,6 @@ async function getPlayerGameRecord(event, context, callback) {
   if(startTime >= endTime || startTime >= lastTime) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.timeError)));
   }
-  
   //检查商户信息是否正确
   const merchant = new MerchantModel();
   const [queryMerchantError, merchantInfo] = await merchant.findById(+buId); 

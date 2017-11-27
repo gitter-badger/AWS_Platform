@@ -21,7 +21,7 @@ export const CODES = {
 
     playerRecordError : { //账单数据错误
       depositErr : 12000, //存点不正确
-      takeErr : 12001,   //取点不正确
+      takeErr : 12005,   //取点不正确
       billNotMatchErr : 12002, //账单不匹配
       notSingleUser : 12003,  //不是同一个用户提交
       notHaveRecord : 12004,  //没有记录
@@ -62,9 +62,9 @@ const errorMessage = {
   "11001" : "玩家正在游戏中,不能进行转账",
   "11005" : "玩家不在游戏中!",
   "12000" : "存点不正确",
-  "12001" : "取点不正确",
+  "12005" : "取点不正确",
   "12002" : "账单不匹配",
-  "12001" : "startTime不能大于endTime",
+  "12001" : "startTime不能大于endTime/lastTime",
   "12003" : "不是同一个用户提交",
   "12004" : "记录不存在",
   "13000" : "道具不存在",
