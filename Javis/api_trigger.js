@@ -55,39 +55,82 @@ const playerBalanceTrigger = async (e, c, cb) => {
     if (!playerInfo) {
         return;
     }
-    let userId = playerInfo.userId;
-
+    let userId = playerInfo.userId
+    let nickname = playerInfo.nickname
+    let headPic = playerInfo.headPic
     //用户余额
     let [bError, balance] = await new UserBillModel().getBalanceByUid(userId);
     if (bError) {
         console.log(bError);
         return;
     }
-    // 更新用户排行榜余额
-    console.log('开始更新排行榜')
-    new UserModel().updateItem({
-        TableName: Tables.UserRankStat,
-        Key: { userName: userName },
-        UpdateExpression: 'SET balance=:balance',
-        ExpressionAttributeValues: {
-            ':balance': balance
-        }
-    }).then((res) => {
-        console.log(res)
-        console.log(userName + '下注和返奖统计更新完成：' + balance)
-    }).catch((err) => {
-        console.error(err)
-    })
 
     // 推送余额给大厅
     console.log('开始推送余额给大厅')
-    new PushModel().pushUserBalance(userId, balance).then((res)=>{
+    new PushModel().pushUserBalance(userId, balance).then((res) => {
         console.info("玩家余额变更推送成功");
-    }).catch((err)=>{
+    }).catch((err) => {
         console.info("玩家余额变更推送失败");
         console.info(err);
     });
-    
+
+    // 更新用户排行榜余额
+    let recordRnak = e.Records[0].dynamodb
+    let bet = +(recordRnak.NewImage.betAmount || {}).N || 0
+    let win = +(recordRnak.NewImage.reAmount || {}).N || 0
+    let query = {
+        TableName: Tables.UserRankStat,
+        KeyConditionExpression: '#userName = :userName',
+        ExpressionAttributeNames: {
+            '#userName': 'userName'
+        },
+        ExpressionAttributeValues: {
+            ':userName': userName
+        }
+    }
+    new UserModel().query(query).then((res) => {
+        let ret = res[1]
+        if (ret.Items.length == 0 || !ret.Items[0].bet) {
+            let updateObj = {
+                TableName: Tables.UserRankStat,
+                Key: { userName: userName },
+                UpdateExpression: 'SET bet=:bet,win=:win,nickname=:nickname,headPic=:headPic,userId=:userId,balance=:balance',
+                ExpressionAttributeValues: {
+                    ':bet': +bet.toFixed(2),
+                    ':win': +win.toFixed(2),
+                    ':nickname': nickname,
+                    ':headPic': headPic,
+                    ':userId': userId,
+                    ':balance': +balance.toFixed(2)
+                }
+            }
+            new UserModel().updateItem(updateObj).then((res) => {
+                console.log(res)
+                console.log('用户下注和返奖统计新增更新完成')
+            }).catch((err) => {
+                console.error(err)
+            })
+        } else {
+            new UserModel().updateItem({
+                TableName: Tables.UserRankStat,
+                Key: { userName: userName },
+                UpdateExpression: 'SET balance=:balance,bet=bet+:bet,win=win+:win',
+                ExpressionAttributeValues: {
+                    ':balance': +balance.toFixed(2),
+                    ':bet': bet,
+                    ':win': win
+                }
+            }).then((res) => {
+                console.log(res)
+                console.log(userName + '下注和返奖统计更新完成：' + balance)
+            }).catch((err) => {
+                console.error(err)
+            })
+        }
+    }).catch((error) => {
+        console.error(error)
+    })
+
     // 统计看板数据
     console.log('开始统计看板数据')
     playerBillStat(userName, createAt);
