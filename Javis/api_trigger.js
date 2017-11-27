@@ -96,7 +96,7 @@ const playerBalanceTrigger = async (e, c, cb) => {
                 Key: { userName: userName },
                 UpdateExpression: 'SET bet=:bet,win=:win,nickname=:nickname,headPic=:headPic,userId=:userId,balance=:balance',
                 ExpressionAttributeValues: {
-                    ':bet': +bet.toFixed(2),
+                    ':bet': Math.abs(+bet.toFixed(2)),
                     ':win': +win.toFixed(2),
                     ':nickname': nickname,
                     ':headPic': headPic,
@@ -117,7 +117,7 @@ const playerBalanceTrigger = async (e, c, cb) => {
                 UpdateExpression: 'SET balance=:balance,bet=bet+:bet,win=win+:win',
                 ExpressionAttributeValues: {
                     ':balance': +balance.toFixed(2),
-                    ':bet': bet,
+                    ':bet': Math.abs(bet),
                     ':win': win
                 }
             }).then((res) => {
