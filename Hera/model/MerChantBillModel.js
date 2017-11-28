@@ -49,7 +49,7 @@ export class MerchantBillModel extends athena.BaseModel {
         }
     }
     async getBlance(){
-        let [err, records] = await this.get({userId: this.userId}, [], "UserIdIndexSec", true);
+        let [err, records] = await this.get({userId: this.userId}, [], "UserIdIndex", true);
         if(err) return [err, 0];
         records = records || [];
         let sumMount = 0;
