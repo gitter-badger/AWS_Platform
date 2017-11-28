@@ -117,6 +117,6 @@ export class UserRecordModel extends athena.BaseModel {
                 }
             }
         }
-        return {income,betAmount, reAmount,busCount:s.length};
+        return {income,betAmount, reAmount,busCount:s.size};
     }
 }
