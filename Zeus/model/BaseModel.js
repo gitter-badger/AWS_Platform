@@ -185,7 +185,7 @@ export class BaseModel {
                 opts.FilterExpression += `${k} between :${k}0 and :${k}1`
                 // opts.FilterExpression += `${k} > :${k}0 and ${k} < :${k}1`
                 opts.ExpressionAttributeValues[`:${k}0`] = item[0]
-                opts.ExpressionAttributeValues[`:${k}1`] = item[1] + 86399999
+                opts.ExpressionAttributeValues[`:${k}1`] = item[1]// + 86399999
             }
             else if (Object.is(typeof item, "object")) {
                 for (let key in item) {
