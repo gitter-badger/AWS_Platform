@@ -70,7 +70,7 @@ export class PlayerBillModel extends BaseModel {
             console.log(inparam.gameUserId + '查询流水开始：' + new Date().getTime())
             let query = {
                 IndexName: 'userIdIndex',
-                ProjectionExpression: 'amount,betAmount,reAmount',
+                ProjectionExpression: 'amount,betAmount,reAmount,busCount',
                 KeyConditionExpression: '#userId  = :userId AND createAt between :createdAt0 AND :createdAt1',
                 FilterExpression: "gameType=:gameType",
                 ExpressionAttributeNames: {
@@ -86,13 +86,13 @@ export class PlayerBillModel extends BaseModel {
             self.query(query).then((resArr) => {
                 let res = resArr[1]
                 console.log('查询结束：' + new Date().getTime() + '查询流水个数' + res.Items.length)
-                let bet = 0
-                let winlose = 0
-                let betCount = 0
+                let bet = 0         // 下注
+                let winlose = 0     // 输赢
+                let betCount = 0    // 次数
                 for (let item of res.Items) {
-                    bet += parseFloat(item.betAmount)
-                    winlose += parseFloat(item.amount)
-                    betCount++
+                    bet += parseFloat(item.betAmount || 0)
+                    winlose += parseFloat(item.amount || 0)
+                    betCount += parseInt(item.busCount || 0)
                 }
                 resolve({ bet: bet, winlose: winlose, betCount: betCount })
             }).catch((err) => {

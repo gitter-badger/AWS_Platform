@@ -27,7 +27,7 @@ export class SysBillModel extends BaseModel {
             let p = new Promise(async function (resolve, reject) {
                 let query = {
                     TableName: Tables.HeraGamePlayer,
-                    IndexName: 'ParentIdIndex',
+                    IndexName: 'parentIdIndex',
                     ProjectionExpression: 'userId',
                     KeyConditionExpression: '#parent = :parent',
                     ExpressionAttributeNames: {
