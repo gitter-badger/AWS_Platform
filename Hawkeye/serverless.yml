@@ -205,3 +205,10 @@ functions:
           path: /game/player/offline
           method: post
           cors: true
+  sysConfig:  #系统配置
+    handler: openApi_sys.sysConfig
+    events:
+      - http:
+          path: /sysconfig
+          method: post
+          cors: true
