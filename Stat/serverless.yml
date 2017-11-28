@@ -98,3 +98,21 @@ functions:
           path: /statistics/playerBetRank
           method: post
           cors: true
+  calcPlayerBill: #计算玩家账单
+    handler: api_calc.calcPlayerBill
+    events:
+      -
+        http:
+          path: /calcPlayerBill
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  calcUserBill: #计算用户账单
+    handler: api_calc.calcUserBill
+    events:
+      -
+        http:
+          path: /calcUserBill
+          method: post
+          cors: true
+          authorizer: tokenAuth
