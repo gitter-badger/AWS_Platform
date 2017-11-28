@@ -57,7 +57,6 @@ custom:
     - table: ZeusPlatformBill
       index:
         - UserIdIndex
-        - ActionIndex
         - CreatedDateIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
@@ -434,20 +433,6 @@ resources:
                 KeyType: HASH
               -
                 AttributeName: createdAt
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
-            IndexName: ActionIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-              -
-                AttributeName: action
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
