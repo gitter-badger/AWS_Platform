@@ -1,4 +1,4 @@
-import { Store$, Codes, BizErr, Empty, Model, Keys, Pick, Omit } from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Model } from '../lib/all'
 import _ from 'lodash'
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
@@ -23,8 +23,8 @@ export class BaseModel {
     }
 
     /**
-     * 更新单项
-     * @param {*} item
+     * 插入单项
+     * @param {*} item 
      */
     putItem(item) {
         return new Promise((reslove, reject) => {
@@ -109,7 +109,9 @@ export class BaseModel {
             }
             this.db$('query', params)
                 .then((res) => {
-                    const exist = res ? true : false
+                    let exist = false
+                    if (res && !res.Items) { exist = true }
+                    if (res && res.Items && res.Items.length > 0) { exist = true }
                     return reslove([0, exist])
                 }).catch((err) => {
                     return reslove([BizErr.DBErr(err.toString()), false])
@@ -122,39 +124,93 @@ export class BaseModel {
         // const [queryErr, queryRet] = await Store$('query', params)
         // return [queryErr, queryRet]
     }
+
     /**
-     * 查询数据
+     * 递归查询所有数据
      */
     query(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.queryInc(params, null)
+    }
+
+    // 内部增量查询，用于结果集超过1M的情况
+    queryInc(params, result) {
+        return this.db$('query', params).then((res) => {
+            if (!result) {
+                result = res
+            } else {
+                result.Items.push(...res.Items)
             }
-            this.db$('query', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
+            if (res.LastEvaluatedKey) {
+                params.ExclusiveStartKey = res.LastEvaluatedKey
+                return this.queryInc(params, result)
+            } else {
+                return [false, result]
+            }
+        }).catch((err) => {
+            return [BizErr.DBErr(err.toString()), false]
         })
+    }
+
+    /**
+     * 
+     * @param {*} query 
+     * @param {*} inparam (pageSize,startKey)
+     */
+    async page(query, inparam) {
+        let pageData = { Items: [], LastEvaluatedKey: {} }
+        let [err, ret] = [0, 0]
+        while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
+            [err, ret] = await this.query({
+                ...query,
+                ExclusiveStartKey: inparam.startKey
+            })
+            if (err) {
+                return [err, 0]
+            }
+            // 追加数据
+            if (pageData.Items.length > 0) {
+                pageData.Items.push(...ret.Items)
+                pageData.LastEvaluatedKey = ret.LastEvaluatedKey
+            } else {
+                pageData = ret
+            }
+            inparam.startKey = ret.LastEvaluatedKey
+        }
+        return [err, pageData]
     }
 
     /**
      * 全表查询数据
      */
     scan(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.scanInc(params, null)
+    }
+
+    // 内部增量查询，用于结果集超过1M的情况
+    scanInc(params, result) {
+        return this.db$('scan', params).then((res) => {
+            if (!result) {
+                result = res
+            } else {
+                result.Items.push(...res.Items)
             }
-            this.db$('scan', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
+            if (res.LastEvaluatedKey) {
+                params.ExclusiveStartKey = res.LastEvaluatedKey
+                return this.scanInc(params, result)
+            } else {
+                return [false, result]
+            }
+        }).catch((err) => {
+            console.error(err)
+            return [BizErr.DBErr(err.toString()), false]
         })
     }
 
