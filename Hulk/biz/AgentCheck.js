@@ -160,7 +160,7 @@ export class AgentCheck {
     checkLogin(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
-            { name: "password", type: "S", min: 8, max: 16 },
+            // { name: "password", type: "S", min: 8, max: 16 },
             // { name: "suffix", type: "REG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
             { name: "role", type: "N", min: 1000, max: 1000 },
             { name: "captcha", type: "N", min: 1000, max: 9999 }

@@ -57,9 +57,6 @@ custom:
     - table: ZeusPlatformBill
       index:
         - UserIdIndex
-        - UserIdIndexSec
-        - SnIndex
-        - ActionIndex
         - CreatedDateIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
@@ -101,8 +98,8 @@ custom:
         usage: 0.75
     - table: HeraGamePlayerBill
       index:
-        - userNameIndex
-        - userIdIndex
+        - billIdIndex
+        # - userIdIndex
         - CreatedDateIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
@@ -412,9 +409,6 @@ resources:
             AttributeName: userId
             AttributeType: S
           -
-            AttributeName: action
-            AttributeType: N
-          -
             AttributeName: createdAt
             AttributeType: N
           -
@@ -436,45 +430,6 @@ resources:
                 KeyType: HASH
               -
                 AttributeName: createdAt
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
-            IndexName: UserIdIndexSec
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
-            IndexName: SnIndex
-            KeySchema:
-              -
-                AttributeName: sn
-                KeyType: HASH
-              -
-                AttributeName: createdAt
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
-            IndexName: ActionIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-              -
-                AttributeName: action
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -961,22 +916,14 @@ resources:
           StreamViewType: NEW_AND_OLD_IMAGES
         GlobalSecondaryIndexes:
           -
-            IndexName: userNameIndex
-            KeySchema:
-              -
-                AttributeName: userName
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
             IndexName: userIdIndex
             KeySchema:
               -
                 AttributeName: userId
                 KeyType: HASH
+              -
+                AttributeName: createAt
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:

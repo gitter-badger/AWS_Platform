@@ -102,20 +102,21 @@ export class UserRecordModel extends athena.BaseModel {
         //     income += (+amount + (+betAmount));
         // }
         // return income;
-        let income = 0, betAmount = 0,reAmount =0;
+        let income = 0, betAmount = 0,reAmount =0,s = new Set();
         for(let i = 0; i < this.records.length; i++) {
             let record = this.records[i];
             let amount = record.amount;
             if(record.type == TypeEnum.bet || record.type == TypeEnum.reward){
+                s.add(record.businessKey);
                 income += +amount
                 if(record.type == TypeEnum.bet) {
                     betAmount += +amount;
                 }
                 if(record.type == TypeEnum.reward) {
-                    reAmount += +amount
+                    reAmount += +amount;
                 }
             }
         }
-        return {income,betAmount, reAmount};
+        return {income,betAmount, reAmount,busCount:s.length};
     }
 }

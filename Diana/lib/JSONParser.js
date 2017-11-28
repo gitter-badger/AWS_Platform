@@ -22,6 +22,7 @@ export const JSONParser = (data) => {
       }
     }
   }
+  delete ret.updatedAt
   return [0, ret]
 }
 export const Trim = _.trim
