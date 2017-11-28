@@ -13,9 +13,9 @@ provider:
   environment:
       TOKEN_SECRET: ${ssm:TOKEN_SECRET~true}
       IMG_BUCKET: ${ssm:IMG_BUCKET}
-      RDS_HOST: ${ssm:RDS_HOST~true}
-      RDS_USERNAME: ${ssm:RDS_USERNAME~true}
-      RDS_PASSWORD: ${ssm:RDS_PASSWORD~true}
+      # RDS_HOST: ${ssm:RDS_HOST~true}
+      # RDS_USERNAME: ${ssm:RDS_USERNAME~true}
+      # RDS_PASSWORD: ${ssm:RDS_PASSWORD~true}
   timeout: 300
   iamRoleStatements:
     - Effect: Allow

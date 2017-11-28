@@ -18,6 +18,8 @@ export class MysteryCheck {
         inparam.status = MysteryStatusEnum.Unreceived
         inparam.receiveAt = Model.NumberValue
         inparam.winAt = parseInt(inparam.winAt)
+        inparam.operateNick=Model.StringValue
+        inparam.operateName=Model.StringValue
 
         return [checkAttError, errorParams]
     }
