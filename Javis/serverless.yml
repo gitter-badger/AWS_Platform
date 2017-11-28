@@ -409,9 +409,6 @@ resources:
             AttributeName: userId
             AttributeType: S
           -
-            AttributeName: action
-            AttributeType: N
-          -
             AttributeName: createdAt
             AttributeType: N
           -
