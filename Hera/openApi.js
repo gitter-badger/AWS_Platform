@@ -795,6 +795,7 @@ async function settlement(event, context, callback) {
     gameType: gameType,
     msn: merchantModel.msn,
     type: Type.gameSettlement,
+    bussCount : incomeObj.bussCount,
     typeName: typeName,
     joinTime : userModel.joinTime,
     rate : merchantModel.rate,
