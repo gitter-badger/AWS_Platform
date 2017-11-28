@@ -47,7 +47,7 @@ export class UserBillModel extends athena.BaseModel {
         }
     }
     async getBalance(){
-        let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], "userNameIndex", true);
+        let [err, records] = await this.get({userName:this.userName}, ["userName","amount"], undefined, true);
         if(err) return [err, 0];
         records = records || [];
         let sumMount = 0;

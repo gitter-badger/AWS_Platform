@@ -23,6 +23,15 @@ export const SeatContentEnum = {
   tool: "1"
 }
 
+export const RoleCodeEnum = {
+  'SuperAdmin': '0',  //超级管理员
+  'PlatformAdmin': '1', //平台管理员
+  'Manager': '10',  //线路商
+  'Merchant': '100',  //商家
+  'Agent': '1000',   //代理
+  'Player': '10000'  //玩家
+}
+
 export const BillModel = {
   sn: Model.uuid(),
   fromRole: Model.StringValue,
