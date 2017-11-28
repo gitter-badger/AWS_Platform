@@ -57,7 +57,6 @@ custom:
     - table: ZeusPlatformBill
       index:
         - UserIdIndex
-        - SnIndex
         - ActionIndex
         - CreatedDateIndex
       read:
@@ -432,20 +431,6 @@ resources:
             KeySchema:
               -
                 AttributeName: userId
-                KeyType: HASH
-              -
-                AttributeName: createdAt
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
-            IndexName: SnIndex
-            KeySchema:
-              -
-                AttributeName: sn
                 KeyType: HASH
               -
                 AttributeName: createdAt
