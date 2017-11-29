@@ -8,7 +8,7 @@ export class AdCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "adName", type: "S", min: 1, max: 20 },
             { name: "img", type: "REG", min: null, max: null, equal: athena.RegEnum.URL },
-            { name: "url", type: "REG", min: null, max: null, equal: athena.RegEnum.URL },
+            { name: "url", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
 
@@ -58,7 +58,7 @@ export class AdCheck {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
             { name: "adId", type: "N", min: 100000, max: 999999 },
             { name: "img", type: "REG", min: null, max: null, equal: athena.RegEnum.URL },
-            { name: "url", type: "REG", min: null, max: null, equal: athena.RegEnum.URL },
+            { name: "url", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL },
             { name: "adName", type: "S", min: 1, max: 20 },
             { name: "adStatus", type: "N", min: 0, max: 1 },
 

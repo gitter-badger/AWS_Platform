@@ -1,10 +1,10 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, BizErr } from './lib/all'
 import { PlayerBillModel } from './model/PlayerBillModel'
 import { SysBillModel } from './model/SysBillModel'
 /**
  * 计算玩家流水
  */
-const calcPlayerBill = async (e, c, cb) => {
+const calcPlayerStat = async (e, c, cb) => {
     try {
         // 入参转换
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -13,7 +13,7 @@ const calcPlayerBill = async (e, c, cb) => {
         // 身份令牌
         const [tokenErr, token] = await Model.currentToken(e)
         // 业务操作
-        const [err, ret] = await new PlayerBillModel().calcPlayerBill(inparam)
+        const [err, ret] = await new PlayerBillModel().calcPlayerStat(inparam)
         // 返回结果
         if (err) { return ResErr(cb, err) }
         return ResOK(cb, { payload: ret })
@@ -25,7 +25,7 @@ const calcPlayerBill = async (e, c, cb) => {
 /**
  * 计算用户流水
  */
-const calcUserBill = async (e, c, cb) => {
+const calcUserStat = async (e, c, cb) => {
     try {
         // 入参转换
         const [jsonParseErr, inparam] = JSONParser(e && e.body)
@@ -69,6 +69,6 @@ const calcUserBill = async (e, c, cb) => {
 
 // ==================== 以下为内部方法 ====================
 export {
-    calcPlayerBill,                      //计算玩家账单
-    calcUserBill                         //计算用户账单
+    calcPlayerStat,                      //计算玩家账单
+    calcUserStat                         //计算用户账单
 }

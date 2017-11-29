@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, SeatTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, SeatTypeEnum, RoleCodeEnum, BizErr } from './lib/all'
 
 import { LogModel } from './model/LogModel'
 import { SeatModel } from './model/SeatModel'

@@ -18,7 +18,7 @@ export class PlayerBillModel extends BaseModel {
      * 计算用户流水
      * @param {*} inparam 
      */
-    async calcPlayerBill(inparam) {
+    async calcPlayerStat(inparam) {
         let promiseArr = []
         let self = this
         for (let gameUserId of inparam.gameUserIds) {
@@ -30,6 +30,7 @@ export class PlayerBillModel extends BaseModel {
                     let bet = res.bet
                     let winlose = res.winlose
                     let betCount = res.betCount
+                    let mixAmount = res.mixAmount
                     let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(2)
                     console.log('玩家id:' + gameUserId + '玩家bet:' + bet + '玩家winlose:' + winlose + '次数:' + betCount + '比例:' + winloseRate)
                     // 返回数据
@@ -38,6 +39,7 @@ export class PlayerBillModel extends BaseModel {
                         bet: Math.abs(+bet.toFixed(2)),
                         winlose: +winlose.toFixed(2),
                         betCount: betCount,
+                        mixAmount: mixAmount,
                         winloseRate: winloseRate,
                     }
                     console.log('玩家id:' + gameUserId + '执行成功:' + new Date().getTime())
@@ -70,7 +72,7 @@ export class PlayerBillModel extends BaseModel {
             console.log(inparam.gameUserId + '查询流水开始：' + new Date().getTime())
             let query = {
                 IndexName: 'userIdIndex',
-                ProjectionExpression: 'amount,betAmount,reAmount',
+                ProjectionExpression: 'amount,betAmount,reAmount,busCount',
                 KeyConditionExpression: '#userId  = :userId AND createAt between :createdAt0 AND :createdAt1',
                 FilterExpression: "gameType=:gameType",
                 ExpressionAttributeNames: {
@@ -86,15 +88,17 @@ export class PlayerBillModel extends BaseModel {
             self.query(query).then((resArr) => {
                 let res = resArr[1]
                 console.log('查询结束：' + new Date().getTime() + '查询流水个数' + res.Items.length)
-                let bet = 0
-                let winlose = 0
-                let betCount = 0
+                let bet = 0         // 下注
+                let winlose = 0     // 输赢
+                let betCount = 0    // 次数
+                let mixAmount = 0   // 洗码率量
                 for (let item of res.Items) {
-                    bet += parseFloat(item.betAmount)
-                    winlose += parseFloat(item.amount)
-                    betCount++
+                    bet += Math.abs(parseFloat(item.betAmount || 0))
+                    winlose += parseFloat(item.amount || 0)
+                    betCount += parseInt(item.busCount || 0)
+                    mixAmount += Math.abs(parseFloat(item.mixAmount || item.betAmount || 0))
                 }
-                resolve({ bet: bet, winlose: winlose, betCount: betCount })
+                resolve({ bet: bet, winlose: winlose, betCount: betCount, mixAmount: mixAmount })
             }).catch((err) => {
                 reject(err)
             })

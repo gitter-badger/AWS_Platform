@@ -27,7 +27,7 @@ export class SysBillModel extends BaseModel {
             let p = new Promise(async function (resolve, reject) {
                 let query = {
                     TableName: Tables.HeraGamePlayer,
-                    IndexName: 'ParentIdIndex',
+                    IndexName: 'parentIdIndex',
                     ProjectionExpression: 'userId',
                     KeyConditionExpression: '#parent = :parent',
                     ExpressionAttributeNames: {
@@ -44,18 +44,20 @@ export class SysBillModel extends BaseModel {
                     gameUserIdsArr.push(player.userId)
                 }
                 // 查询所有商户对应玩家的流水
-                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerBill({ gameUserIds: gameUserIdsArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
+                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerStat({ gameUserIds: gameUserIdsArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
                 let bet = 0
                 let betCount = 0
                 let winlose = 0
+                let mixAmount = 0
                 for (let playerWater of playerWaterRet) {
                     bet += playerWater.bet
                     betCount += playerWater.betCount
                     winlose += playerWater.winlose
+                    mixAmount += playerWater.mixAmount
                 }
                 let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(2)
                 console.log('商户userid：' + userId + 'bet:' + bet + 'winlose:' + winlose + 'betCount:' + betCount + 'winloseRate:' + winloseRate)
-                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate })
+                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount })
             })
             promiseArr.push(p)
         }
@@ -76,13 +78,15 @@ export class SysBillModel extends BaseModel {
         for (let userId of inparam.userIds) {
             let p = new Promise(async function (resolve, reject) {
                 let query = {
-                    FilterExpression: 'contains(#levelIndex,:levelIndex)',
+                    FilterExpression: 'contains(#levelIndex,:levelIndex) AND #role=:role',
                     ProjectionExpression: 'userId',
                     ExpressionAttributeNames: {
+                        '#role': 'role',
                         '#levelIndex': 'levelIndex'
                     },
                     ExpressionAttributeValues: {
-                        ':levelIndex': userId
+                        ':levelIndex': userId,
+                        ':role': RoleCodeEnum.Merchant
                     }
                 }
                 const [merchantsErr, merchantsRet] = await self.scan(query)
@@ -97,14 +101,16 @@ export class SysBillModel extends BaseModel {
                 let bet = 0
                 let betCount = 0
                 let winlose = 0
+                let mixAmount = 0
                 for (let playerWater of playerWaterRet) {
                     bet += playerWater.bet
                     betCount += playerWater.betCount
                     winlose += playerWater.winlose
+                    mixAmount += playerWater.mixAmount
                 }
                 let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(2)
                 console.log('线路商userid：' + userId + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate })
+                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount })
             })
             promiseArr.push(p)
         }
@@ -142,14 +148,16 @@ export class SysBillModel extends BaseModel {
         let bet = 0
         let betCount = 0
         let winlose = 0
+        let mixAmount = 0
         for (let playerWater of playerWaterRet) {
             bet += playerWater.bet
             betCount += playerWater.betCount
             winlose += playerWater.winlose
+            mixAmount += playerWater.mixAmount
         }
         let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(2)
         console.log('平台管理员：' + inparam.userIds[0] + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate }]]
+        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount }]]
     }
     /**
      * 查询指定条件下代理的统计信息
@@ -183,14 +191,16 @@ export class SysBillModel extends BaseModel {
                 let bet = 0
                 let betCount = 0
                 let winlose = 0
+                let mixAmount = 0
                 for (let playerWater of playerWaterRet) {
                     bet += playerWater.bet
                     betCount += playerWater.betCount
                     winlose += playerWater.winlose
+                    mixAmount += playerWater.mixAmount
                 }
                 let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(2)
                 console.log('代理userid：' + userId + '参数：bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate })
+                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount })
             })
             promiseArr.push(p)
         }
@@ -228,13 +238,15 @@ export class SysBillModel extends BaseModel {
         let bet = 0
         let betCount = 0
         let winlose = 0
+        let mixAmount = 0
         for (let playerWater of playerWaterRet) {
             bet += playerWater.bet
             betCount += playerWater.betCount
             winlose += playerWater.winlose
+            mixAmount += playerWater.mixAmount
         }
         let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(2)
         console.log('代理userid：' + inparam.userIds[0] + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate }]]
+        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount }]]
     }
 }

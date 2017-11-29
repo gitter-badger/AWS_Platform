@@ -49,6 +49,7 @@ custom:
     - table: HeraGamePlayer
       index:
         - userIdIndex
+        - parentIdIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 10000
@@ -167,6 +168,9 @@ resources:
           -
             AttributeName: userId
             AttributeType: N
+          -
+            AttributeName: parent
+            AttributeType: S
         KeySchema:
           -
             AttributeName: userName
@@ -185,6 +189,17 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          -
+            IndexName: parentIdIndex
+            KeySchema:
+              -
+                AttributeName: parent
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
 
     HeraGameRecord: #游戏战绩表
