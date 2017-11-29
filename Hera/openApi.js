@@ -315,10 +315,10 @@ async function getGamePlayerBalance(event, context, callback) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
   //验证白名单
-  // let white = validateIp(event, merchantInfo);
-  // if (!white) {
-  //   return errorHandler(callback, new CHeraErr(CODES.ipError), "getBalance", merchantInfo, event.pathParameters);
-  // }
+  let white = validateIp(event, merchantInfo);
+  if (!white) {
+    return errorHandler(callback, new CHeraErr(CODES.ipError), "getBalance", merchantInfo, event.pathParameters);
+  }
   userName = `${merchantInfo.suffix}_${userName}`;
   let userBill = new UserBillModel({ userName });
   let [bError, balance] = await userBill.getBalance();
