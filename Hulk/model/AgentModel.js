@@ -54,8 +54,8 @@ export class AgentModel extends BaseModel {
         // 获取代理角色模型
         const bizRole = RoleModels[userInfo.role]()
         // 生成注册用户信息
-        userInfo = Omit(userInfo, ['userId', 'passhash'])
-        const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
+        userInfo = _.omit(userInfo, ['userId', 'passhash'])
+        const userInput = _.pick({ ...bizRole, ...userInfo }, _.keys(bizRole))
         const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
 
         // 检查用户是否已经存在
@@ -153,10 +153,10 @@ export class AgentModel extends BaseModel {
         // 获取代理角色模型
         const Role = RoleModels[userLoginInfo.role]()
         // 组装用户登录信息
-        const UserLoginInfo = Pick({
+        const UserLoginInfo = _.pick({
             ...Role,
             ...userLoginInfo
-        }, Keys(Role))
+        }, _.keys(Role))
         const username = UserLoginInfo.username
         // 查询用户信息
         const [queryUserErr, User] = await new UserModel().getUserByName(userLoginInfo.role, username)
@@ -188,7 +188,7 @@ export class AgentModel extends BaseModel {
             return [saveUserErr, User]
         }
         // 返回用户身份令牌
-        saveUserRet = Pick(User, RoleDisplay[User.role])
+        saveUserRet = _.pick(User, RoleDisplay[User.role])
         // 更新TOKEN
         await Store$('put', { TableName: Tables.SYSToken, Item: { iat: Math.floor(Date.now() / 1000) - 30, ...saveUserRet } })
         return [0, { ...saveUserRet, token: Model.token(saveUserRet) }]
@@ -322,6 +322,6 @@ const saveUser = async (userInfo) => {
         Store$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'displayId', code: uucodeRet } })
     }
 
-    const ret = Pick(UserItem, roleDisplay)
+    const ret = _.pick(UserItem, roleDisplay)
     return [0, ret]
 }
