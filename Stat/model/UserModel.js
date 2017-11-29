@@ -116,7 +116,7 @@ export class UserModel extends BaseModel {
         let query = {
             TableName: Tables.HeraGamePlayer,
             IndexName: 'parentIdIndex',
-            KeyConditionExpression: 'parentId = :parentId',
+            KeyConditionExpression: 'parent = :parentId',
             ExpressionAttributeValues: {
                 ':parentId': inparam.parentId
             }
