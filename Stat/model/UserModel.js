@@ -24,6 +24,10 @@ export class UserModel extends BaseModel {
             IndexName: 'UserIdIndex',
             ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt,rate,vedioMix,liveMix',
             KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#level': 'level'
+            },
             ExpressionAttributeValues: {
                 ':userId': inparam.userId
             }
