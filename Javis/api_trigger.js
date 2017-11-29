@@ -42,6 +42,7 @@ const userTrigger = async (e, c, cb) => {
 const playerBalanceTrigger = async (e, c, cb) => {
     console.log(e);
     let record = e.Records[0].dynamodb.Keys;
+    console.log(e.Records[0].dynamodb);
     console.log(record);
     let userName = record.userName.S;
     let createAt = +record.createAt.N;
@@ -75,7 +76,8 @@ const playerBalanceTrigger = async (e, c, cb) => {
     });
 
     // 更新用户排行榜余额
-    let recordRnak = e.Records[0].dynamodb
+    let recordRnak = e.Records[0].dynamodb;
+    if(recordRnak.OldImage) return;  //如果是删除，直接返回
     let bet = +(recordRnak.NewImage.betAmount || {}).N || 0
     let win = +(recordRnak.NewImage.reAmount || {}).N || 0
     let query = {
