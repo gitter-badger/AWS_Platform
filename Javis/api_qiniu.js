@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, Tables, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, Tables, RoleCodeEnum, BizErr } from './lib/all'
 
 // 七牛上传工具
 const qiniu = require('qiniu')
