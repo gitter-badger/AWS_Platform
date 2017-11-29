@@ -16,10 +16,12 @@ const queryUserStat = async (e, c, cb) => {
         if (inparam.userId) {
             const [err, ret] = await new UserModel().queryOne(inparam) // 查询单个用户统计
             if (err) { return ResErr(cb, err) }
+            initValue(ret)
             return ResOK(cb, { payload: ret })
         } else {
             const [err, ret] = await new UserModel().queryChild(inparam) // 查询所有下级用户统计
             if (err) { return ResErr(cb, err) }
+            ret.forEach(item => initValue(item))
             return ResOK(cb, { payload: ret })
         }
     } catch (error) {
@@ -41,6 +43,7 @@ const queryPlayerStat = async (e, c, cb) => {
         // 业务操作
         const [err, ret] = await new UserModel().queryChildPlayer(inparam)
         if (err) { return ResErr(cb, err) }
+        ret.forEach(item => initValue(item))
         return ResOK(cb, { payload: ret })
     } catch (error) {
         console.error(error)
@@ -48,6 +51,13 @@ const queryPlayerStat = async (e, c, cb) => {
     }
 }
 
+function initValue(item) {
+    item.bet = 0
+    item.betCount = 0
+    item.winlose = 0
+    item.winloseRate = 0
+    item.mixAmount = 0
+}
 // ==================== 以下为内部方法 ====================
 export {
     queryUserStat,
