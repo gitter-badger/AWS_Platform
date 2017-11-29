@@ -108,4 +108,33 @@ export class UserModel extends BaseModel {
             return [0, sortResult]
         }
     }
+
+    /**
+     * 查询玩家统计
+     */
+    async queryChildPlayer(inparam) {
+        let query = {
+            TableName: Tables.HeraGamePlayer,
+            IndexName: 'parentIdIndex',
+            KeyConditionExpression: 'parentId = :parentId',
+            ExpressionAttributeValues: {
+                ':parentId': inparam.parentId
+            }
+        }
+        // 条件搜索
+        if (!_.isEmpty(inparam.query)) {
+            const queryParams = this.buildQueryParams(inparam.query, true)
+            query.FilterExpression = queryParams.FilterExpression
+            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+        }
+        const [queryErr, queryRet] = await this.query(query)
+        if (queryErr) {
+            return [queryErr, 0]
+        }
+        // 排序输出
+        let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
+        if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
+        return [0, sortResult]
+    }
 }
