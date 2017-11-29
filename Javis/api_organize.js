@@ -1,4 +1,4 @@
-import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick } from './lib/all'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes } from './lib/all'
 import { UserModel } from './model/UserModel'
 
 /**

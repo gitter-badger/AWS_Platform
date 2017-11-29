@@ -1,4 +1,4 @@
-import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, S3Store$ } from './lib/all'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, S3Store$ } from './lib/all'
 const AWS = require('aws-sdk')
 const axios = require('axios')
 const IMG_BUCKET = process.env.IMG_BUCKET
