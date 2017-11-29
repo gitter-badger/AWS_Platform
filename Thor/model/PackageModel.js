@@ -1,4 +1,4 @@
-import {Tables,Store$,Codes,BizErr,Trim,Empty,Model,Keys,Pick,Omit,RoleCodeEnum,RoleModels} from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Model, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 import { SeatModel } from './SeatModel'
@@ -107,7 +107,7 @@ export class PackageModel extends BaseModel {
      */
     async changeStatus(inparam) {
         // 检查是否可以变更
-        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        let [err, ret] = await new SeatModel().findIdsContains('package_' + inparam.packageId)
         if (ret) {
             return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
         }
@@ -131,7 +131,7 @@ export class PackageModel extends BaseModel {
      */
     async update(inparam) {
         // 检查是否可以变更
-        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        let [err, ret] = await new SeatModel().findIdsContains('package_' + inparam.packageId)
         if (ret) {
             return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
         }
@@ -166,7 +166,7 @@ export class PackageModel extends BaseModel {
      */
     async delete(inparam) {
         // 检查是否可以删除
-        let [err, ret] = await new SeatModel().findIdsContains('package_'+inparam.packageId)
+        let [err, ret] = await new SeatModel().findIdsContains('package_' + inparam.packageId)
         if (ret) {
             return [BizErr.ItemUsed('礼包在展位中，不可删除'), 0]
         }
@@ -183,7 +183,7 @@ export class PackageModel extends BaseModel {
 
         // End:删除生成的编码
         this.db$('delete', { TableName: Tables.ZeusPlatformCode, Key: { type: 'package', code: inparam.packageId } })
-        
+
         return [0, ret]
     }
 }
