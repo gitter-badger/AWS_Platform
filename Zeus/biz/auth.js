@@ -4,7 +4,7 @@ import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
 import { BillModel } from '../model/BillModel'
 import { SubRoleModel } from '../model/SubRoleModel'
-import _ from 'loadsh'
+import _ from 'lodash'
 
 /**
  * 管理员注册
