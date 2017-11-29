@@ -1,4 +1,4 @@
-import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, SubRoleNameEnum, StatusEnum, Model, Codes, Pick } from './lib/all'
+import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, SubRoleNameEnum, StatusEnum, Model, Codes } from './lib/all'
 import { RegisterAdmin, UpdateAdmin, RegisterUser, LoginUser } from './biz/auth'
 import { UserModel } from './model/UserModel'
 import { AdminModel } from './model/AdminModel'
