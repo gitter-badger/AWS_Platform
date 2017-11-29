@@ -76,6 +76,7 @@ export class UserModel extends BaseModel {
         // 查询平台 
         else {
             let query = {
+                ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt',                
                 FilterExpression: '(#role=:role10 OR #role=:role100) AND #parent=:parent',
                 ExpressionAttributeNames: {
                     '#role': 'role',
