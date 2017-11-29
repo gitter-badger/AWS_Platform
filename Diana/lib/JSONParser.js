@@ -25,8 +25,3 @@ export const JSONParser = (data) => {
   delete ret.updatedAt
   return [0, ret]
 }
-export const Trim = _.trim
-export const Empty = _.isEmpty
-export const Pick = _.pick
-export const Omit = _.omit
-export const Keys = _.keys

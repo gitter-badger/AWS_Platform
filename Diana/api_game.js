@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, GameTypeEnum, RoleCodeEnum, Trim, Pick, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, GameTypeEnum, RoleCodeEnum, BizErr } from './lib/all'
 import { GameModel } from './model/GameModel'
 import { LogModel } from './model/LogModel'
 import { UserModel } from './model/UserModel'
