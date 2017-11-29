@@ -78,13 +78,15 @@ export class SysBillModel extends BaseModel {
         for (let userId of inparam.userIds) {
             let p = new Promise(async function (resolve, reject) {
                 let query = {
-                    FilterExpression: 'contains(#levelIndex,:levelIndex)',
+                    FilterExpression: 'contains(#levelIndex,:levelIndex) AND #role=:role',
                     ProjectionExpression: 'userId',
                     ExpressionAttributeNames: {
+                        '#role': 'role',
                         '#levelIndex': 'levelIndex'
                     },
                     ExpressionAttributeValues: {
-                        ':levelIndex': userId
+                        ':levelIndex': userId,
+                        ':role': RoleCodeEnum.Merchant
                     }
                 }
                 const [merchantsErr, merchantsRet] = await self.scan(query)
