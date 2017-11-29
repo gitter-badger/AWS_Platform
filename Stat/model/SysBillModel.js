@@ -44,7 +44,7 @@ export class SysBillModel extends BaseModel {
                     gameUserIdsArr.push(player.userId)
                 }
                 // 查询所有商户对应玩家的流水
-                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerBill({ gameUserIds: gameUserIdsArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
+                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerStat({ gameUserIds: gameUserIdsArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
                 let bet = 0
                 let betCount = 0
                 let winlose = 0

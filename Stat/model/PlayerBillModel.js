@@ -18,7 +18,7 @@ export class PlayerBillModel extends BaseModel {
      * 计算用户流水
      * @param {*} inparam 
      */
-    async calcPlayerBill(inparam) {
+    async calcPlayerStat(inparam) {
         let promiseArr = []
         let self = this
         for (let gameUserId of inparam.gameUserIds) {
