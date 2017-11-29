@@ -54,7 +54,8 @@ export class UserModel extends BaseModel {
                 KeyConditionExpression: '#role=:role AND #parent=:parent',
                 ExpressionAttributeNames: {
                     '#role': 'role',
-                    '#parent': 'parent'
+                    '#parent': 'parent',
+                    '#level': 'level'
                 },
                 ExpressionAttributeValues: {
                     ':role': inparam.token.role,
@@ -84,7 +85,8 @@ export class UserModel extends BaseModel {
                 FilterExpression: '(#role=:role10 OR #role=:role100) AND #parent=:parent',
                 ExpressionAttributeNames: {
                     '#role': 'role',
-                    '#parent': 'parent'
+                    '#parent': 'parent',
+                    '#level': 'level'
                 },
                 ExpressionAttributeValues: {
                     ':role10': '10',
