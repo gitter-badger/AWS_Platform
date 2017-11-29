@@ -22,7 +22,7 @@ export class UserModel extends BaseModel {
     async queryOne(inparam) {
         let query = {
             IndexName: 'UserIdIndex',
-            ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt',
+            ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt,rate,vedioMix,liveMix',
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
                 ':userId': inparam.userId
@@ -46,7 +46,7 @@ export class UserModel extends BaseModel {
         if (Model.isAgent(inparam.token)) {
             let query = {
                 IndexName: 'RoleParentIndex',
-                ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt',
+                ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt,rate,vedioMix,liveMix',
                 KeyConditionExpression: '#role=:role AND #parent=:parent',
                 ExpressionAttributeNames: {
                     '#role': 'role',
@@ -76,7 +76,7 @@ export class UserModel extends BaseModel {
         // 查询平台 
         else {
             let query = {
-                ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt',                
+                ProjectionExpression: 'userId,suffix,uname,username,displayName,#role,#level,levelIndex,parent,parentName,parentRole,createdAt,updatedAt,rate,vedioMix,liveMix',
                 FilterExpression: '(#role=:role10 OR #role=:role100) AND #parent=:parent',
                 ExpressionAttributeNames: {
                     '#role': 'role',
