@@ -104,40 +104,37 @@ export class UserBillDetailModel extends athena.BaseModel {
         //小汇总
         let  betArray = [], reArray= [], notDep = true;
         function findBet(array, b) {
+            let returnArr = [];
             for(let i =0; i <array.length;i ++) {
                 let item = array[i];
-                if(item.businessKey == b.businessKey) {
-                    return item;
+                if(item.businessKey == b.businessKey && (item.type == 4 || item.type==5)) {
+                    returnArr.push(item);
                 }
             }
+            return returnArr;
         }
         list.forEach((item, index) => {
             let alreadySave = lastCreatedAt ? item.createdAt > lastCreatedAt : true;
             if(item.type == 3 && alreadySave) {
-                let p = betArray.find((b) => b.businessKey == item.businessKey && item.businessKey)
+                let p = betArray.find((b) => b.businessKey == item.businessKey && item.businessKey);
                 if(!p) {
                     p = {
                         ...item,
                         sn : Util.billSerial(this.userId, index),
                         type : 21,
+                        reTime : item.createdAt,
+                        reAmount : 0,
+                        balance :+(item.originalAmount + item.amount).toFixed(2)
                     }
                     betArray.push(p)
-                    let reItem = list.find((p) => p.type == 4 && p.businessKey == item.businessKey);
-                    if(!reItem){
-                            notDep = false;
-                    }else {
-                        p.reAmount = reItem.amount; //返奖金额
+                    let reItem = list.find((p) => (p.type == 4 || p.type==5) && p.businessKey == item.businessKey);
+                    if(reItem){
+                        p.reAmount += reItem.amount; //返奖金额
                         p.reTime = reItem.createdAt;//返奖时间
                         p.balance = +(reItem.originalAmount + reItem.amount).toFixed(2);
                     }
-                    
                 }else {
                     p.amount += item.amount; //下注金额
-                    if(!notDep) {
-                        p.reTime = item.createdAt; //返奖时间
-                        p.reAmount = 0;  //返奖金额
-                        p.balance = +(item.originalAmount + item.amount).toFixed(2) //结算金额
-                    }
                 }
             }
         })
