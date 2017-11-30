@@ -783,6 +783,7 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(err));
   }
   let {betAmount, reAmount, income} = incomeObj;
+  console.log("结算账单条数:"+list.length);
   console.log("账单消耗:" + income);
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
 
