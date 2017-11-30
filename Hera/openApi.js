@@ -750,6 +750,9 @@ async function settlement(event, context, callback) {
       lastCreatedAt = lastBillDetail.createdAt;
     }
   }
+  if(gameType == "30000") {
+    list.reverse(); //如果是真人(过来数据从大到小)，颠倒排序
+  }
   detailBill.billId = billId;
   list = detailBill.summary(list, lastCreatedAt);
   let [sumErr] = await detailBill.batchWrite(list);
@@ -796,6 +799,7 @@ async function settlement(event, context, callback) {
     msn: merchantModel.msn,
     type: Type.gameSettlement,
     busCount : incomeObj.busCount,
+    mixAmount : incomeObj.mixAmount,
     typeName: typeName,
     joinTime : userModel.joinTime,
     rate : merchantModel.rate,
@@ -813,7 +817,6 @@ async function settlement(event, context, callback) {
 
   userBillModel.originalAmount = oriBalance;
   Object.assign(userBillModel, billBase);
-
   let [uSaveErr] = await userBillModel.save();
   if (uSaveErr) {
     return callback(null, ReHandler.fail(uSaveErr));

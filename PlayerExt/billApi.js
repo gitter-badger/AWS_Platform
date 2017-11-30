@@ -155,7 +155,7 @@ const billDetail = async(event, context, cb) => {
   depSumAmount = -sumAmount + reSumAmount;
   //根据billId查询账单
   let billModel = new UserBillModel();
-  let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt","amount"], "billIdIndex");
+  let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt","amount","mixAmount"], "billIdIndex");
   if(billInfoErr) {
     return cb(null, ReHandler.fail(billInfoErr));
   }
@@ -173,7 +173,7 @@ const billDetail = async(event, context, cb) => {
       sumAmount : sumAmount , //下注总额
       reSumAmount, //返还金额
       depSumAmount, //利润总额
-      mixNum :sumAmount  //洗马量
+      mixNum :billInfo.mixAmount || sumAmount  //洗马量
     }
   }
   for(let i = 0; i < list.length; i++) {
