@@ -112,7 +112,8 @@ export const RoleModels = {
       hostName: Model.StringValue,          // 负责人姓名
       hostContact: Model.StringValue,       // 负责人联系方式
       moneyURL: Model.StringValue,          // 商户充值站点
-      registerURL: Model.StringValue        // 商户注册站点
+      registerURL: Model.StringValue,       // 商户注册站点
+      sn: Model.StringValue                 // 商户邀请码
     }
   },
   '1000': function () {
@@ -186,7 +187,11 @@ export const RoleDisplay = {
     'displayId',
     'contractPeriod',
     'isforever',
-    'updatedAt'
+    'updatedAt',
+
+    'moneyURL',
+    'registerURL',
+    'sn'
 
     // 'password',
     // 'remark'
@@ -255,7 +260,10 @@ export const RoleEditProps = {
 
     'contractPeriod',
     'remark',
-    'isforever'
+    'isforever',
+
+    'moneyURL',
+    'registerURL'
   ],
   '1000': [// 代理
     'password',
