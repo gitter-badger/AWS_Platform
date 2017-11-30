@@ -199,8 +199,8 @@ function getsn(leng = 6) {
   for (let i = 0; i < index2; i++) {
     snArr.push(letterArr[Math.floor(Math.random() * letterArr.length)])
   }
-  snArr.sort(() => { 0.5 - Math.random() })
-  let sn = snArr.join('')
+  let newsnArr=_.shuffle(snArr)
+  let sn=newsnArr.join('')
   return sn
 }
 
