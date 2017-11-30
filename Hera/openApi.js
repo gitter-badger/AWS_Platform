@@ -786,7 +786,7 @@ async function settlement(event, context, callback) {
   console.log("结算账单条数:"+list.length);
   console.log("账单消耗:" + income);
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
-
+  let remark = gameType == "30000" ? "真人视讯" : game.gameName;
   
   let billBase = {
     fromRole: RoleCodeEnum.Player,
@@ -808,7 +808,7 @@ async function settlement(event, context, callback) {
     joinTime : userModel.joinTime,
     rate : merchantModel.rate,
     mix :mix,
-    remark: `游戏结算[${game.gameName}]`
+    remark: `游戏结算[${remark}]`
   }
   //玩家点数发生变化
   let userBillModel = new UserBillModel({
@@ -1109,7 +1109,7 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
-  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
+  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr, 0);
   if (batchSaveErr) {
     return callback(null, ReHandler.fail(batchSaveErr));
   }

@@ -51,8 +51,8 @@ export class UserBillDetailModel extends athena.BaseModel {
             batch.RequestItems.PlayerBillDetail = saveArray;
             promises.push(this.db$("batchWrite", batch));
         }
-        return new Promise((reslove, reject) => {
-            Promise.all(promises).then((result) => {
+        // return new Promise((reslove, reject) => {
+        return Promise.all(promises).then((result) => {
                 console.log("插入账单明细成功");
                 // console.log(result);
                 console.log(result.length);
@@ -68,21 +68,26 @@ export class UserBillDetailModel extends athena.BaseModel {
                 for(let i = 0; i < unArray.length; i++) {
                     unArray[i] = unArray[i].PutRequest.Item;
                 }
-                
+                // if(index ==0) {
+                //     unArray = records;
+                // }
                 console.log("发生错误的总条目数:"+unArray.length);
                 if(unArray.length > 0) {
                     console.log("重新处理");
                     return this.batchWrite(unArray);
+                    // return reslove(this.batchWrite(unArray));
                 }else {
-                    return reslove([null]);
+                    return [0]
+                    // return reslove([null]);
                 }
             }).catch((err) => {
                 console.log("插入账单明细失败");
                 console.log(records);
                 console.log(err);
-                return reslove([new CHeraErr(CODES.SystemError)]);
+                return [new CHeraErr(CODES.SystemError)]
+                // return reslove([new CHeraErr(CODES.SystemError)]);
             });
-        })
+        // })
     }
     summary(list, lastCreatedAt){
         //写入账单明细
