@@ -49,7 +49,9 @@ function validateIp(event, merchant) {
   console.log("event.headers.identity");
   console.log(event.requestContext.identity);
   console.log(whiteList);
-  let sourceIp = event.requestContext.identity.sourceIp;
+  // let sourceIp = event.requestContext.identity.sourceIp;
+  let sourceIp = ((event.headers["X-Forwarded-For"] || "").split(",") || [])[0];
+  console.log(sourceIp);
   let allIp = whiteList.find((ip) => ip == "0.0.0.0");
   let whiteIp = whiteList.find((ip) => ip == sourceIp);
   if (whiteIp || allIp) return true;
@@ -212,6 +214,7 @@ async function gamePlayerRegister(event, context, callback) {
  */
 async function gamePlayerLogin(event, context, callback) {
   //json转换
+  console.log(event);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
 
   if (parserErr) return callback(null, ReHandler.fail(parserErr));
@@ -1196,7 +1199,7 @@ export {
   getA3GamePlayerBalance, //用户余额（A3）
   joinGame, //进入游戏
   updatePassword, //修改密码
-  updateUserInfo,  //修改用户基本信息
+  updateUserInfo,  //修改用户基本信息`
   playerGameRecord, //玩家记录
   getPlayerGameRecord, //获取玩家游戏记录
 }
