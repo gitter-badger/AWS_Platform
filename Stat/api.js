@@ -16,8 +16,7 @@ const jwtverify = async (e, c, cb) => {
     return c.fail('未授权')
   }
   // 有效期校验
-  const [checkErr, checkRet] = await new TokenModel(userInfo).checkExpire(userInfo);
-  console.log(userInfo);
+  const [checkErr, checkRet] = await new TokenModel().checkExpire(userInfo)
   if (checkErr) {
     return c.succeed(GeneratePolicyDocument(-1, 'Allow', e.methodArn, userInfo))
   } else {
