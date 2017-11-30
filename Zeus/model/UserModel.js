@@ -408,4 +408,35 @@ export class UserModel extends BaseModel {
     //     }
     // }
     // await this.db$('update', params)
+
+    /**
+     * 检查sn是否存在
+     * @param {*} role 
+     * @param {*} sn 
+     */
+    async checkSnExist(role, sn) {
+        let [err, ret] = await this.query({
+            TableName: Tables.ZeusPlatformUser,
+            IndexName: 'RoleSuffixIndex',
+            KeyConditionExpression: '#role = :role',
+            FilterExpression: '#sn = :sn',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#sn': 'sn'
+            },
+            ExpressionAttributeValues: {
+                ':role': role,
+                ':sn': sn
+            }
+        })
+        if (err) {
+            return [err, 0]
+        }
+        if (ret.Items.length > 0) {
+            return [0, false]
+        } else {
+            return [0, true]
+        }
+    }
+
 }
