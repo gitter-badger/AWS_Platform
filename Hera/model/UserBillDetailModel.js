@@ -68,24 +68,18 @@ export class UserBillDetailModel extends athena.BaseModel {
                 for(let i = 0; i < unArray.length; i++) {
                     unArray[i] = unArray[i].PutRequest.Item;
                 }
-                // if(index ==0) {
-                //     unArray = records;
-                // }
                 console.log("发生错误的总条目数:"+unArray.length);
                 if(unArray.length > 0) {
                     console.log("重新处理");
                     return this.batchWrite(unArray);
-                    // return reslove(this.batchWrite(unArray));
                 }else {
                     return [0]
-                    // return reslove([null]);
                 }
             }).catch((err) => {
                 console.log("插入账单明细失败");
                 console.log(records);
                 console.log(err);
                 return [new CHeraErr(CODES.SystemError)]
-                // return reslove([new CHeraErr(CODES.SystemError)]);
             });
         // })
     }

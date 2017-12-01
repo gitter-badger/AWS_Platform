@@ -743,6 +743,7 @@ async function settlement(event, context, callback) {
   });
   let billId = Util.billSerial(userModel.userId), lastCreatedAt;
   //billId获取，如果是电子游戏的则先在数据库中找
+  console.log("查询时间:"+joinGame+"    "+Date.now());
   if(gameType == "40000") {
     let [billIdErr, lastBillDetail] = await detailBill.getLastDetail(userModel.userName, joinTime);
     if(billIdErr) {
