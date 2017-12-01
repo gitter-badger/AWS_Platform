@@ -14,8 +14,6 @@ import {MerchantModel} from "./model/MerchantModel"
 
 import {RoleCodeEnum, GameTypeEnum} from "./lib/Consts"
 
-import { TokenModel } from './model/TokenModel'
-
 /**
  * 添加公告
  * @param {*} e 
@@ -213,7 +211,7 @@ const validateToken = async(e) => {
     }
     const [te, tokenInfo] = await JwtVerify(token[1])
     if(te) {
-        return [te, nuyll];
+        return [te, null];
     }
     let role = tokenInfo.role;
     let userId = tokenInfo.userId;
@@ -240,27 +238,4 @@ export{
     merchantList,
     remove,
     list
-}
-
-// TOKEN验证
-export const jwtverify = async (e, c, cb) => {
-  // get the token from event.authorizationToken
-  const token = e.authorizationToken.split(' ')
-  if (token[0] !== 'Bearer') {
-    return c.fail('Unauthorized: wrong token type')
-  }
-  // verify it and return the policy statements
-  const [err, userInfo] = await JwtVerify(token[1]);
-  if (err || !userInfo) {
-    console.log(JSON.stringify(err), JSON.stringify(userInfo));
-    return c.fail('Unauthorized')
-  }
-  const [checkErr, checkRet] = await new TokenModel(userInfo).checkExpire(userInfo);
-  if (checkErr) {
-    return c.succeed(Util.generatePolicyDocument(-1, 'Allow', e.methodArn, userInfo))
-    // return c.fail(checkErr.msg)
-  } else {
-    return c.succeed(Util.generatePolicyDocument(userInfo.userId, 'Allow', e.methodArn, userInfo))
-  }
-
 }

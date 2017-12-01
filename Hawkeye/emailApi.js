@@ -269,7 +269,7 @@ const validateToken = async(e) => {
     
     const [te, tokenInfo] = await JwtVerify(token[1])
     if(te) {
-        return [te, nuyll];
+        return [te, null];
     }
     let role = tokenInfo.role;
     let userId = tokenInfo.userId;

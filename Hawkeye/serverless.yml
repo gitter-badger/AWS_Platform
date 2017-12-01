@@ -32,7 +32,7 @@ provider:
             - ":table/*"  
 functions:
   tokenVerify:
-    handler: noticeApi.jwtverify
+    handler: api.jwtverify
     integration: lambda
   addNotice:  #添加公告
     handler: noticeApi.add
