@@ -146,7 +146,7 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   }
   // 商户时生成一个6位sn
   if (CheckUser.role === RoleCodeEnum['Merchant']) {
-    let sn = ''
+    let sn = Model.StringValue
     while (true) {
       sn = getsn()
       let [snErr, snRet] = await new UserModel().checkSnExist(CheckUser.role, sn)
