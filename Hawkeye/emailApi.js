@@ -260,25 +260,14 @@ const remove = async(e, c, cb) => {
  * @param {*} e 
  * @param {*} validateParams 
  */
-const validateToken = async(e) => {
+const validateToken = async (e) => {
+  try {
     //json转换
     const [tokenErr, token] = await Model.currentToken(e);
-    if (tokenErr) {
-        return [tokenErr, null];
-    }
-    
-    const [te, tokenInfo] = await JwtVerify(token[1])
-    if(te) {
-        return [te, null];
-    }
-    let role = tokenInfo.role;
-    let userId = tokenInfo.userId;
-    let displayId = +tokenInfo.displayId;
-    let displayName = tokenInfo.displayName
-    if(role != RoleCodeEnum.PlatformAdmin && role != RoleCodeEnum.Manager) {
-      return [new CHeraErr(CODES.notAuth), null];
-    }
-    return [null, {userId, displayId, displayName}];
+    return [null, token];
+  } catch (error) {
+    return [error, null];
+  }
 }
 
 
