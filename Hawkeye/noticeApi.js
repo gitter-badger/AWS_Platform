@@ -40,8 +40,9 @@ const add = async (e, c, cb) => {
     Object.assign(checkAttError, { params: errorParams });
     return errorHandle(cb, checkAttError);
   }
-
   requestParams.userId = userInfo.userId;
+  requestParams.operatorName = userInfo.username;
+  requestParams.operatorRole = userInfo.role;
   let noticeModel = new NoticeModel(requestParams);
   let [saveErr] = await noticeModel.save();
   if (saveErr) {
@@ -124,7 +125,15 @@ const list = async (e, c, cb) => {
   }
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if (parserErr) return errorHandle(cb, parserErr);
-  let [scanErr, list] = await new NoticeModel().scan({});
+  let query = {
+    operatorRole: '1'
+  }
+  if (!Model.isPlatformAdmin(userInfo)) {
+    query = {
+      operatorName: userInfo.username
+    }
+  }
+  let [scanErr, list] = await new NoticeModel().scan(query);
   if (scanErr) {
     return errorHandle(cb, scanErr);
   }
