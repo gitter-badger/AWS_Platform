@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const jwtVerify = Bluebird.promisify(jwt.verify)
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 
+// 返回模板
 const responseTemplate = (statusCode, body, code, headers = {}) => {
   headers = {
     ...headers,
@@ -12,6 +13,24 @@ const responseTemplate = (statusCode, body, code, headers = {}) => {
   }
   return {statusCode, headers, body: JSON.stringify(body)}
 }
+// 返回工具类
+export const Success = (body, code = Codes.OK, headers = {}) => {
+  const content = {
+    ...body,
+    code: code
+  }
+  return responseTemplate(200, content, code, headers)
+}
+export const Fail = (body, code = Codes.Error, headers = {}) => {
+  const content = {
+    ...body,
+    code: code
+  }
+  return responseTemplate(500, content, code, headers)
+}
+export const ResOK = (callback, res) => callback(null, Success(res))
+export const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))
+export const ResErr = (callback, err) => ResFail(callback, { err: err }, err.code)
 
 export class ReHandler{
   static success(body = {}, headers = {}){
