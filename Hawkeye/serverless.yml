@@ -34,7 +34,7 @@ functions:
   tokenVerify:
     handler: api.jwtverify
     integration: lambda
-  addNotice:  #添加公告
+  addNotice:  #添加跑马灯
     handler: noticeApi.add
     events:
       - http:
@@ -42,7 +42,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  updateNotice:  #修改公告
+  updateNotice:  #修改跑马灯
     handler: noticeApi.update
     events:
       - http:
@@ -50,7 +50,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  removeNotice:  #删除公告
+  removeNotice:  #删除跑马灯
     handler: noticeApi.remove
     events:
       - http:
@@ -58,7 +58,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  listNotice:  #公告列表
+  listNotice:  #跑马灯列表
     handler: noticeApi.list
     events:
       - http:
@@ -82,7 +82,7 @@ functions:
           method: post
           cors: true
           authorizer: tokenVerify
-  info :  #公告信息
+  info :  #跑马灯信息
     handler: openApi.info
     events:
       - http:

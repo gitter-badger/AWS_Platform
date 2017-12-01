@@ -15,7 +15,7 @@ import { MerchantModel } from "./model/MerchantModel"
 import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
 
 /**
- * 添加公告
+ * 添加跑马灯
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
@@ -69,7 +69,7 @@ function getGameName(requestParams) {
 }
 
 /**
- * 修改公告
+ * 修改跑马灯
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
@@ -95,7 +95,7 @@ const update = async (e, c, cb) => {
     Object.assign(checkAttError, { params: errorParams });
     return errorHandle(cb, checkAttError);
   }
-  //找到这个公告
+  //找到这个跑马灯
   let [getErr, noticeInfo] = await new NoticeModel().get({ noid: requestParams.noid });
   if (getErr) {
     return errorHandle(cb, getErr);
@@ -113,7 +113,7 @@ const update = async (e, c, cb) => {
 }
 
 /**
- * 公告列表
+ * 跑马灯列表
  * @param {*} e 
  * @param {*} c 
  * @param {*} cb 
@@ -192,7 +192,7 @@ const remove = async (e, c, cb) => {
     Object.assign(checkAttError, { params: errorParams });
     return errorHandle(cb, checkAttError);
   }
-  //找到这个公告
+  //找到这个跑马灯
   let [getErr, noticeInfo] = await new NoticeModel().get({ noid: requestParams.noid });
   if (getErr) {
     return errorHandle(cb, getErr);
