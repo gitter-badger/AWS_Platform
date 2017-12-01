@@ -62,7 +62,10 @@ export class AdModel extends BaseModel {
     async list(inparam) {
         // 查询
         let query = {
-            FilterExpression: 'operatorRole=1'
+            FilterExpression: 'operatorRole=:operatorRole',
+            ExpressionAttributeValues: {
+                ':operatorRole': RoleCodeEnum.PlatformAdmin
+            }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
             query = {
