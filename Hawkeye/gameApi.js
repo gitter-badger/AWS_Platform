@@ -180,9 +180,9 @@ const merchantInfo = async (event, context, cb) => {
         suffix: merchant.suffix,
         levelIndex: merchant.levelIndex + "",
         merUrl: merchant.frontURL || "-1",
-        sn: merchant.sn || '',
-        moneyURL: merchant.moneyURL || "",
-        registerURL: merchant.registerURL || ""
+        sn: merchant.sn || 'NULL!',
+        moneyURL: merchant.moneyURL || "NULL!",
+        registerURL: merchant.registerURL || "NULL!"
     }
     function setGameList(gameList) {
         gameList = gameList || [];
