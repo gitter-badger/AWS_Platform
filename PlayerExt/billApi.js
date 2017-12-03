@@ -110,6 +110,7 @@ const billFlow = async(event, context, cb) => {
  * @param {*} cb 
  */
 const billDetail = async(event, context, cb) => {
+  console.log(event);
   const [tokenErr, token] = await Model.currentToken(event);
   if (tokenErr) {
     return ResFail(cb, tokenErr)
@@ -139,26 +140,39 @@ const billDetail = async(event, context, cb) => {
   }
   //洗马量和argPTR没有写
   let sumAmount = 0, reSumAmount= 0, depSumAmount =0,mixNum=0;
-  for(let i = 0; i < list.length; i++) {
-    let item = list[i];
-    item.joinTime = item.createdAt;
-    if(item.type >=1 && item.type<=4) {
-      list.splice(i, 1);
-      i --;
-    }else {
-      sumAmount += Math.abs(item.amount);
-      reSumAmount += item.reAmount || 0;
-    }
-  }
-  depSumAmount = -sumAmount + reSumAmount;
   //根据billId查询账单
   let billModel = new UserBillModel();
-  let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt","amount","mixAmount"], "billIdIndex");
+  let [billInfoErr, billInfo] = await billModel.get({billId}, ["userName","billId","joinTime","createAt","amount","mixAmount","betAmount","reAmount"], "billIdIndex");
   if(billInfoErr) {
     return cb(null, ReHandler.fail(billInfoErr));
   }
+  
   if(!billInfo) {
     return cb(null, ReHandler.fail(new CHeraErr(CODES.billNotExist)));
+  }
+
+  if(billInfo.betAmount && billInfo.reAmount) {
+    depSumAmount = +(billInfo.reAmount - Math.abs(billInfo.betAmount)).toFixed(2);
+    for(let i = 0; i < list.length; i++) {
+        let item = list[i];
+        if(item.type >=1 && item.type<=5) {
+          list.splice(i, 1);
+          i --;
+        }
+      }
+  }else {
+    for(let i = 0; i < list.length; i++) {
+      let item = list[i];
+      item.joinTime = item.createdAt;
+      if(item.type >=1 && item.type<=5) {
+        list.splice(i, 1);
+        i --;
+      }else {
+        sumAmount += Math.abs(item.amount);
+        reSumAmount += item.reAmount || 0;
+      }
+    }
+    depSumAmount = -sumAmount + reSumAmount;
   }
   billInfo = buildBillInfo();
   function buildBillInfo(){
@@ -168,8 +182,8 @@ const billDetail = async(event, context, cb) => {
       joinTime : billInfo.joinTime || 0,  //进入时间
       createdAt : billInfo.createAt,   //退出时间（结算时间）
       avgRTP : Math.abs(+reSumAmount/(sumAmount).toFixed(2)),  //净利润/总投注数
-      sumAmount : sumAmount , //下注总额
-      reSumAmount, //返还金额
+      sumAmount : -billInfo.betAmount || sumAmount , //下注总额
+      reSumAmount : billInfo.reAmount || reSumAmount, //返还金额
       depSumAmount, //利润总额
       mixNum :billInfo.mixAmount || sumAmount  //洗马量
     }
@@ -194,7 +208,7 @@ const billDetail = async(event, context, cb) => {
       amount : item.amount,   //下注金额
       rate : item.rate || null, //成数
       balance : item.balance,  //结算金额
-      mix : item.mix > 0? item.mix : null,  //洗马比
+      mix : item.mix || 0,  //洗马比
       reAmount : item.reAmount || 0,  //返还金额
       deAmount : (item.amount + item.reAmount || 0),  //净利
       balance : item.balance || null,   //返还后余额
