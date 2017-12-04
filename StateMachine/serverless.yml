@@ -89,6 +89,13 @@ functions:
             method: post
             cors: true
             authorizer: tokenAuth
+  testredis: #测试redis
+    handler: api_upload.testredis
+    events:
+        - http:
+            path: testredis
+            method: get
+            cors: true
   # testmysql: #测试mysql
   #   handler: api_fetch.testmysql
   #   events:
