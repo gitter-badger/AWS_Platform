@@ -437,17 +437,6 @@ resources:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
-            IndexName: UserIdIndexSec
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          -
             IndexName: CreatedDateIndex
             KeySchema:
               -
