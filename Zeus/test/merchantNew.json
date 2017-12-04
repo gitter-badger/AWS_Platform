@@ -4,27 +4,83 @@
   },
   "requestContext": {
     "authorizer": {
-      "username": "Platform_cheney",
-      "parent": "00",
+      "userId": "242b5dac-5b60-49bf-b1fa-c3f1c16006ad",
       "role": "1",
-      "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
-      "principalId": "de1fb483-5307-4ff9-8009-9a04cffee142"
+      "suffix": "Platform",
+      "username": "Platform_NAtest",
+      "parent": "00",
+      "parentName": "SuperAdmin",
+      "parentRole": "00",
+      "displayName": "平台管理员",
+      "level": 0,
+      "subRole": "平台管理员",
+      "subRolePermission": [
+        "看板",
+        "个人中心",
+        "线路商列表",
+        "创建线路商",
+        "商户列表",
+        "创建商户",
+        "玩家列表",
+        "游戏列表",
+        "游戏后台",
+        "游戏公告列表",
+        "跑马灯列表",
+        "游戏邮件列表",
+        "展位列表",
+        "电子游戏风控",
+        "线路商登录日志",
+        "商户登录日志",
+        "管理员操作日志",
+        "管理员列表",
+        "添加管理员",
+        "管理员角色列表",
+        "新增管理员角色",
+        "线路号列表",
+        "层级关系"
+      ],
+      "iat": 1512013906
     },
     "identity": {
       "sourceIp": "127.0.0.1"
     }
   },
   "body": {
-    "username": "cmmerchant1",
-    "password": "Ab123456",
     "role": "100",
-    "hostName": "负责人一号",
-    "hostContact": "18780004427",
-    "parent": "01",
-    "suffix": "CY1",
-    "msn": "1",
-    "displayName": "测试商户1",
-    "rate": "90",
-    "points": "1000"
+    "suffix": "vcvc",
+    "displayName": "mvcvcmm",
+    "rate": "10",
+    "merchantEmail": "ddsfd@d.com",
+    "hostName": "dgfgcvcf",
+    "hostContact": "vcdfvd",
+    "parent": "",
+    "remark": "sdas",
+    "contractPeriod": 0,
+    "isforever": true,
+    "points": "5555",
+    "msn": "696",
+    "gameList": [
+      {
+        "code": "40000",
+        "name": "电子游戏",
+        "url": "http://tigergame.na12345.com/admin/api/checkLoginAccess",
+        "desc": "NA电子游戏融合了传统的经典电子游戏加入了更加多元化的题材以及更加具有娱乐性的玩法让更多的玩家有丰富的游戏体验",
+        "imgurl": "https://d38xgux2jezyfx.cloudfront.net/4.png"
+      },
+      {
+        "code": "30000",
+        "name": "真人视讯",
+        "url": "http://lgate.na12345.com/gate/player/login",
+        "desc": "我们集合了当下最流行的真人视讯游戏类型整合了全新的互联网直播技术通过更逼真的赌场还原以及更流畅的服务，为客户提供全新的体验",
+        "imgurl": "https://d38xgux2jezyfx.cloudfront.net/1.png"
+      }
+    ],
+    "loginWhiteList": "0.0.0.0",
+    "frontURL": "Http://baidu.com",
+    "username": "dfdsere",
+    "password": "dfddffd@ww12",
+    "adminName": "dsfdsf",
+    "adminEmail": "trtr@q.com",
+    "adminContact": "4545fgf"
   }
 }

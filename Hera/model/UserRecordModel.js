@@ -9,7 +9,8 @@ const TypeEnum = {
     deposit : 1,   //转入
     take : 2,  //转出
     bet : 3,   //下注
-    reward : 4  //返奖
+    reward : 4,  //返奖
+    restore : 5, //返还
 }
 
 export const SettlementState = {  //结算状态
@@ -102,21 +103,29 @@ export class UserRecordModel extends athena.BaseModel {
         //     income += (+amount + (+betAmount));
         // }
         // return income;
-        let income = 0, betAmount = 0,reAmount =0,s = new Set();
+        let income = 0, betAmount = 0,reAmount =0,busCount=0,mixAmount =0;
         for(let i = 0; i < this.records.length; i++) {
             let record = this.records[i];
             let amount = record.amount;
-            if(record.type == TypeEnum.bet || record.type == TypeEnum.reward){
-                s.add(record.businessKey);
+            if(record.type == TypeEnum.bet || record.type == TypeEnum.reward || record.type == TypeEnum.restore){
                 income += +amount
+                //下注
                 if(record.type == TypeEnum.bet) {
+                    busCount ++;
                     betAmount += +amount;
+                    mixAmount += -amount;
                 }
+                //返奖
                 if(record.type == TypeEnum.reward) {
                     reAmount += +amount;
                 }
+                //返还
+                if(record.type == TypeEnum.restore) {
+                    reAmount += +amount;
+                    mixAmount -= amount;
+                }
             }
         }
-        return {income,betAmount, reAmount,busCount:s.length};
+        return {income,betAmount, reAmount,busCount, mixAmount};
     }
 }

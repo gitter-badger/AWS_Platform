@@ -1,4 +1,4 @@
-import { Tables, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels } from '../lib/all'
+import { Tables, Codes, BizErr, Model, RoleCodeEnum, RoleModels } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 
@@ -51,7 +51,7 @@ export class TokenModel extends BaseModel {
             }
         }
         // 不存在，返回错误
-        else{
+        else {
             return [BizErr.TokenErr(), 0]
         }
         return [0, inparam]

@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, Pick, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, BizErr, MSNStatusEnum, RoleCodeEnum, } from './lib/all'
 import { CaptchaModel } from './model/CaptchaModel'
 import { MsnModel } from './model/MsnModel'
 import { LogModel } from './model/LogModel'

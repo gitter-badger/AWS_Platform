@@ -15,10 +15,18 @@ const responseTemplate = (statusCode, body, code, headers = {}) => {
 }
 // 返回工具类
 export const Success = (body, code = Codes.OK, headers = {}) => {
-  return responseTemplate(200, body, code, headers)
+  const content = {
+    ...body,
+    code: code
+  }
+  return responseTemplate(200, content, code, headers)
 }
 export const Fail = (body, code = Codes.Error, headers = {}) => {
-  return responseTemplate(500, body, code, headers)
+  const content = {
+    ...body,
+    code: code
+  }
+  return responseTemplate(500, content, code, headers)
 }
 export const ResOK = (callback, res) => callback(null, Success(res))
 export const ResFail = (callback, res, code = Codes.Error) => callback(null, Fail(res, code))

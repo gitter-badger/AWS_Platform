@@ -24,32 +24,32 @@ function deploy(path, servername) {
         'cd /usr/dev/NA/rotta-admin',
         'npm run test-admin',
         'cd dist',
-        '/usr/local/bin/aws s3 rm s3://rotta-test/*',
-        '/usr/local/bin/aws s3 sync . s3://rotta-test --acl public-read --delete',
+        '/usr/local/bin/aws s3 rm s3://sys-test-admin/*',
+        '/usr/local/bin/aws s3 sync . s3://sys-test-admin --acl public-read --delete',
 
         'cd /usr/dev/NA/rotta-agent',
         'npm run test',
         'cd dist',
-        '/usr/local/bin/aws s3 rm s3://rotta-test-agent/*',
-        '/usr/local/bin/aws s3 sync . s3://rotta-test-agent --acl public-read --delete',
+        '/usr/local/bin/aws s3 rm s3://sys-test-agent/*',
+        '/usr/local/bin/aws s3 sync . s3://sys-test-agent --acl public-read --delete',
 
         'cd /usr/dev/NA/rotta-admin',
         'npm run test-manager',
         'cd dist',
-        '/usr/local/bin/aws s3 rm s3://rotta-test-manager/*',
-        '/usr/local/bin/aws s3 sync . s3://rotta-test-manager --acl public-read --delete',
+        '/usr/local/bin/aws s3 rm s3://sys-test-manager/*',
+        '/usr/local/bin/aws s3 sync . s3://sys-test-manager --acl public-read --delete',
 
         'cd /usr/dev/NA/rotta-admin',
         'npm run test-merchant',
         'cd dist',
-        '/usr/local/bin/aws s3 rm s3://rotta-test-merchant/*',
-        '/usr/local/bin/aws s3 sync . s3://rotta-test-merchant --acl public-read --delete',
+        '/usr/local/bin/aws s3 rm s3://sys-test-merchant/*',
+        '/usr/local/bin/aws s3 sync . s3://sys-test-merchant --acl public-read --delete',
 
         'cd /usr/dev/NA/rotta-game',
         'npm run test',
         'cd dist',
-        '/usr/local/bin/aws s3 rm s3://rotta-test-game/*',
-        '/usr/local/bin/aws s3 sync . s3://rotta-test-game --acl public-read --delete',
+        '/usr/local/bin/aws s3 rm s3://sys-test-game/*',
+        '/usr/local/bin/aws s3 sync . s3://sys-test-game --acl public-read --delete',
 
     ].join(' && ')
     console.log('开始自动构建...')

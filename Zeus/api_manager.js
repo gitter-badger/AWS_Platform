@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { UserModel } from './model/UserModel'
 import { ManagerModel } from './model/ManagerModel'
 import { LogModel } from './model/LogModel'
@@ -107,7 +107,7 @@ const managerUpdate = async (e, c, cb) => {
       return ResErr(cb, managerErr)
     }
     // 获取更新属性和新密码HASH
-    const Manager = { ...manager, ...Pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']]) }
+    const Manager = { ...manager, ..._.pick(managerInfo, RoleEditProps[RoleCodeEnum['Manager']]) }
     Manager.passhash = Model.hashGen(Manager.password)
     // 业务操作
     const [updateErr, updateRet] = await new UserModel().userUpdate(Manager)

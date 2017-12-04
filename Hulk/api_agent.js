@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, Trim, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { AgentModel } from './model/AgentModel'
 import { UserModel } from './model/UserModel'
 import { LogModel } from './model/LogModel'
@@ -76,6 +76,7 @@ const agentLogin = async (e, c, cb) => {
         if (loginUserErr) { return ResErr(cb, loginUserErr) }
         return ResOK(cb, { payload: loginUserRet })
     } catch (error) {
+        console.error(error)
         return ResErr(cb, error)
     }
 }
@@ -153,7 +154,7 @@ const agentUpdate = async (e, c, cb) => {
         const [err, ret] = await new UserModel().getUser(inparam.userId, RoleCodeEnum['Agent'])
         if (err) { return ResErr(cb, err) }
         // 获取更新属性和新密码HASH
-        const Agent = { ...ret, ...Pick(inparam, RoleEditProps[RoleCodeEnum['Agent']]) }
+        const Agent = { ...ret, ..._.pick(inparam, RoleEditProps[RoleCodeEnum['Agent']]) }
         Agent.passhash = Model.hashGen(Agent.password)
         // 业务操作
         const [updateErr, updateRet] = await new UserModel().userUpdate(Agent)

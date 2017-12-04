@@ -49,7 +49,9 @@ function validateIp(event, merchant) {
   console.log("event.headers.identity");
   console.log(event.requestContext.identity);
   console.log(whiteList);
-  let sourceIp = event.requestContext.identity.sourceIp;
+  // let sourceIp = event.requestContext.identity.sourceIp;
+  let sourceIp = ((event.headers["X-Forwarded-For"] || "").split(",") || [])[0];
+  console.log(sourceIp);
   let allIp = whiteList.find((ip) => ip == "0.0.0.0");
   let whiteIp = whiteList.find((ip) => ip == sourceIp);
   if (whiteIp || allIp) return true;
@@ -212,6 +214,7 @@ async function gamePlayerRegister(event, context, callback) {
  */
 async function gamePlayerLogin(event, context, callback) {
   //json转换
+  console.log(event);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
 
   if (parserErr) return callback(null, ReHandler.fail(parserErr));
@@ -315,10 +318,10 @@ async function getGamePlayerBalance(event, context, callback) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
   }
   //验证白名单
-  // let white = validateIp(event, merchantInfo);
-  // if (!white) {
-  //   return errorHandler(callback, new CHeraErr(CODES.ipError), "getBalance", merchantInfo, event.pathParameters);
-  // }
+  let white = validateIp(event, merchantInfo);
+  if (!white) {
+    return errorHandler(callback, new CHeraErr(CODES.ipError), "getBalance", merchantInfo, event.pathParameters);
+  }
   userName = `${merchantInfo.suffix}_${userName}`;
   let userBill = new UserBillModel({ userName });
   let [bError, balance] = await userBill.getBalance();
@@ -740,6 +743,7 @@ async function settlement(event, context, callback) {
   });
   let billId = Util.billSerial(userModel.userId), lastCreatedAt;
   //billId获取，如果是电子游戏的则先在数据库中找
+  console.log("查询时间:"+joinGame+"    "+Date.now());
   if(gameType == "40000") {
     let [billIdErr, lastBillDetail] = await detailBill.getLastDetail(userModel.userName, joinTime);
     if(billIdErr) {
@@ -749,6 +753,9 @@ async function settlement(event, context, callback) {
       billId = lastBillDetail.billId;
       lastCreatedAt = lastBillDetail.createdAt;
     }
+  }
+  if(gameType == "30000") {
+    list.reverse(); //如果是真人(过来数据从大到小)，颠倒排序
   }
   detailBill.billId = billId;
   list = detailBill.summary(list, lastCreatedAt);
@@ -777,9 +784,10 @@ async function settlement(event, context, callback) {
     return callback(null, ReHandler.fail(err));
   }
   let {betAmount, reAmount, income} = incomeObj;
+  console.log("结算账单条数:"+list.length);
   console.log("账单消耗:" + income);
   let userAction = income < 0 ? Action.reflect : Action.recharge; //如果用户收益为正数，用户action为1
-
+  let remark = gameType == "30000" ? "真人视讯" : game.gameName;
   
   let billBase = {
     fromRole: RoleCodeEnum.Player,
@@ -796,11 +804,12 @@ async function settlement(event, context, callback) {
     msn: merchantModel.msn,
     type: Type.gameSettlement,
     busCount : incomeObj.busCount,
+    mixAmount : incomeObj.mixAmount,
     typeName: typeName,
     joinTime : userModel.joinTime,
     rate : merchantModel.rate,
     mix :mix,
-    remark: `游戏结算[${game.gameName}]`
+    remark: `游戏结算[${remark}]`
   }
   //玩家点数发生变化
   let userBillModel = new UserBillModel({
@@ -813,7 +822,6 @@ async function settlement(event, context, callback) {
 
   userBillModel.originalAmount = oriBalance;
   Object.assign(userBillModel, billBase);
-
   let [uSaveErr] = await userBillModel.save();
   if (uSaveErr) {
     return callback(null, ReHandler.fail(uSaveErr));
@@ -1102,7 +1110,7 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
-  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr);
+  let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr, 0);
   if (batchSaveErr) {
     return callback(null, ReHandler.fail(batchSaveErr));
   }
@@ -1193,7 +1201,7 @@ export {
   getA3GamePlayerBalance, //用户余额（A3）
   joinGame, //进入游戏
   updatePassword, //修改密码
-  updateUserInfo,  //修改用户基本信息
+  updateUserInfo,  //修改用户基本信息`
   playerGameRecord, //玩家记录
   getPlayerGameRecord, //获取玩家游戏记录
 }

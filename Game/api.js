@@ -1,4 +1,4 @@
-// import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, Pick, JwtVerify, GeneratePolicyDocument } from './lib/all'
+// import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, JwtVerify, GeneratePolicyDocument } from './lib/all'
 // // import { TokenModel } from './model/TokenModel'
 // // ==================== 以下为内部方法 ====================
 

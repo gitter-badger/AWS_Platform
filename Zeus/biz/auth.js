@@ -1,9 +1,10 @@
-import { Store$, Tables, Codes, BizErr, Model, Pick, Keys, Omit, StatusEnum, RoleCodeEnum, RoleModels, RoleDisplay, MSNStatusEnum } from '../lib/all'
+import { Store$, Tables, Codes, BizErr, Model, StatusEnum, RoleCodeEnum, RoleModels, RoleDisplay, MSNStatusEnum } from '../lib/all'
 import { CaptchaModel } from '../model/CaptchaModel'
 import { UserModel } from '../model/UserModel'
 import { MsnModel } from '../model/MsnModel'
 import { BillModel } from '../model/BillModel'
 import { SubRoleModel } from '../model/SubRoleModel'
+import _ from 'lodash'
 
 /**
  * 管理员注册
@@ -12,10 +13,10 @@ import { SubRoleModel } from '../model/SubRoleModel'
 export const RegisterAdmin = async (userInfo) => {
   // 默认值设置
   const adminRole = RoleModels[RoleCodeEnum['PlatformAdmin']]()
-  const userInput = Pick({
+  const userInput = _.pick({
     ...adminRole,
-    ...Omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
-  }, Keys(adminRole))
+    ..._.omit(userInfo, ['userId', 'points', 'role', 'suffix', 'passhash']) // 这几个都是默认值
+  }, _.keys(adminRole))
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
   // 查询用户是否已存在
   const [queryUserErr, queryUserRet] = await new UserModel().checkUserBySuffix(CheckUser.role, CheckUser.suffix, CheckUser.username)
@@ -61,8 +62,8 @@ export const UpdateAdmin = async (inparam) => {
 export const RegisterUser = async (token = {}, userInfo = {}) => {
   // 生成注册用户信息
   const bizRole = RoleModels[userInfo.role]()
-  userInfo = Omit(userInfo, ['userId', 'passhash'])
-  const userInput = Pick({ ...bizRole, ...userInfo }, Keys(bizRole))
+  userInfo = _.omit(userInfo, ['userId', 'passhash'])
+  const userInput = _.pick({ ...bizRole, ...userInfo }, _.keys(bizRole))
   const CheckUser = { ...userInput, passhash: Model.hashGen(userInput.password) }
 
   // 检查用户是否已经存在
@@ -143,6 +144,21 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     level: parentUser.level + 1,
     levelIndex: levelIndex
   }
+  // 商户时生成一个6位sn
+  if (CheckUser.role === RoleCodeEnum['Merchant']) {
+    let sn = Model.StringValue
+    while (true) {
+      sn = getsn()
+      let [snErr, snRet] = await new UserModel().checkSnExist(CheckUser.role, sn)
+      if (snErr) {
+        return [snErr, 0]
+      }
+      if (snRet) {
+        break
+      }
+    }
+    User.sn = sn
+  }
 
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
@@ -166,6 +182,27 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
   }
   return [0, { ...saveUserRet, orderId: orderId }]
 }
+//获取数字加字母的sn
+function getsn(leng = 6) {
+  let numberArr = [0, 2, 3, 4, 5, 6, 7, 8, 9]
+  let letterArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+  let indexArr = []
+  for (let i = 1; i < leng; i++) {
+    indexArr.push(i)
+  }
+  let index1 = indexArr[Math.floor(Math.random() * (leng - 1))]
+  let index2 = leng - index1
+  let snArr = []
+  for (let i = 0; i < index1; i++) {
+    snArr.push(numberArr[Math.floor(Math.random() * numberArr.length)])
+  }
+  for (let i = 0; i < index2; i++) {
+    snArr.push(letterArr[Math.floor(Math.random() * letterArr.length)])
+  }
+  let newsnArr=_.shuffle(snArr)
+  let sn=newsnArr.join('')
+  return sn
+}
 
 /**
  * 用户登录
@@ -180,10 +217,10 @@ export const LoginUser = async (userLoginInfo = {}) => {
   // 获取用户身份
   const Role = RoleModels[userLoginInfo.role]()
   // 组装用户登录信息
-  const LoginInfo = Pick({
+  const LoginInfo = _.pick({
     ...Role,
     ...userLoginInfo
-  }, Keys(Role))
+  }, _.keys(Role))
   const username = LoginInfo.username
   const suffix = LoginInfo.suffix
   // 查询用户信息
@@ -258,7 +295,7 @@ export const LoginUser = async (userLoginInfo = {}) => {
     User.subRolePermission = subRole.permissions
   }
   // 返回用户身份令牌
-  saveUserRet = Pick(User, RoleDisplay[User.role])
+  saveUserRet = _.pick(User, RoleDisplay[User.role])
   saveUserRet.subRolePermission = User.subRolePermission
   // 更新TOKEN
   await Store$('put', { TableName: Tables.SYSToken, Item: { iat: Math.floor(Date.now() / 1000) - 30, ...saveUserRet } })
@@ -408,6 +445,6 @@ const saveUser = async (userInfo) => {
   }
 
   const roleDisplay = RoleDisplay[userInfo.role]
-  const ret = Pick(UserItem, roleDisplay)
+  const ret = _.pick(UserItem, roleDisplay)
   return [0, ret]
 }

@@ -4,21 +4,22 @@
     },
     "requestContext": {
         "authorizer": {
-            "username": "Platform_cheney",
+            "username": "Platform_NAtest",
             "parent": "00",
             "role": "1",
-            "userId": "de1fb483-5307-4ff9-8009-9a04cffee142",
-            "principalId": "de1fb483-5307-4ff9-8009-9a04cffee142"
+            "userId": "6a478d03-f360-4640-bb12-650e9286b0c5",
+            "principalId": "6a478d03-f360-4640-bb12-650e9286b0c5"
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "role": "1000",
-        "suffix": "Agent",
-        "username": "NAagent",
-        "password": "Ab123456",
-        "captcha": "5390"
+        "gameType":30000,
+        "role":"100",
+        "userIds": ["77b12de3-b593-430d-95ff-4c1905d842cc"],
+        "query":{
+            "createdAt":[0,2511515432377]
+        }
     }
-}
+  }

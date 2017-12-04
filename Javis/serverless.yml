@@ -99,7 +99,7 @@ custom:
     - table: HeraGamePlayerBill
       index:
         - billIdIndex
-        # - userIdIndex
+        - userIdIndex
         - CreatedDateIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}

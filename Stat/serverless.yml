@@ -98,21 +98,40 @@ functions:
           path: /statistics/playerBetRank
           method: post
           cors: true
-  calcPlayerBill: #计算玩家账单
-    handler: api_calc.calcPlayerBill
+  #========== 以下是报表统计接口 ==========
+  queryUserStat: #查询用户统计信息
+    handler: api_query.queryUserStat
     events:
       -
         http:
-          path: /calcPlayerBill
+          path: /queryUserStat
           method: post
           cors: true
           authorizer: tokenAuth
-  calcUserBill: #计算用户账单
-    handler: api_calc.calcUserBill
+  queryPlayerStat: #查询玩家统计信息
+    handler: api_query.queryPlayerStat
     events:
       -
         http:
-          path: /calcUserBill
+          path: /queryPlayerStat
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  calcPlayerStat: #计算玩家账单
+    handler: api_calc.calcPlayerStat
+    events:
+      -
+        http:
+          path: /calcPlayerStat
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  calcUserStat: #计算用户账单
+    handler: api_calc.calcUserStat
+    events:
+      -
+        http:
+          path: /calcUserStat
           method: post
           cors: true
           authorizer: tokenAuth

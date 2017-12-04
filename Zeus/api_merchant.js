@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, Pick, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, BizErr, RoleCodeEnum, RoleEditProps } from './lib/all'
 import { UserModel } from './model/UserModel'
 import { MerchantModel } from './model/MerchantModel'
 import { LogModel } from './model/LogModel'
@@ -82,7 +82,7 @@ const merchantUpdate = async (e, c, cb) => {
     }
     // 获取更新属性和新密码HASH
     const Merchant = {
-      ...merchant, ...Pick(merchantInfo, RoleEditProps[RoleCodeEnum['Merchant']])
+      ...merchant, ..._.pick(merchantInfo, RoleEditProps[RoleCodeEnum['Merchant']])
     }
     Merchant.passhash = Model.hashGen(Merchant.password)
     // 业务操作

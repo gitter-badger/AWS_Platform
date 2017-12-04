@@ -1,4 +1,4 @@
-import { Tables, Store$, Codes, BizErr, Trim, Empty, Model, Keys, Pick, Omit, RoleCodeEnum, RoleModels, BillMo } from '../lib/all'
+import { Tables, Store$, Codes, BizErr, Model, RoleCodeEnum, RoleModels, BillMo } from '../lib/all'
 import _ from 'lodash'
 import { BaseModel } from './BaseModel'
 import { UserModel } from './UserModel'
@@ -212,7 +212,7 @@ export class BillModel extends BaseModel {
      */
     async billTransfer(from, billInfo) {
         // 输入数据处理
-        billInfo = Omit(billInfo, ['sn', 'fromRole', 'fromUser', 'action'])
+        billInfo = _.omit(billInfo, ['sn', 'fromRole', 'fromUser', 'action'])
         const [toUserErr, to] = await new UserModel().getUserByName(billInfo.toRole, billInfo.toUser)
         if (toUserErr) {
             return [toUserErr, 0]
@@ -221,17 +221,17 @@ export class BillModel extends BaseModel {
         if (!Role || Role.points === undefined) {
             return [BizErr.ParamErr('role error'), 0]
         }
-        const fromInparam = Pick({
+        const fromInparam = _.pick({
             ...Role,
             ...from
-        }, Keys(Role))
+        }, _.keys(Role))
         if (fromInparam.username == billInfo.toUser) {
             return [BizErr.ParamErr('不允许自我转账')]
         }
         // 存储账单流水
         const Bill = {
             ...Model.baseModel(),
-            ...Pick({
+            ..._.pick({
                 ...BillMo(),
                 ...billInfo,
                 fromUser: fromInparam.username,
@@ -240,7 +240,7 @@ export class BillModel extends BaseModel {
                 fromDisplayName: fromInparam.displayName,
                 action: 0,
                 operator: from.operatorToken.username
-            }, Keys(BillMo()))
+            }, _.keys(BillMo()))
         }
         const batch = {
             RequestItems: {
