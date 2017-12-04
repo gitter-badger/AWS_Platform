@@ -21,8 +21,7 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam 
      */
     async add(inparam) {
-        // 判断编号是否重复
-        const [existErr, exist] = await this.isExist({
+        let query = {
             IndexName: 'SeatTypeIndex',
             KeyConditionExpression: 'seatType = :seatType AND #order = :order',
             ExpressionAttributeNames: {
@@ -32,13 +31,16 @@ export class SeatModel extends BaseModel {
                 ':seatType': inparam.seatType,
                 ':order': inparam.order
             }
-        })
-        if (existErr) {
-            return [existErr, 0]
         }
-        if (exist) {
-            return [BizErr.ItemExistErr('编号已存在'), 0]
+        if (!Model.isPlatformAdmin(inparam.token)) {
+            query.FilterExpression = 'operatorName=' + inparam.token.username
+        } else {
+            query.FilterExpression = 'operatorRole=' + inparam.token.role
         }
+        // 判断编号是否重复
+        const [existErr, exist] = await this.isExist(query)
+        if (existErr) { return [existErr, 0] }
+        if (exist) { return [BizErr.ItemExistErr('编号已存在'), 0] }
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
         if (inparam.content['toolId']) {
@@ -48,6 +50,7 @@ export class SeatModel extends BaseModel {
         }
         inparam.contentIds = contentIds.substr(0, contentIds.length - 1)
         // 保存
+        delete inparam.token
         const dataItem = {
             ...this.item,
             ...inparam
@@ -64,14 +67,26 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam
      */
     async list(inparam) {
-        // 查询
-        const [err, ret] = await this.scan({
+        let query = {
             IndexName: 'SeatTypeIndex',
-            FilterExpression: 'seatType = :seatType',
+            FilterExpression: 'seatType = :seatType AND operatorRole=:operatorRole',
             ExpressionAttributeValues: {
                 ':seatType': inparam.seatType,
+                ':operatorRole': RoleCodeEnum.PlatformAdmin
             }
-        })
+        }
+        if (!Model.isPlatformAdmin(inparam.token)) {
+            query = {
+                IndexName: 'SeatTypeIndex',
+                FilterExpression: 'seatType = :seatType AND operatorName=:operatorName',
+                ExpressionAttributeValues: {
+                    ':seatType': inparam.seatType,
+                    ':operatorName': inparam.token.username
+                }
+            }
+        }
+        // 查询
+        const [err, ret] = await this.scan(query)
         if (err) {
             return [err, 0]
         }
@@ -121,8 +136,7 @@ export class SeatModel extends BaseModel {
      * @param {席位对象} inparam 
      */
     async update(inparam) {
-        // 判断编号是否重复
-        const [existErr, exist] = await this.query({
+        let query = {
             IndexName: 'SeatTypeIndex',
             KeyConditionExpression: 'seatType = :seatType AND #order = :order',
             ExpressionAttributeNames: {
@@ -132,26 +146,20 @@ export class SeatModel extends BaseModel {
                 ':seatType': inparam.seatType,
                 ':order': inparam.order
             }
-        })
-        if (existErr) {
-            return [existErr, 0]
         }
-        console.info('测试数据')
-        console.info(exist)
-        console.info(inparam.order)
-        // console.info(exist.Items[0].order)
-        
-        if (exist && exist.Items[0] && inparam.seatId != exist.Items[0].seatId) {
-            return [BizErr.ItemExistErr('编号已存在'), 0]
+        if (!Model.isPlatformAdmin(inparam.token)) {
+            query.FilterExpression = 'operatorName=' + inparam.token.username
+        } else {
+            query.FilterExpression = 'operatorRole=' + inparam.token.role
         }
+        // 判断编号是否重复
+        const [existErr, exist] = await this.isExist(query)
+        if (existErr) { return [existErr, 0] }
+        if (exist) { return [BizErr.ItemExistErr('编号已存在'), 0] }
         // 更新
         const [err, ret] = await this.getOne(inparam)
-        if (err) {
-            return [err, 0]
-        }
-        if (!ret) {
-            return [new BizErr.ItemNotExistErr(), 0]
-        }
+        if (err) { return [err, 0] }
+        if (!ret) { return [new BizErr.ItemNotExistErr(), 0] }
         ret.order = inparam.order
         ret.price = inparam.price
         ret.remark = inparam.remark
@@ -170,7 +178,6 @@ export class SeatModel extends BaseModel {
             contentIds += ('package_' + inparam.content['packageId'] + ',')
         }
         ret.contentIds = contentIds.substr(0, contentIds.length - 1)
-
         return await this.putItem(ret)
     }
 
