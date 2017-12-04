@@ -98,7 +98,7 @@ custom:
         usage: 0.75
     - table: HeraGamePlayerBill
       index:
-        - billIdIndex
+        - userNameIndex
         - userIdIndex
         - CreatedDateIndex
       read:
@@ -409,6 +409,9 @@ resources:
             AttributeName: userId
             AttributeType: S
           -
+            AttributeName: action
+            AttributeType: N
+          -
             AttributeName: createdAt
             AttributeType: N
           -
@@ -430,6 +433,45 @@ resources:
                 KeyType: HASH
               -
                 AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          -
+            IndexName: UserIdIndexSec
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          -
+            IndexName: SnIndex
+            KeySchema:
+              -
+                AttributeName: sn
+                KeyType: HASH
+              -
+                AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          -
+            IndexName: ActionIndex
+            KeySchema:
+              -
+                AttributeName: userId
+                KeyType: HASH
+              -
+                AttributeName: action
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -921,9 +963,6 @@ resources:
               -
                 AttributeName: userId
                 KeyType: HASH
-              -
-                AttributeName: createAt
-                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
