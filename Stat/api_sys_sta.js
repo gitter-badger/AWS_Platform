@@ -37,7 +37,7 @@ import {Model} from "./lib/Dynamo"
  */
 const init = async function(event, context, callback) {
     console.log("开始");
-    let  allStatArr = [],userInfoObj = {},platUserObj= {},platUserRoleObj = {};
+    let  allStatArr = [],userInfoObj = {},userInfoErrObj = {},platUserObj= {},platUserErrObj= {},platUserRoleObj = {};
     let [playerBillListErr, playerBillList] = await new UserBillModel().scan({});
     console.log(playerBillList.length);
     if(playerBillListErr) {
@@ -50,14 +50,22 @@ const init = async function(event, context, callback) {
         if(playerBillItem.type== 3 || playerBillItem.type ==4) {
             let parentId = userInfoObj[playerBillItem.userName];
             if(!parentId) {
+                if(userInfoErrObj[playerBillItem.userName.split("_")[0]]){
+                    console.log("找到过没有找到");
+                    continue
+                }
                 let [userErr, userInfo] = await new PlayerModel().get({userName:playerBillItem.userName});
                 if(userErr || !userInfo) {
+                    if(!userInfo) {
+                        userInfoErrObj[playerBillItem.userName.split("_")[0]] = "abc"
+                    }
                     console.log("没有找到用户上级:"+playerBillItem.userName);
                     continue;
                 }
                 parentId = userInfo.parent;
                 userInfoObj[playerBillItem.userName] = parentId;
             }
+            console.log("1111111111");
             pushStat(allStatArr, playerBillItem, parentId, "10000",false, 1);
             let allUserId = playerBillItem.msn == "000" ? "ALL_AGENT_PLAYER" : "ALL_PLAYER";
             pushStat(allStatArr, playerBillItem, allUserId, "10000", false, 3);
@@ -77,9 +85,13 @@ const init = async function(event, context, callback) {
         let {amount, fromUser, toUser,fromRole, toRole, userId} = billInfo;
         let platUserInfo = platUserObj[userId];
         if(!platUserInfo) {
+            if(platUserErrObj[userId]) continue;
             let [userErr, p] = await new PlatformUserModel().findByUserId(userId);
             if(userErr || !p) {
                 console.log("查找用户信息失败:"+userErr);
+                if(!p) {
+                    platUserErrObj[userId] = "abc";
+                } 
                 continue;
             }
             platUserInfo = p;
