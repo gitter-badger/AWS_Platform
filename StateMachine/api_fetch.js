@@ -64,10 +64,13 @@ const testmysql = async (e, c, cb) => {
  */
 const testredis = async (e, c, cb) => {
     try {
+        let start = new Date().getTime()
         const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
         redisClient.set('REDIS_TEST', 'REDIS存储测试', (err) => {
             if (err) throw err
             redisClient.get('REDIS_TEST', (err, value) => {
+                let end = new Date().getTime()
+                console.info('用时' + (end - start) + '毫秒')
                 ResOK(cb, { payload: value })
                 redisClient.quit()
             })
