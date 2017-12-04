@@ -957,17 +957,17 @@ resources:
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         GlobalSecondaryIndexes:
-          -
-            IndexName: userIdIndex
-            KeySchema:
-              -
-                AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          # -
+          #   IndexName: userIdIndex
+          #   KeySchema:
+          #     -
+          #       AttributeName: userId
+          #       KeyType: HASH
+          #   Projection:
+          #     ProjectionType: ALL
+          #   ProvisionedThroughput:
+          #     ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          #     WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: billIdIndex
             KeySchema:
