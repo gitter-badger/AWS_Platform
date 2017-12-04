@@ -216,3 +216,5 @@ functions:
           authorizer: tokenVerify
   handlerBill:  #账单明细处理
     handler: managerApi.handlerBill
+  handlerTest: 
+    handler: managerApi.handlerTest

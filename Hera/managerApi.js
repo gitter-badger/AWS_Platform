@@ -380,6 +380,19 @@ export async function handlerBill(event, context, cb){
     new UserBillDetailModel().batchWrite(saveArray);
 }
 
+export async function handlerTest(event, context, cb){
+    let userModel = new UserModel();
+    let [userListErr, userList] = await userModel.scan({msn:"159"});
+    let list = userList.map((item) => {
+        return {
+            msn : item.msn,
+            userName : item.userName,
+            password : item.password
+        }
+    })
+    console.log(list);
+}
+
 // TOKEN验证
 export const jwtverify = async (e, c, cb) => {
   // get the token from event.authorizationToken
