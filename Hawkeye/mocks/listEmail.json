@@ -1,0 +1,14 @@
+{
+    "requestContext": {
+        "authorizer": {
+            "username": "Platform_NAtest",
+            "parent": "00",
+            "role": "1",
+            "userId": "24577674-762e-4c54-aeaf-1aaefe1f0146",
+            "suffix": "Platform"
+        },
+        "identity": {
+            "sourceIp": "127.0.0.1"
+        }
+    }
+}

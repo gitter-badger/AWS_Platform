@@ -1,11 +1,19 @@
 {
-    "requestContext" : {
-        "authorizer" : [0,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRHWDAyX1RneDAwMiIsInBhc3N3b3JkIjoiVGd4MDAyIiwic3VmZml4IjoiVEdYMDIiLCJwYXJlbnQiOiI5NDQ1MzE2Ni02ZmFmLTQzMmMtOTFlNy0zYzZkNWVmMmI1MzYiLCJwYXJlbnROYW1lIjoiVEdYMV9UR1h0ZXN0MSIsInVzZXJJZCI6ImRhYzRlM2UyLTYwN2QtNDgxNy1iOGY5LTExNmEwZjk0NjRmNyIsInJvbGUiOiIxMCIsImRpc3BsYXlOYW1lIjoiVEdYMDIiLCJ1cGRhdGVkQXQiOjE1MDI2OTk2NDI2NzEsImRpc3BsYXlJZCI6ODI4NTA2LCJpYXQiOjE1MDI2OTk2MTJ9.kp_5IUJs0otcc8dfD4Tsb3R10OZY1MmbsRFJjoEvyRk"]
+    "requestContext": {
+        "authorizer": {
+            "username": "hello",
+            "parent": "00",
+            "role": "1",
+            "userId": "24577674-762e-4c54-aeaf-1aaefe1f0146",
+            "suffix": "Platform"
+        },
+        "identity": {
+            "sourceIp": "127.0.0.1"
+        }
     },
     "body" : {
-        "content" : "这是一条邮件的内容",
+        "content" : "这是一条邮件的内容22222222",
         "title" : "新手福利",
-        "nickname" : "小白",
         "sendTime" : 150125254124,
         "tools" : [
             {
