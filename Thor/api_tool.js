@@ -39,8 +39,8 @@ const toolList = async (e, c, cb) => {
   try {
     // 入参转换
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
-    // 获取令牌，只有管理员有权限
-    const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
+    // 身份令牌
+    const [tokenErr, token] = await Model.currentToken(e)
 
     // 业务操作
     const [err, ret] = await new ToolModel().list(inparam)
