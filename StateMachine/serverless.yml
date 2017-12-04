@@ -90,7 +90,7 @@ functions:
             cors: true
             authorizer: tokenAuth
   testredis: #测试redis
-    handler: api_upload.testredis
+    handler: api_fetch.testredis
     events:
         - http:
             path: testredis

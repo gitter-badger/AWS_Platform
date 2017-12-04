@@ -3,6 +3,8 @@ import { ResOK, ResErr, Codes, JSONParser, Model, SeatTypeEnum, RoleCodeEnum, Bi
 // import { FetchCheck } from './model/FetchCheck'
 import { UserModel } from './model/UserModel'
 import NodeBatis from 'nodebatis'
+const redis = require('redis')
+
 /**
  * 获取用户
  */
@@ -57,9 +59,28 @@ const testmysql = async (e, c, cb) => {
     }
 }
 
+/**
+ * 测试redis数据库连接
+ */
+const testredis = async (e, c, cb) => {
+    try {
+        const redisClient = redis.createClient({ url: 'redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
+        redisClient.set('REDIS_TEST', 'REDIS存储测试', (err) => {
+            if (err) throw err
+            redisClient.get('REDIS_TEST', (err, value) => {
+                ResOK(cb, { payload: value })
+                redisClient.quit()
+            })
+        })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
 // ==================== 以下为内部方法 ====================
 
 export {
     testmysql,
+    testredis,
     fetchuser   // 获取平台用户
 }

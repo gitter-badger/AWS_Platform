@@ -2,7 +2,6 @@ import { ResOK, ResErr, JSONParser, BizErr, RoleCodeEnum, Model, Codes, S3Store$
 const AWS = require('aws-sdk')
 const axios = require('axios')
 const IMG_BUCKET = process.env.IMG_BUCKET
-const redis = require('redis')
 /**
  * 上传图片至S3
  */
@@ -54,26 +53,10 @@ const ipquery = async (e, c, cb) => {
     }
 }
 
-const testredis = async (e, c, cb) => {
-    try {
-        redisClient = redis.createClient({ url: 'redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
-        redisClient.set('REDIS_TEST', 'REDIS存储测试', (err) => {
-            if (err) throw err
-            redisClient.get('REDIS_TEST', (err, value) => {
-                ResOK(cb, { payload: value })
-                redisClient.quit()
-            })
-        })
-    } catch (error) {
-        return ResErr(cb, error)
-    }
-}
-
 /**
  * 对外方法
  */
 export {
     upload,
-    ipquery,
-    testredis
+    ipquery
 }
