@@ -64,7 +64,7 @@ const testmysql = async (e, c, cb) => {
  */
 const testredis = async (e, c, cb) => {
     try {
-        const redisClient = redis.createClient({ url: 'redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
+        const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
         redisClient.set('REDIS_TEST', 'REDIS存储测试', (err) => {
             if (err) throw err
             redisClient.get('REDIS_TEST', (err, value) => {
