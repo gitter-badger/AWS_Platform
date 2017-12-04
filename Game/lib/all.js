@@ -8,7 +8,6 @@ export {
   BillActionEnum,
   RoleCodeEnum,
   RoleModels,
-  GameTypeEnum,
   MSNStatusEnum,
   BillModel,
   RoleDisplay,

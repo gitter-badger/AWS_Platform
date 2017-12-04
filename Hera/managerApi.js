@@ -355,7 +355,7 @@ export async function batchForzen(event, context, cb){
 
 export async function handlerBill(event, context, cb){
     let userModel = new UserModel();
-    let [userListErr, userList] = await userModel.scan({});
+    let [userListErr, userList] = await userModel.scan({msn:"159"});
     if(userListErr) {
         return console.log(userListErr);
     }
@@ -372,12 +372,27 @@ export async function handlerBill(event, context, cb){
             createdAt : Date.now(),
             action : 1,
             remark : "系统升级原账结余",
+            // remark : "测试账号重新初始化",
             sn : uuid,
             billId : uuid,
             type : 10
         }
     })
     new UserBillDetailModel().batchWrite(saveArray);
+}
+
+export async function handlerTest(event, context, cb){
+    let userModel = new UserModel();
+    let [userListErr, userList] = await userModel.scan({msn:"159"});
+    let list = userList.map((item) => {
+        return {
+            msn : item.msn,
+            userName : item.userName.substring(6,item.userName.length),
+            password : item.password
+        }
+    })
+    require("fs").writeFileSync("./a.txt",JSON.stringify(list), "utf-8")
+    // console.log(list);
 }
 
 // TOKEN验证
