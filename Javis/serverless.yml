@@ -932,9 +932,9 @@ resources:
           -
             AttributeName: userName
             AttributeType: S
-          -
-            AttributeName: userId
-            AttributeType: N
+          # -
+          #   AttributeName: userId
+          #   AttributeType: N
           -
             AttributeName: billId
             AttributeType: S
