@@ -7,7 +7,7 @@ import {Util} from "../lib/Util";
 
 
 export class NoticeModel extends athena.BaseModel {
-    constructor({userId, content, showTime, kindId,startTime, endTime, splitTime, gameName, msn, count} = {}) {
+    constructor({userId, content, showTime, kindId,startTime, endTime, splitTime, gameName, msn, count,operatorName,operatorRole} = {}) {
         super(Tables.HawkeyeGameNotice);
         this.userId = userId;    //创建者
         this.noid = Util.uuid();
@@ -22,6 +22,8 @@ export class NoticeModel extends athena.BaseModel {
         this.splitTime = +splitTime;  //播放间隔（单位秒）
         this.count = +count; //总播放次数
         // this.msn = +msn;  //商家线路号
+        this.operatorName=operatorName; //操作人昵称
+        this.operatorRole=operatorRole //操作人角色
     }
     async update(conditions, updates) {
         return super.update(conditions, this.setProperties(updates));

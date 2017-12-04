@@ -40,7 +40,7 @@ export class AdModel extends BaseModel {
         const [uucodeErr, uucodeRet] = await Model.uucode('ad', 6)
         if (uucodeErr) { return [uucodeErr, 0] }
         inparam.adId = uucodeRet
-        
+
         const dataItem = {
             ...this.item,
             ...inparam
@@ -61,8 +61,21 @@ export class AdModel extends BaseModel {
      */
     async list(inparam) {
         // 查询
-        const [err, ret] = await this.scan({
-        })
+        let query = {
+            FilterExpression: 'operatorRole=:operatorRole',
+            ExpressionAttributeValues: {
+                ':operatorRole': RoleCodeEnum.PlatformAdmin
+            }
+        }
+        if (!Model.isPlatformAdmin(inparam.token)) {
+            query = {
+                FilterExpression: 'operatorName=:operatorName',
+                ExpressionAttributeValues: {
+                    ':operatorName': inparam.token.username
+                }
+            }
+        }
+        const [err, ret] = await this.scan(query)
         if (err) {
             return [err, 0]
         }

@@ -58,6 +58,7 @@ const PlatformBaseBizRole = function () {
     displayId: Model.NumberValue,         // 显示ID
     displayName: Model.StringValue,       // 显示名称
     suffix: Model.StringValue,            // 前缀
+    gameList: [],                         // 游戏类型列表
     children: Model.NumberValue,
     points: Model.NumberValue,            // 初始积分
     rate: Model.NumberValue,              // 抽成比
@@ -94,7 +95,6 @@ export const RoleModels = {
   '10': function () {
     return { // 线路商
       ...PlatformBaseBizRole(),
-      gameList: [],                         // 游戏类型列表
       // limit: Model.NumberValue,             // 可用名额
       managerEmail: Model.StringValue,      // 线路商邮箱
       hostName: Model.StringValue,          // 负责人姓名
@@ -104,14 +104,16 @@ export const RoleModels = {
   '100': function () {
     return { // 商户
       ...PlatformBaseBizRole(),
-      gameList: [],                         // 游戏类型列表
       msn: Model.StringValue,               // 线路号
       apiKey: Model.uuid(),                 // APIKEY
       frontURL: Model.StringValue,          // 商户站点
       loginWhiteList: '0.0.0.0',            // 登录白名单
       merchantEmail: Model.StringValue,     // 商户邮箱
       hostName: Model.StringValue,          // 负责人姓名
-      hostContact: Model.StringValue        // 负责人联系方式
+      hostContact: Model.StringValue,       // 负责人联系方式
+      moneyURL: Model.StringValue,          // 商户充值站点
+      registerURL: Model.StringValue,       // 商户注册站点
+      sn: Model.StringValue                 // 商户邀请码
     }
   },
   '1000': function () {
@@ -135,7 +137,7 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    
+
     'parent',
     'parentName',
     'parentRole',
@@ -150,7 +152,7 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    
+
     'parent',
     'parentName',
     'parentDisplayName',
@@ -171,7 +173,7 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    
+
     'parent',
     'parentName',
     'parentDisplayName',
@@ -185,7 +187,11 @@ export const RoleDisplay = {
     'displayId',
     'contractPeriod',
     'isforever',
-    'updatedAt'
+    'updatedAt',
+
+    'moneyURL',
+    'registerURL',
+    'sn'
 
     // 'password',
     // 'remark'
@@ -195,7 +201,7 @@ export const RoleDisplay = {
     'role',
     'suffix',
     'username',
-    
+
     'parent',
     'parentName',
     'parentDisplayName',
@@ -254,11 +260,15 @@ export const RoleEditProps = {
 
     'contractPeriod',
     'remark',
-    'isforever'
+    'isforever',
+
+    'moneyURL',
+    'registerURL'
   ],
   '1000': [// 代理
     'password',
     'rate',
+    'gameList',
     'contractPeriod',
     'isforever',
 

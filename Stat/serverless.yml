@@ -128,6 +128,7 @@ functions:
           authorizer: tokenAuth
   calcUserStat: #计算用户账单
     handler: api_calc.calcUserStat
+    memorySize: 512
     events:
       -
         http:

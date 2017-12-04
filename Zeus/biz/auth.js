@@ -144,6 +144,21 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     level: parentUser.level + 1,
     levelIndex: levelIndex
   }
+  // 商户时生成一个6位sn
+  if (CheckUser.role === RoleCodeEnum['Merchant']) {
+    let sn = Model.StringValue
+    while (true) {
+      sn = getsn()
+      let [snErr, snRet] = await new UserModel().checkSnExist(CheckUser.role, sn)
+      if (snErr) {
+        return [snErr, 0]
+      }
+      if (snRet) {
+        break
+      }
+    }
+    User.sn = sn
+  }
 
   const [saveUserErr, saveUserRet] = await saveUser(User)
   if (saveUserErr) {
@@ -166,6 +181,27 @@ export const RegisterUser = async (token = {}, userInfo = {}) => {
     orderId = '-1'
   }
   return [0, { ...saveUserRet, orderId: orderId }]
+}
+//获取数字加字母的sn
+function getsn(leng = 6) {
+  let numberArr = [0, 2, 3, 4, 5, 6, 7, 8, 9]
+  let letterArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+  let indexArr = []
+  for (let i = 1; i < leng; i++) {
+    indexArr.push(i)
+  }
+  let index1 = indexArr[Math.floor(Math.random() * (leng - 1))]
+  let index2 = leng - index1
+  let snArr = []
+  for (let i = 0; i < index1; i++) {
+    snArr.push(numberArr[Math.floor(Math.random() * numberArr.length)])
+  }
+  for (let i = 0; i < index2; i++) {
+    snArr.push(letterArr[Math.floor(Math.random() * letterArr.length)])
+  }
+  let newsnArr=_.shuffle(snArr)
+  let sn=newsnArr.join('')
+  return sn
 }
 
 /**
