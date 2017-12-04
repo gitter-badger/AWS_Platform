@@ -73,6 +73,7 @@ const testredis = async (e, c, cb) => {
             })
         })
     } catch (error) {
+        console.error(error)
         return ResErr(cb, error)
     }
 }
