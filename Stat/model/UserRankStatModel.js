@@ -20,6 +20,10 @@ export class UserRankStatModel extends BaseModel {
 
     async scanRank(inparam) {
         const [err, ret] = await this.scan({
+            FilterExpression: 'nickname <> :nickname',
+            ExpressionAttributeValues: {
+                ':nickname': Model.StringValue
+            }
         })
         if (err) {
             return [err, 0]
