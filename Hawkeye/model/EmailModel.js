@@ -15,7 +15,7 @@ const EmailState = {
 
 
 export class EmailModel extends athena.BaseModel {
-    constructor({emid, userId, content,  state, msn, sendTime,title,sendUser,nickname,tools, sendUserId,operatorName,operatorRole} = {}) {
+    constructor({emid, userId, content,  state, msn, sendTime,title,sendUser,nickname,tools, sendUserId,operatorName,operatorRole,operatorMsn,operatorId} = {}) {
         super(Tables.HawkeyeGameEmail);
         this.userId = userId || -1;    //接收人，如果是-1表示所有人
         this.title = title;
@@ -31,6 +31,8 @@ export class EmailModel extends athena.BaseModel {
         this.tools = tools;
         this.operatorName = operatorName;
         this.operatorRole = operatorRole;
+        this.operatorMsn = operatorMsn;
+        this.operatorId = operatorId;
     }
     setTools(toolList, toolNumbers) {
         let tools = [];

@@ -90,6 +90,7 @@ const add = async (e, c, cb) => {
   requestParams.operatorName = userInfo.username
   requestParams.operatorRole = userInfo.role
   requestParams.operatorMsn = userInfo.msn || Model.StringValue
+  requestParams.operatorId = userInfo.userId
   let emailModel = new EmailModel(requestParams);
   let [saveErr] = await emailModel.save();
   if (saveErr) {
