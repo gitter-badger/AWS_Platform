@@ -64,7 +64,7 @@ export class AdModel extends BaseModel {
         let query = {
             FilterExpression: 'operatorRole=:operatorRole',
             ExpressionAttributeValues: {
-                ':operatorRole': RoleCodeEnum.PlatformAdmin
+                ':operatorRole': inparam.operatorRole || RoleCodeEnum.PlatformAdmin
             }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
@@ -74,6 +74,18 @@ export class AdModel extends BaseModel {
                     ':operatorName': inparam.token.username
                 }
             }
+        }
+        // 条件搜索
+        if (!_.isEmpty(inparam.query)) {
+            if (inparam.query.createdAt) {
+                inparam.query.createdAt = { $range: inparam.query.createdAt }
+            }
+            if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
+            if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
+            const queryParams = this.buildQueryParams(inparam.query, false)
+            query.FilterExpression = queryParams.FilterExpression
+            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [err, ret] = await this.scan(query)
         if (err) {
