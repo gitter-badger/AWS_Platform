@@ -1,7 +1,7 @@
 {
     "body" : {
-        "userName" : "CT01_chenwen",
-        "betId" : "5ac40800-c5f7-11e7-ae94-1184ed201d85"
+        "userName" : "XYCHD_ns050",
+        "betId" : "387647695394701312"
     },
     "headers" : {
         "Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxYjc4MzE3Yi0zYzZlLTQyNDQtOTQ4Ny02MWJhNmZhNDRlM2UiLCJyb2xlIjoiMTAwMCIsInN1ZmZpeCI6IkFnZW50IiwidXNlcm5hbWUiOiJOQWFnZW50IiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInBhcmVudFJvbGUiOiIwMCIsImRpc3BsYXlOYW1lIjoi5Luj55CG566h55CG5ZGYIiwibGV2ZWwiOjAsInZlZGlvTWl4IjoxMDAsImxpdmVNaXgiOjEwMCwiZGlzcGxheUlkIjo5NDk1NjYsImNvbnRyYWN0UGVyaW9kIjowLCJpc2ZvcmV2ZXIiOnRydWUsInVwZGF0ZWRBdCI6MTUwNDg0MDQ4MjkzOSwicmVtYXJrIjoiTlVMTCEiLCJpYXQiOjE1MDUwOTk5OTl9.vyk0lRJMv98LCaIIBa_79EX8xrGqW95R88d1peNom38"
