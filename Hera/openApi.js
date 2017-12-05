@@ -743,7 +743,7 @@ async function settlement(event, context, callback) {
   });
   let billId = Util.billSerial(userModel.userId), lastCreatedAt;
   //billId获取，如果是电子游戏的则先在数据库中找
-  console.log("查询时间:"+joinGame+"    "+Date.now());
+  console.log("查询时间:"+joinTime+"    "+Date.now());
   if(gameType == "40000") {
     let [billIdErr, lastBillDetail] = await detailBill.getLastDetail(userModel.userName, joinTime);
     if(billIdErr) {
@@ -754,11 +754,14 @@ async function settlement(event, context, callback) {
       lastCreatedAt = lastBillDetail.createdAt;
     }
   }
-  if(gameType == "30000") {
-    list.reverse(); //如果是真人(过来数据从大到小)，颠倒排序
-  }
   detailBill.billId = billId;
-  list = detailBill.summary(list, lastCreatedAt);
+  let liveList, otherBillObj
+  //单独处理真人的
+  if(gameType == "30000") {
+    list = detailBill.summaryLive(list);
+  }else {
+    list = detailBill.summary(list, lastCreatedAt);
+  }
   let [sumErr] = await detailBill.batchWrite(list);
   if(sumErr) {
     return callback(null, ReHandler.fail(sumErr));

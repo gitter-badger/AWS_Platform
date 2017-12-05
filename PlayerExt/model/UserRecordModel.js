@@ -78,6 +78,17 @@ export class UserRecordModel extends athena.BaseModel {
         }
         return true;
     }
+    async findByBetTime(userName, betTime) {
+        let opts = {
+            KeyConditionExpression : "userName=:userName",
+            FilterExpression : "betTime=:betTime",
+            ExpressionAttributeValues:{
+                ":userName" : userName,
+                ":betTime" : betTime,
+            }
+        }
+        return this.promise("query", opts);
+    }
     /**
      * 根据状态获取
      * @param {*} recoreds 

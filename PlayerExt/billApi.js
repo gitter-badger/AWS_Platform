@@ -255,6 +255,20 @@ const billGameRecord = async(event, context, cb) => {
     return cb(null, ReHandler.fail(recordErr));
   }
   recordInfo =recordInfo || null;
+  if(recordInfo) {
+    let betTime = recordInfo.betTime;
+    let [recordListErr, recordList] = await new UserRecordModel().findByBetTime(userName, betTime);
+    if(recordListErr) {
+      return cb(null, ReHandler.fail(recordListErr));
+    }
+    recordInfo.record = recordInfo.record || {}
+    recordInfo.record.betNum = "";
+    for(let i = 0; i < recordList.length; i++){
+      let item = recordList[i].record;
+      recordInfo.record.betNum += item.itemName+"($"+item.amount+")，"
+    }
+    recordInfo.record.betNum = recordInfo.record.betNum.substring(0, recordInfo.record.betNum.length-1);
+  }
   ResOK(cb, {data:recordInfo});
 }
 
