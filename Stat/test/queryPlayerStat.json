@@ -15,6 +15,11 @@
         }
     },
     "body": {
-        "parent": "01"
+        "parentId": "690c7cd4-5c19-459a-988e-b9fc93956d67",
+        "query": {
+            "username": "ja_7758258"
+        },
+        "sortkey": "createdAt",
+        "sort": "desc"
     }
 }
