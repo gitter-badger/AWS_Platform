@@ -16,12 +16,14 @@ const adNew = async (e, c, cb) => {
     const [checkAttError, errorParams] = new AdCheck().check(inparam)
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
+    console.info(token)
     // 业务操作
     inparam.operatorName = token.username
     inparam.operatorRole = token.role
     inparam.operatorMsn = token.msn || Model.StringValue
     inparam.operatorId = token.userId
     inparam.operatorDisplayName = token.displayName
+    console.info(inparam)
     const [addInfoErr, addRet] = await new AdModel().addAd(inparam)
     // 操作日志记录
     inparam.operateAction = '创建公告'
