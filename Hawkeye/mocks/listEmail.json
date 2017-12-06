@@ -10,5 +10,11 @@
         "identity": {
             "sourceIp": "127.0.0.1"
         }
+    },
+    "body":{
+        "operatorRole":"100",
+        "query":{
+            "msn":"123"
+        }
     }
 }

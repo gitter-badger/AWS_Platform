@@ -26,6 +26,9 @@ export class CaptchaModel extends BaseModel {
         if (userLoginInfo.suffix) {
             suffix = userLoginInfo.suffix
         }
+        if (Model.isMerchant(userLoginInfo)) {
+            suffix = parseInt(userLoginInfo.msn).toString()
+        }
         const relKey = suffix + '_' + userLoginInfo.username
         // 查询验证码
         const [err, ret] = await this.query({

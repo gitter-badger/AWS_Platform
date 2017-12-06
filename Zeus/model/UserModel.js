@@ -47,7 +47,7 @@ export class UserModel extends BaseModel {
                 return [err, 0]
             }
             // else if (childs.length < user.limit) {
-                userArr.push(user)
+            userArr.push(user)
             // }
         }
 
@@ -109,27 +109,43 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 根据角色，前缀，用户名查询唯一用户
+     * 根据角色，前缀，用户名/线路号查询唯一用户
      * @param {*} role 
      * @param {*} suffix 
      * @param {*} username 
+     * @param {*} msn
      */
-    async queryUserBySuffix(role, suffix, username) {
-        return await this.query({
-            IndexName: 'RoleSuffixIndex',
-            KeyConditionExpression: '#suffix = :suffix and #role = :role',
-            FilterExpression: '#username = :username',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#suffix': 'suffix',
-                '#username': 'username'
-            },
-            ExpressionAttributeValues: {
-                ':suffix': suffix,
-                ':role': role,
-                ':username': `${suffix}_${username}`
-            }
-        })
+    async queryUserBySuffix(role, suffix, username, msn) {
+        if (msn) {
+            return await this.query({
+                KeyConditionExpression: '#role = :role',
+                FilterExpression: '#msn = :msn',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#msn': 'msn'
+                },
+                ExpressionAttributeValues: {
+                    ':role': role,
+                    ':msn': msn
+                }
+            })
+        } else {
+            return await this.query({
+                IndexName: 'RoleSuffixIndex',
+                KeyConditionExpression: '#suffix = :suffix and #role = :role',
+                FilterExpression: '#username = :username',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#suffix': 'suffix',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':suffix': suffix,
+                    ':role': role,
+                    ':username': `${suffix}_${username}`
+                }
+            })
+        }
     }
 
     /**
@@ -247,7 +263,7 @@ export class UserModel extends BaseModel {
         let [err, ret] = [0, 0]
         // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
         if (role === RoleCodeEnum['PlatformAdmin']) {
-            [err, ret] = await this.queryUserBySuffix(role, suffix, username)
+            [err, ret] = await this.queryUserBySuffix(role, suffix, username, null)
         }
         // 非代理
         else if (role != RoleCodeEnum['Agent']) {

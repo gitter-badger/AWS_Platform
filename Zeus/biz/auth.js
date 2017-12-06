@@ -199,8 +199,8 @@ function getsn(leng = 6) {
   for (let i = 0; i < index2; i++) {
     snArr.push(letterArr[Math.floor(Math.random() * letterArr.length)])
   }
-  let newsnArr=_.shuffle(snArr)
-  let sn=newsnArr.join('')
+  let newsnArr = _.shuffle(snArr)
+  let sn = newsnArr.join('')
   return sn
 }
 
@@ -223,8 +223,9 @@ export const LoginUser = async (userLoginInfo = {}) => {
   }, _.keys(Role))
   const username = LoginInfo.username
   const suffix = LoginInfo.suffix
+  const msn = LoginInfo.msn
   // 查询用户信息
-  const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(LoginInfo.role, suffix, username)
+  const [queryUserErr, queryUserRet] = await new UserModel().queryUserBySuffix(LoginInfo.role, suffix, username, msn)
   if (queryUserErr) {
     return [queryUserErr, 0]
   }

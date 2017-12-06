@@ -3,6 +3,7 @@ import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
 // AWS.config.setPromisesDependency(require('bluebird'))
 const dbClient = new AWS.DynamoDB.DocumentClient()
+import _ from 'lodash'
 
 export class BaseModel {
     /**
