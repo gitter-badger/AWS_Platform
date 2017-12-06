@@ -21,6 +21,7 @@ const adNew = async (e, c, cb) => {
     inparam.operatorRole = token.role
     inparam.operatorMsn = token.msn || Model.StringValue
     inparam.operatorId = token.userId
+    inparam.operatorDisplayName = token.displayName
     const [addInfoErr, addRet] = await new AdModel().addAd(inparam)
     // 操作日志记录
     inparam.operateAction = '创建公告'

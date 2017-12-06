@@ -45,6 +45,7 @@ const add = async (e, c, cb) => {
   requestParams.operatorRole = userInfo.role;
   requestParams.operatorMsn = userInfo.msn || Model.StringValue;
   requestParams.operatorId = userInfo.userId;
+  requestParams.operatorDisplayName = userInfo.displayName
   let noticeModel = new NoticeModel(requestParams);
   let [saveErr] = await noticeModel.save();
   if (saveErr) {

@@ -21,6 +21,7 @@ const seatNew = async (e, c, cb) => {
         inparam.operatorRole = token.role
         inparam.operatorMsn = token.msn || Model.StringValue
         inparam.operatorId = token.userId
+        inparam.operatorDisplayName = token.displayName
         inparam.token = token
         const [addInfoErr, addRet] = await new SeatModel().add(inparam)
         // 操作日志记录
