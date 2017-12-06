@@ -1,0 +1,28 @@
+{
+    "requestContext": {
+        "authorizer": {
+            "userId": "5668b822-0af4-4dc9-a253-4d595ebcf6b8",
+            "role": "1",
+            "suffix": "Platfor",
+            "username": "NAtest",
+            "parent": "00",
+            "parentName": "PlatformAdmin",
+            "displayName": "代理管理员",
+            "level": 0,
+            "vedioMix": 100,
+            "liveMix": 100,
+            "displayId": 533563,
+            "contractPeriod": 0,
+            "isforever": true,
+            "updatedAt": 1504166810726,
+            "remark": "NULL!",
+            "iat": 1504166780
+        },
+        "identity": {
+            "sourceIp": "127.0.0.1"
+        }
+    },
+    "body": {
+        "operatorRole":"1"
+    }
+}

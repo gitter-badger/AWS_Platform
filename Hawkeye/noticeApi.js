@@ -13,7 +13,7 @@ import { NoticeModel } from "./model/NoticeModel"
 import { MerchantModel } from "./model/MerchantModel"
 
 import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
-
+import _ from 'lodash'
 /**
  * 添加跑马灯
  * @param {*} e 
@@ -128,12 +128,18 @@ const list = async (e, c, cb) => {
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if (parserErr) return errorHandle(cb, parserErr);
   let query = {
-    operatorRole: '1'
+    operatorRole: requestParams.operatorRole || RoleCodeEnum.PlatformAdmin
   }
   if (!Model.isPlatformAdmin(userInfo)) {
     query = {
       operatorName: userInfo.username
     }
+  }
+  // 条件搜索
+  if (!_.isEmpty(requestParams.query)) {
+    if (requestParams.query.createdAt) { query.createdAt = requestParams.query.createdAt }
+    if (requestParams.query.msn) { query.msn = requestParams.query.msn }
+    if (requestParams.query.displayName) { query.displayName = requestParams.query.displayName }
   }
   let [scanErr, list] = await new NoticeModel().scan(query);
   if (scanErr) {

@@ -1,5 +1,5 @@
 import { Tables, Store$, Codes, BizErr, Model } from '../lib/all'
-
+import _ from 'lodash'
 import AWS from 'aws-sdk'
 AWS.config.update({ region: 'ap-southeast-1' })
 // AWS.config.setPromisesDependency(require('bluebird'))

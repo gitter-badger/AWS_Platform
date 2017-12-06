@@ -83,7 +83,7 @@ export class AdModel extends BaseModel {
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
             const queryParams = this.buildQueryParams(inparam.query, false)
-            query.FilterExpression = queryParams.FilterExpression
+            query.FilterExpression += (' AND ' + queryParams.FilterExpression)
             query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
             query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
