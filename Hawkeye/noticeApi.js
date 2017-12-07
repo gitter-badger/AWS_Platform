@@ -13,6 +13,7 @@ import { NoticeModel } from "./model/NoticeModel"
 import { MerchantModel } from "./model/MerchantModel"
 
 import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
+import { BaseModel } from './model/BaseModel'
 import _ from 'lodash'
 /**
  * 添加跑马灯
@@ -129,20 +130,34 @@ const list = async (e, c, cb) => {
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if (parserErr) return errorHandle(cb, parserErr);
   let query = {
-    operatorRole: requestParams.operatorRole || RoleCodeEnum.PlatformAdmin
+    TableName: 'HawkeyeGameNotice',
+    FilterExpression: 'operatorRole = :operatorRole',
+    ExpressionAttributeValues: {
+      ':operatorRole': requestParams.operatorRole || RoleCodeEnum.PlatformAdmin
+    }
   }
   if (!Model.isPlatformAdmin(userInfo)) {
     query = {
-      operatorName: userInfo.username
+      TableName: 'HawkeyeGameNotice',
+      FilterExpression: 'operatorName = :operatorName',
+      ExpressionAttributeValues: {
+        ':operatorName': userInfo.username
+      }
     }
   }
   // 条件搜索
   if (!_.isEmpty(requestParams.query)) {
-    if (requestParams.query.createdAt) { query.createdAt = requestParams.query.createdAt }
-    if (requestParams.query.operatorMsn) { query.operatorMsn = requestParams.query.operatorMsn }
-    if (requestParams.query.operatorDisplayName) { query.operatorDisplayName = requestParams.query.operatorDisplayName }
+    if (requestParams.query.createdAt) {
+      requestParams.query.createdAt = { $range: requestParams.query.createdAt }
+    }
+    if (requestParams.query.operatorMsn) { requestParams.query.operatorMsn = requestParams.query.operatorMsn }
+    if (requestParams.query.operatorDisplayName) { requestParams.query.operatorDisplayName = { $like: requestParams.query.operatorDisplayName } }
+    const queryParams = new BaseModel().buildQueryParams(requestParams.query, false)
+    query.FilterExpression += (' AND ' + queryParams.FilterExpression)
+    query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+    query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
   }
-  let [scanErr, list] = await new NoticeModel().scan(query);
+  let [scanErr, list] = await new BaseModel().scan(query);
   if (scanErr) {
     return errorHandle(cb, scanErr);
   }
