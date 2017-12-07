@@ -171,6 +171,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  seatAllList: #商户所有席位列表
+    handler: api_seat.seatAllList
+    events:
+      -
+        http:
+          path: seatAllList
+          method: post
+          cors: true
+          authorizer: tokenAuth
   seatOne: #单个席位
     handler: api_seat.seatOne
     events:

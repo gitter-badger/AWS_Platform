@@ -107,6 +107,62 @@ export class SeatModel extends BaseModel {
     }
 
     /**
+    * 查看所有商户席位列表
+    * @param {*} inparam
+    */
+    async listAll(inparam) {
+        let query = {
+            IndexName: 'SeatTypeIndex',
+            FilterExpression: 'seatType = :seatType AND operatorRole=:operatorRole',
+            ExpressionAttributeValues: {
+                ':seatType': inparam.seatType,
+                ':operatorRole': inparam.operatorRole || RoleCodeEnum.PlatformAdmin
+            }
+        }
+        if (!Model.isPlatformAdmin(inparam.token)) {
+            query = {
+                IndexName: 'SeatTypeIndex',
+                FilterExpression: 'seatType = :seatType AND operatorName=:operatorName',
+                ExpressionAttributeValues: {
+                    ':seatType': inparam.seatType,
+                    ':operatorName': inparam.token.username
+                }
+            }
+        }
+        // 条件搜索
+        if (!_.isEmpty(inparam.query)) {
+            if (inparam.query.createdAt) {
+                inparam.query.createdAt = { $range: inparam.query.createdAt }
+            }
+            if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
+            if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
+            const queryParams = this.buildQueryParams(inparam.query, false)
+            query.FilterExpression += (' AND ' + queryParams.FilterExpression)
+            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+        }
+        // 查询
+        const [err, ret] = await this.scan(query)
+        if (err) {
+            return [err, 0]
+        }
+        let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
+        let arrInfo=[]
+        for(let item in objectInfo){
+            let info={operatorDisplayName:item}
+            let n=1
+            for(let i of objectInfo[item]){
+                let contents='content'+n
+               info.operatorMsn=i.operatorMsn
+               info.seatStatus=i.seatStatus
+               info[contents]=i.content.content
+               n++
+            }
+            arrInfo.push(info)
+        }
+        return [0, arrInfo]
+    }
+    /**
      * 查询单个席位
      * @param {*} inparam
      */
