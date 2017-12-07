@@ -12,7 +12,7 @@ const calcPlayerStat = async (e, c, cb) => {
         // new UserRankCheck().check(inparam)
         // 身份令牌
         // const [tokenErr, token] = await Model.currentToken(e)
-        const [tokenErr, token] = await JwtVerify(e.authorizationToken.split(' ')[1])
+        const [tokenErr, token] = await JwtVerify(e.headers.Authorization.split(' ')[1])
         if (tokenErr) { ResErr(cb, tokenErr) }
         if (!token || !token.iat) { ResErr(cb, BizErr.TokenExpire()) }
         // 判断TOKEN是否太老（大于24小时）
@@ -40,9 +40,13 @@ const calcUserStat = async (e, c, cb) => {
         // const [checkAttError, errorParams] = new QueryPlayerStatCheck().check(inparam)
         // 身份令牌
         // const [tokenErr, token] = await Model.currentToken(e)
-        const [tokenErr, token] = await JwtVerify(e.authorizationToken.split(' ')[1])
+        const [tokenErr, token] = await JwtVerify(e.headers.Authorization.split(' ')[1])
         if (tokenErr) { ResErr(cb, tokenErr) }
         if (!token || !token.iat) { ResErr(cb, BizErr.TokenExpire()) }
+        // 判断TOKEN是否太老（大于24小时）
+        if (Math.floor((new Date().getTime() / 1000)) - token.iat > 86400) {
+            return ResErr(cb, BizErr.TokenExpire())
+        }
         // 业务操作
         switch (inparam.role) {
             case '1':
