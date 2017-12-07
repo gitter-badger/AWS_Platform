@@ -1,0 +1,29 @@
+{
+    "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX0ZhZGUwMDEiLCJwYXNzd29yZCI6IjExMTExMSIsInN1ZmZpeCI6IlBsYXRmb3JtIiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInVzZXJJZCI6ImVkNTk4ZWI3LWQ0NzEtNDNjZS1iY2VhLWM4OTk4OTIyNzE0NSIsInJvbGUiOiIxIiwiZGlzcGxheU5hbWUiOiLlubPlj7DnrqHnkIblkZgiLCJpYXQiOjE1MDA3MDEzMjN9.Wo2ZKXtfY6q3MraIoQra5MrJHP_S0JSE4qQ6KUevTmQ"
+    },
+    "requestContext": {
+        "authorizer": {
+            "userId": "a0ebec9a-ee90-4075-a39d-d41ca8607030",
+            "role": "1",
+            "suffix": "Platform",
+            "username": "Platform_NAtest",
+            "parent": "00",
+            "parentName": "SuperAdmin",
+            "displayName": "平台管理员",
+            "level": 0,
+            "subRole": "admin",
+            "iat": 1504065432
+        },
+        "identity": {
+            "sourceIp": "127.0.0.1"
+        }
+    },
+    "body": {
+        "toolName":"钻石",
+        "toolId":"100000",
+        "toolPrice":"100",
+        "comeUpRatio":"10%",
+        "lowerRatio":"10%"
+    }
+}

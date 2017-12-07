@@ -107,6 +107,25 @@ export class ToolModel extends BaseModel {
     }
 
     /**
+     * 设置道具价格
+     */
+    async setPrice(inparam) {
+        let updateObj = {
+            Key: { 'toolName': inparam.toolName, 'toolId': inparam.toolId },
+            UpdateExpression: 'SET toolPrice=:toolPrice ,comeUpRatio=:comeUpRatio,lowerRatio=:lowerRatio',
+            ExpressionAttributeValues: {
+                ':toolPrice': inparam.toolPrice,
+                ':comeUpRatio': inparam.comeUpRatio,
+                ':lowerRatio': inparam.lowerRatio
+            }
+        }
+        const [err, ret] = await this.updateItem(updateObj)
+        if (err) {
+            return [err, 0]
+        }
+        return [0, ret]
+    }
+    /**
      * 查询单个道具
      * @param {*} inparam
      */
