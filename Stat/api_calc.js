@@ -1,4 +1,4 @@
-import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, BizErr } from './lib/all'
+import { ResOK, ResErr, Codes, JSONParser, Model, RoleCodeEnum, BizErr, JwtVerify } from './lib/all'
 import { PlayerBillModel } from './model/PlayerBillModel'
 import { SysBillModel } from './model/SysBillModel'
 /**
@@ -11,7 +11,9 @@ const calcPlayerStat = async (e, c, cb) => {
         // 检查参数是否合法
         // new UserRankCheck().check(inparam)
         // 身份令牌
-        const [tokenErr, token] = await Model.currentToken(e)
+        // const [tokenErr, token] = await Model.currentToken(e)
+        const [tokenErr, token] = await JwtVerify(e.authorizationToken.split(' ')[1])
+        if (tokenErr) { ResErr(cb, tokenErr) }
         // 业务操作
         const [err, ret] = await new PlayerBillModel().calcPlayerStat(inparam)
         // 返回结果
@@ -32,7 +34,9 @@ const calcUserStat = async (e, c, cb) => {
         //检查参数是否合法
         // const [checkAttError, errorParams] = new QueryPlayerStatCheck().check(inparam)
         // 身份令牌
-        const [tokenErr, token] = await Model.currentToken(e)
+        // const [tokenErr, token] = await Model.currentToken(e)
+        const [tokenErr, token] = await JwtVerify(e.authorizationToken.split(' ')[1])
+        if (tokenErr) { ResErr(cb, tokenErr) }
         // 业务操作
         switch (inparam.role) {
             case '1':

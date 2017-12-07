@@ -51,8 +51,6 @@ export const JwtVerify = async (data) => {
     const decoded = await jwtVerify(data, TOKEN_SECRET)
     return [0, decoded]
   } catch (e) {
-    console.log("rrrrrr");
-    console.log(e);
     return [BizErr.TokenErr(), 0]
   }
 }
