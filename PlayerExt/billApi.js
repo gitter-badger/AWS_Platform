@@ -95,6 +95,7 @@ const billFlow = async(event, context, cb) => {
       sn : item.sn,
       createdAt : item.createdAt,
       type : item.type,
+      billId : item.billId,
       businessKey : item.businessKey || "",
       originalAmount : item.originalAmount || 0,
       balance : item.balance || "",

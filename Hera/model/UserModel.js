@@ -53,7 +53,6 @@ export class UserModel extends athena.BaseModel {
         return super.isExist({userName});
     }
     findByBuIds(buIds, conditions = {}) {
-        console.log("111111111111111111111111");
         let {userName, merchantName, nickname, msn} = conditions;
         let filterExpression = "(",
             expressionAttributeValues = {},
@@ -88,6 +87,23 @@ export class UserModel extends athena.BaseModel {
         }
         console.log(scanOpts);
         return this.promise("scan", scanOpts);
+    }
+    findByUids(uids) {
+        let keyConditionExpression = "",
+            expressionAttributeValues = {};
+        for(var i =0; i < uids.length; i++){
+            keyConditionExpression += `userId=:uid${i} or `;
+            expressionAttributeValues[`:uid${i}`] = uids[i];
+        }
+        keyConditionExpression = keyConditionExpression.substring(0,keyConditionExpression.length -3);
+     
+        let queryOpts = {
+            TableName : this.tableName,
+            IndexName : "userIdIndex",
+            KeyConditionExpression : keyConditionExpression,
+            ExpressionAttributeNames : expressionAttributeNames
+        }
+        return this.promise("query", queryOpts);
     }
     async getUserByNickname(nickname) {
         let [scanErr, userList] = await this.scan({nickname});
