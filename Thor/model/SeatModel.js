@@ -152,7 +152,7 @@ export class SeatModel extends BaseModel {
         for(let key in objectInfo){
             arrInfo.push(objectInfo[key])
         }
-        return [0, objectInfo]
+        return [0, arrInfo]
     }
     /**
      * 查询单个席位
