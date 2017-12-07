@@ -147,19 +147,21 @@ export class SeatModel extends BaseModel {
             return [err, 0]
         }
         let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
-        let arrInfo=[]
-        for(let item in objectInfo){
-            let info={operatorDisplayName:item}
-            let n=1
-            for(let i of objectInfo[item]){
-                let contents='content'+n
-               info.operatorMsn=i.operatorMsn
-               info.seatStatus=i.seatStatus
-               info[contents]=i.content.content
-               n++
+        let arrInfo = []
+        for (let item in objectInfo) {
+            let info = { operatorDisplayName: item }
+            let n = 1
+            for (let i of objectInfo[item]) {
+                let contents = 'content' + n
+                info.operatorMsn = i.operatorMsn
+                i.content.content = i.content.content[0]
+                i.content.content.seatStatus = i.seatStatus
+                info[contents] = i.content.content
+                n++
             }
             arrInfo.push(info)
         }
+        console.log(arrInfo)
         return [0, arrInfo]
     }
     /**
@@ -217,9 +219,11 @@ export class SeatModel extends BaseModel {
             }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
-            query.FilterExpression = 'operatorName=' + inparam.token.username
+            query.FilterExpression = 'operatorName = :operatorName' 
+            query.ExpressionAttributeValues[':operatorName']= inparam.token.username
         } else {
-            query.FilterExpression = 'operatorRole=' + inparam.token.role
+            query.FilterExpression = 'operatorRole = :operatorRole' 
+            query.ExpressionAttributeValues[':operatorRole']= inparam.token.role
         }
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
@@ -238,7 +242,6 @@ export class SeatModel extends BaseModel {
         ret.content = inparam.content
         ret.icon = inparam.icon
         ret.updatedAt = Model.timeStamp()
-
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
         if (inparam.content['toolId']) {

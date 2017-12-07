@@ -20,13 +20,30 @@
         }
     },
     "body": {
-        "remark": "这是N币",
-        "toolStatus": 1,
-        "icon": "Diamond",
-        "toolName": "N币",
-        "updatedAt": 1503548612609,
-        "createdAt": 1503548563105,
-        "toolId": "100000",
-        "desc": "这是N币test"
+        "content": {
+            "createdAt": 1503548604894,
+            "toolId": "200000",
+            "toolStatus": 1,
+            "icon": "RoomCard1",
+            "remark": "这是房卡",
+            "toolName": "房卡",
+            "updatedAt": 1504066128220,
+            "desc": "房卡是开房间玩法所需的重要道具。"
+        },
+        "seatStatus": "2",
+        "seatId": "79ee10a2-274a-47fe-8b18-6d62f7ab70a9",
+        "createdDate": "2017-09-21",
+        "icon": "RoomCard1",
+        "prop": "房卡",
+        "sum": 30,
+        "createdAt": 1504601061786,
+        "contentIds": "tool_200000",
+        "order": 1,
+        "contentType": 1,
+        "seatType": "2",
+        "remark": "",
+        "updatedAt": 1507888539515,
+        "price": 150,
+        "operatorRole": "1"
     }
 }

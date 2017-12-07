@@ -154,6 +154,7 @@ const seatUpdate = async (e, c, cb) => {
         if (err) { return ResErr(cb, err) }
         return ResOK(cb, { payload: ret })
     } catch (error) {
+        console.log(error)
         return ResErr(cb, error)
     }
 }
