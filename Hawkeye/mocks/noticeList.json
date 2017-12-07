@@ -1,14 +1,51 @@
 {
     "requestContext": {
         "authorizer": {
+            "userId": "242b5dac-5b60-49bf-b1fa-c3f1c16006ad",
+            "role": "1",
+            "suffix": "Platform",
             "username": "Platform_NAtest",
             "parent": "00",
-            "role": "100",
-            "userId": "24577674-762e-4c54-aeaf-1aaefe1f0146",
-            "suffix": "Platform"
-        },
+            "parentName": "SuperAdmin",
+            "parentRole": "00",
+            "displayName": "平台管理员",
+            "level": 0,
+            "subRole": "平台管理员",
+            "subRolePermission": [
+              "看板",
+              "个人中心",
+              "线路商列表",
+              "创建线路商",
+              "商户列表",
+              "创建商户",
+              "玩家列表",
+              "游戏列表",
+              "游戏后台",
+              "游戏公告列表",
+              "跑马灯列表",
+              "游戏邮件列表",
+              "展位列表",
+              "电子游戏风控",
+              "线路商登录日志",
+              "商户登录日志",
+              "管理员操作日志",
+              "管理员列表",
+              "添加管理员",
+              "管理员角色列表",
+              "新增管理员角色",
+              "线路号列表",
+              "层级关系"
+            ],
+            "iat": 1512612267
+          },
         "identity": {
             "sourceIp": "127.0.0.1"
+        }
+    },
+    "body": {
+        "operatorRole": "100",
+        "query":{
+            "operatorMsn":"133"      
         }
     }
 }

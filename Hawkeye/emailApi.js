@@ -94,7 +94,7 @@ const add = async (e, c, cb) => {
   requestParams.operatorMsn = userInfo.msn || Model.StringValue
   requestParams.operatorId = userInfo.userId
   requestParams.operatorDisplayName = userInfo.displayName
-  let emailModel = new EmailModel(requestParams);
+  let emailModel = new EmailModel(requestParams)
   let [saveErr] = await emailModel.save();
   if (saveErr) {
     return errorHandle(cb, saveErr);
@@ -204,8 +204,8 @@ const list = async (e, c, cb) => {
   // 条件搜索
   if (!_.isEmpty(requestParams.query)) {
     if (requestParams.query.createdAt) { query.createdAt = requestParams.query.createdAt }
-    if (requestParams.query.msn) { query.msn = requestParams.query.msn }
-    if (requestParams.query.displayName) { query.displayName = requestParams.query.displayName }
+    if (requestParams.query.operatorMsn) { query.operatorMsn = requestParams.query.operatorMsn }
+    if (requestParams.query.operatorDisplayName) { query.operatorDisplayName = requestParams.query.operatorDisplayName }
   }
   let [scanErr, list] = await new EmailModel().scan(query);
   if (scanErr) {
