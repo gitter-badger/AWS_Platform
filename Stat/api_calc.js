@@ -52,13 +52,7 @@ const calcUserStat = async (e, c, cb) => {
             case '1':
                 const [err1, ret1] = await new SysBillModel().calcAdminStat(inparam)
                 if (err1) { return ResErr(cb, err1) }
-                let filterRes1 = []
-                for (let item of ret1) {
-                    if (item.betCount > 0) {
-                        filterRes1.push(item)
-                    }
-                }
-                return ResOK(cb, { payload: filterRes1 })
+                return ResOK(cb, { payload: ret1 })
                 break
             case '10':
                 const [err10, ret10] = await new SysBillModel().calcManagerStat(inparam)
@@ -95,14 +89,7 @@ const calcUserStat = async (e, c, cb) => {
                 break
             case '-1000':
                 const [err, ret] = await new SysBillModel().calcAgentAdminStat(inparam)
-                if (err) { return ResErr(cb, err) }
-                let filterRes = []
-                for (let item of ret) {
-                    if (item.betCount > 0) {
-                        filterRes.push(item)
-                    }
-                }
-                return ResOK(cb, { payload: filterRes })
+                return ResOK(cb, { payload: ret })
                 break
         }
     } catch (error) {
