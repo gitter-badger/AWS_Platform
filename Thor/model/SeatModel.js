@@ -33,9 +33,11 @@ export class SeatModel extends BaseModel {
             }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
-            query.FilterExpression = 'operatorName=' + inparam.token.username
+            query.FilterExpression = 'operatorName = :operatorName'
+            query.ExpressionAttributeValues[':operatorName'] = inparam.token.username
         } else {
-            query.FilterExpression = 'operatorRole=' + inparam.token.role
+            query.FilterExpression = 'operatorRole = :operatorRole'
+            query.ExpressionAttributeValues[':operatorRole'] = inparam.token.role
         }
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
@@ -149,7 +151,7 @@ export class SeatModel extends BaseModel {
         let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
 
         let arrInfo = []
-        for(let key in objectInfo){
+        for (let key in objectInfo) {
             arrInfo.push(objectInfo[key])
         }
         return [0, arrInfo]
@@ -209,11 +211,11 @@ export class SeatModel extends BaseModel {
             }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
-            query.FilterExpression = 'operatorName = :operatorName' 
-            query.ExpressionAttributeValues[':operatorName']= inparam.token.username
+            query.FilterExpression = 'operatorName = :operatorName'
+            query.ExpressionAttributeValues[':operatorName'] = inparam.token.username
         } else {
-            query.FilterExpression = 'operatorRole = :operatorRole' 
-            query.ExpressionAttributeValues[':operatorRole']= inparam.token.role
+            query.FilterExpression = 'operatorRole = :operatorRole'
+            query.ExpressionAttributeValues[':operatorRole'] = inparam.token.role
         }
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
