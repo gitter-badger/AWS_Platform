@@ -26,7 +26,7 @@ export class ToolCheck {
         inparam.toolPrice = inparam.toolPrice || Model.StringValue  //道具单价
         inparam.comeUpRatio = inparam.comeUpRatio || Model.StringValue  //上浮比例
         inparam.lowerRatio = inparam.lowerRatio || Model.StringValue  //下浮比例
-        
+
         return [checkAttError, errorParams]
     }
 
@@ -92,6 +92,29 @@ export class ToolCheck {
             { name: "toolName", type: "S", min: 1, max: 20 },
             { name: "toolId", type: "N", min: 100000, max: 999999 }]
             , inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
+        // 数据类型处理
+        inparam.toolId = inparam.toolId.toString()
+
+        return [checkAttError, errorParams]
+    }
+    /**
+    * 检查定价参数
+    * @param {*} inparam 
+    */
+    checkPrice(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "toolName", type: "S", min: 1, max: 20 },
+            { name: "toolId", type: "N", min: 100000, max: 999999 },
+            { name: "toolPrice", type: "N", min: 0 },
+            { name: "comeUpRatio", type: "N", min: 0, max: 100 },
+            { name: "lowerRatio", type: "N", min: 0, max: 100 }
+        ], inparam)
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })

@@ -61,6 +61,8 @@ const toolSetPrice = async (e, c, cb) => {
   try {
     // 入参转换
     const [jsonParseErr, inparam] = JSONParser(e && e.body)
+    // 检查参数是否合法
+    const [checkAttError, errorParams] = new ToolCheck().checkPrice(inparam)
     // 身份令牌
     const [tokenErr, token] = await Model.currentToken(e)
 
