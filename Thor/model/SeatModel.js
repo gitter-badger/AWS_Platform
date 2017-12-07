@@ -217,6 +217,8 @@ export class SeatModel extends BaseModel {
             query.FilterExpression = 'operatorRole = :operatorRole'
             query.ExpressionAttributeValues[':operatorRole'] = inparam.token.role
         }
+        query.FilterExpression += ' AND seatId <> :seatId'
+        query.ExpressionAttributeValues[':seatId'] = inparam.seatId
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
         if (existErr) { return [existErr, 0] }
