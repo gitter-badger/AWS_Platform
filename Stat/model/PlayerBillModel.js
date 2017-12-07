@@ -58,8 +58,13 @@ export class PlayerBillModel extends BaseModel {
         }
         let end = new Date().getTime()
         console.log('所有并发执行耗时：' + (end - start) + '毫秒')
-        console.log(finalRes)
-        return [false, finalRes]
+        let filterRes = []
+        for (let item of finalRes) {
+            if (item.betCount > 0) {
+                filterRes.push(item)
+            }
+        }
+        return [false, filterRes]
     }
 
     /**
