@@ -23,7 +23,10 @@ export class ToolCheck {
         inparam.icon = inparam.icon || Model.StringValue
         inparam.desc = inparam.desc || Model.StringValue
         inparam.remark = inparam.remark || Model.StringValue
-
+        inparam.toolPrice = inparam.toolPrice || Model.StringValue  //道具单价
+        inparam.comeUpRatio = inparam.comeUpRatio || Model.StringValue  //上浮比例
+        inparam.lowerRatio = inparam.lowerRatio || Model.StringValue  //下浮比例
+        
         return [checkAttError, errorParams]
     }
 

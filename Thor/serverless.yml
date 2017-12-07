@@ -79,6 +79,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
+  # toolUpdate: #道具更新
+  #   handler: api_tool.toolUpdate
+  #   events:
+  #     -
+  #       http:
+  #         path: toolUpdate
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
   toolDelete: #道具删除
     handler: api_tool.toolDelete
     events:
@@ -159,6 +168,15 @@ functions:
       -
         http:
           path: seatList
+          method: post
+          cors: true
+          authorizer: tokenAuth
+  seatAllList: #商户所有席位列表
+    handler: api_seat.seatAllList
+    events:
+      -
+        http:
+          path: seatAllList
           method: post
           cors: true
           authorizer: tokenAuth

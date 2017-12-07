@@ -57,6 +57,29 @@ const seatList = async (e, c, cb) => {
         return ResErr(cb, error)
     }
 }
+/**
+ * 所有商户列表
+ */
+const seatAllList = async (e, c, cb) => {
+    try {
+        // 入参转换
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
+        // 检查参数是否合法
+        const [checkAttError, errorParams] = new SeatCheck().checkQuery(inparam)
+        // 身份令牌
+        const [tokenErr, token] = await Model.currentToken(e)
+        // 业务操作
+        inparam.token = token
+        const [err, ret] = await new SeatModel().listAll(inparam)
+        // 结果返回
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
+    } catch (error) {
+        console.error(error)
+        return ResErr(cb, error)
+    }
+}
+
 
 /**
  * 单个
@@ -131,6 +154,7 @@ const seatUpdate = async (e, c, cb) => {
         if (err) { return ResErr(cb, err) }
         return ResOK(cb, { payload: ret })
     } catch (error) {
+        console.log(error)
         return ResErr(cb, error)
     }
 }
@@ -184,5 +208,6 @@ export {
     seatUpdate,                      // 更新席位
     seatChangeStatus,                // 席位状态变更
     seatDelete,                      // 席位删除
-    seatType                         // 展位列表
+    seatType,                        // 展位列表
+    seatAllList                      // 管理员看所有商户的展位列表
 }

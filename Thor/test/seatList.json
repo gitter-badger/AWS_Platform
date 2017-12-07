@@ -14,6 +14,7 @@
         }
     },
     "body": {
-        "seatType": 1
+        "seatType": 2,
+        "operatorRole":"100"
     }
 }
