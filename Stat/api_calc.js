@@ -14,6 +14,11 @@ const calcPlayerStat = async (e, c, cb) => {
         // const [tokenErr, token] = await Model.currentToken(e)
         const [tokenErr, token] = await JwtVerify(e.authorizationToken.split(' ')[1])
         if (tokenErr) { ResErr(cb, tokenErr) }
+        if (!token || !token.iat) { ResErr(cb, BizErr.TokenExpire()) }
+        // 判断TOKEN是否太老（大于24小时）
+        if (Math.floor((new Date().getTime() / 1000)) - token.iat > 86400) {
+            return ResErr(cb, BizErr.TokenExpire())
+        }
         // 业务操作
         const [err, ret] = await new PlayerBillModel().calcPlayerStat(inparam)
         // 返回结果
@@ -37,6 +42,7 @@ const calcUserStat = async (e, c, cb) => {
         // const [tokenErr, token] = await Model.currentToken(e)
         const [tokenErr, token] = await JwtVerify(e.authorizationToken.split(' ')[1])
         if (tokenErr) { ResErr(cb, tokenErr) }
+        if (!token || !token.iat) { ResErr(cb, BizErr.TokenExpire()) }
         // 业务操作
         switch (inparam.role) {
             case '1':
