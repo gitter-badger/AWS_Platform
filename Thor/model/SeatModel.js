@@ -147,22 +147,12 @@ export class SeatModel extends BaseModel {
             return [err, 0]
         }
         let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
+
         let arrInfo = []
-        for (let item in objectInfo) {
-            let info = { operatorDisplayName: item }
-            let n = 1
-            for (let i of objectInfo[item]) {
-                let contents = 'content' + n
-                info.operatorMsn = i.operatorMsn
-                i.content.content = i.content.content[0]
-                i.content.content.seatStatus = i.seatStatus
-                info[contents] = i.content.content
-                n++
-            }
-            arrInfo.push(info)
+        for(let key in objectInfo){
+            arrInfo.push(objectInfo[key])
         }
-        console.log(arrInfo)
-        return [0, arrInfo]
+        return [0, objectInfo]
     }
     /**
      * 查询单个席位
