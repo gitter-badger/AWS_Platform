@@ -79,7 +79,7 @@ export class PlayerBillModel extends BaseModel {
             console.log(inparam.gameUserId + '查询流水开始：' + new Date().getTime())
             let query = {
                 IndexName: 'userIdIndex',
-                ProjectionExpression: 'amount,betAmount,reAmount,busCount,#mix,#rate',
+                ProjectionExpression: 'amount,betAmount,reAmount,busCount,mixAmount,#mix,#rate',
                 KeyConditionExpression: '#userId  = :userId AND createAt between :createdAt0 AND :createdAt1',
                 FilterExpression: "gameType=:gameType",
                 ExpressionAttributeNames: {
@@ -97,19 +97,23 @@ export class PlayerBillModel extends BaseModel {
             self.query(query).then((resArr) => {
                 let res = resArr[1]
                 console.log('查询结束：' + new Date().getTime() + '查询流水个数' + res.Items.length)
-                let bet = 0         // 下注
-                let winlose = 0     // 输赢
-                let betCount = 0    // 次数
-                let mixAmount = 0   // 洗码率量
-                let mix = 0         // 洗码比
-                let rate = 0        // 抽成比
+                let bet = 0                 // 下注
+                let winlose = 0             // 输赢
+                let betCount = 0            // 次数
+                let mixAmount = 0           // 洗码率量
+                let mix = 0                 // 洗码比
+                let rate = 0                // 抽成比
+                // let commission = 0          // 佣金
+                // let agentTotalAmount = 0    // 代理总金额
+                // let agentSubmit = 0         // 代理交公司
+                // let profitRate = 0          // 获利比例
                 for (let item of res.Items) {
                     bet += Math.abs(parseFloat(item.betAmount || 0))
                     winlose += parseFloat(item.amount || 0)
                     betCount += parseInt(item.busCount || 0)
                     mixAmount += Math.abs(parseFloat(item.mixAmount || item.betAmount || 0))
-                    mix = item.mix
-                    rate = item.rate
+                    // mix = item.mix
+                    // rate = item.rate
                 }
                 resolve({ bet: bet, winlose: winlose, betCount: betCount, mixAmount: mixAmount, mix: mix, rate: rate })
             }).catch((err) => {
