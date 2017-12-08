@@ -23,6 +23,23 @@ export class MerchantModel extends athena.BaseModel {
             userId
         }, [], "UserIdIndex");
     }
+    findByUids(uids) {
+        let keyConditionExpression = "",
+            expressionAttributeValues = {};
+        for(var i =0; i < uids.length; i++){
+            keyConditionExpression += `userId=:uid${i} or `;
+            expressionAttributeValues[`:uid${i}`] = uids[i];
+        }
+        keyConditionExpression = keyConditionExpression.substring(0,keyConditionExpression.length -3);
+     
+        let queryOpts = {
+            TableName : this.tableName,
+            IndexName : "UserIdIndex",
+            KeyConditionExpression : keyConditionExpression,
+            ExpressionAttributeNames : expressionAttributeNames
+        }
+        return this.promise("query", queryOpts);
+    }
 
     commission(){
         let parent = this.parent;
