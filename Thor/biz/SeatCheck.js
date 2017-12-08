@@ -140,4 +140,28 @@ export class SeatCheck {
 
         return [checkAttError, errorParams]
     }
+    /**
+     * 检查交换数据
+     * @param {*} inparam 
+     */
+    checkeOrder(inparam) {
+        let [checkAttError, errorParams] = athena.Util.checkProperties([
+            { name: "beforeSeatId", type: "S", min: 36, max: 36 },
+            { name: "beforeOrder", type: "N", min: 1, max: 6 },
+            { name: "afterSeatId", type: "S", min: 36, max:36 },
+            { name: "afterOrder", type: "N", min: 1, max: 6 }
+        ] , inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
+        // 数据类型处理
+        inparam.beforeOrder = parseInt(inparam.beforeOrder)
+        inparam.afterOrder = parseInt(inparam.afterOrder)
+        
+        return [checkAttError, errorParams]
+    }
+
 }

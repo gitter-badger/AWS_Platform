@@ -1,0 +1,27 @@
+{
+    "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX0ZhZGUwMDEiLCJwYXNzd29yZCI6IjExMTExMSIsInN1ZmZpeCI6IlBsYXRmb3JtIiwicGFyZW50IjoiMDAiLCJwYXJlbnROYW1lIjoiU3VwZXJBZG1pbiIsInVzZXJJZCI6ImVkNTk4ZWI3LWQ0NzEtNDNjZS1iY2VhLWM4OTk4OTIyNzE0NSIsInJvbGUiOiIxIiwiZGlzcGxheU5hbWUiOiLlubPlj7DnrqHnkIblkZgiLCJpYXQiOjE1MDA3MDEzMjN9.Wo2ZKXtfY6q3MraIoQra5MrJHP_S0JSE4qQ6KUevTmQ"
+    },
+    "requestContext": {
+        "authorizer": {
+            "username": "Platform_NAtest",
+            "password": "Ab123456",
+            "suffix": "Platform",
+            "parent": "00",
+            "parentName": "SuperAdmin",
+            "userId": "46d562f8-57f6-4511-a022-b2f414f87233",
+            "role": "1",
+            "displayName": "初始管理员一",
+            "iat": 1502250211
+        },
+        "identity": {
+            "sourceIp": "127.0.0.1"
+        }
+    },
+    "body": {
+        "beforeSeatId": "44b7d8c0-28b6-4ad3-a5b0-eef2d77b1abb",
+        "beforeOrder": 2,
+        "afterSeatId": "eb5568f0-04e6-456a-a08e-19ec338b74d2",
+        "afterOrder": 1
+    }
+}

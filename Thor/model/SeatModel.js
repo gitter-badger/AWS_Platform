@@ -102,10 +102,10 @@ export class SeatModel extends BaseModel {
         // 查询
         const [err, ret] = await this.scan(query)
         if (err) {
-            console.log(err)
             return [err, 0]
         }
-        return [0, ret.Items]
+        const retOrderBy = _.sortBy(ret.Items, ['order'])
+        return [0, retOrderBy]
     }
 
     /**
@@ -261,6 +261,43 @@ export class SeatModel extends BaseModel {
             return [err, 0]
         }
         return [0, ret]
+    }
+    /**
+     * 展位互换
+     * @param {*} inparam
+     */
+    async seatTigger(inparam) {
+        let updateObj1 = {
+            Key: { 'seatId': inparam.beforeSeatId },
+            UpdateExpression: 'SET #order=:order',
+            ExpressionAttributeNames: {
+                '#order': 'order'
+            },
+            ExpressionAttributeValues: {
+                ':order': inparam.afterOrder
+            }
+        }
+        this.updateItem(updateObj1).then((res) => {
+            console.log(res)
+        }).catch((err) => {
+            console.error(err)
+        })
+        let updateObj2 = {
+            Key: { 'seatId': inparam.afterSeatId },
+            UpdateExpression: 'SET #order=:order',
+            ExpressionAttributeNames: {
+                '#order': 'order'
+            },
+            ExpressionAttributeValues: {
+                ':order': inparam.beforeOrder
+            }
+        }
+        this.updateItem(updateObj2).then((res) => {
+            console.log(res)
+        }).catch((err) => {
+            console.error(err)
+        })
+        return [0, []]
     }
 }
 
