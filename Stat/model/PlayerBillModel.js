@@ -101,11 +101,15 @@ export class PlayerBillModel extends BaseModel {
                 let winlose = 0     // 输赢
                 let betCount = 0    // 次数
                 let mixAmount = 0   // 洗码率量
+                let mix = 0         // 洗码比
+                let rate = 0        // 抽成比
                 for (let item of res.Items) {
                     bet += Math.abs(parseFloat(item.betAmount || 0))
                     winlose += parseFloat(item.amount || 0)
                     betCount += parseInt(item.busCount || 0)
                     mixAmount += Math.abs(parseFloat(item.mixAmount || item.betAmount || 0))
+                    mix = item.mix
+                    rate = item.rate
                 }
                 resolve({ bet: bet, winlose: winlose, betCount: betCount, mixAmount: mixAmount, mix: mix, rate: rate })
             }).catch((err) => {
