@@ -26,7 +26,7 @@ export class AdModel extends BaseModel {
                 ':operatorRole': RoleCodeEnum.PlatformAdmin
             }
         }
-        if (!inparam.operatorName) {
+        if (inparam.operatorName) {
             query = {
                 FilterExpression: 'operatorName=:operatorName',
                 ExpressionAttributeValues: {
