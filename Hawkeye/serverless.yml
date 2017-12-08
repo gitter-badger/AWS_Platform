@@ -175,7 +175,7 @@ functions:
     events:
       - http:
           path: /game/advert/list
-          method: get
+          method: post
           cors: true
   gameState:  #游戏状态更新
     handler: gameApi.updateState
