@@ -94,11 +94,15 @@ export class ToolModel extends BaseModel {
     async setPrice(inparam) {
         let updateObj = {
             Key: { 'toolName': inparam.toolName, 'toolId': inparam.toolId },
-            UpdateExpression: 'SET toolPrice=:toolPrice ,comeUpRatio=:comeUpRatio,lowerRatio=:lowerRatio',
+            UpdateExpression: 'SET toolPrice=:toolPrice ,comeUpRatio=:comeUpRatio,lowerRatio=:lowerRatio,#status=:status',
+            ExpressionAttributeNames: {
+                '#status': 'status'
+            },
             ExpressionAttributeValues: {
                 ':toolPrice': inparam.toolPrice,
                 ':comeUpRatio': inparam.comeUpRatio,
-                ':lowerRatio': inparam.lowerRatio
+                ':lowerRatio': inparam.lowerRatio,
+                ':status':inparam.status
             }
         }
         const [err, ret] = await this.updateItem(updateObj)

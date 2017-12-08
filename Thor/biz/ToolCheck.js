@@ -110,14 +110,14 @@ export class ToolCheck {
     checkPrice(inparam) {
         let checkArr = [
             { name: "toolName", type: "S", min: 1, max: 20 },
+            { name: "status", type: "N", min: 1, max: 2 },
             { name: "toolId", type: "N", min: 100000, max: 999999 },
-            { name: "toolPrice", type: "N", min: 0 },
-            { name: "lowerRatio", type: "N", min: 0, max: 100 }
+            { name: "toolPrice", type: "REG", min: null, max: null, equal: athena.RegEnum.INT },
+            { name: "lowerRatio", type: "REG", min: 0, max: null, equal: athena.RegEnum.FLOAT2 },
         ]
         if (inparam.status == ToolStatusEnum.limit) {
-            checkArr.push({ name: "comeUpRatio", type: "N", min: 0, max: 100 })
+            checkArr.push({ name: "comeUpRatio", type: "REG", min: 0, max: null, equal: athena.RegEnum.FLOAT2 })
         }
-        console.log(checkArr)
         let [checkAttError, errorParams] = athena.Util.checkProperties(checkArr, inparam)
 
         if (checkAttError) {
@@ -127,9 +127,12 @@ export class ToolCheck {
 
         // 数据类型处理
         inparam.toolId = inparam.toolId.toString()
-        if(inparam.comeUpRatio==''){
-            inparam.comeUpRatio=Model.StringValue
+        if (inparam.comeUpRatio == '') {
+            inparam.comeUpRatio = Model.StringValue
+        } else {
+            inparam.comeUpRatio = inparam.comeUpRatio.toFixed(2)
         }
+        inparam.lowerRatio = inparam.lowerRatio.toFixed(2)
         return [checkAttError, errorParams]
     }
 }

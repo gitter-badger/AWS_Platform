@@ -20,11 +20,11 @@
         }
     },
     "body": {
-        "toolName":"道具名称",
-        "toolId":"道具id",
-        "toolPrice":"道具单价",
-        "comeUpRatio":"上浮比例",
-        "lowerRatio":"下调比例",
-        "status":1
+        "toolName":"钻石",
+        "toolId":"2000",
+        "toolPrice":"12.02",
+        "comeUpRatio":"12",
+        "lowerRatio":"10.0001",
+        "status":2
     }
 }
