@@ -79,15 +79,15 @@ functions:
           method: post
           cors: true
           authorizer: tokenAuth
-  # toolUpdate: #道具更新
-  #   handler: api_tool.toolUpdate
-  #   events:
-  #     -
-  #       http:
-  #         path: toolUpdate
-  #         method: post
-  #         cors: true
-  #         authorizer: tokenAuth
+  toolSetPrice: #道具定价
+    handler: api_tool.toolSetPrice
+    events:
+      -
+        http:
+          path: toolSetPrice
+          method: post
+          cors: true
+          authorizer: tokenAuth
   toolDelete: #道具删除
     handler: api_tool.toolDelete
     events:

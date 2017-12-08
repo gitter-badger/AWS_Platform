@@ -26,7 +26,7 @@ export class ToolCheck {
         inparam.toolPrice = inparam.toolPrice || Model.StringValue  //道具单价
         inparam.comeUpRatio = inparam.comeUpRatio || Model.StringValue  //上浮比例
         inparam.lowerRatio = inparam.lowerRatio || Model.StringValue  //下浮比例
-        
+
         return [checkAttError, errorParams]
     }
 
@@ -101,6 +101,38 @@ export class ToolCheck {
         // 数据类型处理
         inparam.toolId = inparam.toolId.toString()
 
+        return [checkAttError, errorParams]
+    }
+    /**
+    * 检查定价参数
+    * @param {*} inparam 
+    */
+    checkPrice(inparam) {
+        let checkArr = [
+            { name: "toolName", type: "S", min: 1, max: 20 },
+            { name: "status", type: "N", min: 1, max: 2 },
+            { name: "toolId", type: "N", min: 100000, max: 999999 },
+            { name: "toolPrice", type: "REG", min: null, max: null, equal: athena.RegEnum.INT },
+            { name: "lowerRatio", type: "REG", min: 0, max: null, equal: athena.RegEnum.FLOAT2 },
+        ]
+        if (inparam.status == ToolStatusEnum.limit) {
+            checkArr.push({ name: "comeUpRatio", type: "REG", min: 0, max: null, equal: athena.RegEnum.FLOAT2 })
+        }
+        let [checkAttError, errorParams] = athena.Util.checkProperties(checkArr, inparam)
+
+        if (checkAttError) {
+            Object.assign(checkAttError, { params: errorParams })
+            throw checkAttError
+        }
+
+        // 数据类型处理
+        inparam.toolId = inparam.toolId.toString()
+        if (!inparam.comeUpRatio) {
+            inparam.comeUpRatio = Model.StringValue
+        } else {
+            inparam.comeUpRatio = (+inparam.comeUpRatio).toFixed(2)
+        }
+        inparam.lowerRatio = (+inparam.lowerRatio).toFixed(2)
         return [checkAttError, errorParams]
     }
 }

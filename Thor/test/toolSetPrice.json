@@ -4,20 +4,27 @@
     },
     "requestContext": {
         "authorizer": {
-            "username": "Platform_cheney",
-            "parent": "00",
+            "userId": "a0ebec9a-ee90-4075-a39d-d41ca8607030",
             "role": "1",
-            "userId": "6028eec6-96ec-492d-a36b-fd8d6981b76f",
-            "principalId": "6028eec6-96ec-492d-a36b-fd8d6981b76f"
+            "suffix": "Platform",
+            "username": "Platform_NAtest",
+            "parent": "00",
+            "parentName": "SuperAdmin",
+            "displayName": "平台管理员",
+            "level": 0,
+            "subRole": "admin",
+            "iat": 1504065432
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "query":{
-            "toolId":"道具id",
-            "toolName":"道具名称"
-        }
+        "toolName":"房卡",
+        "toolId":"200000",
+        "toolPrice":"200",
+        "comeUpRatio":"",
+        "lowerRatio":"8",
+        "status":1
     }
 }
