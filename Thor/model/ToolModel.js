@@ -69,36 +69,18 @@ export class ToolModel extends BaseModel {
      * @param {*} inparam
      */
     async list(inparam) {
-        inparam = { toolName: null, toolStatus: 1 }
-        let ranges = Model.getInparamRanges(inparam)
-        let values = Model.getInparamValues(inparam)
-        // 组装条件
-        // let ranges = _.map(inparam, (v, i) => {
-        //     if (v === null) {
-        //         return null
-        //     }
-        //     if (i == 'toolName') {
-        //         return `contains(${i}, :${i})`
-        //     } else {
-        //         return `${i} = :${i}`
-        //     }
-        // })
-        // _.remove(ranges, (v) => v === null)
-        // ranges = _.join(ranges, ' AND ')
-        // 组装条件值
-        // const values = _.reduce(inparam, (result, v, i) => {
-        //     if (v !== null) {
-        //         result[`:${i}`] = v
-        //     }
-        //     return result
-        // }, {})
-        console.info(ranges)
-        console.info(values)
+        // 条件搜索
+        let query = {}
+        if (!_.isEmpty(inparam.query)) {
+            if (inparam.query.toolId) { inparam.query.toolId = {$like:inparam.query.toolId }}
+            if (inparam.query.toolName) { inparam.query.toolName = { $like: inparam.query.toolName } }
+            const queryParams = this.buildQueryParams(inparam.query, false)
+            query.FilterExpression = queryParams.FilterExpression
+            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+        }
         // 查询
-        const [err, ret] = await this.scan({
-            // FilterExpression: ranges,
-            // ExpressionAttributeValues: values
-        })
+        const [err, ret] = await this.scan(query)
         if (err) {
             return [err, 0]
         }

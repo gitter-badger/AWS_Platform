@@ -108,13 +108,17 @@ export class ToolCheck {
     * @param {*} inparam 
     */
     checkPrice(inparam) {
-        let [checkAttError, errorParams] = athena.Util.checkProperties([
+        let checkArr = [
             { name: "toolName", type: "S", min: 1, max: 20 },
             { name: "toolId", type: "N", min: 100000, max: 999999 },
             { name: "toolPrice", type: "N", min: 0 },
-            { name: "comeUpRatio", type: "N", min: 0, max: 100 },
             { name: "lowerRatio", type: "N", min: 0, max: 100 }
-        ], inparam)
+        ]
+        if (inparam.status == ToolStatusEnum.limit) {
+            checkArr.push({ name: "comeUpRatio", type: "N", min: 0, max: 100 })
+        }
+        console.log(checkArr)
+        let [checkAttError, errorParams] = athena.Util.checkProperties(checkArr, inparam)
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
@@ -123,7 +127,9 @@ export class ToolCheck {
 
         // 数据类型处理
         inparam.toolId = inparam.toolId.toString()
-
+        if(inparam.comeUpRatio==''){
+            inparam.comeUpRatio=Model.StringValue
+        }
         return [checkAttError, errorParams]
     }
 }

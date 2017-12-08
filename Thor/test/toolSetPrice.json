@@ -24,6 +24,7 @@
         "toolId":"道具id",
         "toolPrice":"道具单价",
         "comeUpRatio":"上浮比例",
-        "lowerRatio":"下调比例"
+        "lowerRatio":"下调比例",
+        "status":1
     }
 }
