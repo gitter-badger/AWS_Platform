@@ -154,7 +154,7 @@ functions:
     events:
       - http:
           path: /game/seat/list
-          method: get
+          method: post
           cors: true
   packageList:  #道具包列表
     handler: openApi_tool.packageList

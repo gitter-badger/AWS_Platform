@@ -38,6 +38,7 @@ const HulkPlatformAd = "HulkPlatformAd"
 const SYSConfig = "SYSConfig"
 const HeraGameRecord = "HeraGameRecord"
 const SYSToken = 'SYSToken'
+const DianaPlatformSeat = 'DianaPlatformSeat'
 
 export const Tables = {
   ZeusPlatformUser,
@@ -54,7 +55,8 @@ export const Tables = {
   HulkPlatformAd,
   SYSConfig,
   HeraGameRecord,
-  SYSToken
+  SYSToken,
+  DianaPlatformSeat
 }
 
 export const Model = {
