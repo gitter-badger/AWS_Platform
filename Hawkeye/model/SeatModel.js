@@ -40,6 +40,16 @@ export class SeatModel extends BaseModel {
         if (err) {
             return [err, 0]
         }
+        // 如果没有数据，再查询平台的数据
+        if (!ret.Items || ret.Items.length == 0) {
+            const [err2, ret2] = await this.scan({
+                FilterExpression: 'operatorRole=:operatorRole',
+                ExpressionAttributeValues: {
+                    ':operatorRole': RoleCodeEnum.PlatformAdmin
+                }
+            })
+            return [0, ret2.Items]
+        }
         return [0, ret.Items]
     }
 }
