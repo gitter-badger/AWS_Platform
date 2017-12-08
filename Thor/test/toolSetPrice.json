@@ -20,11 +20,11 @@
         }
     },
     "body": {
-        "toolName":"钻石",
-        "toolId":"2000",
-        "toolPrice":"12.02",
-        "comeUpRatio":"12",
-        "lowerRatio":"10.0001",
-        "status":2
+        "toolName":"房卡",
+        "toolId":"200000",
+        "toolPrice":"200",
+        "comeUpRatio":"",
+        "lowerRatio":"8",
+        "status":1
     }
 }

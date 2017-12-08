@@ -127,12 +127,12 @@ export class ToolCheck {
 
         // 数据类型处理
         inparam.toolId = inparam.toolId.toString()
-        if (inparam.comeUpRatio == '') {
+        if (!inparam.comeUpRatio) {
             inparam.comeUpRatio = Model.StringValue
         } else {
-            inparam.comeUpRatio = inparam.comeUpRatio.toFixed(2)
+            inparam.comeUpRatio = (+inparam.comeUpRatio).toFixed(2)
         }
-        inparam.lowerRatio = inparam.lowerRatio.toFixed(2)
+        inparam.lowerRatio = (+inparam.lowerRatio).toFixed(2)
         return [checkAttError, errorParams]
     }
 }
