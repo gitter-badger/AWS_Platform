@@ -88,22 +88,18 @@ export class UserModel extends athena.BaseModel {
         console.log(scanOpts);
         return this.promise("scan", scanOpts);
     }
-    findByUids(uids) {
-        let keyConditionExpression = "",
-            expressionAttributeValues = {};
-        for(var i =0; i < uids.length; i++){
-            keyConditionExpression += `userId=:uid${i} or `;
-            expressionAttributeValues[`:uid${i}`] = uids[i];
+    async findByUids(uids) {
+        let promises = [];
+        for(let i = 0; i < uids.length; i++) {
+            let promise = this.get({userId: uids[i]}, [], "userIdIndex");
+            promises.push(promise);
         }
-        keyConditionExpression = keyConditionExpression.substring(0,keyConditionExpression.length -3);
-     
-        let queryOpts = {
-            TableName : this.tableName,
-            IndexName : "userIdIndex",
-            KeyConditionExpression : keyConditionExpression,
-            ExpressionAttributeNames : expressionAttributeNames
-        }
-        return this.promise("query", queryOpts);
+        return Promise.all(promises).then((result) => {
+            let rs = result.map((item) => item[1])
+            return [null, rs]
+        }).catch((err) => {
+            return [new CHeraErr(CODES.SystemError)]
+        });
     }
     async getUserByNickname(nickname) {
         let [scanErr, userList] = await this.scan({nickname});
