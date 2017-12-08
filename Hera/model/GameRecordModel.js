@@ -140,12 +140,12 @@ export class GameRecordModel extends BaseModel{
             return [dbErr, null];
         }
         let lastRecord = result.LastEvaluatedKey;
-        page.list = page.list.concat(page.list, result.Items);
+        page.list = page.list.concat(result.Items);
         if(page.list.length >= page.pageSize) {
             page.list = page.list.slice(0, page.pageSize)
             return [null, page]
         } else if(lastRecord) {
-            opts.ExpressionAttributeValues[":startTime"] = lastRecord.betTime+1;
+            opts.ExpressionAttributeValues[":endTime"] = lastRecord.betTime-1;
             return this.findRecords(opts, page);
         } else {
             return [null, page];
