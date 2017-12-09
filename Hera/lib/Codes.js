@@ -2,6 +2,7 @@
 export const CODES = {
     OK : 0,
     SystemError : 500,
+    PARAMS_ERROR :900,
     JSONParseError : 10000,
     DataError : 10000,
     merchantNotExist : 10001,
@@ -48,6 +49,7 @@ export const CODES = {
 
 const errorMessage = {
   "500" : "服务器错误",
+  "900" : "入参参数不合法",
   "10000" : "数据错误",
   "10001" : "商家不存在",
   "10002" : "apiKey错误",

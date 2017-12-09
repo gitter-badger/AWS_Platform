@@ -262,7 +262,7 @@ export class UserBillDetailModel extends athena.BaseModel {
             });
         })
     }
-    async handlerRecordsAndSave(records) {
+    async handlerRecordsAndSave(records, gameType) {
         //找到所有用户，所有用户的商家 测试点，如果没有记录，单个用户，多个用户
         let uidSet = new Set(),uids= [], parentSet = new Set(),parentIds = [], userListErr, userList = [], merchantListErr, merchantList = [];
         records.forEach((item) => {
@@ -273,16 +273,17 @@ export class UserBillDetailModel extends athena.BaseModel {
         if(uids.length > 0) {
             [userListErr, userList] = await user.findByUids(uids);
             if(userListErr) {
-                return callback(null, ReHandler.fail(userListErr));
+                return [userListErr]
             }
             userList.forEach((userItem) => {
+                userItem = userItem || {};
                 parentSet.add(userItem.parent);
             });
             parentIds = [...parentSet];
             let merchant = new MerchantModel();
-            [merchantListErr, merchantList] = merchant.findByUids(parentIds);
+            [merchantListErr, merchantList] = await merchant.findByUids(parentIds);
             if(merchantListErr) {
-                return callback(null, ReHandler.fail(merchantListErr));
+                return [merchantListErr]
             }
         }
 
@@ -300,21 +301,27 @@ export class UserBillDetailModel extends athena.BaseModel {
             })
             recordMerchant = recordMerchant || {vedioMix:-1,liveMix:-1, rate:0};
             if(gameType == "30000"){
-                mix = merchantModel.vedioMix
+                mix = recordMerchant.vedioMix
             } 
             if(gameType == "40000"){
-                mix = merchantModel.liveMix;
+                mix = recordMerchant.liveMix;
             }
             Object.assign(record, {
                 action : record.amount>=0 ? 1 :-1,
                 balance : +(record.preBalance + record.amount).toFixed(2),
                 billId : recordUser.sessionId,
-                createdDate : his.parseDay(new Date()),
+                createdDate : this.parseDay(new Date()),
+                userName : recordUser.userName,
                 mix,
-                originalAmount : +((+item.preBalance).toFixed(2)),
+                originalAmount : +((+record.preBalance).toFixed(2)),
                 rate : recordMerchant.rate
             })
         }
-        return this.batchWrite(records);
+        if(records.length> 0) {
+            return this.batchWrite(records);
+        }else {
+            return [null];
+        }
+         
     }   
 }

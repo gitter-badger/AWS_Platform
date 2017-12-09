@@ -101,12 +101,12 @@ export class UserBillDetailModel extends athena.BaseModel {
      * 账单流水详情
      * @param {*} billId 
      */
-    billDetail(billId) {
+    async billDetail(billId) {
         let opts = {
             IndexName : "BillIdIndex",
             ScanIndexForward :false,
             KeyConditionExpression : "billId=:billId",
-            ProjectionExpression : ["sn", "createdAt","originalAmount","amount","reAmount","reTime","rate","mix","balance","#type","businessKey"].join(","),
+            ProjectionExpression : ["sn", "createdAt","originalAmount","amount","reAmount","reTime","rate","mix","balance","#type","businessKey","roundId"].join(","),
             ExpressionAttributeValues : {
                 ":billId":billId
             },
@@ -114,13 +114,56 @@ export class UserBillDetailModel extends athena.BaseModel {
                 "#type":"type"
             }
         }
-        return new Promise((reslove, reject) => {
-            this.db$("query", opts).then((result) => {
-                reslove([null, result.Items]);
-            }).catch((err) => {
-                console.log(err);
-                reslove([new CHeraErr(CODES.SystemError, err.stack), null]);
-            });
-        })
+        let [queryErr, serialList] = await this.promise("query", opts);
+        if(queryErr) return [queryErr];
+        let sumList = [], sumObj = {};
+        serialList.forEach(function(element) {
+            if(element.type >= 3 && element.type <=5) {
+                if(!sumObj[element.roundId]) {
+                    sumObj[element.roundId] = [];
+                }
+                sumObj[element.roundId].push(element)
+            }
+        }, this);
+        for(let roundId in sumObj) {
+            let roundArr = sumObj[roundId];
+            let betAmount = 0, originalAmount = 0;
+            let roundBill = {
+                roundId : roundId,
+                createdAt : 0,
+                originalAmount : 0,  //账前余额
+                amount : 0,   //下注金额
+                rate : 0, //成数
+                balance : 0,  //结算金额
+                mix : 0,  //洗马比
+                reAmount : 0,  //返还金额
+                deAmount : 0,  //净利
+                balance : 0,   //返还后余额
+                businessKey : ""  //betId
+            }
+            for(let i = 0; i < roundArr.length; i++) {
+                let item = roundArr[i];
+                if(item.type ==3) {
+                    roundBill.roundId = item.roundId;
+                    roundBill.amount += +(item.amount.toFixed(2));
+                    roundBill.createdAt = item.createdAt;
+                    roundBill.businessKey= item.businessKey;
+                    roundBill.rate = item.rate || 0;
+                    roundBill.mix = item.mix || 0;
+                    if(roundBill.originalAmount < item.originalAmount || roundBill.originalAmount == 0) {
+                        roundBill.originalAmount = item.originalAmount;
+                    }
+                }
+                if(item.type == 4 || item.type == 5) {
+                    roundBill.reAmount += +(Math.abs(item.amount).toFixed(2));
+                    if(roundBill.balance < item.balance) {
+                        roundBill.balance = item.balance
+                    }
+                }
+            }
+            roundBill.deAmount = +((roundBill.reAmount + roundBill.amount).toFixed(2));
+            sumList.push(roundBill);
+        }
+        return [null, sumList];
     }
 }

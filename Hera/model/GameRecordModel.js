@@ -71,7 +71,7 @@ export class GameRecordModel extends BaseModel{
         });
         
     }
-    async page(pageSize, parentId, userName, gameId, startTime, endTime, lastTime) {
+    async page(pageSize, parentId, userName, gameId, startTime, endTime, lastTime, gameType) {
         //找到总数
         let opts = {
             IndexName : "parentIdIndex",
@@ -97,6 +97,14 @@ export class GameRecordModel extends BaseModel{
                 opts.FilterExpression += "gameId=:gameId";
             }
             opts.ExpressionAttributeValues[":gameId"] = gameId+"";
+        }
+        if(gameType) {
+            if(userName || gameId) {
+                opts.FilterExpression += "and gameType=:gameType";
+            }else {
+                opts.FilterExpression += "gameType=:gameType";
+            }
+            opts.ExpressionAttributeValues[":gameType"] = +gameType;
         }
         let [countErr, count] = await this.count(opts);
         if(countErr) {
@@ -132,12 +140,12 @@ export class GameRecordModel extends BaseModel{
             return [dbErr, null];
         }
         let lastRecord = result.LastEvaluatedKey;
-        page.list = page.list.concat(page.list, result.Items);
+        page.list = page.list.concat(result.Items);
         if(page.list.length >= page.pageSize) {
             page.list = page.list.slice(0, page.pageSize)
             return [null, page]
         } else if(lastRecord) {
-            opts.ExpressionAttributeValues[":startTime"] = lastRecord.betTime+1;
+            opts.ExpressionAttributeValues[":endTime"] = lastRecord.betTime-1;
             return this.findRecords(opts, page);
         } else {
             return [null, page];
