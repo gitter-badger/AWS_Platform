@@ -22,6 +22,7 @@ export class ReHandler{
     return responseTemplate(200, body, headers)
   }
   static fail(failBody, headers = {}, opts = {}){
+    delete failBody.errMsg;
     Object.assign(failBody, opts);
     return responseTemplate(500, failBody,  headers)
   }

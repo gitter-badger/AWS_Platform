@@ -23,6 +23,19 @@ export class MerchantModel extends athena.BaseModel {
             userId
         }, [], "UserIdIndex");
     }
+    async findByUids(uids) {
+        let promises = [];
+        for(let i = 0; i < uids.length; i++) {
+            let promise = this.get({userId: uids[i]}, [], "UserIdIndex");
+            promises.push(promise);
+        }
+        return Promise.all(promises).then((result) => {
+            let rs = result.map((item) => item[1])
+            return [null, rs]
+        }).catch((err) => {
+            return [new CHeraErr(CODES.SystemError)]
+        });
+    }
 
     commission(){
         let parent = this.parent;

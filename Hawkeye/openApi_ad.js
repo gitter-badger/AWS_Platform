@@ -1,30 +1,35 @@
 
-let  athena  = require("./lib/athena");
+let athena = require("./lib/athena");
 
-import {CODES, CHeraErr} from "./lib/Codes";
+import { CODES, CHeraErr } from "./lib/Codes";
 
-import {ReHandler} from "./lib/Response";
+import { ReHandler } from "./lib/Response";
 
-import {RoleCodeEnum,SeatTypeEnum, SeatContentEnum, ToolIdEnum} from "./lib/Consts"
+import { RoleCodeEnum, SeatTypeEnum, SeatContentEnum, ToolIdEnum } from "./lib/Consts"
 
 
-import {AdvertModel} from "./model/AdvertModel";
+import { AdModel } from "./model/AdModel";
 
-import {Util} from "./lib/Util"
+import { Util } from "./lib/Util"
 
 /**
  * 广告列表
  * @param {*} event 
  */
 async function advertList(event, context, callback) {
-  let advertModel = new AdvertModel();
-  let [scanErr, list] = await advertModel.scan({adStatus :1});
+  let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
+  if (parserErr) return callback(null, ReHandler.fail(parserErr));
+  let adModel = new AdModel();
+  let [scanErr, list] = await new AdModel().list(requestParams);
+  if (scanErr) {
+    return callback(null, ReHandler.fail(scanErr));
+  }
   callback(null, ReHandler.success({
-      data :{list}
+    data: { list }
   }));
 }
 
 
-export{
-  advertList, //广告列表
+export {
+  advertList   //广告列表
 }

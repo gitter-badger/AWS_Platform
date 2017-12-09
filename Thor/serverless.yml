@@ -225,3 +225,12 @@ functions:
           method: get
           cors: true
           authorizer: tokenAuth
+  seatTigger: #展位互换
+    handler: api_seat.seatTigger
+    events:
+      -
+        http:
+          path: seatTigger
+          method: post
+          cors: true
+          authorizer: tokenAuth

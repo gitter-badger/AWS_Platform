@@ -62,7 +62,7 @@ export class UserRecordModel extends athena.BaseModel {
         let incomeObj = this.settlementIncome(this.records);
         this.income = +(incomeObj.income.toFixed(2));
         this.state = SettlementState.success;
-        return [0, incomeObj]
+        return incomeObj
     } 
     isSingleUser(){
         if(this.records.length == 0) return false;

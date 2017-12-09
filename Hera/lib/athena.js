@@ -24,7 +24,9 @@ export class BaseModel{
             }
         }).catch((error) => {
             console.log(error);
-            return [error, []];
+            let e = new AError(CODES.DB_ERROR);
+            e.errMsg = error.message;
+            return [e, []];
         })
     }
     parseDay(date){
@@ -43,11 +45,9 @@ export class BaseModel{
         return item;
     }
     save(){
-        console.log("保存前："+Date.now());
         let item = this.setProperties();
         return new Promise((reslove, reject) => {
             this.db$("put", {Item:item}).then((result) => {
-                console.log("保存后："+Date.now());
                 return reslove([null, result]);
             }).catch((err) => {
                 console.log(err);
@@ -459,12 +459,12 @@ class AError{
 
 const CODES = {
     JSON_FORMAT_ERROR: 10000,
-    INPARAM_ERROR: 10001,
+    INPARAM_ERROR: 900,
     DB_ERROR: 500
 }
 
 const EMSG = {
     "10000": "数据错误",
-    "10001": "入参数据不合法",
+    "900": "入参数据不合法",
     "500": "服务器错误"
 }

@@ -95,6 +95,7 @@ const billFlow = async(event, context, cb) => {
       sn : item.sn,
       createdAt : item.createdAt,
       type : item.type,
+      billId : item.billId,
       businessKey : item.businessKey || "",
       originalAmount : item.originalAmount || 0,
       balance : item.balance || "",
@@ -111,14 +112,14 @@ const billFlow = async(event, context, cb) => {
  */
 const billDetail = async(event, context, cb) => {
   console.log(event);
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-    return ResFail(cb, tokenErr)
-  }
-  const [e, tokenInfo] = await JwtVerify(token[1])
-  if(e) {
-    return ResFail(cb, e)
-  }
+  // const [tokenErr, token] = await Model.currentToken(event);
+  // if (tokenErr) {
+  //   return ResFail(cb, tokenErr)
+  // }
+  // const [e, tokenInfo] = await JwtVerify(token[1])
+  // if(e) {
+  //   return ResFail(cb, e)
+  // }
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
   if(parserErr) {
       return ResFail(cb, parserErr);
@@ -150,30 +151,35 @@ const billDetail = async(event, context, cb) => {
   if(!billInfo) {
     return cb(null, ReHandler.fail(new CHeraErr(CODES.billNotExist)));
   }
-
-  if(billInfo.betAmount && billInfo.reAmount) {
-    depSumAmount = +(billInfo.reAmount - Math.abs(billInfo.betAmount)).toFixed(2);
-    for(let i = 0; i < list.length; i++) {
-        let item = list[i];
-        if(item.type >=1 && item.type<=5) {
-          list.splice(i, 1);
-          i --;
-        }
-      }
-  }else {
-    for(let i = 0; i < list.length; i++) {
-      let item = list[i];
-      item.joinTime = item.createdAt;
-      if(item.type >=1 && item.type<=5) {
-        list.splice(i, 1);
-        i --;
-      }else {
-        sumAmount += Math.abs(item.amount);
-        reSumAmount += item.reAmount || 0;
-      }
-    }
-    depSumAmount = -sumAmount + reSumAmount;
+  for(let  i = 0; i < list.length; i++) {
+    let item = list[i];
+    sumAmount += item.amount;
+    reSumAmount += item.reAmount;
+    depSumAmount += item.deAmount;
   }
+  // if(billInfo.betAmount && billInfo.reAmount) {
+  //   depSumAmount = +(billInfo.reAmount - Math.abs(billInfo.betAmount)).toFixed(2);
+  //   for(let i = 0; i < list.length; i++) {
+  //       let item = list[i];
+  //       if(item.type >=1 && item.type<=5) {
+  //         list.splice(i, 1);
+  //         i --;
+  //       }
+  //     }
+  // }else {
+  //   for(let i = 0; i < list.length; i++) {
+  //     let item = list[i];
+  //     item.joinTime = item.createdAt;
+  //     if(item.type >=1 && item.type<=5) {
+  //       list.splice(i, 1);
+  //       i --;
+  //     }else {
+  //       sumAmount += Math.abs(item.amount);
+  //       reSumAmount += item.reAmount || 0;
+  //     }
+  //   }
+  //   depSumAmount = -sumAmount + reSumAmount;
+  // }
   billInfo = buildBillInfo();
   function buildBillInfo(){
     return {
@@ -181,9 +187,9 @@ const billDetail = async(event, context, cb) => {
       userName : billInfo.userName,  //用户名
       joinTime : billInfo.joinTime || 0,  //进入时间
       createdAt : billInfo.createAt,   //退出时间（结算时间）
-      avgRTP : Math.abs(+reSumAmount/(sumAmount).toFixed(2)),  //净利润/总投注数
-      sumAmount : -billInfo.betAmount || sumAmount , //下注总额
-      reSumAmount : billInfo.reAmount || reSumAmount, //返还金额
+      avgRTP : -(reSumAmount/sumAmount).toFixed(3),  //净利润/总投注数
+      sumAmount :  -sumAmount , //下注总额
+      reSumAmount : reSumAmount, //返还金额
       depSumAmount, //利润总额
       mixNum :billInfo.mixAmount || sumAmount  //洗马量
     }
@@ -200,24 +206,24 @@ const billDetail = async(event, context, cb) => {
   function isSort(a, b){
       return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
   }
-  let returnArr = list.map((item) => {
-    return {
-      sn : item.sn,
-      createdAt : item.createdAt,
-      originalAmount : item.originalAmount,  //账前余额
-      amount : item.amount,   //下注金额
-      rate : item.rate || null, //成数
-      balance : item.balance,  //结算金额
-      mix : (item.mix == -1 || !item.mix)? 0 : item.mix,  //洗马比
-      reAmount : item.reAmount || 0,  //返还金额
-      deAmount : (item.amount + item.reAmount || 0),  //净利
-      balance : item.balance || null,   //返还后余额
-      businessKey : item.businessKey || ''  //betId
-    }
-  })
+  // let returnArr = list.map((item) => {
+  //   return {
+  //     sn : item.sn,
+  //     createdAt : item.createdAt,
+  //     originalAmount : item.originalAmount,  //账前余额
+  //     amount : item.amount,   //下注金额
+  //     rate : item.rate || null, //成数
+  //     balance : item.balance,  //结算金额
+  //     mix : (item.mix == -1 || !item.mix)? 0 : item.mix,  //洗马比
+  //     reAmount : item.reAmount || 0,  //返还金额
+  //     deAmount : (item.amount + item.reAmount || 0),  //净利
+  //     balance : item.balance || null,   //返还后余额
+  //     businessKey : item.businessKey || ''  //betId
+  //   }
+  // })
   let obj = {
     billInfo,
-    list : returnArr
+    list
   }
   ResOK(cb, obj);
 }
