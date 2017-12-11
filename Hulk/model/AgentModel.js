@@ -213,10 +213,10 @@ export class AgentModel extends BaseModel {
         }
         // 条件搜索
         if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.buildQueryParams(inparam.query, true)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, true)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [queryErr, queryRet] = await this.query(query)
         if (queryErr) {
@@ -254,10 +254,10 @@ export class AgentModel extends BaseModel {
         }
         // 条件搜索
         if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.buildQueryParams(inparam.query, true)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, true)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [queryErr, adminRet] = await this.query(query)
         if (queryErr) {
