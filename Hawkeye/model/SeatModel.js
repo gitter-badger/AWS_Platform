@@ -37,9 +37,6 @@ export class SeatModel extends BaseModel {
         }
         // 查询
         const [err, ret] = await this.scan(query)
-        if (err) {
-            return [err, 0]
-        }
         // 如果没有数据，再查询平台的数据
         if (!ret.Items || ret.Items.length == 0) {
             const [err2, ret2] = await this.scan({
