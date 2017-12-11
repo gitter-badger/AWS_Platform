@@ -202,7 +202,7 @@ const list = async (e, c, cb) => {
   }
   if (!Model.isPlatformAdmin(userInfo)) {
     query = {
-      TableName: 'HawkeyeGameNotice',
+      TableName: 'HawkeyeGameEmail',
       FilterExpression: 'operatorName = :operatorName',
       ExpressionAttributeValues: {
         ':operatorName': userInfo.username
