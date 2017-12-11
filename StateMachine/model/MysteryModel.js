@@ -43,10 +43,10 @@ export class MysteryModel extends BaseModel {
             if (inparam.query.merchantName) { inparam.query.merchantName = { $like: inparam.query.merchantName } }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.nickname) { inparam.query.nickname = { $like: inparam.query.nickname } }
-            const queryParams = this.buildQueryParams(inparam.query, false)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         console.info(query)
         const [queryErr, adminRet] = await this.scan(query)
