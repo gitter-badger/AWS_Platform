@@ -275,18 +275,30 @@ export class UserBillDetailModel extends athena.BaseModel {
             if(userListErr) {
                 return [userListErr]
             }
-            userList.forEach((userItem) => {
-                userItem = userItem || {};
-                parentSet.add(userItem.parent);
-            });
+            for(let i = 0; i < userList.length; i++) {
+                let userItem = userList[i];
+                if(!userItem) {
+                    userList.splice(i, 1);
+                    i --;
+                }else {
+                    parentSet.add(userItem.parent);
+                }
+            }
+           
             parentIds = [...parentSet];
             let merchant = new MerchantModel();
             [merchantListErr, merchantList] = await merchant.findByUids(parentIds);
             if(merchantListErr) {
                 return [merchantListErr]
             }
+            for(let i = 0; i < merchantList.length; i++) {
+                if(!merchantList[i]) {
+                    merchantList.splice(i, 1);
+                    i --;
+                }
+            }
         }
-
+        console.log(records);
         //给records增加洗马比，billId（进入游戏的sessionId）
         for(let i = 0,rl = records.length; i < rl; i++) {
             let record = records[i],mix =0,rate = 0;
@@ -294,21 +306,26 @@ export class UserBillDetailModel extends athena.BaseModel {
                 return u.userId == record.userId;
             })
             //不需要判断玩家是否在游戏中，如果不在游戏中，sessionId为null
-            recordUser = recordUser || {};
-           
             let recordMerchant = merchantList.find((m) => {
                 return m.userId == recordUser.parent;
             })
-            recordMerchant = recordMerchant || {vedioMix:-1,liveMix:-1, rate:0};
+
+            if(!recordUser || !recordMerchant) {
+                records.splice(i, 1);
+                i --;
+                continue;
+            }
+
             if(gameType == "30000"){
-                mix = recordMerchant.vedioMix
+                mix = recordUser.vedioMix ||  recordMerchant.vedioMix
             } 
             if(gameType == "40000"){
-                mix = recordMerchant.liveMix;
+                mix = recordUser.liveMix || recordMerchant.liveMix;
             }
+            
             Object.assign(record, {
                 action : record.amount>=0 ? 1 :-1,
-                balance : +(record.preBalance + record.amount).toFixed(2),
+                balance : +((+record.preBalance) + (+record.amount)).toFixed(2),
                 billId : recordUser.sessionId,
                 createdDate : this.parseDay(new Date()),
                 userName : recordUser.userName,

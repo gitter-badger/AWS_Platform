@@ -91,10 +91,16 @@ export class UserModel extends athena.BaseModel {
     async findByUids(uids) {
         let promises = [];
         for(let i = 0; i < uids.length; i++) {
-            let promise = this.get({userId: uids[i]}, [], "userIdIndex");
+            let promise = this.get({userId: +uids[i]}, [], "userIdIndex");
             promises.push(promise);
         }
         return Promise.all(promises).then((result) => {
+            for(let i = 0; i < result.length; i++) {
+                let item = result[i];
+                if(item && item[0]) {
+                    return [item[0], null]
+                }
+            }
             let rs = result.map((item) => item[1])
             return [null, rs]
         }).catch((err) => {
