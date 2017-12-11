@@ -39,7 +39,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -54,7 +54,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -73,7 +73,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -92,7 +92,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -114,7 +114,7 @@ export class BaseModel {
                     if (res && res.Items && res.Items.length > 0) { exist = true }
                     return reslove([0, exist])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
         // const params = {
@@ -137,7 +137,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -155,7 +155,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
