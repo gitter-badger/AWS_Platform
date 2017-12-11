@@ -25,14 +25,16 @@ export class LogModel extends BaseModel {
         // 管理员查询
         let query = {
             IndexName: 'LogRoleIndex',
-            Limit: inparam.pageSize,
-            ExclusiveStartKey: inparam.startKey,
+            ProjectionExpression: 'userId,createdAt,detail,ret,#role,suffix,#type,username,lastIP,lastLogin,levelIndex,userStatus,displayName,#action',
+            // Limit: inparam.pageSize,
+            // ExclusiveStartKey: inparam.startKey,
             ScanIndexForward: false,
             KeyConditionExpression: "#role = :role",
             FilterExpression: "#type = :type",
             ExpressionAttributeNames: {
                 '#role': 'role',
-                '#type': 'type'
+                '#type': 'type',
+                '#action': 'action',
             },
             ExpressionAttributeValues: {
                 ':role': inparam.role.toString(),
@@ -43,14 +45,16 @@ export class LogModel extends BaseModel {
         if (inparam.parent) {
             query = {
                 IndexName: 'LogRoleIndex',
-                Limit: inparam.pageSize,
-                ExclusiveStartKey: inparam.startKey,
+                ProjectionExpression: 'userId,createdAt,detail,ret,#role,suffix,#type,username,lastIP,lastLogin,levelIndex,userStatus,displayName,#action',
+                // Limit: inparam.pageSize,
+                // ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
                 KeyConditionExpression: "#role = :role",
                 FilterExpression: "(#type = :type AND #parent = :parent) OR (#type = :type AND #userId = :parent)",
                 ExpressionAttributeNames: {
                     '#role': 'role',
                     '#type': 'type',
+                    '#action': 'action',
                     '#parent': 'parent',
                     '#userId': 'userId'
                 },
@@ -65,6 +69,7 @@ export class LogModel extends BaseModel {
         if (!inparam.parent && inparam.level === 0) {
             query = {
                 IndexName: 'LogRoleIndex',
+                ProjectionExpression: 'userId,createdAt,detail,ret,#role,suffix,#type,username,lastIP,lastLogin,levelIndex,userStatus,displayName,#action',
                 // Limit: inparam.pageSize,
                 // ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
@@ -73,6 +78,7 @@ export class LogModel extends BaseModel {
                 ExpressionAttributeNames: {
                     '#role': 'role',
                     '#type': 'type',
+                    '#action': 'action',
                     '#level': 'level',
                     '#username': 'username'
                 },
@@ -88,6 +94,7 @@ export class LogModel extends BaseModel {
         else if (!inparam.parent && inparam.level === -1) {
             query = {
                 IndexName: 'LogRoleIndex',
+                ProjectionExpression: 'userId,createdAt,detail,ret,#role,suffix,#type,username,lastIP,lastLogin,levelIndex,userStatus,displayName,#action',
                 // Limit: inparam.pageSize,
                 // ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
@@ -96,6 +103,7 @@ export class LogModel extends BaseModel {
                 ExpressionAttributeNames: {
                     '#role': 'role',
                     '#type': 'type',
+                    '#action': 'action',
                     '#level': 'level',
                     '#username': 'username'
                 },
