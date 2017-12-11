@@ -15,7 +15,7 @@ export class UserModel extends BaseModel {
             userId: Model.StringValue
         }
     }
-    
+
     /**
      * 查看可用代理
      */
@@ -52,19 +52,17 @@ export class UserModel extends BaseModel {
                 ':levelIndex': inparam.parent
             }
         }
-        let [queryErr, queryRet] = [1, 1]
+        let finalQueryRet = { Items: [] }
         if (!inparam.parent) {
-            [queryErr, queryRet] = await this.query(allAgent)
+            let [queryErr, queryRet] = await this.query(allAgent)
+            finalQueryRet = queryRet
         }
         else {
-            [queryErr, queryRet] = await this.query(childAgent)
-        }
-
-        if (queryErr) {
-            return [queryErr, 0]
+            let [queryErr2, queryRet2] = await this.query(childAgent)
+            finalQueryRet = queryRet2
         }
         // 去除敏感数据
-        queryRet.Items = _.map(queryRet.Items, (item) => {
+        finalQueryRet.Items = _.map(finalQueryRet.Items, (item) => {
             item.passhash = null
             if (!inparam.parent) {
                 item.password = '********'
@@ -72,51 +70,25 @@ export class UserModel extends BaseModel {
             return item
         })
         // 按照层级排序
-        const sortResult = _.sortBy(queryRet.Items, ['level'])
+        const sortResult = _.sortBy(finalQueryRet.Items, ['level'])
         return [0, sortResult]
     }
 
     // 检查代理用户是否重复
     async checkUserBySuffix(role, suffix, username) {
-        // let [err, ret] = [0, 0]
-        // 对于代理管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
-        // if (suffix == 'Agent') {
-        //     [err, ret] = await this.queryUserBySuffix(role, suffix, username)
-        // } else {
-        //     // 对于其他用户，角色和前缀具有联合唯一性
-        //     [err, ret] = await this.query({
-        //         TableName: Tables.ZeusPlatformUser,
-        //         IndexName: 'RoleSuffixIndex',
-        //         KeyConditionExpression: '#suffix = :suffix and #role = :role',
-        //         ExpressionAttributeNames: {
-        //             '#role': 'role',
-        //             '#suffix': 'suffix'
-        //         },
-        //         ExpressionAttributeValues: {
-        //             ':suffix': suffix,
-        //             ':role': role
-        //         }
-        //     })
-        // }
-        // if (err) {
-        //     return [err, 0]
-        // }
-        // 还需要校验角色和用户名的唯一性
-        // if (suffix != 'Agent' && ret.Items.length == 0) {
-            let [err, ret] = await this.query({
-                TableName: Tables.ZeusPlatformUser,
-                IndexName: 'RoleUsernameIndex',
-                KeyConditionExpression: '#username = :username and #role = :role',
-                ExpressionAttributeNames: {
-                    '#role': 'role',
-                    '#username': 'username'
-                },
-                ExpressionAttributeValues: {
-                    ':username': username,
-                    ':role': role
-                }
-            })
-        // }
+        let [err, ret] = await this.query({
+            TableName: Tables.ZeusPlatformUser,
+            IndexName: 'RoleUsernameIndex',
+            KeyConditionExpression: '#username = :username and #role = :role',
+            ExpressionAttributeNames: {
+                '#role': 'role',
+                '#username': 'username'
+            },
+            ExpressionAttributeValues: {
+                ':username': username,
+                ':role': role
+            }
+        })
         if (ret.Items.length > 0) {
             return [0, false]
         } else {
@@ -140,10 +112,6 @@ export class UserModel extends BaseModel {
                 ':displayName': displayName
             }
         })
-
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, false]
         } else {
@@ -168,9 +136,6 @@ export class UserModel extends BaseModel {
                 '#role': 'role'
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         if (queryRet.Items.length - 1 != 0) {
             return [BizErr.UserNotFoundErr(), 0]
         }
@@ -190,9 +155,6 @@ export class UserModel extends BaseModel {
                 ':userId': userId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (querySet.Items.length - 1 != 0) {
             return [BizErr.UserNotFoundErr(), 0]
         }
@@ -241,9 +203,6 @@ export class UserModel extends BaseModel {
                 ':role': role
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         const User = queryRet.Items[0]
         if (!User) {
             return [BizErr.UserNotFoundErr(), 0]
@@ -317,9 +276,6 @@ export class UserModel extends BaseModel {
             ...userData,
             updatedAt: Model.timeStamp()
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, updateRet]
     }
 
@@ -338,9 +294,6 @@ export class UserModel extends BaseModel {
             }
         }
         const [queryErr, queryRet] = await this.scan(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 去除敏感数据（该方法不需要）
         // queryRet.Items = _.map(queryRet.Items, (item) => {
         //     item.passhash = null
