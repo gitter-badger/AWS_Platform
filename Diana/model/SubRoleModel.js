@@ -30,9 +30,6 @@ export class SubRoleModel extends BaseModel {
                 ':name': inparam.name
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr('已存在相同角色'), 0]
         }
@@ -42,9 +39,6 @@ export class SubRoleModel extends BaseModel {
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, dataItem]
     }
 
@@ -55,9 +49,6 @@ export class SubRoleModel extends BaseModel {
     async listSubRole(inparam) {
         const [err, ret] = await this.scan({
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
     }
 
@@ -75,9 +66,6 @@ export class SubRoleModel extends BaseModel {
                 ':name': inparam.name,
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -92,9 +80,6 @@ export class SubRoleModel extends BaseModel {
     async update(inparam) {
         // 更新
         const [err, ret] = await this.getOne(inparam)
-        if (err) {
-            return [err, 0]
-        }
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
@@ -102,9 +87,6 @@ export class SubRoleModel extends BaseModel {
         ret.remark = inparam.remark
         ret.updatedAt = Model.timeStamp()
         const [putErr, putRet] = await this.putItem(ret)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, ret]
     }
 

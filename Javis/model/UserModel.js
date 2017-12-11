@@ -52,7 +52,6 @@ export class UserModel extends BaseModel {
                 }
             }
             let [queryErr, queryRet] = await this.scan(platfromQuery)
-            if (queryErr) { return [queryErr, 0] }
             finalRet = queryRet
         }
         // 查询代理组织架构
@@ -87,7 +86,6 @@ export class UserModel extends BaseModel {
                 }
             }
             let [queryErr, queryRet] = await this.query(agentQuery)
-            if (queryErr) { return [queryErr, 0] }
             finalRet = queryRet
         }
 

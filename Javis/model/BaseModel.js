@@ -39,7 +39,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -54,7 +54,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -73,7 +73,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -92,7 +92,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -114,7 +114,7 @@ export class BaseModel {
                     if (res && res.Items && res.Items.length > 0) { exist = true }
                     return reslove([0, exist])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
         // const params = {
@@ -137,37 +137,9 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
-    }
-
-    /**
-     * 
-     * @param {*} query 
-     * @param {*} inparam (pageSize,startKey)
-     */
-    async page(query, inparam) {
-        let pageData = { Items: [], LastEvaluatedKey: {} }
-        let [err, ret] = [0, 0]
-        while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
-            [err, ret] = await this.query({
-                ...query,
-                ExclusiveStartKey: inparam.startKey
-            })
-            if (err) {
-                return [err, 0]
-            }
-            // 追加数据
-            if (pageData.Items.length > 0) {
-                pageData.Items.push(...ret.Items)
-                pageData.LastEvaluatedKey = ret.LastEvaluatedKey
-            } else {
-                pageData = ret
-            }
-            inparam.startKey = ret.LastEvaluatedKey
-        }
-        return [err, pageData]
     }
 
     /**
@@ -183,7 +155,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }

@@ -30,9 +30,6 @@ export class ConfigModel extends BaseModel {
                 ':code': inparam.code,
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {

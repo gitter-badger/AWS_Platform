@@ -33,9 +33,6 @@ export class UserModel extends BaseModel {
             }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         const User = queryRet.Items[0]
         if (!User) {
             return [BizErr.UserNotFoundErr(), 0]
@@ -64,15 +61,12 @@ export class UserModel extends BaseModel {
             }
             // 条件搜索
             if (!_.isEmpty(inparam.query)) {
-                const queryParams = this.buildQueryParams(inparam.query, true)
-                query.FilterExpression = queryParams.FilterExpression
-                query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-                query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+                const queryParams = this.bindFilterParams(query, inparam.query, true)
+                // query.FilterExpression = queryParams.FilterExpression
+                // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+                // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
             }
             const [queryErr, queryRet] = await this.query(query)
-            if (queryErr) {
-                return [queryErr, 0]
-            }
             // 排序输出
             let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
             if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
@@ -96,10 +90,10 @@ export class UserModel extends BaseModel {
             }
             // 条件搜索
             if (!_.isEmpty(inparam.query)) {
-                const queryParams = this.buildQueryParams(inparam.query, true)
-                query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-                query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-                query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+                const queryParams = this.bindFilterParams(query, inparam.query, true)
+                // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
+                // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+                // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
             }
             const [queryErr, queryRet] = await this.scan(query)
             // 排序输出
@@ -123,15 +117,12 @@ export class UserModel extends BaseModel {
         }
         // 条件搜索
         if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.buildQueryParams(inparam.query, true)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, true)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 排序输出
         let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }

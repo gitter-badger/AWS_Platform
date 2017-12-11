@@ -22,9 +22,6 @@ export class MysteryModel extends BaseModel {
      */
     async add(inparam) {
         const [err, ret] = await this.putItem(inparam)
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
     }
 
@@ -43,16 +40,12 @@ export class MysteryModel extends BaseModel {
             if (inparam.query.merchantName) { inparam.query.merchantName = { $like: inparam.query.merchantName } }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.nickname) { inparam.query.nickname = { $like: inparam.query.nickname } }
-            const queryParams = this.buildQueryParams(inparam.query, false)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
-        console.info(query)
         const [queryErr, adminRet] = await this.scan(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 排序输出
         let sortResult = _.sortBy(adminRet.Items, [inparam.sortkey || 'winAt'])
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }

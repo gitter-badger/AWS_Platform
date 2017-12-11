@@ -27,9 +27,6 @@ export class ConfigModel extends BaseModel {
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, dataItem]
     }
 
@@ -47,9 +44,6 @@ export class ConfigModel extends BaseModel {
                 ':code': inparam.code,
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {

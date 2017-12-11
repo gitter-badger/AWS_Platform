@@ -31,7 +31,6 @@ export class BillModel extends BaseModel {
                 ':userId': userId
             }
         })
-        if (queryErr) { return [queryErr, 0] }
         // 直接在内存里面做列表了. 如果需要进行缓存,以后实现
         let balanceSum = initPoint
         const waterfall = _.map(bills.Items, (item, index) => {
@@ -63,7 +62,6 @@ export class BillModel extends BaseModel {
                 ':userId': user.userId
             }
         })
-        if (queryErr) { return [queryErr, 0] }
         // 内部方法查询余额
         const [err, ret] = await this.checkUserBalance(user)
         // 返回最后一条账单记录和余额
@@ -116,7 +114,6 @@ export class BillModel extends BaseModel {
             }
         }
         let [queryErr, bills] = await this.query(query)
-        if (queryErr) { return [queryErr, 0] }
         // 4、账单汇总
         const sums = _.reduce(bills.Items, (sum, bill) => {
             return sum + bill.amount
@@ -188,7 +185,6 @@ export class BillModel extends BaseModel {
             }
         }
         let [queryErr, bills] = await this.query(query)
-        if (queryErr) { return [queryErr, 0] }
         // 4、账单汇总
         const sums = _.reduce(bills.Items, (sum, bill) => {
             return sum + bill.amount

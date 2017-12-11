@@ -209,30 +209,30 @@ functions:
           cors: true
           authorizer: tokenAuth
   # ==================== 以下是帮助中心接口服务 ====================
-  helpGenreList: 
-    handler: api_help.helpGenreList
-    events:
-      -
-        http:
-          path: /help/genres
-          method: get
-          cors: true
-          authorizer: tokenAuth
-  helpCreateGenre: 
-    handler: api_help.createHelpGenre
-    events:
-      -
-        http:
-          path: /help/genre/create
-          method: post
-          cors: true
-          authorizer: tokenAuth
-  createHelp: 
-    handler: api_help.createHelp
-    events:
-      -
-        http:
-          path: /help/create
-          method: post
-          cors: true
-          authorizer: tokenAuth
+  # helpGenreList: 
+  #   handler: api_help.helpGenreList
+  #   events:
+  #     -
+  #       http:
+  #         path: /help/genres
+  #         method: get
+  #         cors: true
+  #         authorizer: tokenAuth
+  # helpCreateGenre: 
+  #   handler: api_help.createHelpGenre
+  #   events:
+  #     -
+  #       http:
+  #         path: /help/genre/create
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth
+  # createHelp: 
+  #   handler: api_help.createHelp
+  #   events:
+  #     -
+  #       http:
+  #         path: /help/create
+  #         method: post
+  #         cors: true
+  #         authorizer: tokenAuth

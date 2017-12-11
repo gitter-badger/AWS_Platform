@@ -29,9 +29,6 @@ export class AdModel extends BaseModel {
                 ':adName': inparam.adName
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr('公告已存在'), 0]
         }
@@ -47,9 +44,6 @@ export class AdModel extends BaseModel {
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         // End:记录生成的编码
         this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'ad', code: inparam.adId } })
         return [0, dataItem]
@@ -82,15 +76,12 @@ export class AdModel extends BaseModel {
             }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
-            const queryParams = this.buildQueryParams(inparam.query, false)
-            query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [err, ret] = await this.scan(query)
-        if (err) {
-            return [err, 0]
-        }
         const sortResult = _.sortBy(ret.Items, ['createdAt'])
         return [0, sortResult]
     }
@@ -106,9 +97,6 @@ export class AdModel extends BaseModel {
                 ':adId': inparam.adId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -141,9 +129,6 @@ export class AdModel extends BaseModel {
     async updateAd(inparam) {
         // 更新
         const [err, ret] = await this.getOne(inparam)
-        if (err) {
-            return [err, 0]
-        }
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
@@ -167,10 +152,6 @@ export class AdModel extends BaseModel {
                 'adId': inparam.adId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
-
         // End:删除生成的编码
         this.db$('delete', { TableName: Tables.ZeusPlatformCode, Key: { type: 'ad', code: inparam.adId } })
 

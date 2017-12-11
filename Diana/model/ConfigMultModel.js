@@ -28,9 +28,6 @@ export class ConfigMultModel extends BaseModel {
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, dataItem]
     }
 
@@ -50,9 +47,6 @@ export class ConfigMultModel extends BaseModel {
                 ':businessKey': inparam.businessKey
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -75,9 +69,6 @@ export class ConfigMultModel extends BaseModel {
             }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         return [0, queryRet.Items]
     }
 }

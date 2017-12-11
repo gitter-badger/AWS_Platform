@@ -35,9 +35,7 @@ export class CaptchaModel extends BaseModel {
                 ':code': userLoginInfo.captcha
             }
         })
-        if (err) {
-            return [BizErr.DBErr(err.toString()), 0]
-        } else if (ret.Items.length == 0) {
+        if (ret.Items.length == 0) {
             return [BizErr.CaptchaErr(), 0]
         } else {
             if (Model.timeStamp() - ret.Items[0].updatedAt > 30000) {

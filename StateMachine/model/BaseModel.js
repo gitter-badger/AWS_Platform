@@ -39,7 +39,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -54,7 +54,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -73,7 +73,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -92,7 +92,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -114,7 +114,7 @@ export class BaseModel {
                     if (res && res.Items && res.Items.length > 0) { exist = true }
                     return reslove([0, exist])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
         // const params = {
@@ -155,34 +155,6 @@ export class BaseModel {
     }
 
     /**
-     * 
-     * @param {*} query 
-     * @param {*} inparam (pageSize,startKey)
-     */
-    async page(query, inparam) {
-        let pageData = { Items: [], LastEvaluatedKey: {} }
-        let [err, ret] = [0, 0]
-        while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
-            [err, ret] = await this.query({
-                ...query,
-                ExclusiveStartKey: inparam.startKey
-            })
-            if (err) {
-                return [err, 0]
-            }
-            // 追加数据
-            if (pageData.Items.length > 0) {
-                pageData.Items.push(...ret.Items)
-                pageData.LastEvaluatedKey = ret.LastEvaluatedKey
-            } else {
-                pageData = ret
-            }
-            inparam.startKey = ret.LastEvaluatedKey
-        }
-        return [err, pageData]
-    }
-
-    /**
      * 全表查询数据
      */
     scan(conditions = {}) {
@@ -214,11 +186,15 @@ export class BaseModel {
     }
 
     /**
-     * 构建搜索条件
+     * 绑定筛选条件
+     * @param {*} oldquery 原始查询条件
      * @param {*} conditions 查询条件对象
      * @param {*} isDefault 是否默认全模糊搜索
      */
-    buildQueryParams(conditions = {}, isDefault) {
+    bindFilterParams(oldquery = {}, conditions = {}, isDefault) {
+        if (_.isEmpty(oldquery) || _.isEmpty(conditions)) {
+            return
+        }
         // 默认设置搜索条件，所有查询模糊匹配
         if (isDefault) {
             for (let key in conditions) {
@@ -286,6 +262,16 @@ export class BaseModel {
             }
             if (index != keys.length - 1) opts.FilterExpression += " and "
         })
+
+        // 绑定筛选至原来的查询对象
+        if (oldquery.FilterExpression) {
+            oldquery.FilterExpression += (' AND ' + opts.FilterExpression)
+        } else {
+            oldquery.FilterExpression = opts.FilterExpression
+        }
+        oldquery.ExpressionAttributeNames = { ...oldquery.ExpressionAttributeNames, ...opts.ExpressionAttributeNames }
+        oldquery.ExpressionAttributeValues = { ...oldquery.ExpressionAttributeValues, ...opts.ExpressionAttributeValues }
+
         return opts
     }
 }
