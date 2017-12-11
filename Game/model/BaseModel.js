@@ -143,34 +143,6 @@ export class BaseModel {
     }
 
     /**
-     * 
-     * @param {*} query 
-     * @param {*} inparam (pageSize,startKey)
-     */
-    async page(query, inparam) {
-        let pageData = { Items: [], LastEvaluatedKey: {} }
-        let [err, ret] = [0, 0]
-        while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
-            [err, ret] = await this.query({
-                ...query,
-                ExclusiveStartKey: inparam.startKey
-            })
-            if (err) {
-                return [err, 0]
-            }
-            // 追加数据
-            if (pageData.Items.length > 0) {
-                pageData.Items.push(...ret.Items)
-                pageData.LastEvaluatedKey = ret.LastEvaluatedKey
-            } else {
-                pageData = ret
-            }
-            inparam.startKey = ret.LastEvaluatedKey
-        }
-        return [err, pageData]
-    }
-
-    /**
      * 全表查询数据
      */
     scan(conditions = {}) {
