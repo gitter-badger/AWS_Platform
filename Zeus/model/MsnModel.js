@@ -31,9 +31,6 @@ export class MsnModel extends BaseModel {
                 ':msn': inparam.msn
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         return [0, queryRet]
     }
 
@@ -55,9 +52,6 @@ export class MsnModel extends BaseModel {
                 ':lockStatus': MSNStatusEnum['Locked']
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         return [0, (queryRet.Items.length == 0)]
     }
 

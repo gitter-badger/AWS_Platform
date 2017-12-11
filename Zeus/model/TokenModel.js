@@ -36,9 +36,6 @@ export class TokenModel extends BaseModel {
                 ':userId': inparam.userId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         // 存在，则判断是否过期
         if (ret.Items.length > 0) {
             // 超过2小时过期
@@ -49,9 +46,6 @@ export class TokenModel extends BaseModel {
             else {
                 ret.Items[0].iat = Math.floor(Date.now() / 1000) - 30
                 const [putErr, putRet] = await this.putItem(ret.Items[0])
-                if (putErr) {
-                    return [putErr, 0]
-                }
             }
         }
         // 不存在，返回错误

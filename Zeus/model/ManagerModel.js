@@ -51,9 +51,6 @@ export class ManagerModel extends BaseModel {
             // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
             item.passhash = null

@@ -37,9 +37,6 @@ export class AdminModel extends BaseModel {
             // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [queryErr, adminRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 去除敏感数据
         adminRet.Items = _.map(adminRet.Items, (item) => {
             item.passhash = null
