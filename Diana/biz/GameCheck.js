@@ -78,7 +78,7 @@ export class GameCheck {
      */
     checkQuery(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "gameType", type: "NS", min: 5, max: 17 }]
+            { name: "gameType", type: "NS", min: 5, max: 170 }]
             , inparam)
 
         if (checkAttError) {
