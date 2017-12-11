@@ -72,12 +72,12 @@ export class ToolModel extends BaseModel {
         // 条件搜索
         let query = {}
         if (!_.isEmpty(inparam.query)) {
-            if (inparam.query.toolId) { inparam.query.toolId = {$like:inparam.query.toolId }}
+            if (inparam.query.toolId) { inparam.query.toolId = { $like: inparam.query.toolId } }
             if (inparam.query.toolName) { inparam.query.toolName = { $like: inparam.query.toolName } }
-            const queryParams = this.buildQueryParams(inparam.query, false)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         // 查询
         const [err, ret] = await this.scan(query)
@@ -102,7 +102,7 @@ export class ToolModel extends BaseModel {
                 ':toolPrice': inparam.toolPrice,
                 ':comeUpRatio': inparam.comeUpRatio,
                 ':lowerRatio': inparam.lowerRatio,
-                ':status':inparam.status
+                ':status': inparam.status
             }
         }
         const [err, ret] = await this.updateItem(updateObj)
