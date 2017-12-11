@@ -31,9 +31,6 @@ export class GameModel extends BaseModel {
                 ':gameName': gameInfo.gameName
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr(), 0]
         }
@@ -45,9 +42,6 @@ export class GameModel extends BaseModel {
                 ':kindId': gameInfo.kindId,
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr('KindId已存在'), 0]
         }
@@ -57,9 +51,6 @@ export class GameModel extends BaseModel {
             ...gameInfo
         }
         const [putErr, putRet] = await this.putItem(item)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, item]
     }
 
@@ -102,9 +93,6 @@ export class GameModel extends BaseModel {
             ScanIndexForward: false,
             ExpressionAttributeValues: values
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret.Items]
     }
 
@@ -141,9 +129,6 @@ export class GameModel extends BaseModel {
                 ':gameId': gameId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -162,9 +147,6 @@ export class GameModel extends BaseModel {
                 ':companyId': inparam.companyId,
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
     }
 }
