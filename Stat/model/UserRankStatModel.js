@@ -25,9 +25,6 @@ export class UserRankStatModel extends BaseModel {
                 ':nickname': Model.StringValue
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         const sortResult = _.sortBy(ret.Items, [inparam.sortkey])
         const descResult = sortResult.reverse()
         for (let i = 1; i <= descResult.length; i++) {

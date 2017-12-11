@@ -30,10 +30,6 @@ export class PlayerBillDetailModel extends BaseModel {
                 ':type2': 4
             }
         })
-        if (err) {
-            return [err, 0]
-        }
-
         return [0, ret.Items]
     }
 

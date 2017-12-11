@@ -90,7 +90,6 @@ export class SysBillModel extends BaseModel {
                     }
                 }
                 const [merchantsErr, merchantsRet] = await self.scan(query)
-                if (merchantsErr) return [merchantsErr, 0]
                 console.log('线路商所有下级商户的个数：' + merchantsRet.Items.length)
                 let userIdsArr = []
                 for (let merchant of merchantsRet.Items) {
@@ -137,7 +136,6 @@ export class SysBillModel extends BaseModel {
             }
         }
         const [merchantsErr, merchantsRet] = await this.query(query)
-        if (merchantsErr) return [merchantsErr, 0]
         console.log('平台所有下级商户的个数：' + merchantsRet.Items.length)
         let userIdsArr = []
         for (let merchant of merchantsRet.Items) {
@@ -179,7 +177,6 @@ export class SysBillModel extends BaseModel {
                     }
                 }
                 const [agentsErr, agentsRet] = await self.scan(query)
-                if (agentsErr) return [agentsErr, 0]
                 console.log('所有下级代理的个数：' + agentsRet.Items.length)
                 let userIdsArr = []
                 for (let agent of agentsRet.Items) {
@@ -227,7 +224,6 @@ export class SysBillModel extends BaseModel {
             }
         }
         const [agentsErr, agentsRet] = await this.query(query)
-        if (agentsErr) return [agentsErr, 0]
         console.log('所有下级代理的个数：' + agentsRet.Items.length)
         let userIdsArr = []
         for (let agent of agentsRet.Items) {

@@ -33,9 +33,6 @@ export class UserModel extends BaseModel {
             }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         const User = queryRet.Items[0]
         if (!User) {
             return [BizErr.UserNotFoundErr(), 0]
@@ -70,9 +67,6 @@ export class UserModel extends BaseModel {
                 // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
             }
             const [queryErr, queryRet] = await this.query(query)
-            if (queryErr) {
-                return [queryErr, 0]
-            }
             // 排序输出
             let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
             if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
@@ -129,9 +123,6 @@ export class UserModel extends BaseModel {
             // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 排序输出
         let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
