@@ -29,9 +29,6 @@ export class UserModel extends BaseModel {
             }
         }
         const [queryErr, queryRet] = await this.scan(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         return [0, queryRet.Items]
     }
 }

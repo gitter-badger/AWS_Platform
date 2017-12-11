@@ -31,9 +31,6 @@ export class ToolModel extends BaseModel {
                 ':toolName': inparam.toolName
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr('道具已存在'), 0]
         }
@@ -56,9 +53,6 @@ export class ToolModel extends BaseModel {
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         // End:记录生成的编码
         this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: inparam.toolId } })
         return [0, dataItem]
@@ -81,9 +75,6 @@ export class ToolModel extends BaseModel {
         }
         // 查询
         const [err, ret] = await this.scan(query)
-        if (err) {
-            return [err, 0]
-        }
         const sortResult = _.sortBy(ret.Items, ['createdAt'])
         return [0, sortResult]
     }
@@ -106,9 +97,6 @@ export class ToolModel extends BaseModel {
             }
         }
         const [err, ret] = await this.updateItem(updateObj)
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
     }
     /**
@@ -123,9 +111,6 @@ export class ToolModel extends BaseModel {
                 ':toolId': inparam.toolId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -177,9 +162,6 @@ export class ToolModel extends BaseModel {
         // }
         // 更新
         let [err, ret] = await this.getOne(inparam)
-        if (err) {
-            return [err, 0]
-        }
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
@@ -197,29 +179,26 @@ export class ToolModel extends BaseModel {
      */
     async delete(inparam) {
         // 检查是否可以删除
-        let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
-        if (ret) {
+        let [err1, ret1] = await new PackageModel().findIdsContains(inparam.toolId)
+        if (ret1) {
             return [BizErr.ItemUsed('道具在礼包中，不可删除'), 0]
         }
-        [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
-        if (ret) {
+        let [err2, ret2] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
+        if (ret2) {
             return [BizErr.ItemUsed('道具在展位中，不可删除'), 0]
         }
         // 删除
-        [err, ret] = await this.deleteItem({
+        let [err3, ret3] = await this.deleteItem({
             Key: {
                 'toolName': inparam.toolName,
                 'toolId': inparam.toolId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
 
         // End:删除生成的编码
         this.db$('delete', { TableName: Tables.ZeusPlatformCode, Key: { type: 'tool', code: inparam.toolId } })
 
-        return [0, ret]
+        return [0, ret3]
     }
 }
 

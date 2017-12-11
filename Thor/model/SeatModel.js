@@ -41,7 +41,6 @@ export class SeatModel extends BaseModel {
         }
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
-        if (existErr) { return [existErr, 0] }
         if (exist) { return [BizErr.ItemExistErr('编号已存在'), 0] }
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
@@ -58,9 +57,6 @@ export class SeatModel extends BaseModel {
             ...inparam
         }
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, dataItem]
     }
 
@@ -101,9 +97,6 @@ export class SeatModel extends BaseModel {
         }
         // 查询
         const [err, ret] = await this.scan(query)
-        if (err) {
-            return [err, 0]
-        }
         const retOrderBy = _.sortBy(ret.Items, ['order'])
         return [0, retOrderBy]
     }
@@ -145,9 +138,6 @@ export class SeatModel extends BaseModel {
         }
         // 查询
         const [err, ret] = await this.scan(query)
-        if (err) {
-            return [err, 0]
-        }
         let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
 
         let arrInfo = []
@@ -167,9 +157,6 @@ export class SeatModel extends BaseModel {
                 ':seatId': inparam.seatId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -221,11 +208,9 @@ export class SeatModel extends BaseModel {
         query.ExpressionAttributeValues[':seatId'] = inparam.seatId
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
-        if (existErr) { return [existErr, 0] }
         if (exist) { return [BizErr.ItemExistErr('编号已存在'), 0] }
         // 更新
         const [err, ret] = await this.getOne(inparam)
-        if (err) { return [err, 0] }
         if (!ret) { return [new BizErr.ItemNotExistErr(), 0] }
         ret.order = inparam.order
         ret.price = inparam.price
@@ -257,9 +242,6 @@ export class SeatModel extends BaseModel {
                 'seatId': inparam.seatId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
     }
     /**

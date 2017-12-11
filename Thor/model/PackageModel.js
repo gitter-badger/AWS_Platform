@@ -35,9 +35,6 @@ export class PackageModel extends BaseModel {
                 ':packageName': inparam.packageName
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr('道具包已存在'), 0]
         }
@@ -53,9 +50,6 @@ export class PackageModel extends BaseModel {
             ...inparam
         }
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         // End:记录生成的编码
         this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'package', code: uucodeRet } })
         return [0, dataItem]
@@ -71,9 +65,6 @@ export class PackageModel extends BaseModel {
             // FilterExpression: ranges,
             // ExpressionAttributeValues: values
         })
-        if (err) {
-            return [err, 0]
-        }
         const sortResult = _.sortBy(ret.Items, ['createdAt'])
         return [0, sortResult]
     }
@@ -91,9 +82,6 @@ export class PackageModel extends BaseModel {
                 ':packageId': packageId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -131,15 +119,12 @@ export class PackageModel extends BaseModel {
      */
     async update(inparam) {
         // 检查是否可以变更
-        let [err, ret] = await new SeatModel().findIdsContains('package_' + inparam.packageId)
-        if (ret) {
+        let [err2, ret2] = await new SeatModel().findIdsContains('package_' + inparam.packageId)
+        if (ret2) {
             return [BizErr.ItemUsed('礼包在展位中，不可变更'), 0]
         }
         // 变更
-        [err, ret] = await this.getOne(inparam.packageName, inparam.packageId)
-        if (err) {
-            return [err, 0]
-        }
+        let [err, ret] = await this.getOne(inparam.packageName, inparam.packageId)
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
@@ -166,20 +151,17 @@ export class PackageModel extends BaseModel {
      */
     async delete(inparam) {
         // 检查是否可以删除
-        let [err, ret] = await new SeatModel().findIdsContains('package_' + inparam.packageId)
-        if (ret) {
+        let [err2, ret2] = await new SeatModel().findIdsContains('package_' + inparam.packageId)
+        if (ret2) {
             return [BizErr.ItemUsed('礼包在展位中，不可删除'), 0]
         }
         // 删除
-        [err, ret] = await this.deleteItem({
+        let [err, ret] = await this.deleteItem({
             Key: {
                 'packageName': inparam.packageName,
                 'packageId': inparam.packageId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
 
         // End:删除生成的编码
         this.db$('delete', { TableName: Tables.ZeusPlatformCode, Key: { type: 'package', code: inparam.packageId } })

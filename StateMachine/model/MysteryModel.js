@@ -22,9 +22,6 @@ export class MysteryModel extends BaseModel {
      */
     async add(inparam) {
         const [err, ret] = await this.putItem(inparam)
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
     }
 
@@ -48,11 +45,7 @@ export class MysteryModel extends BaseModel {
             // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
             // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
-        console.info(query)
         const [queryErr, adminRet] = await this.scan(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 排序输出
         let sortResult = _.sortBy(adminRet.Items, [inparam.sortkey || 'winAt'])
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
