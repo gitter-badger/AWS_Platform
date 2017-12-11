@@ -65,8 +65,8 @@ export class LogModel extends BaseModel {
         if (!inparam.parent && inparam.level === 0) {
             query = {
                 IndexName: 'LogRoleIndex',
-                Limit: inparam.pageSize,
-                ExclusiveStartKey: inparam.startKey,
+                // Limit: inparam.pageSize,
+                // ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
                 KeyConditionExpression: "#role = :role",
                 FilterExpression: "#type = :type AND (#level = :level OR #username = :username)",
@@ -88,8 +88,8 @@ export class LogModel extends BaseModel {
         else if (!inparam.parent && inparam.level === -1) {
             query = {
                 IndexName: 'LogRoleIndex',
-                Limit: inparam.pageSize,
-                ExclusiveStartKey: inparam.startKey,
+                // Limit: inparam.pageSize,
+                // ExclusiveStartKey: inparam.startKey,
                 ScanIndexForward: false,
                 KeyConditionExpression: "#role = :role",
                 FilterExpression: "#type = :type AND #level <> :level AND #username <> :username",

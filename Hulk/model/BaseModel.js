@@ -141,51 +141,56 @@ export class BaseModel {
      * @param {*} conditions 
      */
     queryOnce(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
-            }
-            this.db$('query', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
-        })
+        // return new Promise((reslove, reject) => {
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.db$('query', params)
+        // .then((res) => {
+        //     return reslove([0, res])
+        // }).catch((err) => {
+        //     return reslove([BizErr.DBErr(err.toString()), false])
+        // })
+        // })
     }
 
     /**
-     * 
+     * 分页查询
      * @param {*} query 
      * @param {*} inparam (pageSize,startKey)
      */
     async page(query, inparam) {
+        // 初始化返回数据
         let pageData = { Items: [], LastEvaluatedKey: {} }
-        let [err, ret] = [0, 0]
+        // 查询数量不足且数据库仍有数据，则继续循环查询
         while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
-            [err, ret] = await this.queryOnce({
+            let ret = await this.queryOnce({
                 ...query,
+                Limit: inparam.pageSize,
                 ExclusiveStartKey: inparam.startKey
             })
-            if (err) {
-                return [err, 0]
-            }
             // 追加数据
             if (pageData.Items.length > 0) {
                 pageData.Items.push(...ret.Items)
-                pageData.LastEvaluatedKey = ret.LastEvaluatedKey
             } else {
                 pageData = ret
             }
+            // 更新最后一条键值
+            pageData.LastEvaluatedKey = ret.LastEvaluatedKey
+            // 更新起始KEY
             inparam.startKey = ret.LastEvaluatedKey
+            // 需要查询的数量减少
+            inparam.pageSize -= ret.Items.length
         }
+        // 最后查询键
+        pageData.LastEvaluatedKey = _.pick(pageData.Items[pageData.Items.length - 1], inparam.lastEvaluatedKeyTemplate)
         // 最后数据超过指定长度，则截取指定长度
-        if (pageData.Items.length > inparam.pageSize) {
-            pageData.Items = _.slice(pageData.Items, 0, inparam.pageSize)
-            pageData.LastEvaluatedKey = _.pick(pageData.Items[pageData.Items.length - 1], inparam.LastEvaluatedKeyTemplate)
-        }
-        return [err, pageData]
+        // if (pageData.Items.length > inparam.pageSize) {
+        //     pageData.Items = _.slice(pageData.Items, 0, inparam.pageSize)
+        //     pageData.LastEvaluatedKey = _.pick(pageData.Items[pageData.Items.length - 1], inparam.LastEvaluatedKeyTemplate)
+        // }
+        return [0, pageData]
     }
 
     /**
