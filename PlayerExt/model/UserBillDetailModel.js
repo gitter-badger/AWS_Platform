@@ -64,7 +64,7 @@ export class UserBillDetailModel extends athena.BaseModel {
         let opts = {
             IndexName : "UserNameIndex",
             ScanIndexForward :false,
-            ProjectionExpression : ["sn","createdAt","#type","originalAmount","amount","balance","businessKey","remark","betId","userName","billId"].join(","),
+            ProjectionExpression : ["sn","createdAt","#type","originalAmount","amount","balance","businessKey","remark","betId","userName","billId","id"].join(","),
             KeyConditionExpression : "createdAt between :startTime and :endTime and userName=:userName",
             ExpressionAttributeValues : {
                 ":startTime":startTime,

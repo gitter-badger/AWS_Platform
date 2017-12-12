@@ -88,7 +88,17 @@ const billFlow = async(event, context, cb) => {
       }
   }
   function isSort(a, b){
+    if(sortKey =="createdAt"){
+      if(a[sortKey] == b[sortKey]) {
+        a.id = a.id || "";
+        b.id = b.id || "";
+        return sortMode == "asce" ? a.id > b.id : a.id < b.id
+      }else {
+        return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+      }
+    }else {
       return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+    }
   }
   function buildObj(item) {
     return {
@@ -96,6 +106,7 @@ const billFlow = async(event, context, cb) => {
       createdAt : item.createdAt,
       type : item.type,
       billId : item.billId,
+      id : item.id,
       businessKey : item.businessKey || "",
       originalAmount : item.originalAmount || 0,
       balance : item.balance || "",
