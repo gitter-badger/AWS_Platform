@@ -22,16 +22,18 @@ export class SeatModel extends BaseModel {
      */
     async list(inparam) {
         let query = {
-            FilterExpression: 'operatorRole=:operatorRole',
+            FilterExpression: 'operatorRole=:operatorRole AND seatType=:seatType',
             ExpressionAttributeValues: {
-                ':operatorRole': RoleCodeEnum.PlatformAdmin
+                ':operatorRole': RoleCodeEnum.PlatformAdmin,
+                ':seatType': '2'
             }
         }
         if (inparam.operatorName) {
             query = {
-                FilterExpression: 'operatorName=:operatorName',
+                FilterExpression: 'operatorName=:operatorName AND seatType=:seatType',
                 ExpressionAttributeValues: {
-                    ':operatorName': inparam.operatorName
+                    ':operatorName': inparam.operatorName,
+                    ':seatType': '2'
                 }
             }
         }
@@ -40,9 +42,10 @@ export class SeatModel extends BaseModel {
         // 如果没有数据，再查询平台的数据
         if (!ret.Items || ret.Items.length == 0) {
             const [err2, ret2] = await this.scan({
-                FilterExpression: 'operatorRole=:operatorRole',
+                FilterExpression: 'operatorRole=:operatorRole AND seatType=:seatType',
                 ExpressionAttributeValues: {
-                    ':operatorRole': RoleCodeEnum.PlatformAdmin
+                    ':operatorRole': RoleCodeEnum.PlatformAdmin,
+                    ':seatType': '2'
                 }
             })
             return [0, ret2.Items]
