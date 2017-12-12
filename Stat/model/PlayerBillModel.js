@@ -31,8 +31,8 @@ export class PlayerBillModel extends BaseModel {
                     let winlose = res.winlose
                     let betCount = res.betCount
                     let mixAmount = res.mixAmount
-                    let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
-                    console.log('玩家id:' + gameUserId + '玩家bet:' + bet + '玩家winlose:' + winlose + '次数:' + betCount + '比例:' + winloseRate)
+                    // let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
+                    console.log('玩家id:' + gameUserId + '玩家bet:' + bet + '玩家winlose:' + winlose + '次数:' + betCount)
                     // 返回数据
                     let finalResult = {
                         gameUserId: gameUserId,
@@ -40,7 +40,7 @@ export class PlayerBillModel extends BaseModel {
                         winlose: +winlose.toFixed(2),
                         betCount: betCount,
                         mixAmount: mixAmount,
-                        winloseRate: winloseRate,
+                        // winloseRate: winloseRate,
                         mix: res.mix,
                         rate: res.rate
                     }
