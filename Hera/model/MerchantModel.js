@@ -30,6 +30,12 @@ export class MerchantModel extends athena.BaseModel {
             promises.push(promise);
         }
         return Promise.all(promises).then((result) => {
+            for(let i = 0; i < result.length; i++) {
+                let item = result[i];
+                if(item && item[0]) {
+                    return [item[0], null]
+                }
+            }
             let rs = result.map((item) => item[1])
             return [null, rs]
         }).catch((err) => {

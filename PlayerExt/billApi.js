@@ -32,14 +32,14 @@ const ResFail = (callback, res) => {
  * @param {*} cb 
  */
 const billFlow = async(event, context, cb) => {
-  const [tokenErr, token] = await Model.currentToken(event);
-  if (tokenErr) {
-    return ResFail(cb, tokenErr)
-  }
-  const [e, tokenInfo] = await JwtVerify(token[1])
-  if(e) {
-    return ResFail(cb, e)
-  }
+  // const [tokenErr, token] = await Model.currentToken(event);
+  // if (tokenErr) {
+  //   return ResFail(cb, tokenErr)
+  // }
+  // const [e, tokenInfo] = await JwtVerify(token[1])
+  // if(e) {
+  //   return ResFail(cb, e)
+  // }
    //检查参数是否合法
   console.log(event.body);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
