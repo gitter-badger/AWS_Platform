@@ -48,15 +48,12 @@ export class MerchantModel extends BaseModel {
             if (inparam.query.msn) { inparam.query.msn = parseInt(inparam.query.msn).toString() }
             if (inparam.query.suffix) { inparam.query.suffix = { $like: inparam.query.suffix } }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
-            const queryParams = this.buildQueryParams(inparam.query, false)
-            query.FilterExpression = queryParams.FilterExpression
-            query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
             item.passhash = null

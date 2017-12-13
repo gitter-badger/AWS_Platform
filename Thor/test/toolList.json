@@ -14,5 +14,10 @@
             "sourceIp": "127.0.0.1"
         }
     },
-    "body": {}
+    "body": {
+        "query":{
+            "toolId":"道具id",
+            "toolName":"道具名称"
+        }
+    }
 }

@@ -115,6 +115,7 @@ export class UserBillDetailModel extends athena.BaseModel {
             }
         }
         let [queryErr, serialList] = await this.promise("query", opts);
+        console.log(serialList);
         if(queryErr) return [queryErr];
         let sumList = [], sumObj = {};
         serialList.forEach(function(element) {

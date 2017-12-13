@@ -31,9 +31,6 @@ export class ToolModel extends BaseModel {
                 ':toolName': inparam.toolName
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr('道具已存在'), 0]
         }
@@ -56,9 +53,6 @@ export class ToolModel extends BaseModel {
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         // End:记录生成的编码
         this.db$('put', { TableName: Tables.ZeusPlatformCode, Item: { type: 'tool', code: inparam.toolId } })
         return [0, dataItem]
@@ -69,43 +63,42 @@ export class ToolModel extends BaseModel {
      * @param {*} inparam
      */
     async list(inparam) {
-        inparam = { toolName: null, toolStatus: 1 }
-        let ranges = Model.getInparamRanges(inparam)
-        let values = Model.getInparamValues(inparam)
-        // 组装条件
-        // let ranges = _.map(inparam, (v, i) => {
-        //     if (v === null) {
-        //         return null
-        //     }
-        //     if (i == 'toolName') {
-        //         return `contains(${i}, :${i})`
-        //     } else {
-        //         return `${i} = :${i}`
-        //     }
-        // })
-        // _.remove(ranges, (v) => v === null)
-        // ranges = _.join(ranges, ' AND ')
-        // 组装条件值
-        // const values = _.reduce(inparam, (result, v, i) => {
-        //     if (v !== null) {
-        //         result[`:${i}`] = v
-        //     }
-        //     return result
-        // }, {})
-        console.info(ranges)
-        console.info(values)
-        // 查询
-        const [err, ret] = await this.scan({
-            // FilterExpression: ranges,
-            // ExpressionAttributeValues: values
-        })
-        if (err) {
-            return [err, 0]
+        // 条件搜索
+        let query = {}
+        if (!_.isEmpty(inparam.query)) {
+            if (inparam.query.toolId) { inparam.query.toolId = { $like: inparam.query.toolId } }
+            if (inparam.query.toolName) { inparam.query.toolName = { $like: inparam.query.toolName } }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression = queryParams.FilterExpression
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
+        // 查询
+        const [err, ret] = await this.scan(query)
         const sortResult = _.sortBy(ret.Items, ['createdAt'])
         return [0, sortResult]
     }
 
+    /**
+     * 设置道具价格
+     */
+    async setPrice(inparam) {
+        let updateObj = {
+            Key: { 'toolName': inparam.toolName, 'toolId': inparam.toolId },
+            UpdateExpression: 'SET toolPrice=:toolPrice ,comeUpRatio=:comeUpRatio,lowerRatio=:lowerRatio,#status=:status',
+            ExpressionAttributeNames: {
+                '#status': 'status'
+            },
+            ExpressionAttributeValues: {
+                ':toolPrice': inparam.toolPrice,
+                ':comeUpRatio': inparam.comeUpRatio,
+                ':lowerRatio': inparam.lowerRatio,
+                ':status': inparam.status
+            }
+        }
+        const [err, ret] = await this.updateItem(updateObj)
+        return [0, ret]
+    }
     /**
      * 查询单个道具
      * @param {*} inparam
@@ -118,9 +111,6 @@ export class ToolModel extends BaseModel {
                 ':toolId': inparam.toolId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -172,9 +162,6 @@ export class ToolModel extends BaseModel {
         // }
         // 更新
         let [err, ret] = await this.getOne(inparam)
-        if (err) {
-            return [err, 0]
-        }
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
@@ -192,29 +179,26 @@ export class ToolModel extends BaseModel {
      */
     async delete(inparam) {
         // 检查是否可以删除
-        let [err, ret] = await new PackageModel().findIdsContains(inparam.toolId)
-        if (ret) {
+        let [err1, ret1] = await new PackageModel().findIdsContains(inparam.toolId)
+        if (ret1) {
             return [BizErr.ItemUsed('道具在礼包中，不可删除'), 0]
         }
-        [err, ret] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
-        if (ret) {
+        let [err2, ret2] = await new SeatModel().findIdsContains('tool_' + inparam.toolId)
+        if (ret2) {
             return [BizErr.ItemUsed('道具在展位中，不可删除'), 0]
         }
         // 删除
-        [err, ret] = await this.deleteItem({
+        let [err3, ret3] = await this.deleteItem({
             Key: {
                 'toolName': inparam.toolName,
                 'toolId': inparam.toolId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
 
         // End:删除生成的编码
         this.db$('delete', { TableName: Tables.ZeusPlatformCode, Key: { type: 'tool', code: inparam.toolId } })
 
-        return [0, ret]
+        return [0, ret3]
     }
 }
 

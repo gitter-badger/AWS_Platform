@@ -33,9 +33,6 @@ export class UserModel extends BaseModel {
                 ':status': StatusEnum.Enable
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 按照层级排序
         const sortResult = _.sortBy(queryRet.Items, ['level'])
 
@@ -47,7 +44,7 @@ export class UserModel extends BaseModel {
                 return [err, 0]
             }
             // else if (childs.length < user.limit) {
-                userArr.push(user)
+            userArr.push(user)
             // }
         }
 
@@ -77,9 +74,6 @@ export class UserModel extends BaseModel {
                 '#role': 'role'
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         if (queryRet.Items.length - 1 != 0) {
             return [BizErr.UserNotFoundErr(), 0]
         }
@@ -99,9 +93,6 @@ export class UserModel extends BaseModel {
                 ':userId': userId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (querySet.Items.length - 1 != 0) {
             return [BizErr.UserNotFoundErr(), 0]
         }
@@ -109,27 +100,44 @@ export class UserModel extends BaseModel {
     }
 
     /**
-     * 根据角色，前缀，用户名查询唯一用户
+     * 根据角色，前缀，用户名/线路号查询唯一用户
      * @param {*} role 
      * @param {*} suffix 
      * @param {*} username 
+     * @param {*} msn
      */
-    async queryUserBySuffix(role, suffix, username) {
-        return await this.query({
-            IndexName: 'RoleSuffixIndex',
-            KeyConditionExpression: '#suffix = :suffix and #role = :role',
-            FilterExpression: '#username = :username',
-            ExpressionAttributeNames: {
-                '#role': 'role',
-                '#suffix': 'suffix',
-                '#username': 'username'
-            },
-            ExpressionAttributeValues: {
-                ':suffix': suffix,
-                ':role': role,
-                ':username': `${suffix}_${username}`
-            }
-        })
+    async queryUserBySuffix(role, suffix, username, msn) {
+        if (msn) {
+
+            return await this.query({
+                KeyConditionExpression: '#role = :role',
+                FilterExpression: '#msn = :msn',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#msn': 'msn'
+                },
+                ExpressionAttributeValues: {
+                    ':role': role,
+                    ':msn': msn
+                }
+            })
+        } else {
+            return await this.query({
+                IndexName: 'RoleSuffixIndex',
+                KeyConditionExpression: '#suffix = :suffix and #role = :role',
+                FilterExpression: '#username = :username',
+                ExpressionAttributeNames: {
+                    '#role': 'role',
+                    '#suffix': 'suffix',
+                    '#username': 'username'
+                },
+                ExpressionAttributeValues: {
+                    ':suffix': suffix,
+                    ':role': role,
+                    ':username': `${suffix}_${username}`
+                }
+            })
+        }
     }
 
     /**
@@ -150,9 +158,6 @@ export class UserModel extends BaseModel {
                 ':role': role
             }
         })
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         const User = queryRet.Items[0]
         if (!User) {
             return [BizErr.UserNotFoundErr(), 0]
@@ -190,9 +195,6 @@ export class UserModel extends BaseModel {
             }
         }
         const [queryErr, queryRet] = await this.query(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
             item.passhash = null
@@ -221,9 +223,6 @@ export class UserModel extends BaseModel {
             }
         }
         const [queryErr, queryRet] = await this.scan(query)
-        if (queryErr) {
-            return [queryErr, 0]
-        }
         // 去除敏感数据（该方法不需要）
         // queryRet.Items = _.map(queryRet.Items, (item) => {
         //     item.passhash = null
@@ -244,15 +243,16 @@ export class UserModel extends BaseModel {
      * @param {*} username 
      */
     async checkUserBySuffix(role, suffix, username) {
-        let [err, ret] = [0, 0]
+        let finalRet = { Items: [] }
         // 对于平台管理员来说。 可以允许suffix相同，所以需要角色，前缀，用户名联合查询
         if (role === RoleCodeEnum['PlatformAdmin']) {
-            [err, ret] = await this.queryUserBySuffix(role, suffix, username)
+            let [err1, ret1] = await this.queryUserBySuffix(role, suffix, username, null)
+            finalRet = ret1
         }
         // 非代理
         else if (role != RoleCodeEnum['Agent']) {
             // 对于其他用户，角色和前缀具有联合唯一性
-            [err, ret] = await this.query({
+            let [err2, ret2] = await this.query({
                 TableName: Tables.ZeusPlatformUser,
                 IndexName: 'RoleSuffixIndex',
                 KeyConditionExpression: '#suffix = :suffix and #role = :role',
@@ -265,10 +265,11 @@ export class UserModel extends BaseModel {
                     ':role': role
                 }
             })
+            finalRet = ret2
         }
         // 代理需要校验角色和用户名的唯一性
         if (role == RoleCodeEnum['Agent']) {
-            [err, ret] = await this.query({
+            let [err3, ret3] = await this.query({
                 TableName: Tables.ZeusPlatformUser,
                 IndexName: 'RoleUsernameIndex',
                 KeyConditionExpression: '#username = :username and #role = :role',
@@ -281,12 +282,10 @@ export class UserModel extends BaseModel {
                     ':role': role
                 }
             })
+            finalRet = ret3
         }
 
-        if (err) {
-            return [err, 0]
-        }
-        if (ret.Items.length > 0) {
+        if (finalRet.Items.length > 0) {
             return [0, false]
         } else {
             return [0, true]
@@ -314,9 +313,6 @@ export class UserModel extends BaseModel {
             }
         })
 
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, false]
         } else {
@@ -390,9 +386,6 @@ export class UserModel extends BaseModel {
             ...userData,
             updatedAt: Model.timeStamp()
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, updateRet]
     }
 
@@ -429,9 +422,6 @@ export class UserModel extends BaseModel {
                 ':sn': sn
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, false]
         } else {

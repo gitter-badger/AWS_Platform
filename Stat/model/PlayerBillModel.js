@@ -31,7 +31,7 @@ export class PlayerBillModel extends BaseModel {
                     let winlose = res.winlose
                     let betCount = res.betCount
                     let mixAmount = res.mixAmount
-                    let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(2)
+                    let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
                     console.log('玩家id:' + gameUserId + '玩家bet:' + bet + '玩家winlose:' + winlose + '次数:' + betCount + '比例:' + winloseRate)
                     // 返回数据
                     let finalResult = {
@@ -41,6 +41,8 @@ export class PlayerBillModel extends BaseModel {
                         betCount: betCount,
                         mixAmount: mixAmount,
                         winloseRate: winloseRate,
+                        mix: res.mix,
+                        rate: res.rate
                     }
                     console.log('玩家id:' + gameUserId + '执行成功:' + new Date().getTime())
                     resolve(finalResult)
@@ -58,8 +60,13 @@ export class PlayerBillModel extends BaseModel {
         }
         let end = new Date().getTime()
         console.log('所有并发执行耗时：' + (end - start) + '毫秒')
-        console.log(finalRes)
-        return [false, finalRes]
+        let filterRes = []
+        for (let item of finalRes) {
+            if (item.betCount > 0) {
+                filterRes.push(item)
+            }
+        }
+        return [false, filterRes]
     }
 
     /**
@@ -72,11 +79,13 @@ export class PlayerBillModel extends BaseModel {
             console.log(inparam.gameUserId + '查询流水开始：' + new Date().getTime())
             let query = {
                 IndexName: 'userIdIndex',
-                ProjectionExpression: 'amount,betAmount,reAmount,busCount',
+                ProjectionExpression: 'amount,betAmount,reAmount,busCount,mixAmount,#mix,#rate',
                 KeyConditionExpression: '#userId  = :userId AND createAt between :createdAt0 AND :createdAt1',
                 FilterExpression: "gameType=:gameType",
                 ExpressionAttributeNames: {
                     '#userId': 'userId',
+                    '#mix': 'mix',
+                    '#rate': 'rate'
                 },
                 ExpressionAttributeValues: {
                     ':userId': parseInt(inparam.gameUserId),
@@ -88,17 +97,25 @@ export class PlayerBillModel extends BaseModel {
             self.query(query).then((resArr) => {
                 let res = resArr[1]
                 console.log('查询结束：' + new Date().getTime() + '查询流水个数' + res.Items.length)
-                let bet = 0         // 下注
-                let winlose = 0     // 输赢
-                let betCount = 0    // 次数
-                let mixAmount = 0   // 洗码率量
+                let bet = 0                 // 下注
+                let winlose = 0             // 输赢
+                let betCount = 0            // 次数
+                let mixAmount = 0           // 洗码率量
+                let mix = 0                 // 洗码比
+                let rate = 0                // 抽成比
+                // let commission = 0          // 佣金
+                // let agentTotalAmount = 0    // 代理总金额
+                // let agentSubmit = 0         // 代理交公司
+                // let profitRate = 0          // 获利比例
                 for (let item of res.Items) {
                     bet += Math.abs(parseFloat(item.betAmount || 0))
                     winlose += parseFloat(item.amount || 0)
                     betCount += parseInt(item.busCount || 0)
                     mixAmount += Math.abs(parseFloat(item.mixAmount || item.betAmount || 0))
+                    // mix = item.mix
+                    // rate = item.rate
                 }
-                resolve({ bet: bet, winlose: winlose, betCount: betCount, mixAmount: mixAmount })
+                resolve({ bet: bet, winlose: winlose, betCount: betCount, mixAmount: mixAmount, mix: mix, rate: rate })
             }).catch((err) => {
                 reject(err)
             })

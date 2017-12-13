@@ -908,6 +908,9 @@ async function settlement(event, context, callback) {
     if(getUserErr) {
       return errorHandler(callback, getUserErr, "settlement",  requestParams);
     }
+    if(!userInfo) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+    }
     if(userInfo.sessionId == "0") {
       return callback(null,ReHandler.success());
     }
@@ -931,13 +934,10 @@ async function settlement(event, context, callback) {
   }
   let company = game.company || {};
   let gameKey = company.companyKey;
-  console.log(gameKey);
   let serverSign = getSign(gameKey, [ "timestamp", "records", "gameId"], requestParams);
-  console.log(sign);
-  console.log(serverSign);
-  if(sign != serverSign) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
-  }
+  // if(sign != serverSign) {
+  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  // }
   //解压数据
   if(isZlib) {
     try{
@@ -980,9 +980,7 @@ async function settlement(event, context, callback) {
   }
 
   //退出游戏流程
-  if(!userInfo) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
-  }
+  
 
   //获取用户的余额
   let [balanceErr, oriBalance] = await new UserBillModel().getBalanceByUid(+userId);
@@ -1356,6 +1354,7 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
+  console.log(batchSaveArr);
   let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr, 0);
   if (batchSaveErr) {
     return callback(null, ReHandler.fail(batchSaveErr));
@@ -1413,7 +1412,7 @@ async function getPlayerGameRecord(event, context, callback) {
   }
   //检查商户信息是否正确
   const merchant = new MerchantModel();
-  const [queryMerchantError, merchantInfo] = await merchant.findById(+buId); 
+  const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);   
   if (queryMerchantError) return callback(null, ReHandler.fail(queryMerchantError));
   if (!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));

@@ -28,17 +28,13 @@ const ResFail = (callback, res) => {
 }
 
 const playerList = async (event,  context, cb) => {
-    console.log(event);
+    // console.log(event);
     //json转换
     let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
     if(parserErr) return cb(null, ReHandler.fail(parserErr));
     const [tokenErr, token] = await Model.currentToken(event);
     if (tokenErr) {
         return ResFail(cb, tokenErr)
-    }
-    const [e, tokenInfo] = await JwtVerify(token[1])
-    if(e) {
-        return ResFail(cb, e)
     }
     //检查参数是否合法
     let [checkAttError, errorParams] = athena.Util.checkProperties([

@@ -3,5 +3,5 @@
         "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6Ik5BODhBX2RheTAwMiIsInN1ZmZpeCI6Ik5BODhBIiwidXNlcklkIjoxODg0NDQsImlhdCI6MTUwMjg1NjUzM30.xthLmbQx6vX-nj17zfCW4uzEx5iCGnvoPWP3gFt8MSU"
     },
     "body" :
-    {"buId":"895537","userName":"","gameId":20001,"apiKey":"fcedfbaa-aa16-4769-859d-010854d35c80","pageSize":5,"startTime":0,"endTime":1512726740000,"lastTime":1512726740000}
+    {"sign":"eff7031d4aeb39a27f264c9550bf851dae2d6a5654a3c91f00a0fc412c85f26a","gameType":"50000","timestamp":"1513047594675","records":"eJyLrlYqLU4t8kxRslIytjRS0gFz/RJzU4ECIKaBgSFQMCm1BKwk2Cci0gmoDioWkglWZ2hqaGxgYm5qaWxhZg6USQdqBys3NYBoL0gsSs2DmBDgGOTqF+LpApKo1aGq7SaGZpak2B4LALwqRQk="}
 }

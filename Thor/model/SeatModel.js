@@ -33,13 +33,14 @@ export class SeatModel extends BaseModel {
             }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
-            query.FilterExpression = 'operatorName=' + inparam.token.username
+            query.FilterExpression = 'operatorName = :operatorName'
+            query.ExpressionAttributeValues[':operatorName'] = inparam.token.username
         } else {
-            query.FilterExpression = 'operatorRole=' + inparam.token.role
+            query.FilterExpression = 'operatorRole = :operatorRole'
+            query.ExpressionAttributeValues[':operatorRole'] = inparam.token.role
         }
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
-        if (existErr) { return [existErr, 0] }
         if (exist) { return [BizErr.ItemExistErr('编号已存在'), 0] }
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
@@ -56,9 +57,6 @@ export class SeatModel extends BaseModel {
             ...inparam
         }
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, dataItem]
     }
 
@@ -72,7 +70,7 @@ export class SeatModel extends BaseModel {
             FilterExpression: 'seatType = :seatType AND operatorRole=:operatorRole',
             ExpressionAttributeValues: {
                 ':seatType': inparam.seatType,
-                ':operatorRole': RoleCodeEnum.PlatformAdmin
+                ':operatorRole': inparam.operatorRole || RoleCodeEnum.PlatformAdmin
             }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
@@ -85,14 +83,69 @@ export class SeatModel extends BaseModel {
                 }
             }
         }
+        // 条件搜索
+        if (!_.isEmpty(inparam.query)) {
+            if (inparam.query.createdAt) {
+                inparam.query.createdAt = { $range: inparam.query.createdAt }
+            }
+            if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
+            if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+        }
         // 查询
         const [err, ret] = await this.scan(query)
-        if (err) {
-            return [err, 0]
-        }
-        return [0, ret.Items]
+        const retOrderBy = _.sortBy(ret.Items, ['order'])
+        return [0, retOrderBy]
     }
 
+    /**
+    * 查看所有商户席位列表
+    * @param {*} inparam
+    */
+    async listAll(inparam) {
+        let query = {
+            IndexName: 'SeatTypeIndex',
+            FilterExpression: 'seatType = :seatType AND operatorRole=:operatorRole',
+            ExpressionAttributeValues: {
+                ':seatType': inparam.seatType,
+                ':operatorRole': inparam.operatorRole || RoleCodeEnum.PlatformAdmin
+            }
+        }
+        if (!Model.isPlatformAdmin(inparam.token)) {
+            query = {
+                IndexName: 'SeatTypeIndex',
+                FilterExpression: 'seatType = :seatType AND operatorName=:operatorName',
+                ExpressionAttributeValues: {
+                    ':seatType': inparam.seatType,
+                    ':operatorName': inparam.token.username
+                }
+            }
+        }
+        // 条件搜索
+        if (!_.isEmpty(inparam.query)) {
+            if (inparam.query.createdAt) {
+                inparam.query.createdAt = { $range: inparam.query.createdAt }
+            }
+            if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
+            if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
+            const queryParams = this.bindFilterParams(query, inparam.query, false)
+            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
+            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+        }
+        // 查询
+        const [err, ret] = await this.scan(query)
+        let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
+
+        let arrInfo = []
+        for (let key in objectInfo) {
+            arrInfo.push(objectInfo[key])
+        }
+        return [0, arrInfo]
+    }
     /**
      * 查询单个席位
      * @param {*} inparam
@@ -104,9 +157,6 @@ export class SeatModel extends BaseModel {
                 ':seatId': inparam.seatId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -148,17 +198,19 @@ export class SeatModel extends BaseModel {
             }
         }
         if (!Model.isPlatformAdmin(inparam.token)) {
-            query.FilterExpression = 'operatorName=' + inparam.token.username
+            query.FilterExpression = 'operatorName = :operatorName'
+            query.ExpressionAttributeValues[':operatorName'] = inparam.token.username
         } else {
-            query.FilterExpression = 'operatorRole=' + inparam.token.role
+            query.FilterExpression = 'operatorRole = :operatorRole'
+            query.ExpressionAttributeValues[':operatorRole'] = inparam.token.role
         }
+        query.FilterExpression += ' AND seatId <> :seatId'
+        query.ExpressionAttributeValues[':seatId'] = inparam.seatId
         // 判断编号是否重复
         const [existErr, exist] = await this.isExist(query)
-        if (existErr) { return [existErr, 0] }
         if (exist) { return [BizErr.ItemExistErr('编号已存在'), 0] }
         // 更新
         const [err, ret] = await this.getOne(inparam)
-        if (err) { return [err, 0] }
         if (!ret) { return [new BizErr.ItemNotExistErr(), 0] }
         ret.order = inparam.order
         ret.price = inparam.price
@@ -169,7 +221,6 @@ export class SeatModel extends BaseModel {
         ret.content = inparam.content
         ret.icon = inparam.icon
         ret.updatedAt = Model.timeStamp()
-
         // 获取所有添加的道具/礼包id，组合字符串以便查询
         let contentIds = ''
         if (inparam.content['toolId']) {
@@ -191,10 +242,44 @@ export class SeatModel extends BaseModel {
                 'seatId': inparam.seatId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
+    }
+    /**
+     * 展位互换
+     * @param {*} inparam
+     */
+    async seatTigger(inparam) {
+        let updateObj1 = {
+            Key: { 'seatId': inparam.beforeSeatId },
+            UpdateExpression: 'SET #order=:order',
+            ExpressionAttributeNames: {
+                '#order': 'order'
+            },
+            ExpressionAttributeValues: {
+                ':order': inparam.afterOrder
+            }
+        }
+        this.updateItem(updateObj1).then((res) => {
+            console.log(res)
+        }).catch((err) => {
+            console.error(err)
+        })
+        let updateObj2 = {
+            Key: { 'seatId': inparam.afterSeatId },
+            UpdateExpression: 'SET #order=:order',
+            ExpressionAttributeNames: {
+                '#order': 'order'
+            },
+            ExpressionAttributeValues: {
+                ':order': inparam.beforeOrder
+            }
+        }
+        this.updateItem(updateObj2).then((res) => {
+            console.log(res)
+        }).catch((err) => {
+            console.error(err)
+        })
+        return [0, []]
     }
 }
 

@@ -26,7 +26,7 @@ const toolNew = async (e, c, cb) => {
     new LogModel().addOperate(inparam, addInfoErr, addRet)
     // 返回结果
     if (addInfoErr) { return ResErr(cb, addInfoErr) }
-    return ResOK(cb, {  payload: addRet })
+    return ResOK(cb, { payload: addRet })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -47,8 +47,35 @@ const toolList = async (e, c, cb) => {
 
     // 结果返回
     if (err) { return ResErr(cb, err) }
-    return ResOK(cb, {  payload: ret })
+    return ResOK(cb, { payload: ret })
   } catch (error) {
+    return ResErr(cb, error)
+  }
+
+}
+
+/**
+ * 道具定价
+ */
+const toolSetPrice = async (e, c, cb) => {
+  try {
+    // 入参转换
+    const [jsonParseErr, inparam] = JSONParser(e && e.body)
+    
+    // 检查参数是否合法
+    const [checkAttError, errorParams] = new ToolCheck().checkPrice(inparam)
+    // 身份令牌
+    const [tokenErr, token] = await Model.currentToken(e)
+
+    // 业务操作
+    const [err, ret] = await new ToolModel().setPrice(inparam)
+
+    // 结果返回
+    if (err) { return ResErr(cb, err) }
+    return ResOK(cb, { payload: ret })
+  } catch (error) {
+    console.log(error)
+    
     return ResErr(cb, error)
   }
 
@@ -69,7 +96,7 @@ const toolOne = async (e, c, cb) => {
 
     // 结果返回
     if (err) { return ResErr(cb, err) }
-    return ResOK(cb, {  payload: ret })
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -97,7 +124,7 @@ const toolChangeStatus = async (e, c, cb) => {
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
     if (err) { return ResErr(cb, err) }
-    return ResOK(cb, {  payload: ret })
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -124,7 +151,7 @@ const toolUpdate = async (e, c, cb) => {
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
     if (err) { return ResErr(cb, err) }
-    return ResOK(cb, {  payload: ret })
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -151,7 +178,7 @@ const toolDelete = async (e, c, cb) => {
     new LogModel().addOperate(inparam, err, ret)
     // 结果返回
     if (err) { return ResErr(cb, err) }
-    return ResOK(cb, {  payload: ret })
+    return ResOK(cb, { payload: ret })
   } catch (error) {
     return ResErr(cb, error)
   }
@@ -165,5 +192,6 @@ export {
   toolOne,                      // 单个道具
   toolUpdate,                   // 更新道具
   toolChangeStatus,             // 道具状态变更
-  toolDelete                    // 道具删除
+  toolDelete,                   // 道具删除
+  toolSetPrice                  // 道具定价
 }

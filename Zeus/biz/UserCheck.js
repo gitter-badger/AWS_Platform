@@ -154,6 +154,7 @@ export class UserCheck {
             { name: "username", type: "REG", min: null, max: null, equal: athena.RegEnum.USERNAME },
             // { name: "password", type: "S", min: 6, max: 16 },
             { name: "suffix", type: "NREG", min: null, max: null, equal: athena.RegEnum.SUFFIX },
+            { name: "msn", type: "NN", min: 1, max: 999 },
             { name: "role", type: "N", min: 1, max: 100 },
             { name: "captcha", type: "N", min: 1000, max: 9999 }
         ], inparam)
@@ -166,6 +167,7 @@ export class UserCheck {
         // 数据类型处理
         inparam.role = inparam.role.toString()
         inparam.captcha = parseInt(inparam.captcha)
+        if (inparam.msn) { inparam.msn = parseInt(inparam.msn).toString() }
 
         return [checkAttError, errorParams]
     }

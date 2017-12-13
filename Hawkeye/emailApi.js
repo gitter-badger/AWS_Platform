@@ -17,6 +17,8 @@ import { MerchantModel } from "./model/MerchantModel"
 import { ToolModel } from "./model/ToolModel"
 
 import { RoleCodeEnum, GameTypeEnum } from "./lib/Consts"
+import { BaseModel } from './model/BaseModel'
+import _ from 'lodash'
 
 /**
  * 添加邮件
@@ -90,7 +92,9 @@ const add = async (e, c, cb) => {
   requestParams.operatorName = userInfo.username
   requestParams.operatorRole = userInfo.role
   requestParams.operatorMsn = userInfo.msn || Model.StringValue
-  let emailModel = new EmailModel(requestParams);
+  requestParams.operatorId = userInfo.userId
+  requestParams.operatorDisplayName = userInfo.displayName
+  let emailModel = new EmailModel(requestParams)
   let [saveErr] = await emailModel.save();
   if (saveErr) {
     return errorHandle(cb, saveErr);
@@ -190,14 +194,34 @@ const list = async (e, c, cb) => {
   let [parserErr, requestParams] = athena.Util.parseJSON(e.body || {});
   if (parserErr) return errorHandle(cb, parserErr);
   let query = {
-    operatorRole: '1'
+    TableName: 'HawkeyeGameEmail',
+    FilterExpression: 'operatorRole = :operatorRole',
+    ExpressionAttributeValues: {
+      ':operatorRole': requestParams.operatorRole || RoleCodeEnum.PlatformAdmin
+    }
   }
   if (!Model.isPlatformAdmin(userInfo)) {
     query = {
-      operatorName: userInfo.username
+      TableName: 'HawkeyeGameEmail',
+      FilterExpression: 'operatorName = :operatorName',
+      ExpressionAttributeValues: {
+        ':operatorName': userInfo.username
+      }
     }
   }
-  let [scanErr, list] = await new EmailModel().scan(query);
+  // 条件搜索
+  if (!_.isEmpty(requestParams.query)) {
+    if (requestParams.query.createdAt) {
+      requestParams.query.createdAt = { $range: requestParams.query.createdAt }
+    }
+    if (requestParams.query.operatorMsn) { requestParams.query.operatorMsn = requestParams.query.operatorMsn }
+    if (requestParams.query.operatorDisplayName) { requestParams.query.operatorDisplayName = { $like: requestParams.query.operatorDisplayName } }
+    const queryParams = new BaseModel().bindFilterParams(query, requestParams.query, false)
+    // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
+    // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
+    // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
+  }
+  let [scanErr, list] = await new BaseModel().scan(query)
   if (scanErr) {
     return errorHandle(cb, scanErr);
   }

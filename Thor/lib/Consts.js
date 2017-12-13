@@ -2,7 +2,9 @@ import { Model } from './Dynamo'
 // 道具状态枚举
 export const ToolStatusEnum = {
   Enable: 1,
-  Disable: 0
+  Disable: 0,
+  limit:2,
+  unlimit:1
 }
 // 道具包状态枚举
 export const PackageStatusEnum = {

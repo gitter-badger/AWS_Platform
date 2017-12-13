@@ -30,9 +30,6 @@ export class CompanyModel extends BaseModel {
                 ':companyName': companyInfo.companyName
             }
         })
-        if (existErr) {
-            return [existErr, 0]
-        }
         if (exist) {
             return [BizErr.ItemExistErr('运营商已存在'), 0]
         }
@@ -42,9 +39,6 @@ export class CompanyModel extends BaseModel {
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, dataItem]
     }
 
@@ -55,9 +49,6 @@ export class CompanyModel extends BaseModel {
     async listCompany(inparams) {
         const [err, ret] = await this.scan({
         })
-        if (err) {
-            return [err, 0]
-        }
         return [0, ret]
     }
 
@@ -68,7 +59,7 @@ export class CompanyModel extends BaseModel {
      * @param {需要变更的状态} status 
      */
     async changeStatus(companyName, companyId, status) {
-        const [err, ret] = this.updateItem({
+        const [err, ret] = await this.updateItem({
             Key: {
                 'companyName': companyName,
                 'companyId': companyId
@@ -93,9 +84,6 @@ export class CompanyModel extends BaseModel {
                 ':companyId': inparam.companyId
             }
         })
-        if (err) {
-            return [err, 0]
-        }
         if (ret.Items.length > 0) {
             return [0, ret.Items[0]]
         } else {
@@ -110,9 +98,6 @@ export class CompanyModel extends BaseModel {
     async update(inparam) {
         // 更新
         const [err, ret] = await this.getOne(inparam)
-        if (err) {
-            return [err, 0]
-        }
         if (!ret) {
             return [new BizErr.ItemNotExistErr(), 0]
         }
@@ -125,9 +110,6 @@ export class CompanyModel extends BaseModel {
         ret.license = inparam.license
         ret.updatedAt = Model.timeStamp()
         const [putErr, putRet] = await this.putItem(ret)
-        if (putErr) {
-            return [putErr, 0]
-        }
         return [0, ret]
     }
 }

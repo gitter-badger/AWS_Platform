@@ -156,7 +156,6 @@ export class BillModel extends BaseModel {
             }
         }
         let [queryErr, bills] = await this.query(query)
-        if (queryErr) { return [queryErr, 0] }
         // 4、账单汇总
         const sums = _.reduce(bills.Items, (sum, bill) => {
             return sum + bill.amount

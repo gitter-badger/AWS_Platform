@@ -20,6 +20,8 @@ const seatNew = async (e, c, cb) => {
         inparam.operatorName = token.username
         inparam.operatorRole = token.role
         inparam.operatorMsn = token.msn || Model.StringValue
+        inparam.operatorId = token.userId
+        inparam.operatorDisplayName = token.displayName
         inparam.token = token
         const [addInfoErr, addRet] = await new SeatModel().add(inparam)
         // 操作日志记录
@@ -55,6 +57,29 @@ const seatList = async (e, c, cb) => {
         return ResErr(cb, error)
     }
 }
+/**
+ * 所有商户列表
+ */
+const seatAllList = async (e, c, cb) => {
+    try {
+        // 入参转换
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
+        // 检查参数是否合法
+        const [checkAttError, errorParams] = new SeatCheck().checkQuery(inparam)
+        // 身份令牌
+        const [tokenErr, token] = await Model.currentToken(e)
+        // 业务操作
+        inparam.token = token
+        const [err, ret] = await new SeatModel().listAll(inparam)
+        // 结果返回
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
+    } catch (error) {
+        console.error(error)
+        return ResErr(cb, error)
+    }
+}
+
 
 /**
  * 单个
@@ -134,6 +159,27 @@ const seatUpdate = async (e, c, cb) => {
 }
 
 /**
+ *展位互换
+ */
+const seatTigger = async (e, c, cb) => {
+    try {
+        // 入参转换
+        const [jsonParseErr, inparam] = JSONParser(e && e.body)
+        // 检查参数是否合法
+        const [checkAttError, errorParams] = new SeatCheck().checkeOrder(inparam)
+        // 身份令牌
+        const [tokenErr, token] = await Model.currentToken(e)
+        // 业务操作
+        const [err, ret] = await new SeatModel().seatTigger(inparam)
+        // 结果返回
+        if (err) { return ResErr(cb, err) }
+        return ResOK(cb, { payload: ret })
+    } catch (error) {
+        return ResErr(cb, error)
+    }
+}
+
+/**
  * 删除
  */
 const seatDelete = async (e, c, cb) => {
@@ -182,5 +228,7 @@ export {
     seatUpdate,                      // 更新席位
     seatChangeStatus,                // 席位状态变更
     seatDelete,                      // 席位删除
-    seatType                         // 展位列表
+    seatType,                        // 展位列表
+    seatAllList,                     // 管理员看所有商户的展位列表
+    seatTigger                       // 展位互换
 }

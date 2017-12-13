@@ -51,8 +51,6 @@ export const JwtVerify = async (data) => {
     const decoded = await jwtVerify(data, TOKEN_SECRET)
     return [0, decoded]
   } catch (e) {
-    console.log("rrrrrr");
-    console.log(e);
     return [BizErr.TokenErr(), 0]
   }
 }
@@ -73,6 +71,7 @@ export const GeneratePolicyDocument = (principalId, effect, resource, userInfo) 
   authResponse.context.suffix = userInfo.suffix
   authResponse.context.level = userInfo.level
   authResponse.context.displayName = userInfo.displayName
+  authResponse.context.msn = userInfo.msn
   if (effect && resource) {
     var policyDocument = {}
     policyDocument.Version = '2012-10-17' // default version

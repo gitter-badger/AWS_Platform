@@ -40,7 +40,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.message), false])
                 })
         })
     }
@@ -55,7 +55,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.message), false])
                 })
         })
     }
@@ -74,7 +74,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.message), false])
                 })
         })
     }
@@ -93,7 +93,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.message), false])
                 })
         })
     }
@@ -115,7 +115,7 @@ export class BaseModel {
                     if (res && res.Items && res.Items.length > 0) { exist = true }
                     return reslove([0, exist])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.message), false])
                 })
         })
         // const params = {
@@ -141,51 +141,56 @@ export class BaseModel {
      * @param {*} conditions 
      */
     queryOnce(conditions = {}) {
-        return new Promise((reslove, reject) => {
-            const params = {
-                ...this.params,
-                ...conditions
-            }
-            this.db$('query', params)
-                .then((res) => {
-                    return reslove([0, res])
-                }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
-                })
-        })
+        // return new Promise((reslove, reject) => {
+        const params = {
+            ...this.params,
+            ...conditions
+        }
+        return this.db$('query', params)
+        // .then((res) => {
+        //     return reslove([0, res])
+        // }).catch((err) => {
+        //     return reject([BizErr.DBErr(err.message), false])
+        // })
+        // })
     }
 
     /**
-     * 
+     * 分页查询
      * @param {*} query 
      * @param {*} inparam (pageSize,startKey)
      */
     async page(query, inparam) {
+        // 初始化返回数据
         let pageData = { Items: [], LastEvaluatedKey: {} }
-        let [err, ret] = [0, 0]
+        // 查询数量不足且数据库仍有数据，则继续循环查询
         while (pageData.Items.length < inparam.pageSize && pageData.LastEvaluatedKey) {
-            [err, ret] = await this.queryOnce({
+            let ret = await this.queryOnce({
                 ...query,
+                Limit: inparam.pageSize,
                 ExclusiveStartKey: inparam.startKey
             })
-            if (err) {
-                return [err, 0]
-            }
             // 追加数据
             if (pageData.Items.length > 0) {
                 pageData.Items.push(...ret.Items)
-                pageData.LastEvaluatedKey = ret.LastEvaluatedKey
             } else {
                 pageData = ret
             }
+            // 更新最后一条键值
+            pageData.LastEvaluatedKey = ret.LastEvaluatedKey
+            // 更新起始KEY
             inparam.startKey = ret.LastEvaluatedKey
+            // 需要查询的数量减少
+            inparam.pageSize -= ret.Items.length
         }
+        // 最后查询键
+        pageData.LastEvaluatedKey = _.pick(pageData.Items[pageData.Items.length - 1], inparam.lastEvaluatedKeyTemplate)
         // 最后数据超过指定长度，则截取指定长度
-        if (pageData.Items.length > inparam.pageSize) {
-            pageData.Items = _.slice(pageData.Items, 0, inparam.pageSize)
-            pageData.LastEvaluatedKey = _.pick(pageData.Items[pageData.Items.length - 1], inparam.LastEvaluatedKeyTemplate)
-        }
-        return [err, pageData]
+        // if (pageData.Items.length > inparam.pageSize) {
+        //     pageData.Items = _.slice(pageData.Items, 0, inparam.pageSize)
+        //     pageData.LastEvaluatedKey = _.pick(pageData.Items[pageData.Items.length - 1], inparam.LastEvaluatedKeyTemplate)
+        // }
+        return [0, pageData]
     }
 
     /**
@@ -201,7 +206,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.message), false])
                 })
         })
     }
@@ -221,16 +226,20 @@ export class BaseModel {
                 return [false, result]
             }
         }).catch((err) => {
-            return [BizErr.DBErr(err.toString()), false]
+            return [BizErr.DBErr(err.message), false]
         })
     }
 
     /**
-     * 构建搜索条件
+     * 绑定筛选条件
+     * @param {*} oldquery 原始查询条件
      * @param {*} conditions 查询条件对象
      * @param {*} isDefault 是否默认全模糊搜索
      */
-    buildQueryParams(conditions = {}, isDefault) {
+    bindFilterParams(oldquery = {}, conditions = {}, isDefault) {
+        if (_.isEmpty(oldquery) || _.isEmpty(conditions)) {
+            return
+        }
         // 默认设置搜索条件，所有查询模糊匹配
         if (isDefault) {
             for (let key in conditions) {
@@ -278,6 +287,14 @@ export class BaseModel {
                             }
                             break
                         }
+                        case "$range": {
+                            array = true
+                            opts.ExpressionAttributeNames[`#${k}`] = k
+                            opts.FilterExpression += `#${k} between :${k}0 and :${k}1`
+                            opts.ExpressionAttributeValues[`:${k}0`] = value[0]
+                            opts.ExpressionAttributeValues[`:${k}1`] = value[1]
+                            break
+                        }
                     }
                     break
                 }
@@ -290,6 +307,16 @@ export class BaseModel {
             }
             if (index != keys.length - 1) opts.FilterExpression += " and "
         })
+
+        // 绑定筛选至原来的查询对象
+        if (oldquery.FilterExpression) {
+            oldquery.FilterExpression += (' AND ' + opts.FilterExpression)
+        } else {
+            oldquery.FilterExpression = opts.FilterExpression
+        }
+        oldquery.ExpressionAttributeNames = { ...oldquery.ExpressionAttributeNames, ...opts.ExpressionAttributeNames }
+        oldquery.ExpressionAttributeValues = { ...oldquery.ExpressionAttributeValues, ...opts.ExpressionAttributeValues }
+
         return opts
     }
 

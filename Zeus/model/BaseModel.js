@@ -39,7 +39,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -54,7 +54,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -73,7 +73,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -92,7 +92,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([false, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -112,7 +112,7 @@ export class BaseModel {
                     const exist = res ? true : false
                     return reslove([0, exist])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
         // const params = {
@@ -135,7 +135,7 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
@@ -153,17 +153,21 @@ export class BaseModel {
                 .then((res) => {
                     return reslove([0, res])
                 }).catch((err) => {
-                    return reslove([BizErr.DBErr(err.toString()), false])
+                    return reject([BizErr.DBErr(err.toString()), false])
                 })
         })
     }
 
     /**
-     * 构建搜索条件
+     * 绑定筛选条件
+     * @param {*} oldquery 原始查询条件
      * @param {*} conditions 查询条件对象
      * @param {*} isDefault 是否默认全模糊搜索
      */
-    buildQueryParams(conditions = {}, isDefault) {
+    bindFilterParams(oldquery = {}, conditions = {}, isDefault) {
+        if (_.isEmpty(oldquery) || _.isEmpty(conditions)) {
+            return
+        }
         // 默认设置搜索条件，所有查询模糊匹配
         if (isDefault) {
             for (let key in conditions) {
@@ -211,6 +215,14 @@ export class BaseModel {
                             }
                             break
                         }
+                        case "$range": {
+                            array = true
+                            opts.ExpressionAttributeNames[`#${k}`] = k
+                            opts.FilterExpression += `#${k} between :${k}0 and :${k}1`
+                            opts.ExpressionAttributeValues[`:${k}0`] = value[0]
+                            opts.ExpressionAttributeValues[`:${k}1`] = value[1]
+                            break
+                        }
                     }
                     break
                 }
@@ -223,6 +235,16 @@ export class BaseModel {
             }
             if (index != keys.length - 1) opts.FilterExpression += " and "
         })
+
+        // 绑定筛选至原来的查询对象
+        if (oldquery.FilterExpression) {
+            oldquery.FilterExpression += (' AND ' + opts.FilterExpression)
+        } else {
+            oldquery.FilterExpression = opts.FilterExpression
+        }
+        oldquery.ExpressionAttributeNames = { ...oldquery.ExpressionAttributeNames, ...opts.ExpressionAttributeNames }
+        oldquery.ExpressionAttributeValues = { ...oldquery.ExpressionAttributeValues, ...opts.ExpressionAttributeValues }
+
         return opts
     }
 }

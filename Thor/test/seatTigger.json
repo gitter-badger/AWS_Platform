@@ -5,16 +5,23 @@
     "requestContext": {
         "authorizer": {
             "username": "Platform_NAtest",
+            "password": "Ab123456",
+            "suffix": "Platform",
             "parent": "00",
+            "parentName": "SuperAdmin",
+            "userId": "46d562f8-57f6-4511-a022-b2f414f87233",
             "role": "1",
-            "userId": "7395d4e2-7354-403b-90ff-a274804c1c40"
+            "displayName": "初始管理员一",
+            "iat": 1502250211
         },
         "identity": {
             "sourceIp": "127.0.0.1"
         }
     },
     "body": {
-        "seatType": 2,
-        "operatorRole":"100"
+        "beforeSeatId": "44b7d8c0-28b6-4ad3-a5b0-eef2d77b1abb",
+        "beforeOrder": 2,
+        "afterSeatId": "eb5568f0-04e6-456a-a08e-19ec338b74d2",
+        "afterOrder": 1
     }
 }

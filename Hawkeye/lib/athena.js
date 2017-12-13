@@ -1,6 +1,6 @@
 
 import AWS from "aws-sdk";
-
+import _ from 'lodash'
 AWS.config.update({
     region : "ap-southeast-1"
 })
@@ -157,9 +157,16 @@ export class BaseModel{
         let expressionAttributeNames = {};
         let expressionAttributeValues = {};
         for(let key in conditions){
-            filterExpression += `#${key}=:${key} and `;
-            expressionAttributeNames[`#${key}`] = `${key}`;
-            expressionAttributeValues[`:${key}`] = conditions[key];
+            if(!_.isArray(conditions[key])){
+                filterExpression += `#${key}=:${key} and `;
+                expressionAttributeNames[`#${key}`] = `${key}`;
+                expressionAttributeValues[`:${key}`] = conditions[key];
+            }else{
+                filterExpression += `#${key} between :${key}0 and :${key}1 and `;
+                expressionAttributeNames[`#${key}`] = `${key}`;
+                expressionAttributeValues[`:${key}0`] = conditions[key][0];
+                expressionAttributeValues[`:${key}1`] = conditions[key][1];
+            }  
         }
         let scanOpts = {};
         if(filterExpression.length!=0){

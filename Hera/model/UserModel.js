@@ -56,7 +56,7 @@ export class UserModel extends athena.BaseModel {
         let {userName, merchantName, nickname, msn} = conditions;
         let filterExpression = "(",
             expressionAttributeValues = {},
-            expressionAttributeNames = {};
+            expressionAttributeNames = {"#state":"state"};
         for(var i =0; i < buIds.length; i++){
             filterExpression += `#buId${i}=:buId${i} or `;
             expressionAttributeNames[`#buId${i}`] = "buId";
@@ -83,7 +83,8 @@ export class UserModel extends athena.BaseModel {
             TableName : this.tableName,
             FilterExpression : filterExpression,
             ExpressionAttributeValues : expressionAttributeValues,
-            ExpressionAttributeNames : expressionAttributeNames
+            ExpressionAttributeNames : expressionAttributeNames,
+            ProjectionExpression : ["userId","userName","msn","buId","merchantName","nickname","#state","gameState","balance","updateAt","gameId"].join(",")
         }
         console.log(scanOpts);
         return this.promise("scan", scanOpts);
@@ -129,7 +130,7 @@ export class UserModel extends athena.BaseModel {
         num ++;
         if(err) return [err, 0];
         if(userInfo) { //重新找
-            if(num%2 ==0) {
+            if(num%4 ==0) {
                 num = 0;
                 len ++;
             }
@@ -142,7 +143,7 @@ export class UserModel extends athena.BaseModel {
         let {userName, merchantName, nickname} = conditions;
         let filterExpression = "";
         let expressionAttributeValues = {};
-        let expressionAttributeNames = {};
+        let expressionAttributeNames = {"#state":"state"};
         for(let key in conditions){
             if(conditions[key]) {
                 if(key == "userName" || key == "merchantName" || key=="nickname") {
@@ -163,7 +164,8 @@ export class UserModel extends athena.BaseModel {
             scanOpts = {
                 FilterExpression : filterExpression,
                 ExpressionAttributeNames : expressionAttributeNames,
-                ExpressionAttributeValues:expressionAttributeValues
+                ExpressionAttributeValues:expressionAttributeValues,
+                ProjectionExpression : ["userId","userName","msn","buId","merchantName","nickname","#state","gameState","balance","updateAt","gameId"].join(",")
             }
         }
         console.log(scanOpts);

@@ -168,29 +168,6 @@ const billDetail = async(event, context, cb) => {
     reSumAmount += item.reAmount;
     depSumAmount += item.deAmount;
   }
-  // if(billInfo.betAmount && billInfo.reAmount) {
-  //   depSumAmount = +(billInfo.reAmount - Math.abs(billInfo.betAmount)).toFixed(2);
-  //   for(let i = 0; i < list.length; i++) {
-  //       let item = list[i];
-  //       if(item.type >=1 && item.type<=5) {
-  //         list.splice(i, 1);
-  //         i --;
-  //       }
-  //     }
-  // }else {
-  //   for(let i = 0; i < list.length; i++) {
-  //     let item = list[i];
-  //     item.joinTime = item.createdAt;
-  //     if(item.type >=1 && item.type<=5) {
-  //       list.splice(i, 1);
-  //       i --;
-  //     }else {
-  //       sumAmount += Math.abs(item.amount);
-  //       reSumAmount += item.reAmount || 0;
-  //     }
-  //   }
-  //   depSumAmount = -sumAmount + reSumAmount;
-  // }
   billInfo = buildBillInfo();
   function buildBillInfo(){
     return {
