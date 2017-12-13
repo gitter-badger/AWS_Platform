@@ -159,14 +159,17 @@ export class BaseModel {
     }
 
     /**
-     * 绑定筛选条件
+     * 绑定筛选条件并查询
      * @param {*} oldquery 原始查询条件
      * @param {*} conditions 查询条件对象
      * @param {*} isDefault 是否默认全模糊搜索
      */
-    bindFilterParams(oldquery = {}, conditions = {}, isDefault) {
-        if (_.isEmpty(oldquery) || _.isEmpty(conditions)) {
+    bindFilterQuery(oldquery = {}, conditions = {}, isDefault) {
+        if (_.isEmpty(oldquery)) {
             return
+        }
+        if (_.isEmpty(conditions)) {
+            return this.query(oldquery)
         }
         // 默认设置搜索条件，所有查询模糊匹配
         if (isDefault) {
@@ -245,6 +248,6 @@ export class BaseModel {
         oldquery.ExpressionAttributeNames = { ...oldquery.ExpressionAttributeNames, ...opts.ExpressionAttributeNames }
         oldquery.ExpressionAttributeValues = { ...oldquery.ExpressionAttributeValues, ...opts.ExpressionAttributeValues }
 
-        return opts
+        return this.query(oldquery)
     }
 }
