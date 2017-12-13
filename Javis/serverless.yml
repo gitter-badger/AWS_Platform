@@ -68,12 +68,12 @@ custom:
         usage: 0.75
     - table: ZeusPlatformCode
       read:
-        minimum: 5
-        maximum: 10000
+        minimum: 1
+        maximum: 10
         usage: 0.75
       write:
-        minimum: 5
-        maximum: 10000
+        minimum: 1
+        maximum: 10
         usage: 0.75
     - table: ZeusPlatformCaptcha
       read:
@@ -729,8 +729,8 @@ resources:
             AttributeName: code
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     ZeusPlatformCaptcha: #验证码表
       Type: AWS::DynamoDB::Table
