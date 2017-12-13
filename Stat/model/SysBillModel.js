@@ -28,7 +28,7 @@ export class SysBillModel extends BaseModel {
                 let query = {
                     TableName: Tables.HeraGamePlayer,
                     IndexName: 'parentIdIndex',
-                    ProjectionExpression: 'userId',
+                    ProjectionExpression: 'userName',
                     KeyConditionExpression: '#parent = :parent',
                     ExpressionAttributeNames: {
                         '#parent': 'parent'
@@ -39,12 +39,12 @@ export class SysBillModel extends BaseModel {
                 }
                 const [playersErr, playersRet] = await self.query(query)
                 console.log('商户：' + userId + '的玩家个数有：' + playersRet.Items.length)
-                let gameUserIdsArr = []
+                let gameUserNamesArr = []
                 for (let player of playersRet.Items) {
-                    gameUserIdsArr.push(player.userId)
+                    gameUserNamesArr.push(player.userName)
                 }
                 // 查询所有商户对应玩家的流水
-                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerStat({ gameUserIds: gameUserIdsArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
+                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerStat({ gameUserNames: gameUserNamesArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
                 let bet = 0
                 let betCount = 0
                 let winlose = 0

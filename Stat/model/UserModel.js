@@ -109,8 +109,12 @@ export class UserModel extends BaseModel {
     async queryChildPlayer(inparam) {
         let query = {
             TableName: Tables.HeraGamePlayer,
+            ProjectionExpression: 'userName,nickname,#parent,parentName,vedioMix,liveMix,msn,createAt',
             IndexName: 'parentIdIndex',
             KeyConditionExpression: 'parent = :parentId',
+            ExpressionAttributeNames: {
+                '#parent': 'parent'
+            },
             ExpressionAttributeValues: {
                 ':parentId': inparam.parentId
             }
@@ -124,7 +128,7 @@ export class UserModel extends BaseModel {
         }
         const [queryErr, queryRet] = await this.query(query)
         // 排序输出
-        let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
+        let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createAt'])
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
         return [0, sortResult]
     }
