@@ -48,11 +48,11 @@ custom:
         - merchantIdIndex
       read:
         minimum: 5
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
         minimum: 5
-        maximum: 10000
+        maximum: 100
         usage: 0.75
     - table: ZeusPlatformBill
       index:
@@ -337,7 +337,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: RoleUsernameIndex
             KeySchema:
@@ -352,7 +352,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: RoleParentIndex
             KeySchema:
@@ -367,7 +367,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: UserIdIndex
             KeySchema:
@@ -379,7 +379,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: merchantIdIndex
             KeySchema:
@@ -390,10 +390,10 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
 
