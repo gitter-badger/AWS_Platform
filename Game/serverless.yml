@@ -476,7 +476,7 @@ resources:
           #   AttributeName: balance
           #   KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
+          ReadCapacityUnits: 5
           WriteCapacityUnits: 10
     SYSMystery: #神秘大奖
       Type: AWS::DynamoDB::Table
