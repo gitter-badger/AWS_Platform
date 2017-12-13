@@ -90,13 +90,9 @@ export class SeatModel extends BaseModel {
             }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
-            const queryParams = this.bindFilterParams(query, inparam.query, false)
-            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         // 查询
-        const [err, ret] = await this.scan(query)
+        const [err, ret] = await this.bindFilterScan(query, inparam.query, false)
         const retOrderBy = _.sortBy(ret.Items, ['order'])
         return [0, retOrderBy]
     }
@@ -131,13 +127,9 @@ export class SeatModel extends BaseModel {
             }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
-            const queryParams = this.bindFilterParams(query, inparam.query, false)
-            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         // 查询
-        const [err, ret] = await this.scan(query)
+        const [err, ret] = await this.bindFilterScan(query, inparam.query, false)
         let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
 
         let arrInfo = []

@@ -76,12 +76,8 @@ export class AdModel extends BaseModel {
             }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
-            const queryParams = this.bindFilterParams(query, inparam.query, false)
-            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
-        const [err, ret] = await this.scan(query)
+        const [err, ret] = await this.bindFilterScan(query, inparam.query, false)
         const sortResult = _.sortBy(ret.Items, ['createdAt'])
         return [0, sortResult]
     }

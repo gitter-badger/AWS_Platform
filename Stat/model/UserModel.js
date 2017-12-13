@@ -60,13 +60,7 @@ export class UserModel extends BaseModel {
                 }
             }
             // 条件搜索
-            if (!_.isEmpty(inparam.query)) {
-                const queryParams = this.bindFilterParams(query, inparam.query, true)
-                // query.FilterExpression = queryParams.FilterExpression
-                // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-                // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
-            }
-            const [queryErr, queryRet] = await this.query(query)
+            const [queryErr, queryRet] = await this.bindFilterQuery(query, inparam.query, true)
             // 排序输出
             let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
             if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
@@ -89,13 +83,7 @@ export class UserModel extends BaseModel {
                 }
             }
             // 条件搜索
-            if (!_.isEmpty(inparam.query)) {
-                const queryParams = this.bindFilterParams(query, inparam.query, true)
-                // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-                // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-                // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
-            }
-            const [queryErr, queryRet] = await this.scan(query)
+            const [queryErr, queryRet] = await this.bindFilterScan(query, inparam.query, true)
             // 排序输出
             let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createdAt'])
             if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
@@ -120,13 +108,7 @@ export class UserModel extends BaseModel {
             }
         }
         // 条件搜索
-        if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.bindFilterParams(query, inparam.query, true)
-            // query.FilterExpression = queryParams.FilterExpression
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
-        }
-        const [queryErr, queryRet] = await this.query(query)
+        const [queryErr, queryRet] = await this.bindFilterQuery(query, inparam.query, true)
         // 排序输出
         let sortResult = _.sortBy(queryRet.Items, [inparam.sortkey || 'createAt'])
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }
