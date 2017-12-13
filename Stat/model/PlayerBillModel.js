@@ -37,7 +37,7 @@ export class PlayerBillModel extends BaseModel {
                     console.log('玩家name:' + gameUserName + '玩家bet:' + bet + '玩家winlose:' + winlose + '次数:' + betCount)
                     // 返回数据
                     let finalResult = {
-                        gameUserName: gameUserName,
+                        userName: gameUserName,
                         bet: Math.abs(+bet.toFixed(2)),
                         winlose: +winlose.toFixed(2),
                         betCount: betCount,
