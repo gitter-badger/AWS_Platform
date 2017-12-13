@@ -51,7 +51,7 @@ custom:
         maximum: 100
         usage: 0.75
       write:
-        minimum: 5
+        minimum: 1
         maximum: 100
         usage: 0.75
     - table: ZeusPlatformBill
