@@ -152,12 +152,8 @@ const list = async (e, c, cb) => {
     }
     if (requestParams.query.operatorMsn) { requestParams.query.operatorMsn = requestParams.query.operatorMsn }
     if (requestParams.query.operatorDisplayName) { requestParams.query.operatorDisplayName = { $like: requestParams.query.operatorDisplayName } }
-    const queryParams = new BaseModel().bindFilterParams(query, requestParams.query, false)
-    // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-    // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-    // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
   }
-  let [scanErr, list] = await new BaseModel().scan(query)
+  let [scanErr, list] = await new BaseModel().bindFilterScan(query, requestParams.query, false)
   if (scanErr) {
     return errorHandle(cb, scanErr);
   }

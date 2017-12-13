@@ -28,7 +28,7 @@ export class SysBillModel extends BaseModel {
                 let query = {
                     TableName: Tables.HeraGamePlayer,
                     IndexName: 'parentIdIndex',
-                    ProjectionExpression: 'userId',
+                    ProjectionExpression: 'userName',
                     KeyConditionExpression: '#parent = :parent',
                     ExpressionAttributeNames: {
                         '#parent': 'parent'
@@ -39,12 +39,12 @@ export class SysBillModel extends BaseModel {
                 }
                 const [playersErr, playersRet] = await self.query(query)
                 console.log('商户：' + userId + '的玩家个数有：' + playersRet.Items.length)
-                let gameUserIdsArr = []
+                let gameUserNamesArr = []
                 for (let player of playersRet.Items) {
-                    gameUserIdsArr.push(player.userId)
+                    gameUserNamesArr.push(player.userName)
                 }
                 // 查询所有商户对应玩家的流水
-                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerStat({ gameUserIds: gameUserIdsArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
+                const [playerWaterErr, playerWaterRet] = await new PlayerBillModel().calcPlayerStat({ gameUserNames: gameUserNamesArr, gameType: inparam.gameType, query: { createdAt: inparam.query.createdAt } })
                 let bet = 0
                 let betCount = 0
                 let winlose = 0
@@ -55,9 +55,9 @@ export class SysBillModel extends BaseModel {
                     winlose += playerWater.winlose
                     mixAmount += playerWater.mixAmount
                 }
-                let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
-                console.log('商户userid：' + userId + 'bet:' + bet + 'winlose:' + winlose + 'betCount:' + betCount + 'winloseRate:' + winloseRate)
-                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount })
+                // let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
+                console.log('商户userid：' + userId + 'bet:' + bet + 'winlose:' + winlose + 'betCount:' + betCount)
+                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, mixAmount: mixAmount })
             })
             promiseArr.push(p)
         }
@@ -107,9 +107,9 @@ export class SysBillModel extends BaseModel {
                     winlose += playerWater.winlose
                     mixAmount += playerWater.mixAmount
                 }
-                let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
-                console.log('线路商userid：' + userId + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount })
+                // let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
+                console.log('线路商userid：' + userId + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose)
+                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, mixAmount: mixAmount })
             })
             promiseArr.push(p)
         }
@@ -153,9 +153,9 @@ export class SysBillModel extends BaseModel {
             winlose += playerWater.winlose
             mixAmount += playerWater.mixAmount
         }
-        let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
-        console.log('平台管理员：' + inparam.userIds[0] + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount }]]
+        // let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
+        console.log('平台管理员：' + inparam.userIds[0] + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose)
+        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, mixAmount: mixAmount }]]
     }
     /**
      * 查询指定条件下代理的统计信息
@@ -195,9 +195,9 @@ export class SysBillModel extends BaseModel {
                     winlose += playerWater.winlose
                     mixAmount += playerWater.mixAmount
                 }
-                let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
-                console.log('代理userid：' + userId + '参数：bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount })
+                // let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
+                console.log('代理userid：' + userId + '参数：bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose)
+                resolve({ userId: userId, bet: bet, betCount: betCount, winlose: winlose, mixAmount: mixAmount })
             })
             promiseArr.push(p)
         }
@@ -241,8 +241,8 @@ export class SysBillModel extends BaseModel {
             winlose += playerWater.winlose
             mixAmount += playerWater.mixAmount
         }
-        let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
-        console.log('代理userid：' + inparam.userIds[0] + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose + 'winloseRate:' + winloseRate)
-        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, winloseRate: winloseRate, mixAmount: mixAmount }]]
+        // let winloseRate = bet == 0 ? 0 : +(winlose / bet).toFixed(4)
+        console.log('代理userid：' + inparam.userIds[0] + 'bet：' + bet + 'betCount:' + betCount + 'winlose:' + winlose)
+        return [0, [{ userId: inparam.userIds[0], bet: bet, betCount: betCount, winlose: winlose, mixAmount: mixAmount }]]
     }
 }

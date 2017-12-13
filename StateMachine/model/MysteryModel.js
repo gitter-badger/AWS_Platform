@@ -40,12 +40,8 @@ export class MysteryModel extends BaseModel {
             if (inparam.query.merchantName) { inparam.query.merchantName = { $like: inparam.query.merchantName } }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.nickname) { inparam.query.nickname = { $like: inparam.query.nickname } }
-            const queryParams = this.bindFilterParams(query, inparam.query, false)
-            // query.FilterExpression = queryParams.FilterExpression
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
-        const [queryErr, adminRet] = await this.scan(query)
+        const [queryErr, adminRet] = await  this.bindFilterScan(query, inparam.query, false)
         // 排序输出
         let sortResult = _.sortBy(adminRet.Items, [inparam.sortkey || 'winAt'])
         if (inparam.sort == "desc") { sortResult = sortResult.reverse() }

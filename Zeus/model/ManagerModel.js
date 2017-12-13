@@ -44,13 +44,7 @@ export class ManagerModel extends BaseModel {
             }
         }
         // 条件搜索
-        if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.bindFilterParams(query, inparam.query, true)
-            // query.FilterExpression = queryParams.FilterExpression
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
-        }
-        const [queryErr, queryRet] = await this.query(query)
+        const [queryErr, queryRet] = await this.bindFilterQuery(query, inparam.query, true)
         // 去除敏感数据
         const users = _.map(queryRet.Items, (item) => {
             item.passhash = null

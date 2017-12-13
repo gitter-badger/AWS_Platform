@@ -68,13 +68,9 @@ export class ToolModel extends BaseModel {
         if (!_.isEmpty(inparam.query)) {
             if (inparam.query.toolId) { inparam.query.toolId = { $like: inparam.query.toolId } }
             if (inparam.query.toolName) { inparam.query.toolName = { $like: inparam.query.toolName } }
-            const queryParams = this.bindFilterParams(query, inparam.query, false)
-            // query.FilterExpression = queryParams.FilterExpression
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         // 查询
-        const [err, ret] = await this.scan(query)
+        const [err, ret] = await this.bindFilterScan(query, inparam.query, false)
         const sortResult = _.sortBy(ret.Items, ['createdAt'])
         return [0, sortResult]
     }
