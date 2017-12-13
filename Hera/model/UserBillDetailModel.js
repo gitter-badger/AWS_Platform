@@ -56,9 +56,6 @@ export class UserBillDetailModel extends athena.BaseModel {
         }
         // return new Promise((reslove, reject) => {
         return Promise.all(promises).then((result) => {
-                console.log("插入账单明细成功");
-                // console.log(result);
-                console.log(result.length);
                 console.log("批量写入后："+Date.now());
                 let unArray = [],errPromiseNum = 0;
                 for(let i =0; i < result.length; i++) {
@@ -298,7 +295,6 @@ export class UserBillDetailModel extends athena.BaseModel {
                 }
             }
         }
-        console.log(records);
         //给records增加洗马比，billId（进入游戏的sessionId）
         for(let i = 0,rl = records.length; i < rl; i++) {
             let record = records[i],mix =0,rate = 0;
@@ -331,9 +327,11 @@ export class UserBillDetailModel extends athena.BaseModel {
                 userName : recordUser.userName,
                 mix,
                 originalAmount : +((+record.preBalance).toFixed(2)),
-                rate : recordMerchant.rate
+                rate : recordMerchant.rate,
+                gameType
             })
         }
+        console.log(records);
         if(records.length> 0) {
             return this.batchWrite(records);
         }else {

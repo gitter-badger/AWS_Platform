@@ -106,6 +106,7 @@ export class UserBillModel extends athena.BaseModel {
             amount : this.amount,
             balance : this.originalAmount + this.amount,
             type : this.type + 10,
+            gameType : -1,
             sn : this.sn || Util.billSerial(this.userId),
             createdAt : +this.createAt
         }

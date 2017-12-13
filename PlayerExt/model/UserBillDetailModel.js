@@ -64,7 +64,7 @@ export class UserBillDetailModel extends athena.BaseModel {
         let opts = {
             IndexName : "UserNameIndex",
             ScanIndexForward :false,
-            ProjectionExpression : ["sn","createdAt","#type","originalAmount","amount","balance","businessKey","remark","betId","userName","billId"].join(","),
+            ProjectionExpression : ["sn","createdAt","#type","originalAmount","amount","balance","businessKey","remark","betId","userName","billId","id"].join(","),
             KeyConditionExpression : "createdAt between :startTime and :endTime and userName=:userName",
             ExpressionAttributeValues : {
                 ":startTime":startTime,
@@ -115,6 +115,7 @@ export class UserBillDetailModel extends athena.BaseModel {
             }
         }
         let [queryErr, serialList] = await this.promise("query", opts);
+        console.log(serialList);
         if(queryErr) return [queryErr];
         let sumList = [], sumObj = {};
         serialList.forEach(function(element) {

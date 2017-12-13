@@ -48,6 +48,27 @@ export class UserBillModel extends athena.BaseModel {
             if(amount < 0) this.amount = -amount;
         }
     }
+    async save(){
+        //写入账单明细
+        let item = {
+            ...this.setProperties(),
+            amount : this.amount,
+            balance : this.originalAmount + this.amount,
+            type : this.type + 10,
+            gameType : -1,
+            sn : this.sn || Util.billSerial(this.userId),
+            createdAt : +this.createAt
+        }
+        let userBillDetailModel = new UserBillDetailModel();
+        Object.assign(userBillDetailModel, item);
+        console.log(userBillDetailModel);
+        let [detailErr] = await userBillDetailModel.save();
+        if(detailErr) {
+            console.log("购买房卡写入明细发生错误");
+            console.log(detailErr);
+        }
+        return super.save();
+    }
     setBillId(userId) {
         this.billId = Util.billSerial(userId);
     }

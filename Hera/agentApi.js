@@ -126,16 +126,7 @@ export async function agentPlayerList(event, context, cb) {
     let userId = requestParams.fromUserId || tokenInfo.userId
     let err, userList;
     if(role == RoleCodeEnum.Agent) {
-        //找到所有下级
-        // let [childrenError, childrenList] = await new MerchantModel().agentChildListByUids([tokenInfo.userId]);
-        // if(childrenError) return ResFail(cb, childrenError)
-        // let buIds = childrenList.map((item) => +item.displayId);
-        // buIds.push(+displayId);
-        // let userModel = new UserModel();
-        // //找到代理所有用户
-        // [err, userList] = await userModel.findByBuIds(buIds);
         if(parent == "00" && !flag) {
-            
             Object.assign(requestParams, {
                 msn : "000"
             })
