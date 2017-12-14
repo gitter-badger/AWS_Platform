@@ -61,17 +61,6 @@ custom:
         minimum: 10
         maximum: 100
         usage: 0.75
-    - table: HawkeyePlayerEmailRecord
-      index:
-        - CreatedDateIndex
-      read:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 100
-        usage: 0.75
-      write:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 100
-        usage: 0.75
     - table: PlayerBillDetail
       index:
         - UserNameIndex
@@ -134,8 +123,8 @@ resources:
             AttributeName: emid
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
             IndexName: CreatedDateIndex
@@ -146,8 +135,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
     HeraGamePlayer: #玩家表
       Type: AWS::DynamoDB::Table
