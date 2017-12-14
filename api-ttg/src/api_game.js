@@ -13,11 +13,11 @@ const BaseModel = require('./model/BaseModel')
 const LogModel = require('./model/LogModel')
 const redis = require('redis')
 const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
-
+const ttg_token = 'https://ams-api.stg.ttms.co:8443/cip/gametoken/'
 // 获取玩家TOKEN
 router.get('/api/ttgtoken', async function (ctx, next) {
     log.info('获取玩家TOKEN')
-    // const url = 'https://ams-api.stg.ttms.co:8443/cip/gametoken/' + 'NA_test'
+    // const url =  + 'NA_test'
     const url = 'http://13.229.74.10:3000/api/test'
     const res = await axios.post(url, {
         headers: { 'Content-Type': 'application/xml' },
