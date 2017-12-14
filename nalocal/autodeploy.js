@@ -34,16 +34,16 @@ function deploy(path, servername) {
         '/usr/local/bin/aws s3 sync . s3://sys-test-agent --acl public-read --delete',
 
         'cd /usr/dev/NA/rotta-admin',
-        'npm run test-manager',
-        'cd dist',
-        '/usr/local/bin/aws s3 rm s3://sys-test-manager/*',
-        '/usr/local/bin/aws s3 sync . s3://sys-test-manager --acl public-read --delete',
-
-        'cd /usr/dev/NA/rotta-admin',
         'npm run test-merchant',
         'cd dist',
         '/usr/local/bin/aws s3 rm s3://sys-test-merchant/*',
         '/usr/local/bin/aws s3 sync . s3://sys-test-merchant --acl public-read --delete',
+
+        'cd /usr/dev/NA/rotta-admin',
+        'npm run test-manager',
+        'cd dist',
+        '/usr/local/bin/aws s3 rm s3://sys-test-manager/*',
+        '/usr/local/bin/aws s3 sync . s3://sys-test-manager --acl public-read --delete',
 
         'cd /usr/dev/NA/rotta-game',
         'npm run test',
