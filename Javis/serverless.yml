@@ -89,15 +89,16 @@ custom:
         usage: 0.75
     - table: HeraGamePlayerBill
       index:
+        - billIdIndex
         - userIdIndex
         - CreatedDateIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 1000
+        maximum: 10000
         usage: 0.75
       write:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 1000
+        maximum: 10000
         usage: 0.75
     - table: HawkeyeGameEmail
       read:
@@ -929,7 +930,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
+              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: CreatedDateIndex
