@@ -9,7 +9,7 @@
         "debug": false
     },
     "auth": {
-        "secret": "cheneyweb",
+        "secret": "na-api-game",
         "pass": ["/auth","/api/*"],
         "role":{
             "admin":[".*"],
