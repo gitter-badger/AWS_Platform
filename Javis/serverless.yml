@@ -66,15 +66,6 @@ custom:
         minimum: ${ssm:SMALL_STORE_UNIT}
         maximum: 100
         usage: 0.75
-    - table: ZeusPlatformCode
-      read:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
-      write:
-        minimum: 1
-        maximum: 10
-        usage: 0.75
     - table: ZeusPlatformLog
       index:
         - LogRoleIndex
@@ -100,7 +91,7 @@ custom:
         minimum: ${ssm:MIN_STORE_UNIT}
         maximum: 1000
         usage: 0.75
-    - table: HawkeyeGameEmail
+    - table: ZeusPlatformCode
       read:
         minimum: 1
         maximum: 10
@@ -109,102 +100,6 @@ custom:
         minimum: 1
         maximum: 10
         usage: 0.75
-    # - table: ZeusPlatformCaptcha
-    #   read:
-    #     minimum: ${ssm:SMALL_STORE_UNIT}
-    #     maximum: 10
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:SMALL_STORE_UNIT}
-    #     maximum: 10
-    #     usage: 0.75
-    # - table: DianaPlatformGame
-    #   index:
-    #     - GameNameIndex
-    #     - GameTypeIndex
-    #     - GameIdIndex
-    #     - KindIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: ZeusPlatformMSN
-    #   index:
-    #     - UserIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformCompany
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformTool
-    #   index:
-    #     - toolIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformPackage
-    #   index:
-    #     - packageIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformSeat
-    #   index:
-    #     - SeatTypeIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: HawkeyeGameNotice
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: HulkPlatformAd
-    #   index:
-    #     - AdNameIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
 functions:
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
