@@ -23,6 +23,8 @@ router.get('/api/ttgtoken', async function (ctx, next) {
         headers: { 'Content-Type': 'application/xml' },
         data: '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>'
     })
+    console.info('接收到的数据')
+    console.log(res.data)
     ctx.body = res.data
 })
 // 查询余额
