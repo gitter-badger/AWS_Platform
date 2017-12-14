@@ -15,6 +15,14 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:*
+        # - dynamodb:DescribeTable
+        # - dynamodb:Query
+        # - dynamodb:Scan
+        # - dynamodb:GetItem
+        # - dynamodb:PutItem
+        # - dynamodb:BatchWriteItem
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
       Resource:
           Fn::Join:
           - ''
@@ -44,20 +52,20 @@ custom:
         - parentIdIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 200
+        maximum: 10000
         usage: 0.75
       write:
-        minimum: 1
-        maximum: 10
+        minimum: ${ssm:MIN_STORE_UNIT}
+        maximum: 10000
         usage: 0.75
     - table: SYSToken
       read:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 100
+        maximum: 10000
         usage: 0.75
       write:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 100
+        maximum: 10000
         usage: 0.75
     - table: BillStat
       index:
@@ -67,11 +75,11 @@ custom:
         - userIdAndDate
       read:
         minimum: 5
-        maximum: 100
+        maximum: 10000
         usage: 0.75
       write:
         minimum: 10
-        maximum: 100
+        maximum: 10000
         usage: 0.75
     - table: HawkeyePlayerEmailRecord
       index:
@@ -169,7 +177,7 @@ resources:
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: 1
+          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
         GlobalSecondaryIndexes:
           -
             IndexName: userIdIndex
@@ -181,7 +189,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-              WriteCapacityUnits: 1
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: parentIdIndex
             KeySchema:
@@ -192,7 +200,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: 1
+              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
 
     HeraGameRecord: #游戏战绩表
       Type: AWS::DynamoDB::Table
