@@ -47,6 +47,8 @@ router.post('/api/fund', async function (ctx, next) {
 // 测试接口
 router.post('/api/test', async function (ctx, next) {
     log.info('测试接口')
+    log.info('接收到的数据2：')
+    log.info(ctx.request.body)
     ctx.body = ctx.request.body
 })
 
