@@ -13,17 +13,17 @@ const BaseModel = require('./model/BaseModel')
 const LogModel = require('./model/LogModel')
 const redis = require('redis')
 const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
+// 域名相关
 const ttg_token = 'https://ams-api.stg.ttms.co:8443/cip/gametoken/'
+
 // 获取玩家TOKEN
-router.get('/api/ttgtoken', async function (ctx, next) {
+router.get('/api/ttgtoken/:username', async function (ctx, next) {
     log.info('获取玩家TOKEN')
-    // const url =  + 'NA_test'
-    const url = 'http://13.229.74.10:3000/api/test'
+    const url = ttg_token + ctx.request.params.username
+    log.info(url)
     const res = await axios.post(url, '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>', {
         headers: { 'Content-Type': 'application/xml' }
     })
-    console.info('接收到的数据')
-    console.log(res.data)
     ctx.body = res.data
 })
 // 查询余额
@@ -41,14 +41,6 @@ router.post('/api/fund', async function (ctx, next) {
     const amtAfter = (parseFloat(amtBefore) + parseFloat(ctx.request.body.cw.$.amt)).toFixed(2)
     await cacheSet(ctx.request.body.cw.$.acctid, amtAfter.toString())
     ctx.body = '<cw type="fundTransferResp" cur="CNY" amt="' + amtAfter + '" err="0" />'
-})
-
-// 测试接口
-router.post('/api/test', async function (ctx, next) {
-    log.info('测试接口')
-    log.info('接收到的数据2：')
-    log.info(ctx.request.body)
-    ctx.body = ctx.request.body
 })
 
 function cacheGet(key) {
