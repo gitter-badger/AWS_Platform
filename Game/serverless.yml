@@ -52,20 +52,20 @@ custom:
         - parentIdIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
+        maximum: 1000
         usage: 0.75
       write:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
+        maximum: 1000
         usage: 0.75
     - table: SYSToken
       read:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        maximum: 100
         usage: 0.75
     - table: BillStat
       index:
@@ -75,11 +75,11 @@ custom:
         - userIdAndDate
       read:
         minimum: 5
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
         minimum: 10
-        maximum: 10000
+        maximum: 100
         usage: 0.75
     - table: HawkeyePlayerEmailRecord
       index:
