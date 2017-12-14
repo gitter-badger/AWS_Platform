@@ -89,7 +89,6 @@ custom:
         usage: 0.75
     - table: HeraGamePlayerBill
       index:
-        - billIdIndex
         - userIdIndex
         - CreatedDateIndex
       read:
