@@ -19,7 +19,7 @@ const ttg_token = 'https://ams-api.stg.ttms.co:8443/cip/gametoken/'
 // 获取玩家TOKEN
 router.get('/api/ttgtoken/:username', async function (ctx, next) {
     log.info('获取玩家TOKEN')
-    const url = ttg_token + ctx.request.params.username
+    const url = ttg_token + ctx.params.username
     log.info(url)
     const res = await axios.post(url, '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>', {
         headers: { 'Content-Type': 'application/xml' }
