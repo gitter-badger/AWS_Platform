@@ -19,9 +19,8 @@ router.get('/api/ttgtoken', async function (ctx, next) {
     log.info('获取玩家TOKEN')
     // const url =  + 'NA_test'
     const url = 'http://13.229.74.10:3000/api/test'
-    const res = await axios.post(url, {
-        headers: { 'Content-Type': 'application/xml' },
-        data: '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>'
+    const res = await axios.post(url, '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>', {
+        headers: { 'Content-Type': 'application/xml' }
     })
     console.info('接收到的数据')
     console.log(res.data)
