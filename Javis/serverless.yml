@@ -111,12 +111,12 @@ custom:
         usage: 0.75
     - table: HawkeyeGameEmail
       read:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        minimum: 1
+        maximum: 10
         usage: 0.75
       write:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        minimum: 1
+        maximum: 10
         usage: 0.75
     # - table: DianaPlatformGame
     #   index:
@@ -543,7 +543,7 @@ resources:
             AttributeName: emid
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
@@ -555,7 +555,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+              ReadCapacityUnits: 1
               WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
