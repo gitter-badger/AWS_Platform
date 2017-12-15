@@ -19,7 +19,6 @@ import { Util } from "./lib/Util"
 async function advertList(event, context, callback) {
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body || {});
   if (parserErr) return callback(null, ReHandler.fail(parserErr));
-  let adModel = new AdModel();
   let [scanErr, list] = await new AdModel().list(requestParams);
   if (scanErr) {
     return callback(null, ReHandler.fail(scanErr));
