@@ -935,8 +935,8 @@ async function settlement(event, context, callback) {
   let company = game.company || {};
   let gameKey = company.companyKey;
   let serverSign = getSign(gameKey, [ "timestamp", "records", "gameId"], requestParams);
-  if(sign != serverSign) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  if(sign != serverSign && sign != gameKey) {
+    return errorHandler(callback, new CHeraErr(CODES.SignError), "settlement",  requestParams);
   }
   //解压数据
   if(isZlib) {
@@ -1419,10 +1419,10 @@ async function getPlayerGameRecord(event, context, callback) {
   let parentId = merchantInfo.userId;
   console.log(parentId);
   //验证白名单
-  // let white = validateIp(event, merchantInfo);
-  // if (!white) {
-  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
-  // }
+  let white = validateIp(event, merchantInfo);
+  if (!white) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  }
   if (merchantInfo.suffix && userName) {
     userName = merchantInfo.suffix + "_" + userName;
   }
