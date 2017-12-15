@@ -241,14 +241,16 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam
      */
     async seatTigger(inparam) {
+        let updatTime=new Date().getTime()
         let updateObj1 = {
             Key: { 'seatId': inparam.beforeSeatId },
-            UpdateExpression: 'SET #order=:order',
+            UpdateExpression: 'SET #order=:order ,updatedAt=:updatedAt',
             ExpressionAttributeNames: {
                 '#order': 'order'
             },
             ExpressionAttributeValues: {
-                ':order': inparam.afterOrder
+                ':order': inparam.afterOrder,
+                ':updatedAt':updatTime
             }
         }
         this.updateItem(updateObj1).then((res) => {
@@ -258,12 +260,13 @@ export class SeatModel extends BaseModel {
         })
         let updateObj2 = {
             Key: { 'seatId': inparam.afterSeatId },
-            UpdateExpression: 'SET #order=:order',
+            UpdateExpression: 'SET #order=:order,updatedAt=:updatedAt',
             ExpressionAttributeNames: {
                 '#order': 'order'
             },
             ExpressionAttributeValues: {
-                ':order': inparam.beforeOrder
+                ':order': inparam.beforeOrder,
+                ':updatedAt':updatTime
             }
         }
         this.updateItem(updateObj2).then((res) => {
