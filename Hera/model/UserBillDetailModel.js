@@ -331,6 +331,7 @@ export class UserBillDetailModel extends athena.BaseModel {
                 gameType
             })
         }
+        console.log("11111111111111");
         console.log(records);
         if(records.length> 0) {
             return this.batchWrite(records);
