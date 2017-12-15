@@ -30,7 +30,7 @@ export class AdModel extends BaseModel {
         let sortResult = _.sortBy(ret.Items, ['createdAt'])
         let sortResult2 = []
         if (inparam.operatorName) {
-           let query = {
+            let query = {
                 FilterExpression: 'operatorName=:operatorName',
                 ExpressionAttributeValues: {
                     ':operatorName': inparam.operatorName
