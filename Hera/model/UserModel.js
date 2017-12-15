@@ -84,7 +84,7 @@ export class UserModel extends athena.BaseModel {
             FilterExpression : filterExpression,
             ExpressionAttributeValues : expressionAttributeValues,
             ExpressionAttributeNames : expressionAttributeNames,
-            ProjectionExpression : ["userId","userName","msn","buId","merchantName","nickname","#state","gameState","balance","updateAt","gameId"].join(",")
+            ProjectionExpression : ["userId","userName","msn","buId","merchantName","nickname","#state","gameState","balance","updateAt","gameId","parent"].join(",")
         }
         console.log(scanOpts);
         return this.promise("scan", scanOpts);
@@ -165,7 +165,7 @@ export class UserModel extends athena.BaseModel {
                 FilterExpression : filterExpression,
                 ExpressionAttributeNames : expressionAttributeNames,
                 ExpressionAttributeValues:expressionAttributeValues,
-                ProjectionExpression : ["userId","userName","msn","buId","merchantName","nickname","#state","gameState","balance","updateAt","gameId"].join(",")
+                ProjectionExpression : ["userId","userName","msn","buId","merchantName","nickname","#state","gameState","balance","updateAt","gameId","parent"].join(",")
             }
         }
         console.log(scanOpts);

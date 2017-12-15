@@ -61,12 +61,13 @@ export class UserBillModel extends athena.BaseModel {
         }
         let userBillDetailModel = new UserBillDetailModel();
         Object.assign(userBillDetailModel, item);
-        console.log(userBillDetailModel);
-        let [detailErr] = await userBillDetailModel.save();
-        if(detailErr) {
-            console.log("购买房卡写入明细发生错误");
-            console.log(detailErr);
-        }
+        if(item.type!=13) { //游戏结算有流水了就不要再添加一条流水
+            let [detailErr] = await userBillDetailModel.save();
+            if(detailErr) {
+                console.log("购买房卡写入明细发生错误");
+                console.log(detailErr);
+            }
+        } 
         return super.save();
     }
     setBillId(userId) {

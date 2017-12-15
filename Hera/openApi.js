@@ -935,9 +935,9 @@ async function settlement(event, context, callback) {
   let company = game.company || {};
   let gameKey = company.companyKey;
   let serverSign = getSign(gameKey, [ "timestamp", "records", "gameId"], requestParams);
-  // if(sign != serverSign) {
-  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
-  // }
+  if(sign != serverSign) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  }
   //解压数据
   if(isZlib) {
     try{
@@ -1354,7 +1354,6 @@ async function playerGameRecord(event, context, callback) {
       record
     })
   }
-  console.log(batchSaveArr);
   let [batchSaveErr] = await new GameRecordModel().batchWrite(batchSaveArr, 0);
   if (batchSaveErr) {
     return callback(null, ReHandler.fail(batchSaveErr));

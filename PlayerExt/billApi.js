@@ -32,14 +32,14 @@ const ResFail = (callback, res) => {
  * @param {*} cb 
  */
 const billFlow = async(event, context, cb) => {
-  // const [tokenErr, token] = await Model.currentToken(event);
-  // if (tokenErr) {
-  //   return ResFail(cb, tokenErr)
-  // }
-  // const [e, tokenInfo] = await JwtVerify(token[1])
-  // if(e) {
-  //   return ResFail(cb, e)
-  // }
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
    //检查参数是否合法
   console.log(event.body);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
@@ -73,7 +73,7 @@ const billFlow = async(event, context, cb) => {
   for(let i = 0; i < list.length; i++) {
     let item = list[i];
     list[i] = buildObj(item);
-    if(item.type == 21 || item.type ==1 || item.type==2) {
+    if(item.type == 21 || item.type ==1 || item.type==2 || item.type ==13) {
       list.splice(i, 1);
       i --;
     }
