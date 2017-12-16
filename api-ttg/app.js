@@ -14,6 +14,7 @@ const log = require('tracer').colorConsole({ level: config.log.level })
 const gamerouter = require('./src/api_game')
 const authtestrouter = require('./src/api_authtest')
 const dbtestrouter = require('./src/api_dbtest')
+const autodeployrouter = require('./src/api_autodeploy')
 
 // 初始化应用服务，加载所有中间件
 const app = new Koa()
@@ -26,6 +27,7 @@ app.use(xauth(config.auth, (v) => v))   // TOKEN身份认证中间件，，参�
 app.use(authtestrouter.routes())        // 业务路由中间件
 app.use(dbtestrouter.routes())          // 业务路由中间件
 app.use(gamerouter.routes())            // 业务路由中间件
+app.use(autodeployrouter.routes())      // 业务路由中间件
 
 // 启动应用服务
 app.listen(PORT)
