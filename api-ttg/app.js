@@ -1,7 +1,6 @@
 // 系统配置参数
 const config = require('config')
-// const { PORT = 80 } = process.env
-const PORT = 80
+const { PORT = 80 } = process.env
 // 应用服务与中间件相关
 const Koa = require('koa')
 // const koaBody = require('koa-body')
