@@ -4,6 +4,7 @@ const router = new Router()
 // 构建相关
 const exec = require('child_process').exec
 // 日志相关
+const config = require('config')
 const log = require('tracer').colorConsole({ level: config.log.level })
 
 router.post('/deploy/na', async function (ctx, next) {
