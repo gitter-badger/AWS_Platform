@@ -10,7 +10,7 @@
     },
     "auth": {
         "secret": "na-api-game",
-        "pass": ["/auth","/api/*"],
+        "pass": ["/deploy/na","/auth","/api/*"],
         "role":{
             "admin":[".*"],
             "financialAdmin":["/financial/*"],
