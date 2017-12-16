@@ -52,6 +52,18 @@ function deployAdmin() {
             'cd dist',
             '/usr/local/bin/aws s3 rm s3://sys-test-admin/*',
             '/usr/local/bin/aws s3 sync . s3://sys-test-admin --acl public-read --delete',
+
+            'cd /usr/dev/NA/rotta-admin',
+            'npm run test-merchant',
+            'cd dist',
+            '/usr/local/bin/aws s3 rm s3://sys-test-merchant/*',
+            '/usr/local/bin/aws s3 sync . s3://sys-test-merchant --acl public-read --delete',
+
+            'cd /usr/dev/NA/rotta-admin',
+            'npm run test-manager',
+            'cd dist',
+            '/usr/local/bin/aws s3 rm s3://sys-test-manager/*',
+            '/usr/local/bin/aws s3 sync . s3://sys-test-manager --acl public-read --delete',
         ].join(' && ')
         log.info('开始自动构建平台管理员系统 ...')
         exec(commands, function (error, stdout, stderr) {
@@ -99,25 +111,13 @@ function deployAgent() {
 function deployOther() {
     return new Promise((reslove, reject) => {
         const commands = [
-            'cd /usr/dev/NA/rotta-admin',
-            'npm run test-merchant',
-            'cd dist',
-            '/usr/local/bin/aws s3 rm s3://sys-test-merchant/*',
-            '/usr/local/bin/aws s3 sync . s3://sys-test-merchant --acl public-read --delete',
-
-            'cd /usr/dev/NA/rotta-admin',
-            'npm run test-manager',
-            'cd dist',
-            '/usr/local/bin/aws s3 rm s3://sys-test-manager/*',
-            '/usr/local/bin/aws s3 sync . s3://sys-test-manager --acl public-read --delete',
-
             'cd /usr/dev/NA/rotta-game',
             'npm run test',
             'cd dist',
             '/usr/local/bin/aws s3 rm s3://sys-test-game/*',
             '/usr/local/bin/aws s3 sync . s3://sys-test-game --acl public-read --delete',
         ].join(' && ')
-        log.info('开始自动构建商户/线路商/游戏系统 ...')
+        log.info('开始自动构建游戏系统 ...')
         exec(commands, function (error, stdout, stderr) {
             if (error) {
                 console.error(`exec error: ${error}`)
