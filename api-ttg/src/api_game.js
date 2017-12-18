@@ -18,7 +18,6 @@ const ttg_token = 'https://ams-api.stg.ttms.co:8443/cip/gametoken/'
 
 // 获取玩家TOKEN
 router.get('/api/ttgtoken/:username', async function (ctx, next) {
-    log.info('获取玩家TOKEN')
     const url = ttg_token + ctx.params.username
     const res = await axios.post(url, '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>', {
         headers: { 'Content-Type': 'application/xml' }
@@ -27,11 +26,14 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
 })
 // 查询余额
 router.post('/api/balance', async function (ctx, next) {
-    log.info('查询余额')
     const balance = await new PlayerModel().getPlayerBalance(ctx.request.body.cw.$.acctid)
-    console.info(balance)
-    const amt = await cacheGet(ctx.request.body.cw.$.acctid)
-    ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + amt + '" err="0" />'
+    if (balance > 0) {
+        ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + balance + '" err="0" />'
+    } else {
+        ctx.body = '<cw type="getBalanceResp" err="1000" />'
+    }
+    // const amt = await cacheGet(ctx.request.body.cw.$.acctid)
+    // ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + amt + '" err="0" />'
 })
 // 接受流水
 router.post('/api/fund', async function (ctx, next) {
