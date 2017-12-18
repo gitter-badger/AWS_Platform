@@ -1,5 +1,5 @@
 const BaseModel = require('./BaseModel')
-
+const _ = require('lodash')
 /**
  * 实际业务子类，继承于BaseModel基类
  */
@@ -22,15 +22,16 @@ module.exports = class PlayerModel extends BaseModel {
      * @param {*} userName 
      */
     async getPlayerBalance(userName) {
-        const player = await this.getItem({
+        const res = await this.getItem({
             ProjectionExpression: 'balance',
             Key: {
                 "userName": userName
             }
         })
-        console.info('1111')
-        console.info(player)
-        console.info('2222')
-        return player.balance
+        if (_.isEmpty(res)) {
+            return -1
+        } else {
+            return res.Item.balance
+        }
     }
 }
