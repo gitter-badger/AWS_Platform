@@ -48,41 +48,23 @@ custom:
         - merchantIdIndex
       read:
         minimum: 5
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
-        minimum: 5
-        maximum: 10000
+        minimum: 1
+        maximum: 100
         usage: 0.75
     - table: ZeusPlatformBill
       index:
         - UserIdIndex
         - CreatedDateIndex
       read:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
-      write:
-        minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
-    - table: ZeusPlatformCode
-      read:
-        minimum: 5
-        maximum: 10000
-        usage: 0.75
-      write:
-        minimum: 5
-        maximum: 10000
-        usage: 0.75
-    - table: ZeusPlatformCaptcha
-      read:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        maximum: 100
         usage: 0.75
     - table: ZeusPlatformLog
       index:
@@ -90,11 +72,11 @@ custom:
         - CreatedDateIndex
       read:
         minimum: 5
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
         minimum: 5
-        maximum: 10000
+        maximum: 100
         usage: 0.75
     - table: HeraGamePlayerBill
       index:
@@ -103,117 +85,22 @@ custom:
         - CreatedDateIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
+        maximum: 1000
         usage: 0.75
       write:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
+        maximum: 1000
         usage: 0.75
-    - table: HawkeyeGameEmail
+    - table: ZeusPlatformCode
       read:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        minimum: 1
+        maximum: 10
         usage: 0.75
       write:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        minimum: 1
+        maximum: 10
         usage: 0.75
-    # - table: DianaPlatformGame
-    #   index:
-    #     - GameNameIndex
-    #     - GameTypeIndex
-    #     - GameIdIndex
-    #     - KindIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: ZeusPlatformMSN
-    #   index:
-    #     - UserIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformCompany
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformTool
-    #   index:
-    #     - toolIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformPackage
-    #   index:
-    #     - packageIdIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: DianaPlatformSeat
-    #   index:
-    #     - SeatTypeIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: HawkeyeGameNotice
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    # - table: HulkPlatformAd
-    #   index:
-    #     - AdNameIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 2
-    #     usage: 0.75
 functions:
-  # initData:
-  #   handler: api.initData
-  #   events:
-  #     -
-  #       http:
-  #         path: /initData
-  #         method: get
-  #         cors: true
   tokenAuth: #TOKEN验证
     handler: api.jwtverify
     integration: lambda
@@ -337,7 +224,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: RoleUsernameIndex
             KeySchema:
@@ -352,7 +239,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: RoleParentIndex
             KeySchema:
@@ -367,7 +254,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: UserIdIndex
             KeySchema:
@@ -379,7 +266,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
           -
             IndexName: merchantIdIndex
             KeySchema:
@@ -390,10 +277,10 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
 
@@ -435,7 +322,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
           -
             IndexName: CreatedDateIndex
             KeySchema:
@@ -445,11 +332,11 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+              WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
     ZeusPlatformLog: #日志表
@@ -543,7 +430,7 @@ resources:
             AttributeName: emid
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
@@ -555,7 +442,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+              ReadCapacityUnits: 1
               WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
@@ -729,8 +616,8 @@ resources:
             AttributeName: code
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     ZeusPlatformCaptcha: #验证码表
       Type: AWS::DynamoDB::Table
@@ -751,8 +638,8 @@ resources:
             AttributeName: usage
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     DianaPlatformCompany: #游戏厂商表
       Type: AWS::DynamoDB::Table
@@ -938,7 +825,7 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              ReadCapacityUnits: 1
               WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
           -
             IndexName: CreatedDateIndex

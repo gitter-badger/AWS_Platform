@@ -90,13 +90,9 @@ export class SeatModel extends BaseModel {
             }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
-            const queryParams = this.bindFilterParams(query, inparam.query, false)
-            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         // 查询
-        const [err, ret] = await this.scan(query)
+        const [err, ret] = await this.bindFilterScan(query, inparam.query, false)
         const retOrderBy = _.sortBy(ret.Items, ['order'])
         return [0, retOrderBy]
     }
@@ -131,13 +127,9 @@ export class SeatModel extends BaseModel {
             }
             if (inparam.query.msn) { inparam.query.msn = inparam.query.msn }
             if (inparam.query.displayName) { inparam.query.displayName = { $like: inparam.query.displayName } }
-            const queryParams = this.bindFilterParams(query, inparam.query, false)
-            // query.FilterExpression += (' AND ' + queryParams.FilterExpression)
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
         }
         // 查询
-        const [err, ret] = await this.scan(query)
+        const [err, ret] = await this.bindFilterScan(query, inparam.query, false)
         let objectInfo = _.groupBy(ret.Items, 'operatorDisplayName')
 
         let arrInfo = []
@@ -249,14 +241,16 @@ export class SeatModel extends BaseModel {
      * @param {*} inparam
      */
     async seatTigger(inparam) {
+        let updatTime=new Date().getTime()
         let updateObj1 = {
             Key: { 'seatId': inparam.beforeSeatId },
-            UpdateExpression: 'SET #order=:order',
+            UpdateExpression: 'SET #order=:order ,updatedAt=:updatedAt',
             ExpressionAttributeNames: {
                 '#order': 'order'
             },
             ExpressionAttributeValues: {
-                ':order': inparam.afterOrder
+                ':order': inparam.afterOrder,
+                ':updatedAt':updatTime
             }
         }
         this.updateItem(updateObj1).then((res) => {
@@ -266,12 +260,13 @@ export class SeatModel extends BaseModel {
         })
         let updateObj2 = {
             Key: { 'seatId': inparam.afterSeatId },
-            UpdateExpression: 'SET #order=:order',
+            UpdateExpression: 'SET #order=:order,updatedAt=:updatedAt',
             ExpressionAttributeNames: {
                 '#order': 'order'
             },
             ExpressionAttributeValues: {
-                ':order': inparam.beforeOrder
+                ':order': inparam.beforeOrder,
+                ':updatedAt':updatTime
             }
         }
         this.updateItem(updateObj2).then((res) => {

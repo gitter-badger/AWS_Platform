@@ -908,6 +908,9 @@ async function settlement(event, context, callback) {
     if(getUserErr) {
       return errorHandler(callback, getUserErr, "settlement",  requestParams);
     }
+    if(!userInfo) {
+      return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
+    }
     if(userInfo.sessionId == "0") {
       return callback(null,ReHandler.success());
     }
@@ -931,12 +934,9 @@ async function settlement(event, context, callback) {
   }
   let company = game.company || {};
   let gameKey = company.companyKey;
-  console.log(gameKey);
   let serverSign = getSign(gameKey, [ "timestamp", "records", "gameId"], requestParams);
-  console.log(sign);
-  console.log(serverSign);
-  if(sign != serverSign) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.SignError)));
+  if(sign != serverSign && sign != gameKey) {
+    return errorHandler(callback, new CHeraErr(CODES.SignError), "settlement",  requestParams);
   }
   //解压数据
   if(isZlib) {
@@ -980,9 +980,7 @@ async function settlement(event, context, callback) {
   }
 
   //退出游戏流程
-  if(!userInfo) {
-    return callback(null, ReHandler.fail(new CHeraErr(CODES.userNotExist)));
-  }
+  
 
   //获取用户的余额
   let [balanceErr, oriBalance] = await new UserBillModel().getBalanceByUid(+userId);
@@ -1413,7 +1411,7 @@ async function getPlayerGameRecord(event, context, callback) {
   }
   //检查商户信息是否正确
   const merchant = new MerchantModel();
-  const [queryMerchantError, merchantInfo] = await merchant.findById(+buId); 
+  const [queryMerchantError, merchantInfo] = await merchant.findById(+buId);   
   if (queryMerchantError) return callback(null, ReHandler.fail(queryMerchantError));
   if (!merchantInfo || !Object.is(merchantInfo.apiKey, apiKey)) {
     return callback(null, ReHandler.fail(new CHeraErr(CODES.merchantNotExist)));
@@ -1421,10 +1419,10 @@ async function getPlayerGameRecord(event, context, callback) {
   let parentId = merchantInfo.userId;
   console.log(parentId);
   //验证白名单
-  // let white = validateIp(event, merchantInfo);
-  // if (!white) {
-  //   return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
-  // }
+  let white = validateIp(event, merchantInfo);
+  if (!white) {
+    return callback(null, ReHandler.fail(new CHeraErr(CODES.ipError)));
+  }
   if (merchantInfo.suffix && userName) {
     userName = merchantInfo.suffix + "_" + userName;
   }

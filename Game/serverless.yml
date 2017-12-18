@@ -15,14 +15,6 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:*
-        # - dynamodb:DescribeTable
-        # - dynamodb:Query
-        # - dynamodb:Scan
-        # - dynamodb:GetItem
-        # - dynamodb:PutItem
-        # - dynamodb:BatchWriteItem
-        # - dynamodb:UpdateItem
-        # - dynamodb:DeleteItem
       Resource:
           Fn::Join:
           - ''
@@ -34,38 +26,26 @@ provider:
 custom:
   webpackIncludeModules: true
   capacities: #数据库自动扩容
-    # - table: HeraGameRecord
-    #   index:
-    #     - parentIdIndex
-    #     - CreatedDateIndex
-    #   read:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 10000
-    #     usage: 0.75
-    #   write:
-    #     minimum: ${ssm:MIN_STORE_UNIT}
-    #     maximum: 10000
-    #     usage: 0.75
     - table: HeraGamePlayer
       index:
         - userIdIndex
         - parentIdIndex
       read:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
+        maximum: 1000
         usage: 0.75
       write:
         minimum: ${ssm:MIN_STORE_UNIT}
-        maximum: 10000
+        maximum: 1000
         usage: 0.75
     - table: SYSToken
       read:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
         minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        maximum: 100
         usage: 0.75
     - table: BillStat
       index:
@@ -75,22 +55,11 @@ custom:
         - userIdAndDate
       read:
         minimum: 5
-        maximum: 10000
+        maximum: 100
         usage: 0.75
       write:
         minimum: 10
-        maximum: 10000
-        usage: 0.75
-    - table: HawkeyePlayerEmailRecord
-      index:
-        - CreatedDateIndex
-      read:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
-        usage: 0.75
-      write:
-        minimum: ${ssm:SMALL_STORE_UNIT}
-        maximum: 10000
+        maximum: 100
         usage: 0.75
     - table: PlayerBillDetail
       index:
@@ -104,6 +73,18 @@ custom:
         minimum: ${ssm:BIG_STORE_UNIT}
         maximum: 10000
         usage: 0.75
+    # - table: HeraGameRecord
+    #   index:
+    #     - parentIdIndex
+    #     - CreatedDateIndex
+    #   read:
+    #     minimum: ${ssm:MIN_STORE_UNIT}
+    #     maximum: 10000
+    #     usage: 0.75
+    #   write:
+    #     minimum: ${ssm:MIN_STORE_UNIT}
+    #     maximum: 10000
+    #     usage: 0.75
 functions:
   tokenVerify:
     handler: api.jwtverify
@@ -142,8 +123,8 @@ resources:
             AttributeName: emid
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
           -
             IndexName: CreatedDateIndex
@@ -154,8 +135,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:SMALL_STORE_UNIT}
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
     HeraGamePlayer: #玩家表
       Type: AWS::DynamoDB::Table
@@ -476,7 +457,7 @@ resources:
           #   AttributeName: balance
           #   KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
+          ReadCapacityUnits: 5
           WriteCapacityUnits: 10
     SYSMystery: #神秘大奖
       Type: AWS::DynamoDB::Table

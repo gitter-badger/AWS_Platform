@@ -55,7 +55,7 @@ function initValue(item) {
     item.bet = 0
     item.betCount = 0
     item.winlose = 0
-    item.winloseRate = 0
+    // item.winloseRate = 0
     item.mixAmount = 0
 }
 // ==================== 以下为内部方法 ====================

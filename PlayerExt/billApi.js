@@ -32,14 +32,14 @@ const ResFail = (callback, res) => {
  * @param {*} cb 
  */
 const billFlow = async(event, context, cb) => {
-  // const [tokenErr, token] = await Model.currentToken(event);
-  // if (tokenErr) {
-  //   return ResFail(cb, tokenErr)
-  // }
-  // const [e, tokenInfo] = await JwtVerify(token[1])
-  // if(e) {
-  //   return ResFail(cb, e)
-  // }
+  const [tokenErr, token] = await Model.currentToken(event);
+  if (tokenErr) {
+    return ResFail(cb, tokenErr)
+  }
+  const [e, tokenInfo] = await JwtVerify(token[1])
+  if(e) {
+    return ResFail(cb, e)
+  }
    //检查参数是否合法
   console.log(event.body);
   let [parserErr, requestParams] = athena.Util.parseJSON(event.body);
@@ -73,7 +73,7 @@ const billFlow = async(event, context, cb) => {
   for(let i = 0; i < list.length; i++) {
     let item = list[i];
     list[i] = buildObj(item);
-    if(item.type == 21 || item.type ==1 || item.type==2) {
+    if(item.type == 21 || item.type ==1 || item.type==2 || item.type ==13) {
       list.splice(i, 1);
       i --;
     }
@@ -88,7 +88,17 @@ const billFlow = async(event, context, cb) => {
       }
   }
   function isSort(a, b){
+    if(sortKey =="createdAt"){
+      if(a[sortKey] == b[sortKey]) {
+        a.id = a.id || "";
+        b.id = b.id || "";
+        return sortMode == "asce" ? a.id > b.id : a.id < b.id
+      }else {
+        return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+      }
+    }else {
       return sortMode == "asce" ? a[sortKey] > b[sortKey] : a[sortKey] < b[sortKey]
+    }
   }
   function buildObj(item) {
     return {
@@ -96,6 +106,7 @@ const billFlow = async(event, context, cb) => {
       createdAt : item.createdAt,
       type : item.type,
       billId : item.billId,
+      id : item.id,
       businessKey : item.businessKey || "",
       originalAmount : item.originalAmount || 0,
       balance : item.balance || "",
@@ -157,29 +168,6 @@ const billDetail = async(event, context, cb) => {
     reSumAmount += item.reAmount;
     depSumAmount += item.deAmount;
   }
-  // if(billInfo.betAmount && billInfo.reAmount) {
-  //   depSumAmount = +(billInfo.reAmount - Math.abs(billInfo.betAmount)).toFixed(2);
-  //   for(let i = 0; i < list.length; i++) {
-  //       let item = list[i];
-  //       if(item.type >=1 && item.type<=5) {
-  //         list.splice(i, 1);
-  //         i --;
-  //       }
-  //     }
-  // }else {
-  //   for(let i = 0; i < list.length; i++) {
-  //     let item = list[i];
-  //     item.joinTime = item.createdAt;
-  //     if(item.type >=1 && item.type<=5) {
-  //       list.splice(i, 1);
-  //       i --;
-  //     }else {
-  //       sumAmount += Math.abs(item.amount);
-  //       reSumAmount += item.reAmount || 0;
-  //     }
-  //   }
-  //   depSumAmount = -sumAmount + reSumAmount;
-  // }
   billInfo = buildBillInfo();
   function buildBillInfo(){
     return {

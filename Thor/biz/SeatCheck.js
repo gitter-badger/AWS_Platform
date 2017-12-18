@@ -15,19 +15,19 @@ export class SeatCheck {
             { name: "icon", type: "NS", min: 1, max: 20 },
             { name: "remark", type: "NS", min: 1, max: 200 }
         ], inparam)
-        
+
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
             throw checkAttError
         }
-        
+
         if (!inparam.content || inparam.content.length < 1) {
             throw { "code": -1, "msg": "内容数据不合法", "params": ["content"] }
         }
         if ((!inparam.content.toolId && !inparam.content.packageId)) {
             throw { "code": -1, "msg": "内容数据不合法", "params": ["content"] }
         }
-        
+
         // 数据类型处理
         inparam.seatStatus = parseInt(inparam.seatStatus)
         inparam.order = parseInt(inparam.order)
@@ -146,11 +146,9 @@ export class SeatCheck {
      */
     checkeOrder(inparam) {
         let [checkAttError, errorParams] = athena.Util.checkProperties([
-            { name: "beforeSeatId", type: "S", min: 36, max: 36 },
             { name: "beforeOrder", type: "N", min: 1, max: 6 },
-            { name: "afterSeatId", type: "S", min: 36, max:36 },
             { name: "afterOrder", type: "N", min: 1, max: 6 }
-        ] , inparam)
+        ], inparam)
 
         if (checkAttError) {
             Object.assign(checkAttError, { params: errorParams })
@@ -160,7 +158,9 @@ export class SeatCheck {
         // 数据类型处理
         inparam.beforeOrder = parseInt(inparam.beforeOrder)
         inparam.afterOrder = parseInt(inparam.afterOrder)
-        
+        inparam.beforeSeatId = inparam.beforeSeatId ? inparam.beforeSeatId : 'NULL!'
+        inparam.afterSeatId = inparam.afterSeatId ? inparam.afterSeatId : 'NULL!'
+
         return [checkAttError, errorParams]
     }
 

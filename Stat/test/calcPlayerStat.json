@@ -1,6 +1,6 @@
 {
     "headers": {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBsYXRmb3JtX2NoZW5leSIsInBhc3N3b3JkIjoiMTIzNDU2Iiwic3VmZml4IjoiUGxhdGZvcm0iLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJTdXBlckFkbWluIiwidXNlcklkIjoiNjAyOGVlYzYtOTZlYy00OTJkLWEzNmItZmQ4ZDY5ODFiNzZmIiwicm9sZSI6IjEiLCJkaXNwbGF5TmFtZSI6IuW5s-WPsOeuoeeQhuWRmCIsImlhdCI6MTUwMDk3Mzg5OX0.2TQMNV3yBDYoBKaUtU0bwTNuAPeaGGAovZ8JN-DZ5pE"
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyNDJiNWRhYy01YjYwLTQ5YmYtYjFmYS1jM2YxYzE2MDA2YWQiLCJyb2xlIjoiMSIsInN1ZmZpeCI6IlBsYXRmb3JtIiwidXNlcm5hbWUiOiJQbGF0Zm9ybV9OQXRlc3QiLCJwYXJlbnQiOiIwMCIsInBhcmVudE5hbWUiOiJTdXBlckFkbWluIiwicGFyZW50Um9sZSI6IjAwIiwiZGlzcGxheU5hbWUiOiLlubPlj7DnrqHnkIblkZgiLCJsZXZlbCI6MCwic3ViUm9sZSI6IuW5s-WPsOeuoeeQhuWRmCIsInN1YlJvbGVQZXJtaXNzaW9uIjpbIueci-advyIsIuS4quS6uuS4reW_gyIsIue6v-i3r-WVhuWIl-ihqCIsIuWIm-W7uue6v-i3r-WVhiIsIuWVhuaIt-WIl-ihqCIsIuWIm-W7uuWVhuaItyIsIueOqeWutuWIl-ihqCIsIua4uOaIj-WIl-ihqCIsIua4uOaIj-WQjuWPsCIsIua4uOaIj-WFrOWRiuWIl-ihqCIsIui3kemprOeBr-WIl-ihqCIsIua4uOaIj-mCruS7tuWIl-ihqCIsIuWxleS9jeWIl-ihqCIsIueUteWtkOa4uOaIj-mjjuaOpyIsIue6v-i3r-WVhueZu-W9leaXpeW_lyIsIuWVhuaIt-eZu-W9leaXpeW_lyIsIueuoeeQhuWRmOaTjeS9nOaXpeW_lyIsIueuoeeQhuWRmOWIl-ihqCIsIua3u-WKoOeuoeeQhuWRmCIsIueuoeeQhuWRmOinkuiJsuWIl-ihqCIsIuaWsOWinueuoeeQhuWRmOinkuiJsiIsIue6v-i3r-WPt-WIl-ihqCIsIuWxgue6p-WFs-ezuyJdLCJpYXQiOjE1MTMwNDQyMDl9.AxhI5uj77aFNGY_Th-G0XOWJpo34eEaXcUINOSq0xtM"
     },
     "requestContext": {
         "authorizer": {
@@ -16,14 +16,13 @@
     },
     "body": {
         "gameType": 40000,
-        "role": "1000",
-        "userIds": [
-            "6029a6c1-c0db-492f-8fc0-016da85c8059"
+        "gameUserNames": [
+            "CT01_ROTTA8"
         ],
         "query": {
             "createdAt": [
-                1512316800000,
-                1512921599999
+                1483200000000,
+                1513083211000
             ]
         }
     }

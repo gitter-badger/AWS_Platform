@@ -20,37 +20,27 @@ export class AdModel extends BaseModel {
      * @param {*} inparam
      */
     async list(inparam) {
-        let query = {
+        //查询
+        const [err, ret] = await this.scan({
             FilterExpression: 'operatorRole=:operatorRole',
             ExpressionAttributeValues: {
                 ':operatorRole': RoleCodeEnum.PlatformAdmin
             }
-        }
+        })
+        let sortResult = _.sortBy(ret.Items, ['createdAt'])
+        let sortResult2 = []
         if (inparam.operatorName) {
-            query = {
+            let query = {
                 FilterExpression: 'operatorName=:operatorName',
                 ExpressionAttributeValues: {
                     ':operatorName': inparam.operatorName
                 }
             }
+            const [err2, ret2] = await this.scan(query)
+            sortResult2 = _.sortBy(ret2.Items, ['createdAt'])
         }
-        const [err, ret] = await this.scan(query)
-        if (err) {
-            return [err, 0]
-        }
-        // 如果没有数据，再查询平台的数据
-        if (!ret.Items || ret.Items.length == 0) {
-            const [err2, ret2] = await this.scan({
-                FilterExpression: 'operatorRole=:operatorRole',
-                ExpressionAttributeValues: {
-                    ':operatorRole': RoleCodeEnum.PlatformAdmin
-                }
-            })
-            const sortResult2 = _.sortBy(ret2.Items, ['createdAt'])
-            return [0, sortResult2]
-        }
-        const sortResult = _.sortBy(ret.Items, ['createdAt'])
-        return [0, sortResult]
+        let retArr = sortResult.concat(sortResult2)
+        return [0, retArr]
     }
 }
 

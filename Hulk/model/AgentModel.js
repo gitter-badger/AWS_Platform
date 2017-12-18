@@ -212,13 +212,7 @@ export class AgentModel extends BaseModel {
             }
         }
         // 条件搜索
-        if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.bindFilterParams(query, inparam.query, true)
-            // query.FilterExpression = queryParams.FilterExpression
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
-        }
-        const [queryErr, queryRet] = await this.query(query)
+        const [queryErr, queryRet] = await this.bindFilterQuery(query, inparam.query, true)
         if (queryErr) {
             return [queryErr, 0]
         }
@@ -253,13 +247,7 @@ export class AgentModel extends BaseModel {
             }
         }
         // 条件搜索
-        if (!_.isEmpty(inparam.query)) {
-            const queryParams = this.bindFilterParams(query, inparam.query, true)
-            // query.FilterExpression = queryParams.FilterExpression
-            // query.ExpressionAttributeNames = { ...query.ExpressionAttributeNames, ...queryParams.ExpressionAttributeNames }
-            // query.ExpressionAttributeValues = { ...query.ExpressionAttributeValues, ...queryParams.ExpressionAttributeValues }
-        }
-        const [queryErr, adminRet] = await this.query(query)
+        const [queryErr, adminRet] = await this.bindFilterQuery(query, inparam.query, true)
         if (queryErr) {
             return [queryErr, 0]
         }
