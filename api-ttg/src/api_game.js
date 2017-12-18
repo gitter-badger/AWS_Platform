@@ -29,6 +29,7 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
 router.post('/api/balance', async function (ctx, next) {
     log.info('查询余额')
     const balance = await new PlayerModel().getPlayerBalance(ctx.request.body.cw.$.acctid)
+    console.info(balance)
     const amt = await cacheGet(ctx.request.body.cw.$.acctid)
     ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + amt + '" err="0" />'
 })
