@@ -88,7 +88,7 @@ custom:
         maximum: 1000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 10
         maximum: 1000
         usage: 0.75
     - table: ZeusPlatformCode
@@ -798,7 +798,7 @@ resources:
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: 10
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         GlobalSecondaryIndexes:
@@ -815,7 +815,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: 10
           -
             IndexName: billIdIndex
             KeySchema:
@@ -826,7 +826,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 1
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: 10
           -
             IndexName: CreatedDateIndex
             KeySchema:
@@ -837,7 +837,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: 10
 
     SYSConfig: #系统配置
       Type: AWS::DynamoDB::Table
