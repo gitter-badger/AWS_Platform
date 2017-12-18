@@ -456,6 +456,20 @@ class BaseModel {
         // 返回绑定筛选参数后的筛选
         return this.scan(oldquery)
     }
+
+    // 生成SN
+    billSerial(userId, num = 0) {
+        let date = new Date();
+        function twoNumber(num) {
+            return num > 9 ? num + "" : "0" + num;
+        }
+        let timestramp = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000 + date.getMilliseconds() + "";
+        for (let i = timestramp.length; i > 8; i--) {
+            timestramp += "0" + timestramp;
+        }
+        date.setHours(date.getHours() + 8)
+        return date.getFullYear() + twoNumber(date.getMonth() + 1) + twoNumber(date.getDate()) + userId + (timestramp + num)
+    }
 }
 
 // 私有日期格式化方法

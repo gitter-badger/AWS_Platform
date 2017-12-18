@@ -10,7 +10,6 @@ const axios = require('axios')
 const log = require('tracer').colorConsole({ level: config.log.level })
 // 持久层相关
 const PlayerModel = require('./model/PlayerModel')
-const PlayerBillDetailModel = require('./model/PlayerBillDetailModel')
 const redis = require('redis')
 const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
 // 域名相关
@@ -27,24 +26,28 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
 // 查询余额
 router.post('/api/balance', async function (ctx, next) {
     const player = await new PlayerModel().getPlayer(ctx.request.body.cw.$.acctid)
-    if (!_.isEmpty(player)) {
+    if (_.isEmpty(player)) {
+        ctx.body = '<cw type="getBalanceResp" err="1000" />'
+    } else {
         await cacheSet(ctx.request.body.cw.$.acctid, player.balance.toString())
         ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + player.balance + '" err="0" />'
-    } else {
-        ctx.body = '<cw type="getBalanceResp" err="1000" />'
     }
     // const amt = await cacheGet(ctx.request.body.cw.$.acctid)
-    // ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + amt + '" err="0" />'
 })
 // 接受流水
 router.post('/api/fund', async function (ctx, next) {
-    // 1、查询玩家sessionId，实时余额
-    // 2、使用sessionId写流水和变化量写流水
-    // 3、更新实时余额，返回
-    const amtBefore = await cacheGet(ctx.request.body.cw.$.acctid)
-    // 计算流水变化后的余额
+    // 1、查询玩家
+    const player = await new PlayerModel().getPlayer(ctx.request.body.cw.$.acctid)
+    if (_.isEmpty(player)) {
+        ctx.body = '<cw type="getBalanceResp" err="1000" />'
+    }
+    // 2、计算玩家实时余额
+    const amtBefore = await cacheGet(ctx.request.body.cw.$.acctid)  // player.balanceCache
     const amtAfter = (parseFloat(amtBefore) + parseFloat(ctx.request.body.cw.$.amt)).toFixed(2)
+    // await new PlayerModel().updateBalanceCache(player, ctx.request.body.cw.$, amtAfter)
+
     await cacheSet(ctx.request.body.cw.$.acctid, amtAfter.toString())
+    // 3、返回实时余额
     ctx.body = '<cw type="fundTransferResp" cur="CNY" amt="' + amtAfter + '" err="0" />'
 })
 
