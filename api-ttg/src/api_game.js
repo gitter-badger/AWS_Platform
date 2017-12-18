@@ -26,9 +26,10 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
 })
 // 查询余额
 router.post('/api/balance', async function (ctx, next) {
-    const balance = await new PlayerModel().getPlayerBalance(ctx.request.body.cw.$.acctid)
-    if (balance > 0) {
-        ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + balance + '" err="0" />'
+    const player = await new PlayerModel().getPlayer(ctx.request.body.cw.$.acctid)
+    if (!_.isEmpty(player)) {
+        await cacheSet(ctx.request.body.cw.$.acctid, player.balance.toString())
+        ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + player.balance + '" err="0" />'
     } else {
         ctx.body = '<cw type="getBalanceResp" err="1000" />'
     }
@@ -37,8 +38,9 @@ router.post('/api/balance', async function (ctx, next) {
 })
 // 接受流水
 router.post('/api/fund', async function (ctx, next) {
-    log.info('接收账单传输')
-    // 先查询玩家余额
+    // 1、查询玩家sessionId，实时余额
+    // 2、使用sessionId写流水和变化量写流水
+    // 3、更新实时余额，返回
     const amtBefore = await cacheGet(ctx.request.body.cw.$.acctid)
     // 计算流水变化后的余额
     const amtAfter = (parseFloat(amtBefore) + parseFloat(ctx.request.body.cw.$.amt)).toFixed(2)
