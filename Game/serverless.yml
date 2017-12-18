@@ -35,7 +35,7 @@ custom:
         maximum: 1000
         usage: 0.75
       write:
-        minimum: ${ssm:MIN_STORE_UNIT}
+        minimum: 10
         maximum: 1000
         usage: 0.75
     - table: SYSToken
@@ -158,7 +158,7 @@ resources:
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-          WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+          WriteCapacityUnits: 10
         GlobalSecondaryIndexes:
           -
             IndexName: userIdIndex
@@ -170,7 +170,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:SMALL_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: 10
           -
             IndexName: parentIdIndex
             KeySchema:
@@ -181,7 +181,7 @@ resources:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: ${ssm:MIN_STORE_UNIT}
-              WriteCapacityUnits: ${ssm:MIN_STORE_UNIT}
+              WriteCapacityUnits: 10
 
     HeraGameRecord: #游戏战绩表
       Type: AWS::DynamoDB::Table
