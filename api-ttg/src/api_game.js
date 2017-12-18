@@ -42,7 +42,8 @@ router.post('/api/fund', async function (ctx, next) {
         ctx.body = '<cw type="getBalanceResp" err="1000" />'
     }
     // 2、计算玩家实时余额
-    const amtBefore = await cacheGet(ctx.request.body.cw.$.acctid)  // player.balanceCache
+    // const amtBefore = player.balanceCache
+    const amtBefore = await cacheGet(ctx.request.body.cw.$.acctid)
     const amtAfter = (parseFloat(amtBefore) + parseFloat(ctx.request.body.cw.$.amt)).toFixed(2)
     // await new PlayerModel().updateBalanceCache(player, ctx.request.body.cw.$, amtAfter)
 
