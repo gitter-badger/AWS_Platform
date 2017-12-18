@@ -9,8 +9,8 @@ const axios = require('axios')
 // 日志相关
 const log = require('tracer').colorConsole({ level: config.log.level })
 // 持久层相关
-const BaseModel = require('./model/BaseModel')
-const LogModel = require('./model/LogModel')
+const PlayerModel = require('./model/PlayerModel')
+const PlayerBillDetailModel = require('./model/PlayerBillDetailModel')
 const redis = require('redis')
 const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
 // 域名相关
@@ -28,6 +28,7 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
 // 查询余额
 router.post('/api/balance', async function (ctx, next) {
     log.info('查询余额')
+    const balance = await new PlayerModel().getPlayerBalance(ctx.request.body.cw.$.acctid)
     const amt = await cacheGet(ctx.request.body.cw.$.acctid)
     ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + amt + '" err="0" />'
 })
