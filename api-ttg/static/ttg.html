@@ -111,7 +111,13 @@
       var ajax = new XMLHttpRequest();
       ajax.open('get', link);
       ajax.send();
+      console.log('1111')
+      console.log(ajax)
       ajax.onreadystatechange = function () {
+        console.log('2222')
+        console.log(ajax)
+        console.log(ajax.status)
+        console.log(ajax.readyState)
         if (ajax.status == 200 && ajax.readyState == 4) {
           alert('已退出')
           window.close()
