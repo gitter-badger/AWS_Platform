@@ -17,5 +17,12 @@
             "financialManager":["/financial/test1","/financial/test2"],
             "financialStaff":["GET:/financial/test1","POST:/financial/test2"]
         }
+    },
+    "na":{
+        "settlementurl":"https://xbbw2jfb58.execute-api.ap-southeast-1.amazonaws.com/dev/game/settlement"
+    },
+    "ttg":{
+        "tokenurl":"https://ams-api.stg.ttms.co:8443/cip/gametoken/",
+        "gameKey":""
     }
 }

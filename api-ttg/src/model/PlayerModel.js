@@ -83,6 +83,7 @@ module.exports = class PlayerModel extends BaseModel {
             billId: player.sessionId,
             userId: player.userId,
             userName: player.userName,
+            gameType: data.gameType,
             amount: parseFloat(data.amt),
             originalAmount: player.balanceCache,
             balance: amtAfter,
