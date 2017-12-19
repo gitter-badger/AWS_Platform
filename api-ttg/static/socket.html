@@ -81,7 +81,7 @@
     Btn.prototype.on = function () {
         var that = this;
         // 1. 声明EventSource
-        that.es = new EventSource('http://ext.na77.org/socket/balance');
+        that.es = new EventSource('/socket/balance');
         // 2. 监听数据
         that.es.onmessage = function (e) {
             document.querySelector('#msg').innerHTML += '<li>'+ e.data +'</li>'
