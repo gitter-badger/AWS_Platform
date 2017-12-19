@@ -21,9 +21,9 @@ router.get('/socket/balance', async function (ctx, next) {
     }, 1000)
 
     // 错误关闭循环
-    ctx.req.on('close', clearInterval(timerId))
-    ctx.req.on('finish', clearInterval(timerId))
-    ctx.req.on('error', clearInterval(timerId))
+    ctx.req.on('close', () => clearInterval(timerId))
+    ctx.req.on('finish', () => clearInterval(timerId))
+    ctx.req.on('error', () => clearInterval(timerId))
 
     // 数据推送
     ctx.body = stream
