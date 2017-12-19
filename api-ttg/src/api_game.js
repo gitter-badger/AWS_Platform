@@ -18,8 +18,6 @@ const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southea
  * 获取玩家TOKEN
  */
 router.get('/api/ttgtoken/:username', async function (ctx, next) {
-    log.warn(ctx.ip)
-    log.warn(ctx.ips)
     // 查询玩家
     const player = await new PlayerModel().getPlayer(ctx.params.username)
     if (_.isEmpty(player)) {
@@ -38,8 +36,6 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
  * 查询余额
  */
 router.post('/api/balance', async function (ctx, next) {
-    log.warn(ctx.ip)
-    log.warn(ctx.ips)
     const player = await new PlayerModel().getPlayer(ctx.request.body.cw.$.acctid)
     if (_.isEmpty(player)) {
         ctx.body = '<cw type="getBalanceResp" err="1000" />'
@@ -52,8 +48,6 @@ router.post('/api/balance', async function (ctx, next) {
  * 接受流水
  */
 router.post('/api/fund', async function (ctx, next) {
-    log.warn(ctx.ip)
-    log.warn(ctx.ips)
     // 1、查询玩家
     const player = await new PlayerModel().getPlayer(ctx.request.body.cw.$.acctid)
     if (_.isEmpty(player)) {
@@ -78,8 +72,6 @@ router.post('/api/fund', async function (ctx, next) {
  * 玩家登出
  */
 router.get('/api/ttglogout/:gameId/:userId/:token', async function (ctx, next) {
-    log.warn(ctx.ip)
-    log.warn(ctx.ips)
     const data = {
         gameId: ctx.params.gameId,
         userId: ctx.params.userId,
