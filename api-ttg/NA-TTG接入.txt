@@ -8,12 +8,42 @@ enabled=1
 
 开启SElinux支持：setsebool httpd_can_network_connect on
 
-然后：yum install nginx
+vi /etc/nginx/conf.d/ext.na77.org.conf
+server {
+    listen	80;
+    ignore_invalid_headers off;
+    server_name ext.na77.org 13.229.74.10;
+
+	## gzip setting
+	gzip on;
+    gzip_disable "msie6";
+
+	gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    #自动构建服务
+    location /deploy/ {
+        proxy_pass http://localhost:3000/deploy/;
+    }
+    #TTG服务
+    location /api/ {
+        allow 27.126.228.114;	#TTG服务器
+        allow 47.88.192.69;	#大厅服务器
+        allow 119.4.254.86;	#测试电脑
+        deny  all;
+        proxy_pass http://localhost:3000/api/;
+    }
+}
+
+安装：yum install nginx
 启动：systemctl start nginx
-启动：systemctl stop nginx
+停止：systemctl stop nginx
 重启：systemctl restart nginx
 状态：systemctl status nginx
-配置文件：/etc/nginx/
 
 【大厅接入】
 1、玩家进入TTG游戏：
