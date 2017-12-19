@@ -7,6 +7,7 @@ const router = new Router()
 const _ = require('lodash')
 const axios = require('axios')
 const crypto = require('crypto')
+const parseString = require('xml2js').parseString
 // 日志相关
 const log = require('tracer').colorConsole({ level: config.log.level })
 // 持久层相关
@@ -29,6 +30,8 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
         const res = await axios.post(config.ttg.tokenurl + ctx.params.username, '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>', {
             headers: { 'Content-Type': 'application/xml' }
         })
+        const finalRes = parseString(res.data)
+        console.info(finalRes)
         ctx.body = res.data
     }
 })
