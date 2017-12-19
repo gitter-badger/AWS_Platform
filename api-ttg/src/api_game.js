@@ -31,7 +31,7 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
             headers: { 'Content-Type': 'application/xml' }
         })
         const finalRes = await xmlParse(res.data)
-        ctx.body = finalRes
+        ctx.body = finalRes.gametoken.$
     }
 })
 /**
