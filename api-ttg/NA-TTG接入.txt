@@ -32,8 +32,8 @@ server {
     #TTG服务
     location /api/ {
         allow 27.126.228.114;	#TTG服务器
-        allow 47.88.192.69;	#大厅服务器
-        allow 119.4.254.86;	#测试电脑
+        allow 47.88.192.69;     #大厅服务器
+        allow 119.4.254.86;     #测试电脑
         deny  all;
         proxy_pass http://localhost:3000/api/;
     }
