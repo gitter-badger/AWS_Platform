@@ -27,11 +27,11 @@ iframe{width: 100%;height: 100%}
   }
   var key = location.href.split("=")[1];
 
-  var gameId = GetQueryString(gameId); // 游戏ID
-  var userId = GetQueryString(userId); // 用户ID
-  var token = GetQueryString(token); // TOKEN
-
-  var link = "http://ext.na77.org/api/ttglogout/" + '1000001' + '/' + '809637' + '/' + '100099499674200134528024359481181051';
+  var gameId = GetQueryString('gameId'); // 游戏ID
+  var userId = GetQueryString('userId'); // 用户ID
+  var token = GetQueryString('playerHandle'); // TOKEN
+  
+  var link = "http://ext.na77.org/api/ttglogout/" + gameId + '/' + userId + '/' + token;
   let url = http + key + end;
   iframe.src = url;
 
@@ -95,7 +95,7 @@ iframe{width: 100%;height: 100%}
         ajax.open('get',link);
         ajax.send();
         ajax.onreadystatechange = function () {
-          if (ajax.readyState == 4 && ajax.status == 0) {
+          if (ajax.status == 0) {
         　　alert('已退出')
             window.close()
           } else {
