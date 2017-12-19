@@ -50,7 +50,7 @@ router.post('/api/fund', async function (ctx, next) {
     const player = await new PlayerModel().getPlayer(ctx.request.body.cw.$.acctid)
     if (_.isEmpty(player)) {
         ctx.body = '<cw type="getBalanceResp" err="1000" />'
-    }else{
+    } else {
         player.liveMix = player.liveMix || DefaultMixRateEnum.liveMix
         player.vedioMix = player.vedioMix || DefaultMixRateEnum.vedioMix
         player.rate = player.rate || DefaultMixRateEnum.rate
@@ -64,6 +64,13 @@ router.post('/api/fund', async function (ctx, next) {
     await cacheSet(ctx.request.body.cw.$.acctid, amtAfter.toString())
     // 3、返回实时余额
     ctx.body = '<cw type="fundTransferResp" cur="CNY" amt="' + amtAfter + '" err="0" />'
+})
+// 玩家登出
+router.get('/api/ttglogout/:username', async function (ctx, next) {
+    const url = ttg_token + ctx.params.username
+    // 登出TTG
+    const res = await axios.delete(url)
+    ctx.body = res.data
 })
 
 function cacheGet(key) {
