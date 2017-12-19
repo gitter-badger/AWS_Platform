@@ -6,9 +6,8 @@ const router = new Router()
 const PassThrough = require('stream').PassThrough
 
 router.get('/socket/balance', async function (ctx, next) {
+    const content = Date.now()
     const stream = new PassThrough()
-    const { source } = ctx.params
-
     setInterval(function () {
         console.info(`data:${content}\n\n`)
         stream.write(`data:${content}\n\n`)
