@@ -22,6 +22,4 @@ router.get('/socket/balance', async function (ctx, next) {
     ctx.body = stream
 })
 
-const sse = (event, data) => {
-    return `event:${event}\ndata: ${data}\n\n`
-}
+module.exports = router
