@@ -1,3 +1,21 @@
+【主机服务】
+vi /etc/yum.repos.d/nginx.repo
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/rhel/7/$basearch/
+gpgcheck=0
+enabled=1
+
+开启SElinux支持：setsebool httpd_can_network_connect on
+
+然后：yum install nginx
+启动：systemctl start nginx
+启动：systemctl stop nginx
+重启：systemctl restart nginx
+状态：systemctl status nginx
+配置文件：/etc/nginx/
+
+【大厅接入】
 1、玩家进入TTG游戏：
 1.1、首先请求陈文接口，判断玩家是否可以进行游戏
 1.2、得到陈文返回后，如果可以游戏，请求【GET】http://ext.na77.org/api/ttgtoken/:userName，其中:userName是玩家的帐号，你会得到TTG的登录TOKEN，例如以下：
