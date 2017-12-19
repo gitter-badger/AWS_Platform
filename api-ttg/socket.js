@@ -13,6 +13,7 @@ http.createServer(function (req, res) {
         res.writeHead(200, HEAD)
         // 2. 输出内容，必须 "data:" 开头 "\n\n" 结尾（代表结束）
         setInterval(function () {
+            console.info(`data:${content}\n\n`)
             res.write(`data:${content}\n\n`)
         }, 1000)
     }
