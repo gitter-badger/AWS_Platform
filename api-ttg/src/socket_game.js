@@ -3,7 +3,7 @@ const config = require('config')
 // 路由相关
 const Router = require('koa-router')
 const router = new Router()
-// const PassThrough = require('stream').PassThrough
+const PassThrough = require('stream').PassThrough
 
 router.get('/socket/balance', async function (ctx, next) {
     const content = Date.now()
