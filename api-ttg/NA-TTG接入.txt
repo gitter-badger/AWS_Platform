@@ -14,7 +14,7 @@ server {
     ignore_invalid_headers off;
     server_name ext.na77.org 13.229.74.10;
 
-	## gzip setting
+    ## gzip setting
 	gzip on;
     gzip_disable "msie6";
 
