@@ -10,7 +10,7 @@
     },
     "auth": {
         "secret": "na-api-game",
-        "pass": ["/deploy/na","/auth","/api/*"],
+        "pass": ["/deploy/na","/auth","/api/*","/static/*"],
         "role":{
             "admin":[".*"],
             "financialAdmin":["/financial/*"],
@@ -25,5 +25,9 @@
         "tokenurl":"https://ams-api.stg.ttms.co:8443/cip/gametoken/",
         "gameType":"1000000",
         "gameKey":""
+    },
+    "server": {
+        "port": 3000,
+        "staticRoot": "/static/"
     }
 }

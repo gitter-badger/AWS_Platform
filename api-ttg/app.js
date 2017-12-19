@@ -1,8 +1,10 @@
 // 系统配置参数
 const config = require('config')
-const { PORT = 3000 } = process.env
+const { PORT = config.server.port } = process.env
 // 应用服务与中间件相关
 const Koa = require('koa')
+const mount = require('koa-mount')
+const staticServer = require('koa-static')
 // const koaBody = require('koa-body')
 const xmlParser = require('koa-xml-body')
 const xerror = require('koa-xerror')
@@ -18,6 +20,9 @@ const autodeployrouter = require('./src/api_autodeploy')
 
 // 初始化应用服务，加载所有中间件
 const app = new Koa()
+// 启用静态资源服务
+app.use(mount(config.server.staticRoot, staticServer(__dirname + '/static')))
+
 app.use(xerror(config.error))           // 全局错误捕获中间件，必须第一位使用，参数1：错误配置
 // app.use(koaBody())                      // 入参JSON解析中间件
 app.use(xmlParser())                    // 入参XML解析中间件
