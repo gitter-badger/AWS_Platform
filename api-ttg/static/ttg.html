@@ -111,22 +111,13 @@
       var ajax = new XMLHttpRequest();
       ajax.open('get', link);
       ajax.send();
-      console.log('1111')
-      console.log(ajax)
       ajax.onreadystatechange = function () {
-        console.log('2222')
-        console.log(ajax)
-        console.log(ajax.status)
-        console.log(ajax.readyState)
-        if (ajax.status == 200) {
+        if (ajax.status == 200 && ajax.readyState == 4) {
           alert('已退出')
-          window.close()
-        } else {
+        } else if(ajax.status != 200){
           alert('退出失败！请重试')
         }
       }
-    } else {
-      alert('已取消退出！')
     }
   }
   document.onmouseup = function ()//释放时自动贴到最近位置
