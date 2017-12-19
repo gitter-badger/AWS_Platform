@@ -11,9 +11,9 @@ const xlog = require('koa-xlog')
 // 日志相关
 const log = require('tracer').colorConsole({ level: config.log.level })
 // 业务控制器
+// const authtestrouter = require('./src/api_authtest')
+// const dbtestrouter = require('./src/api_dbtest')
 const gamerouter = require('./src/api_game')
-const authtestrouter = require('./src/api_authtest')
-const dbtestrouter = require('./src/api_dbtest')
 const autodeployrouter = require('./src/api_autodeploy')
 
 // 初始化应用服务，加载所有中间件
@@ -24,8 +24,8 @@ app.use(xmlParser())                    // 入参XML解析中间件
 app.use(xlog(config.log, (ctx) => { log.info('异步日志处理') }))    //日志中间件，参数1：日志配置，参数2：额外日志处理
 app.use(xauth(config.auth, (v) => v))   // TOKEN身份认证中间件，，参数1：认证配置，参数2：额外自定义TOKEN解析规则
 
-app.use(authtestrouter.routes())        // 业务路由中间件
-app.use(dbtestrouter.routes())          // 业务路由中间件
+// app.use(authtestrouter.routes())        // 业务路由中间件
+// app.use(dbtestrouter.routes())          // 业务路由中间件
 app.use(gamerouter.routes())            // 业务路由中间件
 app.use(autodeployrouter.routes())      // 业务路由中间件
 
