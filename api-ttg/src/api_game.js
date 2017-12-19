@@ -122,7 +122,7 @@ function getSign(secret, args, msg) {
     return signValue;
 }
 
-function xmlParse(key, value) {
+function xmlParse(xml) {
     return new Promise((reslove, reject) => {
         parseString(xml, function (err, res) {
             reslove(res)
