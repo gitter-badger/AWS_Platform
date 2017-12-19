@@ -67,7 +67,8 @@ router.post('/api/fund', async function (ctx, next) {
 })
 // 玩家登出
 router.get('/api/ttglogout/:username', async function (ctx, next) {
-    const url = ttg_token + ctx.params.username
+    // const url = ttg_token + ctx.params.username
+    const url = ttg_token + '100099366211349583795503458921180894'
     // 登出TTG
     const res = await axios.delete(url)
     ctx.body = res.data
