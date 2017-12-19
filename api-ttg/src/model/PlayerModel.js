@@ -44,6 +44,8 @@ module.exports = class PlayerModel extends BaseModel {
             let liveMix = DefaultMixRateEnum.liveMix
             let vedioMix = DefaultMixRateEnum.vedioMix
             let rate = DefaultMixRateEnum.rate
+            console.info(player.parent)
+            console.info(res)
             if (res.Items.length == 1) {
                 liveMix = res.Items[0].liveMix || liveMix
                 vedioMix = res.Items[0].vedioMix || vedioMix
