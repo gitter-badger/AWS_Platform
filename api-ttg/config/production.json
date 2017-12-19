@@ -23,6 +23,7 @@
     },
     "ttg":{
         "tokenurl":"https://ams-api.stg.ttms.co:8443/cip/gametoken/",
+        "gameType":"1000000",
         "gameKey":""
     }
 }
