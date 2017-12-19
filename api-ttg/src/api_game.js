@@ -30,10 +30,8 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
         const res = await axios.post(config.ttg.tokenurl + ctx.params.username, '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>', {
             headers: { 'Content-Type': 'application/xml' }
         })
-        parseString(res.data, function (err, result) {
-            console.info(result)
-        })
-        ctx.body = res.data
+        const finalRes = await xmlParse(res.data)
+        ctx.body = finalRes
     }
 })
 /**
@@ -124,6 +122,13 @@ function getSign(secret, args, msg) {
     return signValue;
 }
 
+function xmlParse(key, value) {
+    return new Promise((reslove, reject) => {
+        parseString(xml, function (err, res) {
+            reslove(res)
+        })
+    })
+}
 function cacheGet(key) {
     return new Promise((reslove, reject) => {
         redisClient.get(key, (err, value) => {
