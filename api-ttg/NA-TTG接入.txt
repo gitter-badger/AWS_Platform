@@ -1,0 +1,12 @@
+1、玩家进入TTG游戏：
+1.1、首先请求陈文接口，判断玩家是否可以进行游戏
+1.2、得到陈文返回后，如果可以游戏，请求【GET】http://ext.na77.org/api/ttgtoken/:userName，其中:userName是玩家的帐号，你会得到TTG的登录TOKEN，例如以下：
+<gametoken token="100099889082716542228996949651180922" uid="NA_NA01" clientAccount="NA_NA01" nickName="1180860"/>
+1.3、使用token拼接游戏链接URL，打开游戏链接进入游戏
+1.4、玩家进入的哪一款TTG游戏，需要记录
+
+2、玩家退出TTG游戏：
+2.1、首先请求【GET】http://ext.na77.org/api/ttglogout/:gameId/:userId/:token，其中:gameId是游戏具体ID，:userId是玩家在NA的ID，:token是玩家在TTG的TOKEN
+2.2、得到接口的返回确认后，才可以关闭游戏界面
+
+PS：游戏大厅对于TTG的断线重连，可以处理为重走1步骤
