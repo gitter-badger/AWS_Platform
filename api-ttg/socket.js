@@ -17,4 +17,4 @@ http.createServer(function (req, res) {
         }, 1000)
     }
 }).listen(PORT)
-log.info(`SOCKET-GAME服务启动【执行环境:${process.env.NODE_ENV},端口:${PORT}】`)
+console.info(`SOCKET-GAME服务启动【执行环境:${process.env.NODE_ENV},端口:${PORT}】`)
