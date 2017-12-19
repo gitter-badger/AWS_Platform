@@ -83,14 +83,14 @@ router.get('/api/ttglogout/:gameId/:userId/:token', async function (ctx, next) {
     const sign = getSign('gameKey', ['gameId', 'timestamp', 'records'], data)
     data.sign = sign
     // 登出NA平台
-    const res = await axios.post(config.na.settlementurl, data)
-    if (res.data.code == 0) {
+    // const res = await axios.post(config.na.settlementurl, data)
+    // if (res.data.code == 0) {
         // 登出TTG
         const res = await axios.delete(config.ttg.tokenurl + ctx.params.token)
         ctx.body = { code: 0, msg: '退出成功' }
-    } else {
-        ctx.body = { code: -1, msg: '退出失败，请重试' }
-    }
+    // } else {
+    //     ctx.body = { code: -1, msg: '退出失败，请重试' }
+    // }
 })
 
 // 数据签名
