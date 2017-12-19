@@ -30,8 +30,9 @@ router.get('/api/ttgtoken/:username', async function (ctx, next) {
         const res = await axios.post(config.ttg.tokenurl + ctx.params.username, '<logindetail><player account="CNY" country="CN" firstName="" lastName="" userName="" nickName="" tester="1" partnerId="NA" commonWallet="1" /><partners><partner partnerId="zero" partnerType="0" /><partner partnerId="NA" partnerType="1" /></partners></logindetail>', {
             headers: { 'Content-Type': 'application/xml' }
         })
-        const finalRes = parseString(res.data)
-        console.info(finalRes)
+        parseString(res.data, function (err, result) {
+            console.info(result)
+        })
         ctx.body = res.data
     }
 })
@@ -88,9 +89,9 @@ router.get('/api/ttglogout/:gameId/:userId/:token', async function (ctx, next) {
     // 登出NA平台
     // const res = await axios.post(config.na.settlementurl, data)
     // if (res.data.code == 0) {
-        // 登出TTG
-        const res = await axios.delete(config.ttg.tokenurl + ctx.params.token)
-        ctx.body = { code: 0, msg: '退出成功' }
+    // 登出TTG
+    const res = await axios.delete(config.ttg.tokenurl + ctx.params.token)
+    ctx.body = { code: 0, msg: '退出成功' }
     // } else {
     //     ctx.body = { code: -1, msg: '退出失败，请重试' }
     // }
