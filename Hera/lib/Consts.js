@@ -44,10 +44,11 @@ export const RoleCodeEnum = {
 
 // 游戏类型枚举
 export const GameTypeEnum = {
-  '10000': { code: '10000', name: '棋牌游戏', url: 'http://test.com' },
-  '30000': { code: '30000', name: '真人视讯', url: 'http://test.com' },
-  '40000': { code: '40000', name: '电子游戏', url: 'http://test.com' },
-  '50000': { code: '50000', name: '街机游戏', url: 'http://test.com' }
+  '10000': { company: 'NA', code: '10000', name: 'NA棋牌游戏', url: 'http://test.com' },
+  '30000': { company: 'NA', code: '30000', name: 'NA真人视讯', url: 'http://test.com' },
+  '40000': { company: 'NA', code: '40000', name: 'NA电子游戏', url: 'http://test.com' },
+  '50000': { company: 'NA', code: '50000', name: 'NA街机游戏', url: 'http://test.com' },
+  '1010000': { company: 'TTG', code: '1010000', name: 'TTG电子游戏' }
 }
 
 // 展位类型枚举

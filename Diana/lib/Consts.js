@@ -19,8 +19,9 @@ export const ConfigStatusEnum = {
 }
 // 游戏类型枚举
 export const GameTypeEnum = {
-  '10000': { code: '10000', name: '棋牌游戏', url: 'http://tablegame.na12345.com/admin/api/checkLoginAccess', desc: '网络棋牌游戏正在被大家慢慢接受和喜欢我们把传统的棋牌游戏进行重新定义加上全新的呈现技术灵活的运营模式，推出了NA棋牌的产品序列', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/2.png' },
-  '30000': { code: '30000', name: '真人视讯', url: 'http://lgate.na12345.com/gate/player/login', desc: '我们集合了当下最流行的真人视讯游戏类型整合了全新的互联网直播技术通过更逼真的赌场还原以及更流畅的服务，为客户提供全新的体验', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/1.png' },
-  '40000': { code: '40000', name: '电子游戏', url: 'http://tigergame.na12345.com/admin/api/checkLoginAccess', desc: 'NA电子游戏融合了传统的经典电子游戏加入了更加多元化的题材以及更加具有娱乐性的玩法让更多的玩家有丰富的游戏体验', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/4.png' },
-  '50000': { code: '50000', name: '街机游戏', url: 'http://tigergame.na12345.com/admin/api/checkLoginAccess', desc: 'NA街机游戏', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/1.png' }
+  '10000': { company: 'NA', code: '10000', name: 'NA棋牌游戏', url: 'http://tablegame.na12345.com/admin/api/checkLoginAccess', desc: '网络棋牌游戏正在被大家慢慢接受和喜欢我们把传统的棋牌游戏进行重新定义加上全新的呈现技术灵活的运营模式，推出了NA棋牌的产品序列', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/2.png' },
+  '30000': { company: 'NA', code: '30000', name: 'NA真人视讯', url: 'http://lgate.na12345.com/gate/player/login', desc: '我们集合了当下最流行的真人视讯游戏类型整合了全新的互联网直播技术通过更逼真的赌场还原以及更流畅的服务，为客户提供全新的体验', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/1.png' },
+  '40000': { company: 'NA', code: '40000', name: 'NA电子游戏', url: 'http://tigergame.na12345.com/admin/api/checkLoginAccess', desc: 'NA电子游戏融合了传统的经典电子游戏加入了更加多元化的题材以及更加具有娱乐性的玩法让更多的玩家有丰富的游戏体验', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/4.png' },
+  '50000': { company: 'NA', code: '50000', name: 'NA街机游戏', url: 'http://tigergame.na12345.com/admin/api/checkLoginAccess', desc: 'NA街机游戏', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/1.png' },
+  '1010000': { company: 'TTG', code: '1010000', name: 'TTG电子游戏', url: 'https://ams-bo.stg.ttms.co:9443/cb5/', desc: 'TTG电子游戏', imgurl: 'https://d38xgux2jezyfx.cloudfront.net/1.png' }
 }
