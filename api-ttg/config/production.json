@@ -23,8 +23,8 @@
     },
     "ttg":{
         "tokenurl":"https://ams-api.stg.ttms.co:8443/cip/gametoken/",
-        "gameType":"1000000",
-        "gameKey":""
+        "gameType":"1010000",
+        "gameKey":"028c6678-8db5-4805-bf49-60aa4d83f3e8"
     },
     "server": {
         "port": 3000,

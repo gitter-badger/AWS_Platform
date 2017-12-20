@@ -88,7 +88,7 @@ module.exports = class PlayerModel extends BaseModel {
             originalAmount: player.balanceCache,
             balance: amtAfter,
             action: parseFloat(data.amt) < 0 ? -1 : 1,
-            mix: player.vedioMix,   // 暂时使用电子游戏洗码比
+            mix: player.vedioMix,   // TODO:暂时使用电子游戏洗码比
             rate: player.rate,
             type: (data.txnsubtypeid == '400' || data.txnsubtypeid == '450') ? 3 : 4
         })

@@ -13,8 +13,8 @@ const log = require('tracer').colorConsole({ level: config.log.level })
 // 持久层相关
 const DefaultMixRateEnum = require('./lib/Consts')
 const PlayerModel = require('./model/PlayerModel')
-const redis = require('redis')
-const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
+// const redis = require('redis')
+// const redisClient = redis.createClient({ url: 'redis://redis-19126.c1.ap-southeast-1-1.ec2.cloud.redislabs.com:19126' })
 /**
  * 获取玩家TOKEN
  */
@@ -42,8 +42,8 @@ router.post('/api/balance', async function (ctx, next) {
     if (_.isEmpty(player)) {
         ctx.body = '<cw type="getBalanceResp" err="1000" />'
     } else {
-        await cacheSet(ctx.request.body.cw.$.acctid, player.balance.toString())
-        ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + player.balance + '" err="0" />'
+        // await cacheSet(ctx.request.body.cw.$.acctid, player.balance.toString())
+        ctx.body = '<cw type="getBalanceResp" cur="CNY" amt="' + player.balanceCache + '" err="0" />'
     }
 })
 /**
@@ -61,12 +61,12 @@ router.post('/api/fund', async function (ctx, next) {
     }
     // 2、计算玩家实时余额和更新
     // const amtBefore = player.balanceCache
-    const amtBefore = await cacheGet(ctx.request.body.cw.$.acctid)
-    const amtAfter = (parseFloat(amtBefore) + parseFloat(ctx.request.body.cw.$.amt)).toFixed(2)
-    // ctx.request.body.cw.$.gameType = config.ttg.gameType
-    // await new PlayerModel().updateBalanceCache(player, ctx.request.body.cw.$, amtAfter)
+    // const amtBefore = await cacheGet(ctx.request.body.cw.$.acctid)
+    const amtAfter = (parseFloat(player.balanceCache) + parseFloat(ctx.request.body.cw.$.amt)).toFixed(2)
+    ctx.request.body.cw.$.gameType = config.ttg.gameType    // TODO:从配置文件获取游戏类型，未来考虑自动获取
+    await new PlayerModel().updateBalanceCache(player, ctx.request.body.cw.$, amtAfter)
 
-    await cacheSet(ctx.request.body.cw.$.acctid, amtAfter.toString())
+    // await cacheSet(ctx.request.body.cw.$.acctid, amtAfter.toString())
     // 3、返回实时余额
     ctx.body = '<cw type="fundTransferResp" cur="CNY" amt="' + amtAfter + '" err="0" />'
 })
@@ -82,17 +82,17 @@ router.get('/api/ttglogout/:gameId/:userId/:token', async function (ctx, next) {
         records: [],
         zlib: 1
     }
-    const sign = getSign('gameKey', ['gameId', 'timestamp', 'records'], data)
+    const sign = getSign(config.ttg.gameKey, ['gameId', 'timestamp', 'records'], data)
     data.sign = sign
     // 登出NA平台
-    // const res = await axios.post(config.na.settlementurl, data)
-    // if (res.data.code == 0) {
-    // 登出TTG
-    const res = await axios.delete(config.ttg.tokenurl + ctx.params.token)
-    ctx.body = { code: 0, msg: '退出成功' }
-    // } else {
-    //     ctx.body = { code: -1, msg: '退出失败，请重试' }
-    // }
+    const res = await axios.post(config.na.settlementurl, data)
+    if (res.data.code == 0) {
+        // 登出TTG
+        const res = await axios.delete(config.ttg.tokenurl + ctx.params.token)
+        ctx.body = { code: 0, msg: '退出成功' }
+    } else {
+        ctx.body = { code: -1, msg: '退出失败，请重试' }
+    }
 })
 
 // 数据签名
@@ -129,21 +129,21 @@ function xmlParse(xml) {
         })
     })
 }
-function cacheGet(key) {
-    return new Promise((reslove, reject) => {
-        redisClient.get(key, (err, value) => {
-            if (err) reject(err)
-            reslove(value)
-        })
-    })
-}
-function cacheSet(key, value) {
-    return new Promise((reslove, reject) => {
-        redisClient.set(key, value, (err) => {
-            if (err) reject(err)
-            reslove(value)
-        })
-    })
-}
+// function cacheGet(key) {
+//     return new Promise((reslove, reject) => {
+//         redisClient.get(key, (err, value) => {
+//             if (err) reject(err)
+//             reslove(value)
+//         })
+//     })
+// }
+// function cacheSet(key, value) {
+//     return new Promise((reslove, reject) => {
+//         redisClient.set(key, value, (err) => {
+//             if (err) reject(err)
+//             reslove(value)
+//         })
+//     })
+// }
 
 module.exports = router
