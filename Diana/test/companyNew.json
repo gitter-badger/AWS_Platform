@@ -15,14 +15,16 @@
         }
     },
     "body": {
-        "companyName": "111",
+        "companyName": "232",
         "companyDesc": "111",
         "companyContact": "联系人一号",
         "companyContactWay": "111",
         "companyEmail": "sda@qq.com",
         "companyRegion": "1",
         "companyContract": "",
-        "license": "11",
-        "remark": "sadadsa"
+        "license": "",
+        "remark": "sadadsa",
+        "companyIden": "0AB",
+        "companyType": 1
     }
 }

@@ -14,10 +14,8 @@ const companyNew = async (e, c, cb) => {
     const [checkAttError, errorParams] = new CompanyCheck().checkCompany(companyInfo)
     // 获取令牌，只有管理员有权限
     const [tokenErr, token] = await Model.currentRoleToken(e, RoleCodeEnum['PlatformAdmin'])
-
     // 业务操作
     const [addCompanyErr, addCompanyRet] = await new CompanyModel().addCompany(companyInfo)
-
     // 操作日志记录
     companyInfo.operateAction = '创建厂商'
     companyInfo.operateToken = token
@@ -26,6 +24,7 @@ const companyNew = async (e, c, cb) => {
     if (addCompanyErr) { return ResErr(cb, addCompanyErr) }
     return ResOK(cb, { payload: addCompanyRet })
   } catch (error) {
+    console.log(error)
     return ResErr(cb, error)
   }
 }

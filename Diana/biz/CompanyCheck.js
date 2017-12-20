@@ -15,7 +15,8 @@ export class CompanyCheck {
             { name: "companyDesc", type: "NS", min: 2, max: 200 },
             { name: "companyContract", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL },
             { name: "license", type: "NREG", min: null, max: null, equal: athena.RegEnum.URL },
-            { name: "remark", type: "NS", min: 2, max: 200 }
+            { name: "remark", type: "NS", min: 2, max: 200 },
+            { name: "companyIden", type: "REG", min: null, max: null, equal: athena.RegEnum.COMPANYIDEN }
         ], inparam)
 
         if (checkAttError) {
@@ -31,7 +32,8 @@ export class CompanyCheck {
         inparam.companyContract = inparam.companyContract || Model.StringValue
         inparam.license = inparam.license || Model.StringValue
         inparam.remark = inparam.remark || Model.StringValue
-
+        inparam.companyIden = inparam.companyIden.toUpperCase()
+        inparam.companyType = parseInt(inparam.companyType)
         return [checkAttError, errorParams]
     }
 

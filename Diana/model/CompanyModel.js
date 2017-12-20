@@ -30,15 +30,28 @@ export class CompanyModel extends BaseModel {
                 ':companyName': companyInfo.companyName
             }
         })
+        
         if (exist) {
             return [BizErr.ItemExistErr('运营商已存在'), 0]
         }
+        //判断运营商标识是否重复
+        const [err, ret] = await this.scan({
+            FilterExpression: 'companyIden = :companyIden',
+            ExpressionAttributeValues: {
+                ':companyIden': companyInfo.companyIden
+            }
+        })
+        if (ret.Items.length != 0) {
+            return [BizErr.ItemExistErr('运营商标识已存在'), 0]
+        }
+
         const dataItem = {
             ...this.item,
             ...companyInfo
         }
         // 保存
         const [putErr, putRet] = await this.putItem(dataItem)
+        
         return [0, dataItem]
     }
 

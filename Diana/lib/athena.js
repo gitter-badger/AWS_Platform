@@ -262,7 +262,8 @@ export const RegEnum = {
     RATE: /^(\d{1,2}(\.\d{1,2})?|100(\.0{1,2})?)$/,
     PRICE: /^[0-9]+([.]{1}[0-9]{1,2})?$/,
 
-    NUMBER: /^[0-9]+$/
+    NUMBER: /^[0-9]+$/,
+    COMPANYIDEN:/^[A-Z0-9]{1,6}$/
 }
 
 export class Util {
