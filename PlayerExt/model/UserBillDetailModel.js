@@ -136,7 +136,7 @@ export class UserBillDetailModel extends athena.BaseModel {
                 amount : 0,   //下注金额
                 rate : 0, //成数
                 balance : 0,  //结算金额
-                mix : 0,  //洗马比
+                mix : 1,  //洗马比
                 reAmount : 0,  //返还金额
                 deAmount : 0,  //净利
                 balance : 0,   //返还后余额
@@ -150,7 +150,7 @@ export class UserBillDetailModel extends athena.BaseModel {
                     roundBill.createdAt = item.createdAt;
                     roundBill.businessKey= item.businessKey;
                     roundBill.rate = item.rate || 0;
-                    roundBill.mix = item.mix || 0;
+                    roundBill.mix = item.mix || 1;
                     if(roundBill.originalAmount < item.originalAmount || roundBill.originalAmount == 0) {
                         roundBill.originalAmount = item.originalAmount;
                     }

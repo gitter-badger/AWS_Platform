@@ -4,8 +4,8 @@ import { UserModel } from './model/UserModel'
 import { AdminModel } from './model/AdminModel'
 import { LogModel } from './model/LogModel'
 import { BillModel } from './model/BillModel'
-
 import { UserCheck } from './biz/UserCheck'
+import {PushModel} from "./model/PushModel"
 import _ from 'lodash'
 /**
  * 创建管理员帐号
@@ -143,9 +143,16 @@ const userChangeStatus = async (e, c, cb) => {
 
         // 更新所有子用户状态
         const [allChildErr, allChildRet] = await new UserModel().listAllChildUsers(user)
+        const merchantUids = []
         for (let child of allChildRet) {
             child.status = inparam.status
             new UserModel().userUpdate(child)
+            if(child.role == "100") {
+                merchantUids.push(child.userId);
+            }
+        }
+        if(inparam.status == StatusEnum.Disable) {
+            new PushModel().pushForzen({type:2, uids:merchantUids})
         }
         // 结果返回
         if (err) { ResErr(cb, err) }
