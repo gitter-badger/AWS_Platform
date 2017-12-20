@@ -18,6 +18,8 @@ import {UserBillModel, Type} from "./model/UserBillModel";
 
 import {MerchantBillModel} from "./model/MerchantBillModel";
 
+import {PushModel} from "./model/PushModel";
+
 import {UserBillDetailModel} from "./model/UserBillDetailModel";
 
 import {Util} from "./lib/Util"
@@ -25,6 +27,7 @@ import {Util} from "./lib/Util"
 import {RoleCodeEnum} from "./lib/Consts";
 
 import { TokenModel } from './model/TokenModel'
+
 
 
 const ResOK = (callback, res) => callback(null, ReHandler.success(res))
@@ -301,6 +304,10 @@ export async function gamePlayerForzen(event, context, cb){
       return ResFail(cb, err);
   }
   let type = state == State.normal ?  "jiesuo" : "suoding";
+  if(state == State.forzen) {
+    new PushModel().pushForzen({type:1, uids:[us.userId]});
+  }
+  
   successHandler(cb, {state}, type, tokenInfo, us);
 //   ResOK(cb, {state});
 }
@@ -339,6 +346,7 @@ export async function batchForzen(event, context, cb){
   } 
   let names = requestParams.names;
   let state = +requestParams.state;
+  let uids = [];
   for(let i = 0; i < names.length; i++){
     let userName = names[i];
     let userModel = new UserModel();
@@ -348,6 +356,10 @@ export async function batchForzen(event, context, cb){
     if(err) {
       return ResFail(cb, err);
     }
+    uids.push(us.userId);
+  }
+  if(state == State.forzen) {
+    new PushModel().pushForzen({type:1, uids});
   }
   let type = state == State.normal ?  "jiesuo" : "suoding";
   successHandler(cb, {state}, type, tokenInfo, {});
